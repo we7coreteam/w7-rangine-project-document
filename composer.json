@@ -1,0 +1,34 @@
+{
+	"name": "w7/rangine",
+	"type": "project",
+	"description": "基于 Swoole 的常驻内存型 PHP 高性能框架",
+	"license": "Apache-2.0",
+	"keywords": [
+		"we7",
+		"swoole"
+	],
+	"homepage": "https://www.rangine.com/",
+	"authors": [
+		{
+			"name": "we7team",
+			"email": "donknap@gmail.com"
+		}
+	],
+	"autoload": {
+		"psr-4": {
+			"W7\\App\\": "app/",
+			"W7\\Tests\\" : "tests/"
+		},
+		"files": [
+			"config/define.php",
+			"app/Helper/Functions.php"
+		]
+	},
+	"require": {
+		"w7/swoole": "^1.0"
+	},
+	"require-dev": {
+		"eaglewu/swoole-ide-helper": "dev-master",
+		"phpunit/phpunit": "^7.0"
+	}
+}

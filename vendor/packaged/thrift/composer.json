@@ -1,0 +1,16 @@
+{
+  "name":              "packaged/thrift",
+  "description":       "Apache Thrift",
+  "keywords":          ["thrift", "apache"],
+  "homepage":          "http://thrift.apache.org/",
+  "minimum-stability": "stable",
+  "license":           "Apache-2.0",
+  "require":           {
+    "php": "^5.5 || ^7.0"
+  },
+  "autoload":          {
+    "psr-4": {
+      "Thrift\\": "src/"
+    }
+  }
+}

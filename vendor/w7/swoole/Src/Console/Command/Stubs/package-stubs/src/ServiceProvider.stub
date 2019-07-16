@@ -1,0 +1,25 @@
+<?php
+
+namespace {{ namespace }};
+
+use W7\Core\Provider\ProviderAbstract;
+
+class ServiceProvider extends ProviderAbstract{
+	/**
+	 * Register any application services.
+	 *
+	 * @return void
+	 */
+	public function register() {
+		$this->registerRoute('api.php');
+	}
+
+	/**
+	 * Bootstrap any application services.
+	 *
+	 * @return void
+	 */
+	public function boot() {
+
+	}
+}
