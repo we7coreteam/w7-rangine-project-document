@@ -38,7 +38,7 @@ return [
 		'default' => [
 			'driver' => 'mysql',
 			'database' => 'we7_api',
-			'host' => '172.16.1.13',
+			'host' => '192.168.11.200',
 			'username' => 'root',
 			'password' => '123456',
 			'charset' => 'utf8',
@@ -49,10 +49,10 @@ return [
 		'addons' => [
 			'driver' => 'mysql',
 			'read' => [
-				'host' => ['172.16.1.152'],
+				'host' => ['192.168.11.200'],
 			],
 			'write' => [
-				'host' => '172.16.1.12'
+				'host' => '192.168.11.200'
 			],
 			'database' => 'we7_addons_api',
 			'username' => 'root',

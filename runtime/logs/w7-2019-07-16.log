@@ -1,0 +1,9 @@
+[2019-07-16 18:28:58] [workid:0 coid:2] stack.ERROR: Uncaught Exception W7\Core\Exception\HttpException: "Route not found" at /home/wwwroot/document-apiserver/vendor/w7/swoole/Src/Core/Dispatcher/RequestDispatcher.php line 70 {"exception":"[object] (W7\\Core\\Exception\\HttpException(code: 404): Route not found at /home/wwwroot/document-apiserver/vendor/w7/swoole/Src/Core/Dispatcher/RequestDispatcher.php:70)
+[stacktrace]
+#0 /home/wwwroot/document-apiserver/vendor/w7/swoole/Src/Core/Dispatcher/RequestDispatcher.php(32): W7\\Core\\Dispatcher\\RequestDispatcher->getRoute(Object(W7\\Http\\Message\\Server\\Request), Object(FastRoute\\Dispatcher\\GroupCountBased))
+#1 /home/wwwroot/document-apiserver/vendor/w7/swoole/Src/Http/Listener/RequestListener.php(43): W7\\Core\\Dispatcher\\RequestDispatcher->dispatch(Object(W7\\Http\\Message\\Server\\Request), Object(W7\\Http\\Message\\Server\\Response))
+#2 /home/wwwroot/document-apiserver/vendor/w7/swoole/Src/Http/Listener/RequestListener.php(23): W7\\Http\\Listener\\RequestListener->dispatch(Object(Swoole\\Http\\Server), Object(Swoole\\Http\\Request), Object(Swoole\\Http\\Response))
+#3 /home/wwwroot/document-apiserver/vendor/w7/swoole/Src/Core/Server/ServerAbstract.php(313): W7\\Http\\Listener\\RequestListener->run(Object(Swoole\\Http\\Server), Object(Swoole\\Http\\Request), Object(Swoole\\Http\\Response))
+#4 {main}
+"} []
+
