@@ -12,13 +12,13 @@ class BaseLogic extends LogicAbstract {
 
 
     //获取缓存
-    public function get($key)
+    public function get($key,$default=null)
     {
-        return $this->getCache()->get($this->generateKey($key));
+        return $this->getCache()->get($this->generateKey($key),$default);
     }
 
     //设置缓存
-    public function set($key,$value,$ttl=null)
+    public function set($key,$value,$ttl=36000)
     {
         $this->getCache()->set($this->generateKey($key),$value,$ttl);
     }

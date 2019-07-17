@@ -16,15 +16,16 @@ class TestController extends Controller{
         try{
             $this->validate($request, [
                 'name' => 'required|max:255',
-                'body' => 'required',
+                'id' => 'required',
             ],[
-                'body.required' => 'body必填',
+                'id.required' => 'id必填',
             ]);
 
             $name = $request->input('name');
-            $res = $this->logic->addUser($name);
+            $id = $request->input('id');
+//            $res = $this->logic->addUser($name);
+            $res = $this->logic->getUser($id);
             return $this->success($res);
-
         }catch (\Exception $e){
             return $this->error($e->getMessage());
         }

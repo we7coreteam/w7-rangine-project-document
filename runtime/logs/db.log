@@ -1,9 +1,27 @@
-[2019-07-17 12:50:12] [workid:0 co/task:2] database.DEBUG: default create connection , count 0. busy count 1 [] []
+[2019-07-17 14:00:19] [workid:0 co/task:2] database.DEBUG: default create connection , count 0. busy count 1 [] []
 
 
-[2019-07-17 12:50:12] [workid:0 co/task:2] database.DEBUG: insert into `tests` (`name`, `updated_at`, `created_at`) values (?, ?, ?), params: tt,1563339012,1563339012 [] []
+[2019-07-17 14:00:19] [workid:0 co/task:2] database.DEBUG: select * from `tests` where `tests`.`id` = ? limit 1, params: 1 [] []
 
 
-[2019-07-17 12:50:12] [workid:0 co/task:2] database.DEBUG: default release push connection , count 1. busy count 0 [] []
+[2019-07-17 14:00:19] [workid:0 co/task:2] database.DEBUG: default release push connection , count 1. busy count 0 [] []
+
+
+[2019-07-17 14:00:26] [workid:0 co/task:8] database.DEBUG: default get by queue , count 1 [] []
+
+
+[2019-07-17 14:00:26] [workid:0 co/task:8] database.DEBUG: select * from `tests` where `tests`.`id` = ? limit 1, params: 2 [] []
+
+
+[2019-07-17 14:00:26] [workid:0 co/task:8] database.DEBUG: default release push connection , count 1. busy count 0 [] []
+
+
+[2019-07-17 14:00:38] [workid:0 co/task:13] database.DEBUG: default get by queue , count 1 [] []
+
+
+[2019-07-17 14:00:38] [workid:0 co/task:13] database.DEBUG: select * from `tests` where `tests`.`id` = ? limit 1, params: 8 [] []
+
+
+[2019-07-17 14:00:38] [workid:0 co/task:13] database.DEBUG: default release push connection , count 1. busy count 0 [] []
 
 
