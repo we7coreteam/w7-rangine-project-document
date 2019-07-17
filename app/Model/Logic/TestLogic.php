@@ -23,7 +23,9 @@ class TestLogic extends BaseLogic
             $user->from = 'cache';
         }else{
             $user = Test::find($id);
-            $this->set('user_'.$id,$user);
+            if($user){
+                $this->set('user_'.$id,$user);
+            }
         }
         return $user;
     }

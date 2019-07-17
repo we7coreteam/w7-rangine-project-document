@@ -25,7 +25,10 @@ class TestController extends Controller{
             $id = $request->input('id');
 //            $res = $this->logic->addUser($name);
             $res = $this->logic->getUser($id);
-            return $this->success($res);
+            if($res){
+                return $this->success($res);
+            }
+            return $this->error('用户不存在');
         }catch (\Exception $e){
             return $this->error($e->getMessage());
         }
