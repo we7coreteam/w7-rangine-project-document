@@ -31,13 +31,14 @@ class BaseLogic extends LogicAbstract {
 
     public function getCache()
     {
-        if(!$this->cache){
+        if(!$this->cache) {
             $this->cache = new Cache();
         }
         return $this->cache;
     }
 
-    public function generateKey($key){
+    public function generateKey($key)
+    {
         return $this->prefix.$key;
     }
 

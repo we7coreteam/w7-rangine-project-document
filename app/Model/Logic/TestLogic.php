@@ -5,6 +5,7 @@ namespace W7\App\Model\Logic;
 
 
 use W7\App\Model\Entity\Test;
+use W7\App\Model\Service\Api\TestApi;
 
 class TestLogic extends BaseLogic
 {
@@ -16,6 +17,8 @@ class TestLogic extends BaseLogic
 
     public function getUser($id)
     {
+        $testapi = new TestApi();
+        return $testapi->getTraceid();
         $cacheUser = $this->get('user_'.$id);
         if($cacheUser){
             $user = $cacheUser;
