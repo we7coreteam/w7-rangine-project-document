@@ -9,6 +9,7 @@ use W7\Http\Message\Server\Request;
 class TestController extends Controller{
     public function __construct()
     {
+        //１１１
         $this->logic = new TestLogic();
     }
 
