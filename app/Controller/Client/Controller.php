@@ -7,6 +7,8 @@ use W7\Core\Controller\ControllerAbstract;
 
 
 class Controller extends ControllerAbstract {
+    protected $logic = null;
+
     public function success($data,$message='ok')
     {
         return [
@@ -24,4 +26,5 @@ class Controller extends ControllerAbstract {
             'message' => $message,
         ];
     }
+
 }

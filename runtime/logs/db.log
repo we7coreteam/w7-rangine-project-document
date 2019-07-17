@@ -1,0 +1,9 @@
+[2019-07-17 12:50:12] [workid:0 co/task:2] database.DEBUG: default create connection , count 0. busy count 1 [] []
+
+
+[2019-07-17 12:50:12] [workid:0 co/task:2] database.DEBUG: insert into `tests` (`name`, `updated_at`, `created_at`) values (?, ?, ?), params: tt,1563339012,1563339012 [] []
+
+
+[2019-07-17 12:50:12] [workid:0 co/task:2] database.DEBUG: default release push connection , count 1. busy count 0 [] []
+
+

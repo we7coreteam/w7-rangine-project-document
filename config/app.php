@@ -23,7 +23,7 @@ return [
 	'cache' => [
 		'default' => [
 			'driver' => 'redis',
-			'host' => '',
+			'host' => 'redis',
 			'port' => '6379',
 			'timeout' => 30,
 		],
@@ -37,13 +37,13 @@ return [
 	'database' => [
 		'default' => [
 			'driver' => 'mysql',
-			'database' => 'we7_api',
+			'database' => 'document',
 			'host' => '192.168.11.200',
 			'username' => 'root',
 			'password' => '123456',
 			'charset' => 'utf8',
 			'collation' => 'utf8_unicode_ci',
-			'prefix' => 'ims_',
+			'prefix' => '',
 			'port' =>'3306',
 		],
 		'addons' => [
@@ -54,12 +54,12 @@ return [
 			'write' => [
 				'host' => '192.168.11.200'
 			],
-			'database' => 'we7_addons_api',
+			'database' => 'document',
 			'username' => 'root',
 			'password' => '123456',
 			'charset' => 'utf8',
 			'collation' => 'utf8_unicode_ci',
-			'prefix' => 'ims_',
+			'prefix' => '',
 			'port'=>'3306',
 		],
 	],
