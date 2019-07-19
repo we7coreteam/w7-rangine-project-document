@@ -25,7 +25,8 @@
 		]
 	},
 	"require": {
-		"w7/swoole": "^1.0"
+		"w7/swoole": "^1.0",
+		"gregwar/captcha": "^1.1"
 	},
 	"require-dev": {
 		"eaglewu/swoole-ide-helper": "dev-master",
