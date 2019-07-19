@@ -18,7 +18,7 @@ class UserController extends Controller {
             'name.required' => '请输入用户姓名',
             'password.required' => '请输入用户密码'
         ]);
-        
+
         $data = [
             'uid' => $request->input('name'),
             'username' => 'rangine'

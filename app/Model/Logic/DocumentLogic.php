@@ -16,8 +16,15 @@ class DocumentLogic extends BaseLogic
         return $document;
     }
 
-    public function getDocuments($page)
+    public function getDocuments($page,$size,$category,$allow_ids)
     {
-        return Document::select('id','name','icon','sort','is_show','category_id')->paginate(10,null,null,$page);
+        return Document::select('id','name','icon','sort','is_show','category_id')
+            ->when($category,function($query) use($category){
+                return $query->where('category_id',$category);
+            })
+            ->when($allow_ids,function($query) use($allow_ids){
+                return $query->whereIn('id',$allow_ids);
+            })
+            ->paginate($size,null,null,$page);
     }
 }

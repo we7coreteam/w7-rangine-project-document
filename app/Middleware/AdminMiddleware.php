@@ -21,13 +21,14 @@ class AdminMiddleware extends MiddlewareAbstract {
 //        $key =App\Model\Service\EncryptorLogic::encrypt('1503343424_1');
 //        $cache->set($key,1);
 //        return App::getApp()->getContext()->getResponse()->json($key);
+
         $token = $request->input('document_access_token');
         if(!$token){
-            return App::getApp()->getContext()->getResponse()->json(['message'=>'缺少用户票据','data'=>null,'status'=>false]);
+            return App::getApp()->getContext()->getResponse()->json(['message'=>'缺少用户票据','data'=>null,'status'=>false,'code'=>444]);
         }
         $access_token = $cache->get($token);
         if(!$access_token){
-            return App::getApp()->getContext()->getResponse()->json(['message'=>'错误的票据','data'=>null,'status'=>false]);
+            return App::getApp()->getContext()->getResponse()->json(['message'=>'错误的票据','data'=>null,'status'=>false,'code'=>444]);
         }
         $request->document_user_id = $access_token;
         $logic = new App\Model\Logic\UserAuthorizationLogic();

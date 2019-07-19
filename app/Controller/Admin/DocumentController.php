@@ -13,10 +13,24 @@ class DocumentController extends Controller
 
     public function index(Request $request)
     {
-//        return $request->document_user_id;
         try{
-            $page = $request->input('page');
-            $result = $this->logic->getDocuments($page);
+            $auth = $request->document_user_auth;
+
+            if($auth === APP_AUTH_ALL){
+                $allow_ids = [];
+            }else{
+                $allow_ids = [0];
+                foreach($auth['document'] as $document){
+                    if($document['can_read']){
+                        $allow_ids[] = $document['function_id'];
+                    }
+                }
+            }
+
+            $page = $request->input('page',1);
+            $category = $request->input('category_id',0);
+            $size = $request->input('size',10);
+            $result = $this->logic->getDocuments($page,$size,$category,$allow_ids);
             return $this->success($result);
         }catch (\Exception $e){
             return $this->error($e->getMessage());
