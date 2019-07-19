@@ -14,6 +14,7 @@ class UserAuthorizationLogic extends BaseLogic
             throw new \Exception('设置失败，该用户是特权用户！');
         }
         $items['document'] = Document::select('id','name')->get()->toArray();
+        array_unshift($items['document'],['id'=>0,'name'=>'新增','checked'=>0,'type' => 'overall']); //新增权限 不与 某条记录对应，标记为overall类型
         $old_documents = UserAuthorization::where('user_id',$user_id)->where('function_name','document')->get()->keyBy('function_id');
         foreach($items['document'] as $k=>$v){
             if(isset($old_documents[$v['id']])){
@@ -31,6 +32,14 @@ class UserAuthorizationLogic extends BaseLogic
             }else{
                 $items['document'][$k]['checked'] = 1;
             }
+
+            if(isset($old_documents[$v['id']]) && $v['id'] < 1){
+                $items['document'][$k]['checked'] = 1;
+            }
+
+            if($v['id'] > 0){
+                $items['document'][$k]['type'] = 'partial'; //文档权限　与　某条具体的记录对应，标记为partial类型
+            }
         }
         return $items;
     }
@@ -45,6 +54,7 @@ class UserAuthorizationLogic extends BaseLogic
         $modify_array = [];
         $documents = $auth['document'];
         $old_documents = UserAuthorization::where('user_id',$user_id)->where('function_name','document')->get()->keyBy('function_id');
+
         foreach ($documents as $document)
         {
             $id = $document['id'];
@@ -67,11 +77,12 @@ class UserAuthorizationLogic extends BaseLogic
         //删除
         foreach($old_documents as $old)
         {
-            if(!in_array($old['id'],$modify_array)){
+            if(!in_array($old['function_id'],$modify_array)){
                 $old->delete();
             }
         }
         $this->delete('auth_'.$user_id);
+        return true;
     }
 
     public function getUserAuthorizations($user_id)
@@ -89,7 +100,7 @@ class UserAuthorizationLogic extends BaseLogic
         }else{
             return [];
         }
-        $auth = UserAuthorization::where('user_id',$user_id)->get()->toArray();
+        $auth['document'] = UserAuthorization::where('user_id',$user_id)->where('function_name','document')->get()->keyBy('function_id')->toArray();
         $this->set('auth_'.$user_id,$auth);
         return $auth;
     }

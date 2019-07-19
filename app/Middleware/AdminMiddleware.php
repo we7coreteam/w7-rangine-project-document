@@ -16,8 +16,11 @@ use W7\Core\Middleware\MiddlewareAbstract;
 
 class AdminMiddleware extends MiddlewareAbstract {
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface {
-        //这里是中间件一些代码 C6F3U6FDgQLBFRRbAAo0o0o
+        //这里是中间件一些代码 C6F3U6FDgQLBFRRbAAo0o0o CdF3UdFDg8KBFVXB24A
         $cache = new Cache();
+//        $key = App\Model\Service\EncryptorLogic::encrypt('1419923324_2');
+//        $cache->set($key,2);
+//        dd($key);
         $token = $request->input('document_access_token');
         if(!$token){
             return App::getApp()->getContext()->getResponse()->json(['message'=>'缺少用户票据','data'=>null,'status'=>false,'code'=>444]);
