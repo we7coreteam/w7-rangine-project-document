@@ -1,7 +1,7 @@
 <?php
 
 irouter()->middleware('AdminMiddleware')->group(['prefix'=>'/admin'],function(\W7\Core\Route\Route $route){
-    $route->get('/user/adduser', 'Admin\UserController@addUser');
+    $route->post('/user/adduser', 'Admin\UserController@addUser');
 
     $route->get('/document/index', 'Admin\DocumentController@index');
     $route->get('/document/create', 'Admin\DocumentController@create');
