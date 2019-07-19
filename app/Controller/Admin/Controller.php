@@ -18,11 +18,11 @@ class Controller extends ControllerAbstract {
         ];
     }
 
-    public function error($message='fail')
+    public function error($message='fail',$data=[])
     {
         return [
             'status' => false,
-            'data' => null,
+            'data' => $data,
             'message' => $message,
         ];
     }

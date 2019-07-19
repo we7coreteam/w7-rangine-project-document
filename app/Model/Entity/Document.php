@@ -8,6 +8,13 @@ namespace W7\App\Model\Entity;
 
 
 class Document extends BaseModel {
+//    protected $casts = [
+//        'is_show' => 'boolean',
+//        'sort' => 'integer'
+//    ];
 
-
+    public static function getDescriptionId($id)
+    {
+        return 'document_'.$id;
+    }
 }

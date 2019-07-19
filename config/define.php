@@ -14,3 +14,6 @@
 ! defined('APP_PATH') && define('APP_PATH', BASE_PATH. DIRECTORY_SEPARATOR. 'app');
 ! defined('RUNTIME_PATH') && define('RUNTIME_PATH', BASE_PATH. DIRECTORY_SEPARATOR. 'runtime');
 ! defined('CDN_URL') && define('CDN_URL', "//cdn.w7.cc/");
+
+//应用常量
+! defined('APP_AUTH_ALL') && define('APP_AUTH_ALL', 'all');
