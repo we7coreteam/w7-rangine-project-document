@@ -7,7 +7,8 @@ irouter()->middleware('AdminMiddleware')->group(['prefix'=>'/admin'],function(\W
     $route->get('/verificationcode/getcode', 'Admin\VerificationcodeController@getCode'); // 获取验证码
 
     $route->get('/document/index', 'Admin\DocumentController@index');
-    $route->get('/document/create', 'Admin\DocumentController@create');
+    $route->post('/document/create', 'Admin\DocumentController@create');
+    $route->post('/document/update', 'Admin\DocumentController@update');
 
     $route->get('/auth/index', 'Admin\UserAuthorizationController@index');
     $route->post('/auth/update', 'Admin\UserAuthorizationController@update');

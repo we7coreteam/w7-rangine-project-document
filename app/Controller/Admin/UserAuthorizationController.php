@@ -29,6 +29,9 @@ class UserAuthorizationController extends Controller
     {
         //auth = {"document":[{"id":0},{"id":1,"can_read":1,"can_modify":0,"can_delete":0},{"id":2,"can_read":1,"can_modify":1,"can_delete":1}]}
         try{
+            if($request->document_user_auth !== APP_AUTH_ALL){
+                return $this->error('无权操作');
+            }
             $auth = json_decode($request->input('auth','{}'),1);
             $user_id = $request->input('user_id');
             if(!$user_id){
