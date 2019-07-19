@@ -20,11 +20,11 @@ class AdminMiddleware extends MiddlewareAbstract {
         $cache = new Cache();
         $token = $request->input('document_access_token');
         if(!$token){
-            return App::getApp()->getContext()->getResponse()->json(['message'=>'缺少用户票据','data'=>null,'status'=>false]);
+            return App::getApp()->getContext()->getResponse()->json(['message'=>'缺少用户票据','data'=>null,'status'=>false,'code'=>444]);
         }
         $access_token = $cache->get($token);
         if(!$access_token){
-            return App::getApp()->getContext()->getResponse()->json(['message'=>'错误的票据','data'=>null,'status'=>false]);
+            return App::getApp()->getContext()->getResponse()->json(['message'=>'错误的票据','data'=>null,'status'=>false,'code'=>444]);
         }
         $request->document_user_id = $access_token;
         $logic = new App\Model\Logic\UserAuthorizationLogic();
