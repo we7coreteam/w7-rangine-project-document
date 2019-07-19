@@ -40,23 +40,36 @@ class DocumentController extends Controller
     public function create(Request $request)
     {
         try{
+            $auth = $request->document_user_auth;
+
+            if($auth !== APP_AUTH_ALL){
+                if(!isset($auth['document'][0])){
+                    return $this->error('没有创建文档的权限!');
+                }
+            }
+
+            $this->logic->checkRepeatRequest($request->document_user_id);
+
             $this->validate($request, [
                 'name' => 'string|required|max:30',
                 'sort' => 'integer|min:0',
+                'category_id' => 'integer|min:1',
                 'content' => 'required'
             ],[
                 'name.required' => '文档名称必填',
                 'name.max' => '文档名最大３０个字符',
                 'sort.min' => '排序最小值为０',
-                'content.required' => '文档内容必填'
+                'content.required' => '文档内容必填',
+                'category_id.required' => '分类id必填',
             ]);
 
-            $data['creator_id'] = 1;
+            $data['creator_id'] = $request->document_user_id;
             $data['name'] = $request->input('name');
             $data['icon'] = $request->input('icon','');
             $content = $request->input('content');
             $data['is_show'] = $request->input('is_show',1);
             $data['sort'] = $request->input('sort',0);
+            $data['category_id'] = $request->input('category_id');
 
             $result = $this->logic->createDocument($data,$content);
             if($result){
@@ -67,4 +80,64 @@ class DocumentController extends Controller
             return $this->error($e->getMessage());
         }
     }
+
+    public function update(Request $request)
+    {
+        try{
+            $auth = $request->document_user_auth;
+            $id = $request->input('id');
+            if(!$id){
+                return $this->error('id必传');
+            }
+
+            if($auth !== APP_AUTH_ALL){
+                if(!isset($auth['document'][$id]) || $auth['document'][$id]['can_modify'] == 0){
+                    return $this->error('没有创建文档的权限!');
+                }
+            }
+
+            $this->logic->checkRepeatRequest($request->document_user_id);
+
+            $this->validate($request, [
+                'name' => 'string|required|max:30',
+                'sort' => 'integer|min:0',
+                'category_id' => 'integer|min:1',
+                'content' => 'required'
+            ],[
+                'name.required' => '文档名称必填',
+                'name.max' => '文档名最大３０个字符',
+                'sort.min' => '排序最小值为０',
+                'content.required' => '文档内容必填',
+                'category_id.required' => '分类id必填',
+            ]);
+
+            $data['creator_id'] = $request->document_user_id;
+            $data['name'] = $request->input('name');
+            $data['icon'] = $request->input('icon','');
+            $content = $request->input('content');
+            $data['is_show'] = $request->input('is_show',1);
+            $data['sort'] = $request->input('sort',0);
+            $data['category_id'] = $request->input('category_id');
+
+            $result = $this->logic->updateDocument($id,$data,$content);
+            if($result){
+                return $this->success($result);
+            }
+            return $this->error($result);
+        }catch (\Exception $e){
+            return $this->error($e->getMessage());
+        }
+    }
+
+    public function show(Request $request)
+    {
+
+    }
+
+    public function destroy(Request $request)
+    {
+        
+    }
+
+
 }

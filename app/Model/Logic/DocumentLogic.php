@@ -3,6 +3,7 @@ namespace W7\App\Model\Logic;
 
 use W7\App\Model\Entity\Description;
 use W7\App\Model\Entity\Document;
+use W7\App\Model\Entity\UserAuthorization;
 
 class DocumentLogic extends BaseLogic
 {
@@ -10,6 +11,25 @@ class DocumentLogic extends BaseLogic
     {
         $document = Document::create($data);
         $description = Description::create(['id'=>Document::getDescriptionId($document['id']),'content'=>$content]);
+        if($document && $description){
+            $document['content'] = $content;
+        }
+        UserAuthorization::create([
+            'user_id'=>$data['creator_id'],
+            'function_id'=>$document['id'],
+            'function_name' => 'document',
+            'can_read'=>1,
+            'can_modify'=>1,
+            'can_delete'=>1
+        ]);
+        $this->delete('auth_'.$data['creator_id']);
+        return $document;
+    }
+
+    public function updateDocument($id,$data,$content)
+    {
+        $document = Document::where('id',$id)->update($data);
+        $description = Description::where('id',Document::getDescriptionId($id))->update(['content'=>$content]);
         if($document && $description){
             $document['content'] = $content;
         }

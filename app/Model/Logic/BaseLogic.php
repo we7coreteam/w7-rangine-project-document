@@ -42,4 +42,12 @@ class BaseLogic extends LogicAbstract {
         return $this->prefix.$key;
     }
 
+    public function checkRepeatRequest($user_id,$ttl=2)
+    {
+        if($this->get('repeat_'.$user_id)){
+            throw new \Exception('重复请求，请稍后再试');
+        }
+        $this->set('repeat_'.$user_id,1,$ttl);
+    }
+
 }
