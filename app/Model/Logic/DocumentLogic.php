@@ -39,12 +39,39 @@ class DocumentLogic extends BaseLogic
     public function getDocuments($page,$size,$category,$allow_ids)
     {
         return Document::select('id','name','icon','sort','is_show','category_id')
+            //->where('is_show',Document::SHOW)
             ->when($category,function($query) use($category){
                 return $query->where('category_id',$category);
             })
             ->when($allow_ids,function($query) use($allow_ids){
                 return $query->whereIn('id',$allow_ids);
             })
+            ->orderBy('sort','desc')
             ->paginate($size,null,null,$page);
     }
+
+    public function getDocument($id)
+    {
+        $document = Document::select('id','name','icon','sort','is_show','category_id','updated_at')->where('id',$id)->first();
+        if(!$document){
+            throw new \Exception('该文档不存在！');
+        }
+        $description = Description::where('id',Document::getDescriptionId($id))->first();
+        if($description){
+        	$document['content'] = $description['content'];
+		}else{
+        	$document['content'] = '';
+		}
+        return $document;
+    }
+
+    public function deleteDocument($id)
+	{
+		$document = Document::select('id','name','icon','sort','is_show','category_id','updated_at')->where('id',$id)->first();
+		if(!$document){
+			throw new \Exception('该文档不存在！');
+		}
+		$document->delete();
+		Description::where('id',Document::getDescriptionId($id))->delete();
+	}
 }

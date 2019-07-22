@@ -92,7 +92,7 @@ class DocumentController extends Controller
 
             if($auth !== APP_AUTH_ALL){
                 if(!isset($auth['document'][$id]) || $auth['document'][$id]['can_modify'] == 0){
-                    return $this->error('没有创建文档的权限!');
+                    return $this->error('没有修改该文档的权限!');
                 }
             }
 
@@ -131,12 +131,45 @@ class DocumentController extends Controller
 
     public function show(Request $request)
     {
-
+        try{
+            $auth = $request->document_user_auth;
+            $id = $request->input('id');
+            if(!$id){
+                return $this->error('id必传');
+            }
+            if($auth !== APP_AUTH_ALL){
+                if(!isset($auth['document'][$id]) || $auth['document'][$id]['can_read'] == 0){
+                    return $this->error('该文档不存在!');
+                }
+            }
+            $result = $this->logic->getDocument($id);
+            if($result){
+                return $this->success($result);
+            }
+            return $this->error($result);
+        }catch (\Exception $e){
+            return $this->error($e->getMessage());
+        }
     }
 
     public function destroy(Request $request)
     {
-
+    	try{
+			$id = $request->input('id');
+			$auth = $request->document_user_auth;
+			if(!$id){
+				return $this->error('id必传');
+			}
+			if($auth !== APP_AUTH_ALL){
+				if(!isset($auth['document'][$id]) || $auth['document'][$id]['can_delete'] == 0){
+					return $this->error('没有删除该文档的权限!!');
+				}
+			}
+			$this->logic->deleteDocument($id);
+			return $this->success();
+		}catch (\Exception $e){
+			return $this->error($e->getMessage());
+		}
     }
 
 
