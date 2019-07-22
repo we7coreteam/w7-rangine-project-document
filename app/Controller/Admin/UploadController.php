@@ -11,7 +11,7 @@ class UploadController extends Controller
 		try {
 			$image = $request->input('image');
 			$uploader = new UploadLogic();
-			$url = $uploader->name('ok')->upload($image);
+			$url = $uploader->upload($image);
 			return $this->success(compact('url'));
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
