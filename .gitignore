@@ -17,4 +17,4 @@ docker-compose.yml
 phpunit.xml
 .phpstorm.meta*
 .idea/vcs.xml
-runtime/logs/*
+runtime/logs

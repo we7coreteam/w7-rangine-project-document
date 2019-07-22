@@ -136,7 +136,7 @@ class DocumentController extends Controller
 
     public function destroy(Request $request)
     {
-        
+
     }
 
 
