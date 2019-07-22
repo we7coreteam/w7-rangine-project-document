@@ -2,7 +2,7 @@
 namespace W7\App\Model\Service;
 
 class UploadLogic extends BaseLogic {
-	protected $root_path = 'runtime/upload/';
+	protected $root_path = RUNTIME_PATH.'/upload/';
 	protected $path = '';
 	protected $name;
 
@@ -50,7 +50,7 @@ class UploadLogic extends BaseLogic {
 			//图片名称
 			$image_url = $dir.$filename;
 			file_put_contents($image_url, base64_decode(str_replace($result[1], '', $base64)));
-			return filename($image_url);
+			return $image_url;
 		}
 		return false;
 	}

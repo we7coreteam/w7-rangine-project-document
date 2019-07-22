@@ -19,6 +19,7 @@ $serverSetting = [
 		'buffer_output_size' => 10485760, // 10*1024*1024
 		'upload_tmp_dir' => BASE_PATH . '/runtime/upload',
 // 		'document_root' => BASE_PATH . '/public',
+		"static_handler_locations" => [RUNTIME_PATH.'/upload'],
 		'enable_static_handler' => true,
 		'ssl_cert_file' => '',
 		'ssl_key_file' => '',

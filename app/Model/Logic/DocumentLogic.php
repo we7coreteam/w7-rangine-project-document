@@ -1,4 +1,15 @@
 <?php
+
+/*
+ * This file is part of PHP CS Fixer.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *     Dariusz Rumiński <dariusz.ruminski@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace W7\App\Model\Logic;
 
 use W7\App\Model\Entity\Description;
@@ -7,71 +18,75 @@ use W7\App\Model\Entity\UserAuthorization;
 
 class DocumentLogic extends BaseLogic
 {
-    public function createDocument($data,$content)
+    public function createDocument($data, $content)
     {
         $document = Document::create($data);
-        $description = Description::create(['id'=>Document::getDescriptionId($document['id']),'content'=>$content]);
-        if($document && $description){
+        $description = Description::create(['id' => Document::getDescriptionId($document['id']), 'content' => $content]);
+        if ($document && $description) {
             $document['content'] = $content;
         }
         UserAuthorization::create([
-            'user_id'=>$data['creator_id'],
-            'function_id'=>$document['id'],
+            'user_id' => $data['creator_id'],
+            'function_id' => $document['id'],
             'function_name' => 'document',
-            'can_read'=>1,
-            'can_modify'=>1,
-            'can_delete'=>1
+            'can_read' => 1,
+            'can_modify' => 1,
+            'can_delete' => 1,
         ]);
         $this->delete('auth_'.$data['creator_id']);
+
         return $document;
     }
 
-    public function updateDocument($id,$data,$content)
+    public function updateDocument($id, $data, $content)
     {
-        $document = Document::where('id',$id)->update($data);
-        $description = Description::where('id',Document::getDescriptionId($id))->update(['content'=>$content]);
-        if($document && $description){
+        $document = Document::where('id', $id)->update($data);
+        $description = Description::where('id', Document::getDescriptionId($id))->update(['content' => $content]);
+        if ($document && $description) {
             $document['content'] = $content;
         }
+
         return $document;
     }
 
-    public function getDocuments($page,$size,$category,$allow_ids)
+    public function getDocuments($page, $size, $category, $allow_ids)
     {
-        return Document::select('id','name','icon','sort','is_show','category_id')
+        return Document::select('id', 'name', 'icon', 'sort', 'is_show', 'category_id')
             //->where('is_show',Document::SHOW)
-            ->when($category,function($query) use($category){
-                return $query->where('category_id',$category);
+            ->when($category, function ($query) use ($category) {
+                return $query->where('category_id', $category);
             })
-            ->when($allow_ids,function($query) use($allow_ids){
-                return $query->whereIn('id',$allow_ids);
+            ->when($allow_ids, function ($query) use ($allow_ids) {
+                return $query->whereIn('id', $allow_ids);
             })
-            ->orderBy('sort','desc')
-            ->paginate($size,null,null,$page);
+            ->orderBy('sort', 'desc')
+            ->paginate($size, null, null, $page)
+        ;
     }
 
     public function getDocument($id)
     {
-        $document = Document::select('id','name','icon','sort','is_show','category_id','updated_at')->where('id',$id)->first();
-        if(!$document){
+        $document = Document::select('id', 'name', 'icon', 'sort', 'is_show', 'category_id', 'updated_at')->where('id', $id)->first();
+        if (!$document) {
             throw new \Exception('该文档不存在！');
         }
-        $description = Description::where('id',Document::getDescriptionId($id))->first();
-        if($description){
-        	$document['content'] = $description['content'];
-		}else{
-        	$document['content'] = '';
-		}
+        $description = Description::where('id', Document::getDescriptionId($id))->first();
+        if ($description) {
+            $document['content'] = $description['content'];
+        } else {
+            $document['content'] = '';
+        }
+
         return $document;
     }
 
     public function deleteDocument($id)
-	{
-		$document = Document::select('id','name','icon','sort','is_show','category_id','updated_at')->where('id',$id)->first();
-		if(!$document){
-			throw new \Exception('该文档不存在！');
-		}
-		$document->delete();
-		Description::where('id',Document::getDescriptionId($id))->delete();
-	}
+    {
+        $document = Document::select('id', 'name', 'icon', 'sort', 'is_show', 'category_id', 'updated_at')->where('id', $id)->first();
+        if (!$document) {
+            throw new \Exception('该文档不存在！');
+        }
+        $document->delete();
+        Description::where('id', Document::getDescriptionId($id))->delete();
+    }
 }
