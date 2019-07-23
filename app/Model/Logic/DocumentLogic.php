@@ -31,11 +31,20 @@ class DocumentLogic extends BaseLogic
     {
         $document = Document::where('id', $id)->update($data);
         $description = Description::where('id', Document::getDescriptionId($id))->update(['content' => $content]);
-        if ($document && $description) {
-            $document['content'] = $content;
-        }
+        $this->delete($id);
+        return true;
+    }
 
-        return $document;
+    public function publishOrCancel($id,$is_show)
+    {
+		$document = Document::find($id);
+		if($document){
+			$document->is_show = $is_show;
+			$document->save();
+			return true;
+			$this->delete($id);
+		}
+		throw new \Exception('该文档不存在');
     }
 
     public function getDocuments($page, $size, $category, $allow_ids)
@@ -54,6 +63,9 @@ class DocumentLogic extends BaseLogic
 
     public function getDocument($id)
     {
+    	if($this->get($id)){
+    		return $this->get($id);
+	    }
         $document = Document::select('id', 'name', 'icon', 'sort', 'is_show', 'category_id', 'updated_at')->where('id', $id)->first();
         if (!$document) {
             throw new \Exception('该文档不存在！');
@@ -64,7 +76,7 @@ class DocumentLogic extends BaseLogic
         } else {
             $document['content'] = '';
         }
-
+        $this->set($id,$document);
         return $document;
     }
 

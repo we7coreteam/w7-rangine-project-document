@@ -8,6 +8,7 @@ irouter()->middleware('AdminMiddleware')->group(['prefix'=>'/admin'],function(\W
 
     $route->get('/document/index', 'Admin\DocumentController@index'); //文档列表
     $route->get('/document/show', 'Admin\DocumentController@show'); //文档详情
+	$route->get('/document/publish_or_cancel', 'Admin\DocumentController@publishOrCancel'); //文档列表
     $route->post('/document/create', 'Admin\DocumentController@create'); //新增文档
     $route->post('/document/update', 'Admin\DocumentController@update'); //修改文档
 	$route->post('/document/destroy', 'Admin\DocumentController@destroy'); //删除文档

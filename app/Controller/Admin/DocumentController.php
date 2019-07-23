@@ -55,7 +55,7 @@ class DocumentController extends Controller
             $this->validate($request, [
                 'name' => 'string|required|max:30',
                 'sort' => 'integer|min:0',
-                'category_id' => 'integer|min:1',
+                'category_id' => 'required|integer|min:1',
                 'content' => 'required',
             ], [
                 'name.required' => '文档名称必填',
@@ -63,18 +63,21 @@ class DocumentController extends Controller
                 'sort.min' => '排序最小值为０',
                 'content.required' => '文档内容必填',
                 'category_id.required' => '分类id必填',
+	            'category_id.min' => '分类id最小为0',
             ]);
 
             $data['creator_id'] = $request->document_user_id;
             $data['name'] = $request->input('name');
             $data['icon'] = $request->input('icon', '');
             $content = $request->input('content');
-            $data['is_show'] = $request->input('is_show', 1);
             $data['sort'] = $request->input('sort', 0);
             $data['category_id'] = $request->input('category_id');
 
+            idb()->beginTransaction();
             $result = $this->logic->createDocument($data, $content);
+            idb()->commit();
             if ($result) {
+            	idb()->rollBack();
                 return $this->success($result);
             }
 
@@ -104,7 +107,7 @@ class DocumentController extends Controller
             $this->validate($request, [
                 'name' => 'string|required|max:30',
                 'sort' => 'integer|min:0',
-                'category_id' => 'integer|min:1',
+                'category_id' => 'required|integer|min:1',
                 'content' => 'required',
             ], [
                 'name.required' => '文档名称必填',
@@ -112,25 +115,54 @@ class DocumentController extends Controller
                 'sort.min' => '排序最小值为０',
                 'content.required' => '文档内容必填',
                 'category_id.required' => '分类id必填',
+	            'category_id.min' => '分类id最小为0',
             ]);
 
             $data['creator_id'] = $request->document_user_id;
             $data['name'] = $request->input('name');
-            $data['icon'] = $request->input('icon', '');
+            $request->input('icon') !== null && $data['icon'] = $request->input('icon');
             $content = $request->input('content');
-            $data['is_show'] = $request->input('is_show', 1);
             $data['sort'] = $request->input('sort', 0);
             $data['category_id'] = $request->input('category_id');
-
+	        idb()->beginTransaction();
             $result = $this->logic->updateDocument($id, $data, $content);
+            idb()->commit();
             if ($result) {
-                return $this->success($result);
+            	idb()->rollBack();
+                return $this->success([]);
             }
 
             return $this->error($result);
         } catch (\Exception $e) {
             return $this->error($e->getMessage());
         }
+    }
+
+    public function publishOrCancel(Request $request)
+    {
+		try{
+			$this->validate($request, [
+				'id' => 'required',
+				'is_show' => 'required|integer|min:0|max:1',
+			], [
+				'id.required' => '文档id必传',
+				'is_show.required' => '发布状态必填',
+			]);
+			$id = $request->input('id');
+			$is_show = $request->input('is_show');
+
+			$auth = $request->document_user_auth;
+			if (APP_AUTH_ALL !== $auth) {
+				if (!isset($auth['document'][$id]) || 0 === $auth['document'][$id]['can_modify']) {
+					return $this->error('没有修改该文档的权限!');
+				}
+			}
+
+			$this->logic->publishOrCancel($id,$is_show);
+			return $this->success(compact('id','is_show'));
+		}catch (\Exception $e){
+			return $this->error($e->getMessage());
+		}
     }
 
     public function show(Request $request)
@@ -170,10 +202,12 @@ class DocumentController extends Controller
                     return $this->error('没有删除该文档的权限!!');
                 }
             }
+	        idb()->beginTransaction();
             $this->logic->deleteDocument($id);
-
+			idb()->commit();
             return $this->success();
         } catch (\Exception $e) {
+        	idb()->rollBack();
             return $this->error($e->getMessage());
         }
     }
