@@ -24,10 +24,9 @@ class VerificationcodeController extends Controller
 
 	/**
 	 * 获取验证码图片
-	 * @param Request $request
 	 * @return false|string
 	 */
-    public function getCodeimg(Request $request){
+    public function getCodeimg(){
         try{
             $phrase = new PhraseBuilder;
 
@@ -41,7 +40,9 @@ class VerificationcodeController extends Controller
             $builder->setMaxFrontLines(0);
             $builder->build($width = $this->width, $height = $this->height, $font = null);
             $phrase = $builder->getPhrase();
-            $this->code->addCode($request->document_user_id,$phrase,60);
+
+			$key = 'imgCode_'.time().rand();
+            $this->code->addCode($key,$phrase,60*60*60*5);
 
 			$this->response()->withoutHeader('Content-Type')->withAddedHeader('Content-Type', 'image/jpg');
 			$this->response()->withoutHeader('Cache-Control')->withAddedHeader('Cache-Control', 'no-cache, must-revalidate');
@@ -52,7 +53,11 @@ class VerificationcodeController extends Controller
 			ob_end_clean();
 
 			$img = 'data:image/jpg;base64,'.base64_encode($img);
-			return $this->success($img);
+			$data = [
+				'img' => $img,
+				'imgcodeKey' => $key
+			];
+			return $this->success($data);
         }catch (\Exception $e){
             return $this->error($e->getMessage());
         }
@@ -65,7 +70,17 @@ class VerificationcodeController extends Controller
 	 */
     public function getCode(Request $request){
     	try{
-			return $this->success($this->code->getCode($request->document_user_id));
+			$this->validate($request,[
+				'imgcodeKey' => 'required'
+			],[
+				'imgcodeKey.required' => '验证码的KEY值不能为空',
+			]);
+			$res = $this->code->getCode($request->input('imgcodeKey'));
+			if ($res){
+				return $this->success($res);
+			}else{
+				return $this->error('验证码已失效');
+			}
 		}catch(\Exception $e){
 			return $this->error($e->getMessage());
 		}

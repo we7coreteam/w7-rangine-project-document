@@ -9,6 +9,23 @@ class UserLogic extends BaseLogic
 	use SoftDeletes;
 	protected $dates = ['deleted_at'];
 
+	public function getUser($data)
+	{
+		if (isset($data['id'])){
+			$user = User::find($data['id']);
+		}
+
+		if (isset($data['username'])){
+			$user = User::where('username', $data['username'])->first();
+		}
+
+		if (isset($data['phone'])){
+			$user = User::where('phone', $data['phone'])->first();
+		}
+
+		return $user;
+	}
+
 	public function createUser($data)
 	{
 		$users = User::where('username',$data['username'])->count();
@@ -32,9 +49,16 @@ class UserLogic extends BaseLogic
 		return User::find($id)->delete();
 	}
 
-	public function delUser($id)
+	public function delUser($ids)
 	{
-		return User::destroy($id);
+		return User::destroy($ids);
+	}
+
+	public function searchUser($data)
+	{
+		if (isset($data['username'])){
+			return User::where('username','like','%'.$data['username'].'%')->get();
+		}
 	}
 
 }

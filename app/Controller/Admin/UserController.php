@@ -19,24 +19,15 @@ class UserController extends Controller
             $this->validate($request,[
                 'username' => 'required',
                 'userpass' => 'required',
-                'is_ban' => 'required', // 是否禁用 0 正常 1 禁止
-                'has_privilege' => 'required', // 是否具有特权 0 无 1 有
             ],[
                 'username.required' => '请输入用户姓名',
                 'userpass.required' => '请输入用户密码',
-                'is_ban.required' => '请设置用户是否禁用',
-                'has_privilege.required' => '请设置用户特权'
             ]);
 
             $data = [
                 'username' => $request->input('username'),
                 'userpass' => md5(md5($request->input('name').$request->input('userpass'))),
-                'is_ban' => $request->input('is_ban'),
-                'has_privilege' => $request->input('has_privilege'),
             ];
-            if ($request->input('remark')){
-				$data['remark'] = $request->input('remark');
-			}
 
             $res = $this->logic->createUser($data);
             if ($res){
@@ -104,16 +95,62 @@ class UserController extends Controller
 	{
 		try{
 			$this->validate($request,[
-				'id' => 'required'
+				'ids' => 'required'
+			],[
+				'ids.required' => 'ID不能为空',
+			]);
+			$ids = array_filter(explode(',',$request->input('ids')));
+
+			if ($ids){
+				$res = $this->logic->delUser($ids);
+				if ($res){
+					return $this->success($res);
+				}
+				return $this->error($res);
+			}
+			return $this->error('参数有误');
+		}catch (\Exception $e){
+			return $this->error($e->getMessage());
+		}
+	}
+
+	public function updateUserpass(Request $request)
+	{
+		try{
+			$this->validate($request,[
+				'id' => 'required',
+				'userpass' => 'required',
 			],[
 				'id.required' => '用户ID不能为空',
+				'userpass.required' => '密码不能为空',
 			]);
-
-			$res = $this->logic->delUser(intval($request->input('id')));
-			if ($res){
-				return $this->success($res);
+			$user_val = $this->logic->getUser(['id'=>$request->input('id')]);
+			if ($user_val){
+				$data = [
+					'userpass' => md5(md5($user_val['username'].$request->input('userpass'))),
+				];
+				$res = $this->logic->updateUser(intval($request->input('id')),$data);
+				if ($res){
+					return $this->success($res);
+				}
+				return $this->error($res);
 			}
-			return $this->error($res);
+			return $this->error($user_val);
+		}catch (\Exception $e){
+			return $this->error($e->getMessage());
+		}
+	}
+
+	public function searchUser(Request $request)
+	{
+		try{
+			$this->validate($request,[
+				'username' => 'required',
+			],[
+				'username.required' => '用户名称不能为空',
+			]);
+			$res = $this->logic->searchUser(['username'=>$request->input('username')]);
+			return $this->success($res);
 		}catch (\Exception $e){
 			return $this->error($e->getMessage());
 		}
