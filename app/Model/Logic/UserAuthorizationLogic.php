@@ -58,6 +58,9 @@ class UserAuthorizationLogic extends BaseLogic
         foreach ($documents as $document)
         {
             $id = $document['id'];
+            if($document['can_modify'] || $document['can_delete']){
+	            $document['can_read'] = 1;
+            }
             if(isset($old_documents[$id])){ //修改
                 $old_document = $old_documents[$id];
                 $old_document->can_read = $document['can_read'] ?? 0;

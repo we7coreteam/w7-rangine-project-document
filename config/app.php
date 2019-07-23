@@ -9,7 +9,15 @@ return [
 		//最新版可用
 		'error_level' => E_ALL ^ E_NOTICE,
 		'basedir' => [
-			'/home/wwwroot/we7/swoole'
+			'/home/wwwroot/we7/swoole',
+			'/tmp',
+			sys_get_temp_dir(),
+			APP_PATH,
+			RUNTIME_PATH,
+			RUNTIME_PATH . DIRECTORY_SEPARATOR . 'logs',
+			RUNTIME_PATH . DIRECTORY_SEPARATOR . 'task',
+			RUNTIME_PATH . DIRECTORY_SEPARATOR . 'upload',
+			BASE_PATH  . DIRECTORY_SEPARATOR . 'vendor',
 		]
 	],
 	'crontab' => [
@@ -17,7 +25,7 @@ return [
 		'interval' => 10,
 	],
 	'reload' => [
-		'interval' => 5, //重复检测的间隔时长
+		'interval' => 1, //重复检测的间隔时长
 		'debug' => false, //开启后，将不监控文件变化，重复reload，方便调试
 	],
 	'cache' => [

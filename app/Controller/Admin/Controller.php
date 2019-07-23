@@ -9,7 +9,7 @@ use W7\Core\Controller\ControllerAbstract;
 class Controller extends ControllerAbstract {
     protected $logic = null;
 
-    public function success($data,$message='ok',$code=200)
+    public function success($data=[],$message='ok',$code=200)
     {
         return [
             'status' => true,

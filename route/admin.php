@@ -14,9 +14,14 @@ irouter()->middleware('AdminMiddleware')->group(['prefix'=>'/admin'],function(\W
     $route->post('/user/updateuserpass', 'Admin\UserController@updateUserpass');
     $route->post('/user/searchuser', 'Admin\UserController@searchUser');
 
-    $route->get('/document/index', 'Admin\DocumentController@index');
-    $route->post('/document/create', 'Admin\DocumentController@create');
-    $route->post('/document/update', 'Admin\DocumentController@update');
+    $route->get('/document/index', 'Admin\DocumentController@index'); //文档列表
+    $route->get('/document/show', 'Admin\DocumentController@show'); //文档详情
+	$route->get('/document/publish_or_cancel', 'Admin\DocumentController@publishOrCancel'); //文档列表
+    $route->post('/document/create', 'Admin\DocumentController@create'); //新增文档
+    $route->post('/document/update', 'Admin\DocumentController@update'); //修改文档
+	$route->post('/document/destroy', 'Admin\DocumentController@destroy'); //删除文档
+
+	$route->post('/upload/image', 'Admin\UploadController@image'); //删除文档
 
     $route->get('/auth/index', 'Admin\UserAuthorizationController@index');
     $route->post('/auth/update', 'Admin\UserAuthorizationController@update');

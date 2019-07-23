@@ -13,6 +13,8 @@ class Document extends BaseModel {
 //        'sort' => 'integer'
 //    ];
 
+	const SHOW = 1;
+
     public static function getDescriptionId($id)
     {
         return 'document_'.$id;
