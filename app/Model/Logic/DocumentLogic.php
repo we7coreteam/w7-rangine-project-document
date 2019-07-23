@@ -3,6 +3,7 @@ namespace W7\App\Model\Logic;
 
 use W7\App\Model\Entity\DocumentContent;
 use W7\App\Model\Entity\Document;
+use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserAuthorization;
 
 class DocumentLogic extends BaseLogic
@@ -47,7 +48,7 @@ class DocumentLogic extends BaseLogic
 		throw new \Exception('该文档不存在');
     }
 
-    public function getDocuments($page, $size, $category, $allow_ids)
+    public function getDocuments($page, $size, $category, $allow_ids,$is_show,$keyword)
     {
         return Document::when($category, function ($query) use ($category) {
                 return $query->where('category_id', $category);
@@ -55,6 +56,15 @@ class DocumentLogic extends BaseLogic
             ->when($allow_ids, function ($query) use ($allow_ids) {
                 return $query->whereIn('id', $allow_ids);
             })
+	        ->where(function ($query) use ($keyword){
+	        	if($keyword){
+			        $user_ids = User::where('username','like',$keyword)->pluck('id')->toArray();
+			        $query->whereIn('creator_id',$user_ids)->orWhere('name','like','%'.$keyword.'%');
+		        }
+	        })
+	        ->when($is_show !== null,function ($query) use ($is_show){
+		        return $query->where('is_show', $is_show);
+	        })
             ->orderBy('sort', 'desc')
             ->paginate($size, null, null, $page);
     }

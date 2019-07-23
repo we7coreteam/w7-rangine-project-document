@@ -30,7 +30,9 @@ class DocumentController extends Controller
             $page = $request->input('page', 1);
             $category = $request->input('category_id', 0);
             $size = $request->input('size', 10);
-            $result = $this->logic->getDocuments($page, $size, $category, $allow_ids);
+            $is_show = $request->input('is_show');
+	        $keyword = $request->input('keyword');
+            $result = $this->logic->getDocuments($page, $size, $category, $allow_ids,$is_show,$keyword);
 
             return $this->success($result);
         } catch (\Exception $e) {
