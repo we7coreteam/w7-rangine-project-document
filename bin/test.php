@@ -40,10 +40,6 @@ class UploadController extends Controller
 
 
 
-
-
-
-
 		try {
 			$file = $request->file('icon');
 			if ($file) {
