@@ -6,14 +6,13 @@ namespace W7\App\Model\Logic;
 
 class VerificationcodeLogic extends BaseLogic
 {
-    public function addCode($id,$flight,$time)
+    public function addCode($key,$flight,$time)
     {
-//        return 'add';
-        return $this->set('code_'.$id,$flight,$time);
+        return $this->set($key,$flight,$time);
     }
 
-    public function getCode($id)
+    public function getCode($key)
     {
-        return $this->get('code_'.$id);
+        return $this->get($key);
     }
 }

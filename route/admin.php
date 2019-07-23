@@ -1,10 +1,18 @@
 <?php
 
-irouter()->middleware('AdminMiddleware')->group(['prefix'=>'/admin'],function(\W7\Core\Route\Route $route){
-    $route->post('/user/adduser', 'Admin\UserController@addUser'); // 添加用户
+irouter()->post('/admin/login/check', 'Admin\LoginController@check');
 
-    $route->get('/verificationcode/getcodeimg', 'Admin\VerificationcodeController@getCodeimg'); // 获取验证码图片
-    $route->get('/verificationcode/getcode', 'Admin\VerificationcodeController@getCode'); // 获取验证码
+irouter()->get('/admin/verificationcode/getcodeimg', 'Admin\VerificationcodeController@getCodeimg');
+irouter()->get('/admin/verificationcode/getcode', 'Admin\VerificationcodeController@getCode');
+
+irouter()->middleware('AdminMiddleware')->group(['prefix'=>'/admin'],function(\W7\Core\Route\Route $route){
+
+    $route->post('/user/adduser', 'Admin\UserController@addUser');
+    $route->post('/user/updateuser', 'Admin\UserController@updateUser');
+    $route->get('/user/softdeluser', 'Admin\UserController@softdelUser');
+    $route->post('/user/deluser', 'Admin\UserController@delUser');
+    $route->post('/user/updateuserpass', 'Admin\UserController@updateUserpass');
+    $route->post('/user/searchuser', 'Admin\UserController@searchUser');
 
     $route->get('/document/index', 'Admin\DocumentController@index'); //文档列表
     $route->get('/document/show', 'Admin\DocumentController@show'); //文档详情

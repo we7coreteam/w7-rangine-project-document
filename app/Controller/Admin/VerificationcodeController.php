@@ -2,10 +2,7 @@
 /**
  * 验证码类
  */
-
 namespace W7\App\Controller\Admin;
-
-use W7\App;
 
 use Gregwar\Captcha\CaptchaBuilder;
 use Gregwar\Captcha\PhraseBuilder;
@@ -13,44 +10,80 @@ use Gregwar\Captcha\PhraseBuilder;
 use W7\App\Model\Logic\VerificationcodeLogic;
 use W7\Http\Message\Server\Request;
 
+
 class VerificationcodeController extends Controller
 {
+	protected $codeNum = 4;
+	protected $width = 100;
+	protected $height = 60;
+
     public function __construct()
     {
         $this->code = new VerificationcodeLogic();
     }
 
-    public function getCodeimg(Request $request){
-//        try{
+	/**
+	 * 获取验证码图片
+	 * @return false|string
+	 */
+    public function getCodeimg(){
+        try{
             $phrase = new PhraseBuilder;
-            // 设置验证码位数
-            $code = $phrase->build(6);
-            // 生成验证码图片的Builder对象，配置相应属性
+
+            $code = $phrase->build($this->codeNum);
+
             $builder = new CaptchaBuilder($code, $phrase);
-            // 设置背景颜色
+
             $builder->setBackgroundColor(220, 210, 230);
             $builder->setMaxAngle(25);
             $builder->setMaxBehindLines(0);
             $builder->setMaxFrontLines(0);
-            // 可以设置图片宽高及字体
-            $builder->build($width = 100, $height = 40, $font = null);
-            // 获取验证码的内容
+            $builder->build($width = $this->width, $height = $this->height, $font = null);
             $phrase = $builder->getPhrase();
-            // 把内容存入 缓存
-            // Session::flash('code', $phrase);
-            $this->code->addCode($request->document_user_id,$phrase,60);
-            // 生成图片
-//            header("Cache-Control: no-cache, must-revalidate");
-            header("Content-Type:image/jpeg");
-            $builder->output();
-//        }catch (\Exception $e){
-//            return $this->error($e->getMessage());
-//        }
 
+			$key = 'imgCode_'.time().rand();
+            $this->code->addCode($key,$phrase,60*60*60*5);
+
+			$this->response()->withoutHeader('Content-Type')->withAddedHeader('Content-Type', 'image/jpg');
+			$this->response()->withoutHeader('Cache-Control')->withAddedHeader('Cache-Control', 'no-cache, must-revalidate');
+
+			ob_start();
+		 	$builder->output();
+		 	$img = ob_get_contents();
+			ob_end_clean();
+
+			$img = 'data:image/jpg;base64,'.base64_encode($img);
+			$data = [
+				'img' => $img,
+				'imgcodeKey' => $key
+			];
+			return $this->success($data);
+        }catch (\Exception $e){
+            return $this->error($e->getMessage());
+        }
     }
 
+	/**
+	 * 获取验证码
+	 * @param Request $request
+	 * @return array
+	 */
     public function getCode(Request $request){
-        return $this->code->getCode($request->document_user_id);
+    	try{
+			$this->validate($request,[
+				'imgcodeKey' => 'required'
+			],[
+				'imgcodeKey.required' => '验证码的KEY值不能为空',
+			]);
+			$res = $this->code->getCode($request->input('imgcodeKey'));
+			if ($res){
+				return $this->success($res);
+			}else{
+				return $this->error('验证码已失效');
+			}
+		}catch(\Exception $e){
+			return $this->error($e->getMessage());
+		}
     }
 
 
