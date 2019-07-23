@@ -19,48 +19,6 @@ class UploadController extends Controller
 {
 	public function image(Request $request)
 	{
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 		try {
 			$file = $request->file('icon');
 			if ($file) {
