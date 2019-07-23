@@ -8,7 +8,6 @@ class VerificationcodeLogic extends BaseLogic
 {
     public function addCode($id,$flight,$time)
     {
-//        return 'add';
         return $this->set('code_'.$id,$flight,$time);
     }
 
