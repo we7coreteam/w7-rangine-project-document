@@ -16,11 +16,11 @@ class UploadController extends Controller
                 return $this->error('icon必传');
             }
 
-            $allowed_mime = ['image/png', 'imagejpg', 'image/gif', 'image/jpeg'];
+            $allowed_mime = ['image/png', 'image/jpg', 'image/gif', 'image/jpeg'];
             if (0 !== $file['error']) {
                 return $this->error('['.$file['error'].']上传失败！网络错误或文件过大');
             }
-            if (isset($file['type']) && !\in_array($file['type'], $allowed_mime, true)) {
+            if (isset($file['type']) && !in_array($file['type'], $allowed_mime, true)) {
                 return $this->error('only jpg,jpeg,png,gif allowed');
             }
             if ($file['size'] > 2 * 1024 * 1204) {
