@@ -50,6 +50,7 @@ class DocumentController extends Controller
             }
 
             $this->logic->checkRepeatRequest($request->document_user_id);
+            $this->logic->checkWindControl($request->document_user_id,'max_number_added_per_day');
 
             $this->validate($request, [
                 'name' => 'string|required|max:30',
