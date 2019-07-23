@@ -23,7 +23,7 @@ class DocumentLogic extends BaseLogic
             'can_delete' => 1,
         ]);
         $this->delete('auth_'.$data['creator_id']);
-
+	    $this->increment('max_number_added_per_day_'.date('Ymd').'_'.$data['creator_id']);
         return $document;
     }
 
@@ -49,8 +49,7 @@ class DocumentLogic extends BaseLogic
                 return $query->whereIn('id', $allow_ids);
             })
             ->orderBy('sort', 'desc')
-            ->paginate($size, null, null, $page)
-        ;
+            ->paginate($size, null, null, $page);
     }
 
     public function getDocument($id)
