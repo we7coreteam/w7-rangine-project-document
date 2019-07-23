@@ -18,4 +18,5 @@ phpunit.xml
 .phpstorm.meta*
 .idea/vcs.xml
 runtime/logs
-runtime/upload/!index.html
+runtime/upload
+!runtime/upload/index.html
