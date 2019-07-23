@@ -22,6 +22,11 @@ class UploadController extends Controller
 
 
 
+
+
+
+
+
 			$file = $request->file('icon');
 			if ($file) {
 				$file = $file->toArray();
