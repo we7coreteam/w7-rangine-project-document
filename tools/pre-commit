@@ -1,0 +1,26 @@
+#!/bin/sh
+#
+# An example hook script to verify what is about to be committed.
+# Called by "git commit" with no arguments.  The hook should
+# exit with non-zero status after issuing an appropriate message if
+# it wants to stop the commit.
+#
+# To enable this hook, rename this file to "pre-commit".
+#
+# .git/hooks/pre-commit
+
+echo "php-cs-fixer pre commit hook start"
+
+PHP_CS_FIXER="vendor/bin/php-cs-fixer"
+PHP_CS_CONFIG=".php_cs"
+CHANGED_FILES=$(git diff --cached --name-only --diff-filter=ACM -- '*.php')
+
+echo $CHANGED_FILES
+
+if [ -n "$CHANGED_FILES" ]; then
+	echo "111"
+    $PHP_CS_FIXER --config=.php_cs --verbose fix $CHANGED_FILES;
+    git add $CHANGED_FILES;
+fi
+
+echo "php-cs-fixer pre commit hook finish"
