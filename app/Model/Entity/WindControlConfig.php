@@ -29,6 +29,7 @@ class WindControlConfig extends BaseModel {
 		$config = self::find($key);
 		if($config){
 			$config->val = $value;
+			$config->save();
 			return true;
 		}
 		self::create(['key'=>$key,'value'=>$value]);

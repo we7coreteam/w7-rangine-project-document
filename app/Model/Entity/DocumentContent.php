@@ -7,7 +7,8 @@
 namespace W7\App\Model\Entity;
 
 
-class Description extends BaseModel {
+class DocumentContent extends BaseModel {
     public $timestamps = false;
+	protected $primaryKey = 'document_id';
 
 }
