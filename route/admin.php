@@ -15,7 +15,7 @@ irouter()->post('/admin/login/check', 'Admin\LoginController@check');
 irouter()->get('/admin/verificationcode/getcodeimg', 'Admin\VerificationcodeController@getCodeimg');
 irouter()->get('/admin/verificationcode/getcode', 'Admin\VerificationcodeController@getCode');
 
-irouter()->middleware('AdminMiddleware')->group(['prefix'=>'/admin'], function (\W7\Core\Route\Route $route) {
+irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'/admin'], function (\W7\Core\Route\Route $route) {
 	$route->post('/user/adduser', 'Admin\UserController@addUser');
 	$route->post('/user/updateuser', 'Admin\UserController@updateUser');
 	$route->get('/user/softdeluser', 'Admin\UserController@softdelUser');

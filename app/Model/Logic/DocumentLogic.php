@@ -12,6 +12,8 @@
 
 namespace W7\App\Model\Logic;
 
+use W7\App\Event\ChangeDocumentEvent;
+use W7\App\Event\CreateDocumentEvent;
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\DocumentContent;
 use W7\App\Model\Entity\User;
@@ -34,7 +36,7 @@ class DocumentLogic extends BaseLogic
 			'can_modify' => 1,
 			'can_delete' => 1,
 		]);
-		$this->delete('auth_'.$data['creator_id']);
+		CreateDocumentEvent::instance()->attach('user_id',$data['creator_id'])->dispatch();
 		$this->increment('max_number_added_per_day_'.date('Ymd').'_'.$data['creator_id']);
 
 		return $document;
@@ -44,8 +46,7 @@ class DocumentLogic extends BaseLogic
 	{
 		Document::where('id', $id)->update($data);
 		DocumentContent::where('document_id', $id)->update(['content' => $content]);
-		$this->delete($id);
-
+		ChangeDocumentEvent::instance()->attach('id',$id)->dispatch();
 		return true;
 	}
 
@@ -55,7 +56,7 @@ class DocumentLogic extends BaseLogic
 		if ($document) {
 			$document->is_show = $is_show;
 			$document->save();
-			$this->delete($id);
+			ChangeDocumentEvent::instance()->attach('id',$id)->dispatch();
 
 			return true;
 		}
@@ -86,9 +87,11 @@ class DocumentLogic extends BaseLogic
 
 	public function getDocument($id)
 	{
-		if ($this->get($id)) {
-			return $this->get($id);
+		if (icache()->get('document_'.$id)) {
+			var_dump('from cache');
+			return $this->get('document_'.$id);
 		}
+		var_dump('from database');
 		$document = Document::where('id', $id)->first();
 		if (!$document) {
 			throw new \Exception('该文档不存在！');
@@ -99,7 +102,7 @@ class DocumentLogic extends BaseLogic
 		} else {
 			$document['content'] = '';
 		}
-		$this->set($id, $document);
+		icache()->set('document_'.$id, $document,24*3600);
 
 		return $document;
 	}
@@ -123,5 +126,6 @@ class DocumentLogic extends BaseLogic
 		}
 		$document->delete();
 		DocumentContent::where('document_id', $id)->delete();
+		ChangeDocumentEvent::instance()->attach('id',$id)->dispatch();
 	}
 }

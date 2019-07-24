@@ -12,6 +12,8 @@
 
 namespace W7\App\Model\Logic;
 
+use W7\App\Event\ChangeAuthEvent;
+use W7\App\Model\Entity\Category;
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserAuthorization;
@@ -26,7 +28,7 @@ class UserAuthorizationLogic extends BaseLogic
 		}
 		$items['document'] = Document::select('id', 'name')->get()->toArray();
 		array_unshift($items['document'], ['id'=>0,'name'=>'新增','checked'=>0,'type' => 'overall']); //新增权限 不与 某条记录对应，标记为overall类型
-		$old_documents = UserAuthorization::where('user_id', $user_id)->where('function_name', 'document')->get()->keyBy('function_id');
+		$old_documents = UserAuthorization::where('user_id', $user_id)->where('function_name', 'document')->get()->keyBy('function_id'); //获取用户权限
 		foreach ($items['document'] as $k=>$v) {
 			if (isset($old_documents[$v['id']])) {
 				$old_document = $old_documents[$v['id']];
@@ -44,7 +46,7 @@ class UserAuthorizationLogic extends BaseLogic
 				$items['document'][$k]['checked'] = 1;
 			}
 
-			if (isset($old_documents[$v['id']]) && $v['id'] < 1) {
+			if (isset($old_documents[$v['id']]) && $v['id'] < 1) { //新增权限
 				$items['document'][$k]['checked'] = 1;
 			}
 
@@ -93,27 +95,59 @@ class UserAuthorizationLogic extends BaseLogic
 				$old->delete();
 			}
 		}
-		$this->delete('auth_'.$user_id);
+		ChangeAuthEvent::instance()->attach('user_id',$user_id)->dispatch();
 		return true;
 	}
 
 	public function getUserAuthorizations($user_id)
 	{
-		$cacheAuth = $this->get('auth_'.$user_id);
+		$cacheAuth = icache()->get('auth_'.$user_id);
 		if ($cacheAuth) {
 			return $cacheAuth;
 		}
 		$user = User::find($user_id);
 		if ($user) {
 			if ($user->has_privilege) {
-				$this->set('auth_'.$user_id, APP_AUTH_ALL);
+				icache()->set('auth_'.$user_id, APP_AUTH_ALL,24*3600);
 				return APP_AUTH_ALL;
 			}
 		} else {
 			return [];
 		}
 		$auth['document'] = UserAuthorization::where('user_id', $user_id)->where('function_name', 'document')->get()->keyBy('function_id')->toArray();
-		$this->set('auth_'.$user_id, $auth);
+		icache()->set('auth_'.$user_id, $auth,24*3600);
 		return $auth;
+	}
+
+	public function getAuthByCategory($withAuth = false)
+	{
+		$roots = Category::select('id', 'name')->where('parent_id', 0)->orderBy('sort', 'desc')->get()->toArray();
+		foreach ($roots as $k=>$v) {
+			$roots[$k]['type'] = 'category';
+			$roots[$k]['children'] = [];
+		}
+		$this->withAuth = $withAuth;
+		$this->getCategoryItems($roots);
+		return $roots;
+	}
+
+	public function getCategoryItems(&$categories)
+	{
+		foreach ($categories as $k=>$v) {
+			if($v['type'] == 'category'){
+				$subordinates = Category::select('id','name')->where('parent_id',$v['id'])->orderBy('sort','desc')->get()->toArray();
+				foreach ($subordinates as $sk => $sv) {
+					$subordinates[$sk]['type'] = 'category';
+					$subordinates[$sk]['children'] = [];
+					$categories[$k]['children'][] = $subordinates[$sk];
+				}
+				$documents = Document::select('id','name')->where('category_id',$v['id'])->orderBy('sort','desc')->get()->each->setAppends([])->toArray();
+				foreach($documents as $dk => $dv){
+					$documents[$dk]['type'] = 'document';
+					$categories[$k]['children'][] = $documents[$dk];
+				}
+				$this->getCategoryItems($categories[$k]['children']);
+			}
+		}
 	}
 }
