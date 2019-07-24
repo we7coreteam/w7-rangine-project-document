@@ -7,5 +7,6 @@ class CreateDocumentEvent extends Event
 {
 	use InstanceTraiter;
 	public $eventType = 'create_document';
+	public $user_id;
 
 }
