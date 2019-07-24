@@ -1,25 +1,37 @@
 <?php
+
+/**
+ * WeEngine Document System
+ *
+ * (c) We7Team 2019 <https://www.w7.cc>
+ *
+ * This is not a free software
+ * Using it under the license terms
+ * visited https://www.w7.cc for more details
+ */
+
 namespace W7\App\Model\Logic;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Schema;
 use W7\App\Model\Entity\User;
+
 class UserLogic extends BaseLogic
 {
-	use SoftDeletes;
-	protected $dates = ['deleted_at'];
+	public function getUserlist()
+	{
+		return User::orderBy('id', 'desc')->get();
+	}
 
 	public function getUser($data)
 	{
-		if (isset($data['id'])){
+		if (isset($data['id'])) {
 			$user = User::find($data['id']);
 		}
 
-		if (isset($data['username'])){
+		if (isset($data['username'])) {
 			$user = User::where('username', $data['username'])->first();
 		}
 
-		if (isset($data['phone'])){
+		if (isset($data['phone'])) {
 			$user = User::where('phone', $data['phone'])->first();
 		}
 
@@ -28,25 +40,17 @@ class UserLogic extends BaseLogic
 
 	public function createUser($data)
 	{
-		$users = User::where('username',$data['username'])->count();
+		$users = User::where('username', $data['username'])->count();
 
-		if (!$users){
+		if (!$users) {
 			return User::create($data);
 		}
 		return '';
 	}
 
-	public function updateUser($id,$data)
+	public function updateUser($id, $data)
 	{
-		return User::where('id',$id)->update($data);
-	}
-
-	public function softdelUser($id)
-	{
-		Schema::table('users',function ($table){
-			$table->softDeletes();
-		});
-		return User::find($id)->delete();
+		return User::where('id', $id)->update($data);
 	}
 
 	public function delUser($ids)
@@ -56,9 +60,8 @@ class UserLogic extends BaseLogic
 
 	public function searchUser($data)
 	{
-		if (isset($data['username'])){
-			return User::where('username','like','%'.$data['username'].'%')->get();
+		if (isset($data['username'])) {
+			return User::where('username', 'like', '%'.$data['username'].'%')->get();
 		}
 	}
-
 }
