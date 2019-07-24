@@ -18,8 +18,8 @@ class UserAuthorizationController extends Controller
                 return $this->error('无权访问');
             }
             $user_id = $request->input('user_id');
-            $result = $this->logic->getItems($user_id);
-
+//            $result = $this->logic->getItems($user_id);
+	        $result = $this->logic->getAuthByCategory($user_id);
             return $this->success($result);
         } catch (\Exception $e) {
             return $this->error($e->getMessage());

@@ -12,10 +12,8 @@
 
 namespace W7\App\Model\Entity;
 
-class User extends BaseModel
+class DocumentContent extends BaseModel
 {
-	//属性类型转换
-//    protected $casts = [
-//        'is_ban' => 'boolean',
-//    ];
+	public $timestamps = false;
+	protected $primaryKey = 'document_id';
 }

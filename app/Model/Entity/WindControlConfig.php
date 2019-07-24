@@ -1,13 +1,19 @@
 <?php
+
 /**
- * @author donknap
- * @date 19-4-23 下午6:38
+ * WeEngine Document System
+ *
+ * (c) We7Team 2019 <https://www.w7.cc>
+ *
+ * This is not a free software
+ * Using it under the license terms
+ * visited https://www.w7.cc for more details
  */
 
 namespace W7\App\Model\Entity;
 
-
-class WindControlConfig extends BaseModel {
+class WindControlConfig extends BaseModel
+{
 	public $timestamps = false;
 
 	public static $errors = [
@@ -18,17 +24,18 @@ class WindControlConfig extends BaseModel {
 	public static function get($key)
 	{
 		$config = self::find($key);
-		if($config){
+		if ($config) {
 			return $config->val;
 		}
 		return null;
 	}
 
-	public static function set($key,$value)
+	public static function set($key, $value)
 	{
 		$config = self::find($key);
-		if($config){
+		if ($config) {
 			$config->val = $value;
+			$config->save();
 			return true;
 		}
 		self::create(['key'=>$key,'value'=>$value]);
@@ -38,7 +45,7 @@ class WindControlConfig extends BaseModel {
 	public static function drop($key)
 	{
 		$config = self::find($key);
-		if($config){
+		if ($config) {
 			return $config->delete();
 		}
 		return false;
