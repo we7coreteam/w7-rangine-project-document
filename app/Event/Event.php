@@ -1,13 +1,14 @@
 <?php
 namespace W7\App\Event;
 
-use W7\App\Subscriber\SubscriberInterface;
+use W7\App\Subscriber\Subscriber;
 
 
 abstract class Event {
 
 	public $eventType = 'event';
 	protected $subscribers = [];
+	protected $localSubscribers = []; //内置订阅者
 
 	public function attach($key,$value)
 	{
@@ -15,11 +16,9 @@ abstract class Event {
 		return $this;
 	}
 
-	public function addSubscriber($subscriber,$key=null)
+	public function addSubscriber($subscriber)
 	{
-		if($key === null){
-			$key = str_replace('\\','_',$subscriber);
-		}
+		$key = $this->getKey($subscriber);
 		if(!isset($this->subscribers[$key])){
 			$this->subscribers[$key] = $subscriber;
 		}
@@ -28,20 +27,23 @@ abstract class Event {
 	public function addSubScribers($subscribers)
 	{
 		foreach ($subscribers as $subscriber){
-			$key = str_replace('\\','_',$subscriber);
-			if(!isset($this->subscribers[$key])){
-				$this->subscribers[$key] = $subscriber;
-			}
+			$this->addSubscriber($subscriber);
 		}
 	}
 
 	public function dispatch()
 	{
-		foreach ($this->subscribers as $k=>$subscriber){
+		$this->addSubScribers($this->localSubscribers);
+		foreach ($this->subscribers as $subscriber){
 			$subscriber = new $subscriber();
-			if($subscriber instanceof SubscriberInterface){
+			if($subscriber instanceof Subscriber){
 				$subscriber->run($this);
 			}
 		}
+	}
+
+	private function getKey($key)
+	{
+		return strtolower(str_replace('\\','_',trim($key,'\\')));
 	}
 }

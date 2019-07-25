@@ -24,12 +24,12 @@ irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'
 	$route->post('/user/updateuserpass', 'Admin\UserController@updateUserpass');
 	$route->post('/user/searchuser', 'Admin\UserController@searchUser');
 
-	$route->get('/document/index', 'Admin\DocumentController@index'); //文档列表
-	$route->get('/document/show', 'Admin\DocumentController@show'); //文档详情
-	$route->post('/document/publish_or_cancel', 'Admin\DocumentController@publishOrCancel'); //发布－取消文档
-	$route->post('/document/create', 'Admin\DocumentController@create'); //新增文档
-	$route->post('/document/update', 'Admin\DocumentController@update'); //修改文档
-	$route->post('/document/destroy', 'Admin\DocumentController@destroy'); //删除文档
+	$route->get('/document/index', 'Admin\ChapterController@index'); //文档列表
+	$route->get('/document/show', 'Admin\ChapterController@show'); //文档详情
+	$route->post('/document/publish_or_cancel', 'Admin\ChapterController@publishOrCancel'); //发布－取消文档
+	$route->post('/document/create', 'Admin\ChapterController@create'); //新增文档
+	$route->post('/document/update', 'Admin\ChapterController@update'); //修改文档
+	$route->post('/document/destroy', 'Admin\ChapterController@destroy'); //删除文档
 
 	$route->post('/upload/image', 'Admin\UploadController@image'); //图片上传
 

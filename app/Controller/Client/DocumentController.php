@@ -2,14 +2,14 @@
 
 
 namespace W7\App\Controller\Client;
-use W7\App\Model\Logic\DocumentLogic;
+use W7\App\Model\Logic\ChapterLogic;
 use W7\Http\Message\Server\Request;
 
 
 class DocumentController extends Controller{
 	public function __construct()
 	{
-		$this->logic = new DocumentLogic();
+		$this->logic = new ChapterLogic();
 	}
 
 	public function detail(Request $request) {
