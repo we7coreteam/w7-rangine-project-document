@@ -23,15 +23,15 @@ class UserLogic extends BaseLogic
 
 	public function getUser($data)
 	{
-		if (isset($data['id'])) {
+		if ($data['id']) {
 			$user = User::find($data['id']);
 		}
 
-		if (isset($data['username'])) {
+		if ($data['username']) {
 			$user = User::where('username', $data['username'])->first();
 		}
 
-		if (isset($data['phone'])) {
+		if ($data['phone']) {
 			$user = User::where('phone', $data['phone'])->first();
 		}
 
@@ -45,7 +45,7 @@ class UserLogic extends BaseLogic
 		if (!$users) {
 			return User::create($data);
 		}
-		return '';
+		return false;
 	}
 
 	public function updateUser($id, $data)
