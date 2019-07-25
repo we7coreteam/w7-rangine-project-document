@@ -1,4 +1,5 @@
 <?php
+
 /**
  * WeEngine Document System
  *
@@ -12,7 +13,6 @@
 irouter()->post('/admin/login/check', 'Admin\LoginController@check');
 irouter()->get('/admin/verificationcode/getcodeimg', 'Admin\VerificationcodeController@getCodeimg');
 irouter()->get('/admin/verificationcode/getcode', 'Admin\VerificationcodeController@getCode');
-
 
 irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'/admin'], function (\W7\Core\Route\Route $route) {
 	$route->post('/login/signout', 'Admin\LoginController@signout'); // 退出登录
@@ -33,10 +33,13 @@ irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'
 
 	$route->post('/upload/image', 'Admin\UploadController@image'); //图片上传
 
-
+	$route->get('/category/getlist', 'Admin\CategoryController@getlist');
 	$route->get('/category/getcatalogue', 'Admin\CategoryController@getCatalogue'); // 目录列表
 	$route->post('/category/add', 'Admin\CategoryController@add'); // 添加类别
+	$route->post('/category/getdetails', 'Admin\CategoryController@getdetails');
+	$route->post('/category/update', 'Admin\CategoryController@update');
+	$route->get('/category/del', 'Admin\CategoryController@del');
 
-    $route->get('/auth/index', 'Admin\UserAuthorizationController@index');
-    $route->post('/auth/update', 'Admin\UserAuthorizationController@update');
+	$route->get('/auth/index', 'Admin\UserAuthorizationController@index');
+	$route->post('/auth/update', 'Admin\UserAuthorizationController@update');
 });
