@@ -26,7 +26,7 @@ class UserAuthorizationLogic extends BaseLogic
 		if ($old_auth === APP_AUTH_ALL) {
 			throw new \Exception('设置失败，该用户是特权用户！');
 		}
-		$items['document'] = Document::select('id', 'name')->get()->toArray();
+		$items['document'] = Document::select('id', 'name')->get()->each->setAppends([])->toArray();
 		array_unshift($items['document'], ['id'=>0,'name'=>'新增','checked'=>0,'type' => 'overall']); //新增权限 不与 某条记录对应，标记为overall类型
 		$old_documents = UserAuthorization::where('user_id', $user_id)->where('function_name', 'document')->get()->keyBy('function_id'); //获取用户权限
 		foreach ($items['document'] as $k=>$v) {
@@ -119,19 +119,26 @@ class UserAuthorizationLogic extends BaseLogic
 		return $auth;
 	}
 
-	public function getAuthByCategory($withAuth = false)
+	public function getAuthByCategory($user_id = 0)
 	{
 		$roots = Category::select('id', 'name')->where('parent_id', 0)->orderBy('sort', 'desc')->get()->toArray();
 		foreach ($roots as $k=>$v) {
 			$roots[$k]['type'] = 'category';
 			$roots[$k]['children'] = [];
 		}
-		$this->withAuth = $withAuth;
-		$this->getCategoryItems($roots);
+
+
+		//处理权限
+		if($user_id){
+			$items = $this->getItems($user_id);
+			$this->getCategoryItems($roots,$items['document']);
+		}else{
+			$this->getCategoryItems($roots);
+		}
 		return $roots;
 	}
 
-	public function getCategoryItems(&$categories)
+	public function getCategoryItems(&$categories,$items = [])
 	{
 		foreach ($categories as $k=>$v) {
 			if($v['type'] == 'category'){
@@ -144,9 +151,20 @@ class UserAuthorizationLogic extends BaseLogic
 				$documents = Document::select('id','name')->where('category_id',$v['id'])->orderBy('sort','desc')->get()->each->setAppends([])->toArray();
 				foreach($documents as $dk => $dv){
 					$documents[$dk]['type'] = 'document';
+					if($items){
+						foreach ($items as $ik => $iv){
+							if($iv['id'] == $dv['id']){
+								$documents[$dk]['can_read'] = $iv['can_read'];
+								$documents[$dk]['can_modify'] = $iv['can_modify'];
+								$documents[$dk]['can_delete'] = $iv['can_delete'];
+								$documents[$dk]['checked'] = $iv['checked'];
+								unset($items[$ik]);
+							}
+						}
+					}
 					$categories[$k]['children'][] = $documents[$dk];
 				}
-				$this->getCategoryItems($categories[$k]['children']);
+				$this->getCategoryItems($categories[$k]['children'],$items);
 			}
 		}
 	}
