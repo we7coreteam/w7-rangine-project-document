@@ -1,14 +1,14 @@
 <?php
 namespace W7\App\Controller\Admin;
 
-use W7\App\Model\Logic\DocumentLogic;
+use W7\App\Model\Logic\ChapterLogic;
 use W7\Http\Message\Server\Request;
 
-class DocumentController extends Controller
+class ChapterController extends Controller
 {
     public function __construct()
     {
-        $this->logic = new DocumentLogic();
+        $this->logic = new ChapterLogic();
     }
 
     public function index(Request $request)
@@ -43,35 +43,31 @@ class DocumentController extends Controller
     public function create(Request $request)
     {
         try {
-            $auth = $request->document_user_auth;
-
-            if (APP_AUTH_ALL !== $auth) {
-                if (!isset($auth['document'][0])) {
-                    return $this->error('没有创建文档的权限!');
-                }
-            }
-
-            $this->logic->checkRepeatRequest($request->document_user_id);
-            $this->logic->checkWindControl($request->document_user_id,'max_number_added_per_day');
+//            $auth = $request->document_user_auth;
+//
+//            if (APP_AUTH_ALL !== $auth) {
+//                if (!isset($auth['document'][0])) {
+//                    return $this->error('没有创建文档的权限!');
+//                }
+//            }
+//
+//            $this->logic->checkRepeatRequest($request->document_user_id);
+//            $this->logic->checkWindControl($request->document_user_id,'max_number_added_per_day');
 
             $this->validate($request, [
                 'name' => 'string|required|max:30',
                 'sort' => 'integer|min:0',
                 'category_id' => 'required|integer|min:1',
-                'content' => 'required',
+                'chapter_id' => 'required',
             ], [
-                'name.required' => '文档名称必填',
-                'name.max' => '文档名最大３０个字符',
+                'name.required' => '章节名称必填',
+                'name.max' => '章节名最大３０个字符',
                 'sort.min' => '排序最小值为０',
-                'content.required' => '文档内容必填',
-                'category_id.required' => '分类id必填',
-	            'category_id.min' => '分类id最小为0',
+                'category_id.required' => '文档id必填',
+	            'category_id.min' => '文档id最小为0',
             ]);
 
-            $data['creator_id'] = $request->document_user_id;
             $data['name'] = $request->input('name');
-            $data['icon'] = $request->input('icon', '');
-            $content = $request->input('content');
             $data['sort'] = $request->input('sort', 0);
             $data['category_id'] = $request->input('category_id');
 

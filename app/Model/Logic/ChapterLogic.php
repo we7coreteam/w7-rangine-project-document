@@ -14,16 +14,16 @@ namespace W7\App\Model\Logic;
 
 use W7\App\Event\ChangeDocumentEvent;
 use W7\App\Event\CreateDocumentEvent;
-use W7\App\Model\Entity\Document;
+use W7\App\Model\Entity\Chapter;
 use W7\App\Model\Entity\DocumentContent;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserAuthorization;
 
-class DocumentLogic extends BaseLogic
+class ChapterLogic extends BaseLogic
 {
 	public function createDocument($data, $content)
 	{
-		$document = Document::create($data);
+		$document = Chapter::create($data);
 		$description = DocumentContent::create(['document_id' => $document['id'], 'content' => $content]);
 		if ($document && $description) {
 			$document['content'] = $content;
@@ -44,7 +44,7 @@ class DocumentLogic extends BaseLogic
 
 	public function updateDocument($id, $data, $content)
 	{
-		Document::where('id', $id)->update($data);
+		Chapter::where('id', $id)->update($data);
 		DocumentContent::where('document_id', $id)->update(['content' => $content]);
 		ChangeDocumentEvent::instance()->attach('id',$id)->dispatch();
 		return true;
@@ -52,7 +52,7 @@ class DocumentLogic extends BaseLogic
 
 	public function publishOrCancel($id, $is_show)
 	{
-		$document = Document::find($id);
+		$document = Chapter::find($id);
 		if ($document) {
 			$document->is_show = $is_show;
 			$document->save();
@@ -66,7 +66,7 @@ class DocumentLogic extends BaseLogic
 
 	public function getDocuments($page, $size, $category, $allow_ids, $is_show, $keyword)
 	{
-		return Document::when($category, function ($query) use ($category) {
+		return Chapter::when($category, function ($query) use ($category) {
 			return $query->where('category_id', $category);
 		})
 			->when($allow_ids, function ($query) use ($allow_ids) {
@@ -88,11 +88,9 @@ class DocumentLogic extends BaseLogic
 	public function getDocument($id)
 	{
 		if (icache()->get('document_'.$id)) {
-			var_dump('from cache');
 			return $this->get('document_'.$id);
 		}
-		var_dump('from database');
-		$document = Document::where('id', $id)->first();
+		$document = Chapter::where('id', $id)->first();
 		if (!$document) {
 			throw new \Exception('该文档不存在！');
 		}
@@ -110,7 +108,7 @@ class DocumentLogic extends BaseLogic
 	public function searchDocument($keyword)
 	{
 		$document_ids = DocumentContent::where('content', 'like', '%'.$keyword.'%')->pluck('document_id')->toArray();
-		$documents = Document::whereIn('id', $document_ids)->where('is_show', 1)->get()->toArray();
+		$documents = Chapter::whereIn('id', $document_ids)->where('is_show', 1)->get()->toArray();
 		foreach ($documents as &$document) {
 			$document['content'] = DocumentContent::find($document['id'])->content ?? '';
 		}
@@ -120,7 +118,7 @@ class DocumentLogic extends BaseLogic
 
 	public function deleteDocument($id)
 	{
-		$document = Document::select('id', 'name', 'icon', 'sort', 'is_show', 'category_id', 'updated_at')->where('id', $id)->first();
+		$document = Chapter::select('id', 'name', 'icon', 'sort', 'is_show', 'category_id', 'updated_at')->where('id', $id)->first();
 		if (!$document) {
 			throw new \Exception('该文档不存在！');
 		}
