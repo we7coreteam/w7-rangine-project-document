@@ -7,5 +7,6 @@ class ChangeAuthEvent extends Event
 {
 	use InstanceTraiter;
 	public $eventType = 'change_auth';
+	public $user_id;
 
 }

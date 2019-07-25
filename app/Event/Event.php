@@ -4,7 +4,7 @@ namespace W7\App\Event;
 use W7\App\Subscriber\SubscriberInterface;
 
 
-class Event {
+abstract class Event {
 
 	public $eventType = 'event';
 	protected $subscribers = [];
@@ -22,6 +22,16 @@ class Event {
 		}
 		if(!isset($this->subscribers[$key])){
 			$this->subscribers[$key] = $subscriber;
+		}
+	}
+
+	public function addSubScribers($subscribers)
+	{
+		foreach ($subscribers as $subscriber){
+			$key = str_replace('\\','_',$subscriber);
+			if(!isset($this->subscribers[$key])){
+				$this->subscribers[$key] = $subscriber;
+			}
 		}
 	}
 

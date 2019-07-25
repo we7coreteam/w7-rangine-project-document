@@ -1,5 +1,0 @@
-[2019-07-24 19:41:58 $2166.0]	WARNING	swManager_check_exit_status: worker#0[pid=2169] abnormal exit, status=255, signal=0
-[2019-07-24 19:42:43 $2166.0]	INFO	Server is reloading all workers now
-[2019-07-24 19:42:59 $2166.0]	WARNING	swManager_check_exit_status: worker#0[pid=2176] abnormal exit, status=255, signal=0
-[2019-07-24 19:43:42 $2166.0]	INFO	Server is reloading all workers now
-[2019-07-24 19:44:01 $2166.0]	INFO	Server is reloading all workers now

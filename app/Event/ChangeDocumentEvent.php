@@ -7,5 +7,6 @@ class ChangeDocumentEvent extends Event
 {
 	use InstanceTraiter;
 	public $eventType = 'change_document';
+	public $id;
 
 }
