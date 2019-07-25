@@ -15,37 +15,22 @@ namespace W7\App\Model\Logic;
 use W7\App\Event\ChangeDocumentEvent;
 use W7\App\Event\CreateDocumentEvent;
 use W7\App\Model\Entity\Chapter;
-use W7\App\Model\Entity\DocumentContent;
+use W7\App\Model\Entity\ChapterContent;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserAuthorization;
 
 class ChapterLogic extends BaseLogic
 {
-	public function createDocument($data, $content)
+	public function createChapter($data, $content)
 	{
-		$document = Chapter::create($data);
-		$description = DocumentContent::create(['document_id' => $document['id'], 'content' => $content]);
-		if ($document && $description) {
-			$document['content'] = $content;
-		}
-		UserAuthorization::create([
-			'user_id' => $data['creator_id'],
-			'function_id' => $document['id'],
-			'function_name' => 'document',
-			'can_read' => 1,
-			'can_modify' => 1,
-			'can_delete' => 1,
-		]);
-		CreateDocumentEvent::instance()->attach('user_id',$data['creator_id'])->dispatch();
-		$this->increment('max_number_added_per_day_'.date('Ymd').'_'.$data['creator_id']);
-
-		return $document;
+		$chapter = Chapter::create($data);
+		ChangeDocumentEvent::instance()->attach('id',$chapter->id)->dispatch();
+		return $chapter;
 	}
 
-	public function updateDocument($id, $data, $content)
+	public function updateChapter($id, $data)
 	{
 		Chapter::where('id', $id)->update($data);
-		DocumentContent::where('document_id', $id)->update(['content' => $content]);
 		ChangeDocumentEvent::instance()->attach('id',$id)->dispatch();
 		return true;
 	}
@@ -94,7 +79,7 @@ class ChapterLogic extends BaseLogic
 		if (!$document) {
 			throw new \Exception('该文档不存在！');
 		}
-		$description = DocumentContent::where('document_id', $id)->first();
+		$description = ChapterContent::where('document_id', $id)->first();
 		if ($description) {
 			$document['content'] = $description['content'];
 		} else {
@@ -107,23 +92,22 @@ class ChapterLogic extends BaseLogic
 
 	public function searchDocument($keyword)
 	{
-		$document_ids = DocumentContent::where('content', 'like', '%'.$keyword.'%')->pluck('document_id')->toArray();
+		$document_ids = ChapterContent::where('content', 'like', '%'.$keyword.'%')->pluck('document_id')->toArray();
 		$documents = Chapter::whereIn('id', $document_ids)->where('is_show', 1)->get()->toArray();
 		foreach ($documents as &$document) {
-			$document['content'] = DocumentContent::find($document['id'])->content ?? '';
+			$document['content'] = ChapterContent::find($document['id'])->content ?? '';
 		}
 
 		return $documents;
 	}
 
-	public function deleteDocument($id)
+	public function deleteChapter($id)
 	{
-		$document = Chapter::select('id', 'name', 'icon', 'sort', 'is_show', 'category_id', 'updated_at')->where('id', $id)->first();
-		if (!$document) {
-			throw new \Exception('该文档不存在！');
+		if (Chapter::where('parent_id',$id)->count() > 0) {
+			throw new \Exception('该章节下有子章节，不可删除！');
 		}
-		$document->delete();
-		DocumentContent::where('document_id', $id)->delete();
+		Chapter::destroy($id);
+		ChapterContent::where('document_id', $id)->delete();
 		ChangeDocumentEvent::instance()->attach('id',$id)->dispatch();
 	}
 }
