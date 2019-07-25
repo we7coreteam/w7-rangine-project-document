@@ -57,25 +57,23 @@ class ChapterController extends Controller
             $this->validate($request, [
                 'name' => 'string|required|max:30',
                 'sort' => 'integer|min:0',
-                'category_id' => 'required|integer|min:1',
-                'chapter_id' => 'required',
+                'document_id' => 'required|integer|min:1',
+	            'parent_id' => 'required|integer|min:0',
             ], [
                 'name.required' => '章节名称必填',
                 'name.max' => '章节名最大３０个字符',
                 'sort.min' => '排序最小值为０',
-                'category_id.required' => '文档id必填',
-	            'category_id.min' => '文档id最小为0',
+                'document_id.required' => '文档id必填',
+	            'document_id.min' => '文档id最小为0',
+	            'parent_id.required' => '父id必填',
             ]);
 
             $data['name'] = $request->input('name');
             $data['sort'] = $request->input('sort', 0);
-            $data['category_id'] = $request->input('category_id');
-
-            idb()->beginTransaction();
-            $result = $this->logic->createDocument($data, $content);
-            idb()->commit();
+            $data['document_id'] = $request->input('document_id');
+            $data['parent_id'] = $request->input('parent_id');
+            $result = $this->logic->createChapter($data);
             if ($result) {
-            	idb()->rollBack();
                 return $this->success($result);
             }
 
@@ -88,45 +86,37 @@ class ChapterController extends Controller
     public function update(Request $request)
     {
         try {
-            $auth = $request->document_user_auth;
-            $id = $request->input('id');
-            if (!$id) {
-                return $this->error('id必传');
-            }
-
-            if (APP_AUTH_ALL !== $auth) {
-                if (!isset($auth['document'][$id]) || 0 === $auth['document'][$id]['can_modify']) {
-                    return $this->error('没有修改该文档的权限!');
-                }
-            }
-
-            $this->logic->checkRepeatRequest($request->document_user_id);
+//            $auth = $request->document_user_auth;
+//            $id = $request->input('id');
+//            if (!$id) {
+//                return $this->error('id必传');
+//            }
+//
+//            if (APP_AUTH_ALL !== $auth) {
+//                if (!isset($auth['document'][$id]) || 0 === $auth['document'][$id]['can_modify']) {
+//                    return $this->error('没有修改该文档的权限!');
+//                }
+//            }
+//
+//            $this->logic->checkRepeatRequest($request->document_user_id);
 
             $this->validate($request, [
-                'name' => 'string|required|max:30',
-                'sort' => 'integer|min:0',
-                'category_id' => 'required|integer|min:1',
-                'content' => 'required',
+	            'name' => 'string|required|max:30',
+	            'sort' => 'integer|min:0',
+	            'id' => 'required|integer|min:1',
             ], [
-                'name.required' => '文档名称必填',
-                'name.max' => '文档名最大３０个字符',
-                'sort.min' => '排序最小值为０',
-                'content.required' => '文档内容必填',
-                'category_id.required' => '分类id必填',
-	            'category_id.min' => '分类id最小为0',
+	            'name.required' => '章节名称必填',
+	            'name.max' => '章节名最大３０个字符',
+	            'sort.min' => '排序最小值为０',
+	            'id.required' => '文档id必填',
+	            'id.min' => '文档id最小为0',
             ]);
 
-            $data['creator_id'] = $request->document_user_id;
             $data['name'] = $request->input('name');
-            $request->input('icon') !== null && $data['icon'] = $request->input('icon');
-            $content = $request->input('content');
-            $data['sort'] = $request->input('sort', 0);
-            $data['category_id'] = $request->input('category_id');
-	        idb()->beginTransaction();
-            $result = $this->logic->updateDocument($id, $data, $content);
-            idb()->commit();
+            $data['sort'] = $request->input('sort');
+	        $id = $request->input('id');
+            $result = $this->logic->updateDocument($id, $data);
             if ($result) {
-            	idb()->rollBack();
                 return $this->success([]);
             }
 
@@ -191,15 +181,15 @@ class ChapterController extends Controller
     {
         try {
             $id = $request->input('id');
-            $auth = $request->document_user_auth;
-            if (!$id) {
-                return $this->error('id必传');
-            }
-            if (APP_AUTH_ALL !== $auth) {
-                if (!isset($auth['document'][$id]) || 0 === $auth['document'][$id]['can_delete']) {
-                    return $this->error('没有删除该文档的权限!!');
-                }
-            }
+//            $auth = $request->document_user_auth;
+//            if (!$id) {
+//                return $this->error('id必传');
+//            }
+//            if (APP_AUTH_ALL !== $auth) {
+//                if (!isset($auth['document'][$id]) || 0 === $auth['document'][$id]['can_delete']) {
+//                    return $this->error('没有删除该文档的权限!!');
+//                }
+//            }
 	        idb()->beginTransaction();
             $this->logic->deleteDocument($id);
 			idb()->commit();
