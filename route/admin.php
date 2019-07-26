@@ -18,6 +18,7 @@ irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'
 	$route->post('/login/signout', 'Admin\LoginController@signout'); // 退出登录
 
 	$route->post('/user/getuserlist', 'Admin\UserController@getUserlist');
+	$route->get('/user/getuserdoclist', 'Admin\UserController@getUserDocList');
 	$route->post('/user/adduser', 'Admin\UserController@addUser');
 	$route->post('/user/updateuser', 'Admin\UserController@updateUser');
 	$route->post('/user/deluser', 'Admin\UserController@delUser');
@@ -43,5 +44,10 @@ irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'
 	$route->get('/auth/index', 'Admin\UserAuthorizationController@index');
 	$route->post('/auth/update', 'Admin\UserAuthorizationController@update');
 
-
+	$route->get('/document/getlist', 'Admin\DocumentController@getlist');
+	$route->post('/document/create', 'Admin\DocumentController@create');
+	$route->post('/document/update', 'Admin\DocumentController@update');
+	$route->get('/document/getdetails', 'Admin\DocumentController@getdetails');
+	$route->post('/document/del', 'Admin\DocumentController@del');
+	$route->get('/document/search', 'Admin\DocumentController@search');
 });

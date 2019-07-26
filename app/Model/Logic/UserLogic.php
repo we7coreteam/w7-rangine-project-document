@@ -12,6 +12,7 @@
 
 namespace W7\App\Model\Logic;
 
+use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\User;
 
 class UserLogic extends BaseLogic
@@ -36,6 +37,17 @@ class UserLogic extends BaseLogic
 		}
 
 		return $user;
+	}
+
+	public function getUserDocList($documents)
+	{
+		if ($documents == 'all'){
+			$res = Document::orderBy('updated_at','desc')->get();
+		}else{
+			$res = Document::orderBy('updated_at','desc')->find($documents);
+		}
+		$this->docLogic = new DocumentLogic();
+		return $this->docLogic->handleDocumentRes($res);
 	}
 
 	public function createUser($data)
