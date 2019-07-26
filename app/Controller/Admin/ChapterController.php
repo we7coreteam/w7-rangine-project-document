@@ -14,25 +14,24 @@ class ChapterController extends Controller
     public function index(Request $request)
     {
         try {
-            $auth = $request->document_user_auth;
+//            $auth = $request->document_user_auth;
+//
+//            if (APP_AUTH_ALL === $auth) {
+//                $allow_ids = [];
+//            } else {
+//                $allow_ids = [0];
+//                foreach ($auth['document'] as $document) {
+//                    if ($document['can_read']) {
+//                        $allow_ids[] = $document['function_id'];
+//                    }
+//                }
+//            }
 
-            if (APP_AUTH_ALL === $auth) {
-                $allow_ids = [];
-            } else {
-                $allow_ids = [0];
-                foreach ($auth['document'] as $document) {
-                    if ($document['can_read']) {
-                        $allow_ids[] = $document['function_id'];
-                    }
-                }
+            $id = (int)$request->input('document_id');
+            if(!$id){
+	            return $this->error('文档id必传');
             }
-
-            $page = $request->input('page', 1);
-            $category = $request->input('category_id', 0);
-            $size = $request->input('size', 10);
-            $is_show = $request->input('is_show');
-	        $keyword = $request->input('keyword');
-            $result = $this->logic->getDocuments($page, $size, $category, $allow_ids,$is_show,$keyword);
+            $result = $this->logic->getChapters($id);
 
             return $this->success($result);
         } catch (\Exception $e) {
@@ -115,9 +114,9 @@ class ChapterController extends Controller
             $data['name'] = $request->input('name');
             $data['sort'] = $request->input('sort');
 	        $id = $request->input('id');
-            $result = $this->logic->updateDocument($id, $data);
+            $result = $this->logic->updateChapter($id, $data);
             if ($result) {
-                return $this->success([]);
+                return $this->success($result);
             }
 
             return $this->error($result);
@@ -191,12 +190,30 @@ class ChapterController extends Controller
 //                }
 //            }
 	        idb()->beginTransaction();
-            $this->logic->deleteDocument($id);
+            $this->logic->deleteChapter($id);
 			idb()->commit();
             return $this->success();
         } catch (\Exception $e) {
         	idb()->rollBack();
             return $this->error($e->getMessage());
         }
+    }
+
+    public function saveContent(Request $request)
+    {
+    	try{
+		    $this->validate($request, [
+			    'chapter_id' => 'required|integer|min:1',
+		    ], [
+			    'chapter_id.required' => '文档id必填',
+			    'chapter_id.min' => '文档id最小为0',
+		    ]);
+		    $id = $request->input('chapter_id');
+		    $content = $request->input('content');
+		    $this->logic->saveContent($id,$content);
+		    return $this->success(['chapter_id'=>$id,'content'=>$content]);
+	    }catch (\Exception $e){
+		    return $this->error($e->getMessage());
+	    }
     }
 }

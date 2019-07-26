@@ -6,7 +6,7 @@ use W7\App\Model\Logic\ChapterLogic;
 use W7\Http\Message\Server\Request;
 
 
-class DocumentController extends Controller{
+class ChapterController extends Controller{
 	public function __construct()
 	{
 		$this->logic = new ChapterLogic();

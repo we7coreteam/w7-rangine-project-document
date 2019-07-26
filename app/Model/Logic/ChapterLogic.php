@@ -21,8 +21,21 @@ use W7\App\Model\Entity\UserAuthorization;
 
 class ChapterLogic extends BaseLogic
 {
-	public function createChapter($data, $content)
+	public function createChapter($data)
 	{
+		if($data['parent_id'] == 0)
+		{
+			$data['levels'] = 1;
+		}else{
+			$parent = Chapter::find($data['parent_id']);
+			if(!$parent){
+				throw new \Exception('父章节不存在');
+			}
+			$data['levels'] = $parent->levels + 1;
+			if($data['levels'] > 3){
+				throw new \Exception('章节最大层级为３层！');
+			}
+		}
 		$chapter = Chapter::create($data);
 		ChangeDocumentEvent::instance()->attach('id',$chapter->id)->dispatch();
 		return $chapter;
@@ -32,7 +45,7 @@ class ChapterLogic extends BaseLogic
 	{
 		Chapter::where('id', $id)->update($data);
 		ChangeDocumentEvent::instance()->attach('id',$id)->dispatch();
-		return true;
+		return Chapter::find($id);
 	}
 
 	public function publishOrCancel($id, $is_show)
@@ -49,25 +62,29 @@ class ChapterLogic extends BaseLogic
 		throw new \Exception('该文档不存在');
 	}
 
-	public function getDocuments($page, $size, $category, $allow_ids, $is_show, $keyword)
+	public function getChapters($id)
 	{
-		return Chapter::when($category, function ($query) use ($category) {
-			return $query->where('category_id', $category);
-		})
-			->when($allow_ids, function ($query) use ($allow_ids) {
-				return $query->whereIn('id', $allow_ids);
-			})
-			->where(function ($query) use ($keyword) {
-				if ($keyword) {
-					$user_ids = User::where('username', 'like', $keyword)->pluck('id')->toArray();
-					$query->whereIn('creator_id', $user_ids)->orWhere('name', 'like', '%'.$keyword.'%');
-				}
-			})
-			->when(null !== $is_show, function ($query) use ($is_show) {
-				return $query->where('is_show', $is_show);
-			})
-			->orderBy('sort', 'desc')
-			->paginate($size, null, null, $page);
+		$roots = Chapter::select('id','name','sort')->where('document_id',$id)->where('parent_id',0)->orderBy('sort','desc')->get()->toArray();
+		if($roots){
+			foreach ($roots as $k=>$v) {
+				$roots[$k]['children'] = [];
+			}
+			$this->getChild($roots);
+		}
+		return $roots;
+	}
+
+	public function getChild(&$chapters)
+	{
+		foreach ($chapters as $k=>$v) {
+			$subordinates = Chapter::select('id','name','sort')->where('parent_id',$v['id'])->orderBy('sort','desc')->get()->toArray();
+			foreach ($subordinates as $sk => $sv) {
+				$subordinates[$sk]['children'] = [];
+				$chapters[$k]['children'][] = $subordinates[$sk];
+			}
+
+			$this->getChild($chapters[$k]['children']);
+		}
 	}
 
 	public function getDocument($id)
@@ -107,7 +124,18 @@ class ChapterLogic extends BaseLogic
 			throw new \Exception('该章节下有子章节，不可删除！');
 		}
 		Chapter::destroy($id);
-		ChapterContent::where('document_id', $id)->delete();
+		ChapterContent::destroy($id);
 		ChangeDocumentEvent::instance()->attach('id',$id)->dispatch();
+	}
+
+	public function saveContent($id,$content)
+	{
+		$chapterContent = ChapterContent::find($id);
+		if($chapterContent){
+			$chapterContent->content = $content;
+			$chapterContent->save();
+		}else{
+			ChapterContent::create(['chapter_id'=>$id,'content'=>$content]);
+		}
 	}
 }

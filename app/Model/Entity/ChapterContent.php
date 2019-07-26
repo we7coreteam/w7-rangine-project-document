@@ -15,5 +15,5 @@ namespace W7\App\Model\Entity;
 class ChapterContent extends BaseModel
 {
 	public $timestamps = false;
-	protected $primaryKey = 'document_id';
+	protected $primaryKey = 'chapter_id';
 }
