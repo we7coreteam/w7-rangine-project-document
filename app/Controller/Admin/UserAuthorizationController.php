@@ -1,6 +1,7 @@
 <?php
 namespace W7\App\Controller\Admin;
 
+use W7\App\Model\Entity\Document;
 use W7\App\Model\Logic\UserAuthorizationLogic;
 use W7\Http\Message\Server\Request;
 
@@ -11,38 +12,70 @@ class UserAuthorizationController extends Controller
         $this->logic = new UserAuthorizationLogic();
     }
 
-    public function index(Request $request)
+    public function inviteUser(Request $request)
     {
-        try {
-            if (APP_AUTH_ALL !== $request->document_user_auth) {
-                return $this->error('无权访问');
-            }
-            $user_id = $request->input('user_id');
-//            $result = $this->logic->getItems($user_id);
-	        $result = $this->logic->getAuthByCategory($user_id);
-            return $this->success($result);
-        } catch (\Exception $e) {
-            return $this->error($e->getMessage());
-        }
+		try{
+
+			$this->validate($request, [
+				'document_id' => 'required|integer|min:1',
+				'user_id' => 'required|integer|min:1',
+			], [
+				'document_id.required' => '文档id必填',
+				'document_id.min' => '文档id非法',
+				'user_id.required' => '用户id必填',
+				'user_id.min' => '用户id非法',
+			]);
+			$user_id = $request->input('user_id');
+			$document_id = $request->input('document_id');
+
+			$document = Document::find($document_id);
+			if(!$document){
+				return $this->error('该文档不存在');
+			}
+			if($request->document_user_auth !== APP_AUTH_ALL && $document->creator_id != $request->document_user_id){
+				return $this->error('无权邀请');
+			}
+
+			$result = $this->logic->inviteUser($user_id, $document_id);
+
+			return $this->success($result, '邀请成功');
+		}catch (\Exception $e){
+			return $this->error($e->getMessage());
+		}
     }
 
-    public function update(Request $request)
+    public function leaveDocument(Request $request)
     {
-        //auth = {"document":[{"id":0},{"id":1,"can_read":1,"can_modify":0,"can_delete":0},{"id":2,"can_read":1,"can_modify":1,"can_delete":1}]}
-        try {
-            if (APP_AUTH_ALL !== $request->document_user_auth) {
-                return $this->error('无权操作');
-            }
-            $auth = json_decode($request->input('auth', '{}'), 1);
-            $user_id = $request->input('user_id');
-            if (!$user_id) {
-                return $this->error('缺少参数');
-            }
-            $result = $this->logic->updateAuth($user_id, $auth);
+	    try{
+		    $this->validate($request, [
+			    'document_id' => 'required|integer|min:1',
+			    'user_id' => 'required|integer|min:1',
+		    ], [
+			    'document_id.required' => '文档id必填',
+			    'document_id.min' => '文档id非法',
+			    'user_id.required' => '用户id必填',
+			    'user_id.min' => '用户id非法',
+		    ]);
+		    $document_id = $request->input('document_id');
+		    $user_id = $request->input('user_id');
 
-            return $this->success($result, '更新成功');
-        } catch (\Exception $e) {
-            return $this->error($e->getMessage());
-        }
+		    $document = Document::find($document_id);
+		    if(!$document){
+			    return $this->error('该文档不存在');
+		    }
+		    if($request->document_user_auth !== APP_AUTH_ALL && $document->creator_id != $request->document_user_id){
+			    return $this->error('无权删除');
+		    }
+
+		    if($document->creator_id == $user_id){
+			    return $this->error('创建者无法离开文档');
+		    }
+
+		    $this->logic->leaveDocument($user_id, $document_id);
+
+		    return $this->success([], '离开文档成功');
+	    }catch (\Exception $e){
+		    return $this->error($e->getMessage());
+	    }
     }
 }

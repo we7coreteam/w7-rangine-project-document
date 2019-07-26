@@ -14,23 +14,15 @@ class ChapterController extends Controller
     public function index(Request $request)
     {
         try {
-//            $auth = $request->document_user_auth;
-//
-//            if (APP_AUTH_ALL === $auth) {
-//                $allow_ids = [];
-//            } else {
-//                $allow_ids = [0];
-//                foreach ($auth['document'] as $document) {
-//                    if ($document['can_read']) {
-//                        $allow_ids[] = $document['function_id'];
-//                    }
-//                }
-//            }
-
             $id = (int)$request->input('document_id');
             if(!$id){
-	            return $this->error('文档id必传');
+	            return $this->error('id is required!');
             }
+	        $auth = $request->document_user_auth;
+	        if (APP_AUTH_ALL !== $auth && !in_array($id,$auth)) {
+		        return $this->error('无权查看!');
+	        }
+
             $result = $this->logic->getChapters($id);
 
             return $this->success($result);
@@ -42,17 +34,7 @@ class ChapterController extends Controller
     public function create(Request $request)
     {
         try {
-//            $auth = $request->document_user_auth;
-//
-//            if (APP_AUTH_ALL !== $auth) {
-//                if (!isset($auth['document'][0])) {
-//                    return $this->error('没有创建文档的权限!');
-//                }
-//            }
-//
-//            $this->logic->checkRepeatRequest($request->document_user_id);
-//            $this->logic->checkWindControl($request->document_user_id,'max_number_added_per_day');
-
+	        $this->logic->checkRepeatRequest($request->document_user_id);
             $this->validate($request, [
                 'name' => 'string|required|max:30',
                 'sort' => 'integer|min:0',
@@ -71,6 +53,14 @@ class ChapterController extends Controller
             $data['sort'] = $request->input('sort', 0);
             $data['document_id'] = $request->input('document_id');
             $data['parent_id'] = $request->input('parent_id');
+
+	        $auth = $request->document_user_auth;
+	        if (APP_AUTH_ALL !== $auth && !in_array($data['document_id'],$auth)) {
+		        if (!isset($auth['document'][0])) {
+			        return $this->error('无权操作');
+		        }
+	        }
+
             $result = $this->logic->createChapter($data);
             if ($result) {
                 return $this->success($result);
@@ -85,20 +75,6 @@ class ChapterController extends Controller
     public function update(Request $request)
     {
         try {
-//            $auth = $request->document_user_auth;
-//            $id = $request->input('id');
-//            if (!$id) {
-//                return $this->error('id必传');
-//            }
-//
-//            if (APP_AUTH_ALL !== $auth) {
-//                if (!isset($auth['document'][$id]) || 0 === $auth['document'][$id]['can_modify']) {
-//                    return $this->error('没有修改该文档的权限!');
-//                }
-//            }
-//
-//            $this->logic->checkRepeatRequest($request->document_user_id);
-
             $this->validate($request, [
 	            'name' => 'string|required|max:30',
 	            'sort' => 'integer|min:0',
@@ -113,6 +89,7 @@ class ChapterController extends Controller
 
             $data['name'] = $request->input('name');
             $data['sort'] = $request->input('sort');
+	        $data['auth'] = $request->document_user_auth;
 	        $id = $request->input('id');
             $result = $this->logic->updateChapter($id, $data);
             if ($result) {
@@ -180,17 +157,12 @@ class ChapterController extends Controller
     {
         try {
             $id = $request->input('id');
-//            $auth = $request->document_user_auth;
-//            if (!$id) {
-//                return $this->error('id必传');
-//            }
-//            if (APP_AUTH_ALL !== $auth) {
-//                if (!isset($auth['document'][$id]) || 0 === $auth['document'][$id]['can_delete']) {
-//                    return $this->error('没有删除该文档的权限!!');
-//                }
-//            }
+            if (!$id) {
+                return $this->error('id必传');
+            }
+
 	        idb()->beginTransaction();
-            $this->logic->deleteChapter($id);
+            $this->logic->deleteChapter($id,$request->document_user_auth);
 			idb()->commit();
             return $this->success();
         } catch (\Exception $e) {
@@ -204,13 +176,15 @@ class ChapterController extends Controller
     	try{
 		    $this->validate($request, [
 			    'chapter_id' => 'required|integer|min:1',
+			    //'content' => 'required',
 		    ], [
 			    'chapter_id.required' => '文档id必填',
 			    'chapter_id.min' => '文档id最小为0',
+			    //'content.required' => '内容必填',
 		    ]);
 		    $id = $request->input('chapter_id');
-		    $content = $request->input('content');
-		    $this->logic->saveContent($id,$content);
+		    $content = $request->input('content','');
+		    $this->logic->saveContent($id,$content,$request->document_user_auth);
 		    return $this->success(['chapter_id'=>$id,'content'=>$content]);
 	    }catch (\Exception $e){
 		    return $this->error($e->getMessage());

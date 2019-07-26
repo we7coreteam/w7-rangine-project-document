@@ -13,39 +13,45 @@
 namespace W7\App\Model\Logic;
 
 use W7\App\Event\ChangeDocumentEvent;
-use W7\App\Event\CreateDocumentEvent;
 use W7\App\Model\Entity\Chapter;
 use W7\App\Model\Entity\ChapterContent;
-use W7\App\Model\Entity\User;
-use W7\App\Model\Entity\UserAuthorization;
 
 class ChapterLogic extends BaseLogic
 {
 	public function createChapter($data)
 	{
-		if($data['parent_id'] == 0)
-		{
+		if ($data['parent_id'] == 0) {
 			$data['levels'] = 1;
-		}else{
+		} else {
 			$parent = Chapter::find($data['parent_id']);
-			if(!$parent){
+			if (!$parent) {
 				throw new \Exception('父章节不存在');
 			}
 			$data['levels'] = $parent->levels + 1;
-			if($data['levels'] > 3){
+			if ($data['levels'] > 3) {
 				throw new \Exception('章节最大层级为３层！');
 			}
 		}
 		$chapter = Chapter::create($data);
-		ChangeDocumentEvent::instance()->attach('id',$chapter->id)->dispatch();
+		ChangeDocumentEvent::instance()->attach('id', $chapter->id)->dispatch();
 		return $chapter;
 	}
 
 	public function updateChapter($id, $data)
 	{
 		Chapter::where('id', $id)->update($data);
-		ChangeDocumentEvent::instance()->attach('id',$id)->dispatch();
-		return Chapter::find($id);
+		$chapter = Chapter::find($id);
+		if ($chapter) {
+			if (APP_AUTH_ALL !== $data['auth'] && !in_array($chapter->document_id, $data['auth'])) {
+				throw new \Exception('sorry,you are not authorized to modify this chapter!');
+			}
+			$chapter->name = $data['name'];
+			$chapter->sort = $data['sort'];
+			$chapter->save();
+			ChangeDocumentEvent::instance()->attach('id', $id)->dispatch();
+			return $chapter;
+		}
+		throw new \Exception('this chapter is not exist,please refresh the web page!');
 	}
 
 	public function publishOrCancel($id, $is_show)
@@ -54,7 +60,7 @@ class ChapterLogic extends BaseLogic
 		if ($document) {
 			$document->is_show = $is_show;
 			$document->save();
-			ChangeDocumentEvent::instance()->attach('id',$id)->dispatch();
+			ChangeDocumentEvent::instance()->attach('id', $id)->dispatch();
 
 			return true;
 		}
@@ -64,8 +70,8 @@ class ChapterLogic extends BaseLogic
 
 	public function getChapters($id)
 	{
-		$roots = Chapter::select('id','name','sort')->where('document_id',$id)->where('parent_id',0)->orderBy('sort','desc')->get()->toArray();
-		if($roots){
+		$roots = Chapter::select('id', 'name', 'sort')->where('document_id', $id)->where('parent_id', 0)->orderBy('sort', 'desc')->get()->toArray();
+		if ($roots) {
 			foreach ($roots as $k=>$v) {
 				$roots[$k]['children'] = [];
 			}
@@ -77,7 +83,7 @@ class ChapterLogic extends BaseLogic
 	public function getChild(&$chapters)
 	{
 		foreach ($chapters as $k=>$v) {
-			$subordinates = Chapter::select('id','name','sort')->where('parent_id',$v['id'])->orderBy('sort','desc')->get()->toArray();
+			$subordinates = Chapter::select('id', 'name', 'sort')->where('parent_id', $v['id'])->orderBy('sort', 'desc')->get()->toArray();
 			foreach ($subordinates as $sk => $sv) {
 				$subordinates[$sk]['children'] = [];
 				$chapters[$k]['children'][] = $subordinates[$sk];
@@ -102,7 +108,7 @@ class ChapterLogic extends BaseLogic
 		} else {
 			$document['content'] = '';
 		}
-		icache()->set('document_'.$id, $document,24*3600);
+		icache()->set('document_'.$id, $document, 24*3600);
 
 		return $document;
 	}
@@ -118,24 +124,51 @@ class ChapterLogic extends BaseLogic
 		return $documents;
 	}
 
-	public function deleteChapter($id)
+	public function deleteChapter($id, $auth)
 	{
-		if (Chapter::where('parent_id',$id)->count() > 0) {
+		if (Chapter::where('parent_id', $id)->count() > 0) {
 			throw new \Exception('该章节下有子章节，不可删除！');
 		}
-		Chapter::destroy($id);
-		ChapterContent::destroy($id);
-		ChangeDocumentEvent::instance()->attach('id',$id)->dispatch();
+		$chapter = Chapter::find($id);
+		if ($chapter) {
+			if (APP_AUTH_ALL !== $auth && !in_array($chapter->document_id, $auth)) {
+				throw new \Exception('sorry,you are not authorized to modify this chapter!');
+			}
+			$chapter->delete();
+			ChapterContent::destroy($id);
+			ChangeDocumentEvent::instance()->attach('id', $id)->dispatch();
+			return $chapter;
+		}
+		throw new \Exception('this chapter is not exist,please refresh the web page!');
 	}
 
-	public function saveContent($id,$content)
+	public function saveContent($id, $content, $auth)
 	{
+		$document_id = Chapter::where('id', $id)->value('document_id');
+		var_dump($document_id);
+		if (!$document_id) {
+			throw new \Exception('sorry,the chapter is deleted,please refresh the web page!');
+		}
+		if (APP_AUTH_ALL !== $auth && !in_array($document_id, $auth)) {
+			throw new \Exception('sorry,you are not authorized to modify this chapter content!');
+		}
 		$chapterContent = ChapterContent::find($id);
-		if($chapterContent){
+		if ($chapterContent) {
 			$chapterContent->content = $content;
 			$chapterContent->save();
-		}else{
+			return $chapterContent;
+		} else {
 			ChapterContent::create(['chapter_id'=>$id,'content'=>$content]);
 		}
+	}
+
+	public function deleteDocument($document_id)
+	{
+		$chapters = Chapter::where('document_id',$document_id)->get();
+		foreach($chapters as $chapter){
+			ChapterContent::where('chapter_id',$chapter->id)->delete();
+			$chapter->delete();
+		}
+		return true;
 	}
 }

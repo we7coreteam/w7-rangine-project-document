@@ -25,7 +25,7 @@ irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'
 	$route->post('/user/searchuser', 'Admin\UserController@searchUser');
 
 	$route->get('/chapter/index', 'Admin\ChapterController@index'); //文档列表
-	$route->get('/chapter/show', 'Admin\ChapterController@show'); //文档详情
+	$route->post('/chapter/save_content', 'Admin\ChapterController@saveContent'); //文档详情
 	$route->post('/chapter/publish_or_cancel', 'Admin\ChapterController@publishOrCancel'); //发布－取消文档
 	$route->post('/chapter/create', 'Admin\ChapterController@create'); //新增文档
 	$route->post('/chapter/update', 'Admin\ChapterController@update'); //修改文档
