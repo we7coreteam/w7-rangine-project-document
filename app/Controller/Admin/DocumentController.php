@@ -24,23 +24,30 @@ class DocumentController extends Controller
 		$this->user = new UserLogic();
 	}
 
-//	public function get(Request $request)
-//	{
-//		try {
-//			$data = [];
-//			if ($request->input('id')){
-//				$data['id'] = $request->input('id');
-//			}
-//			$res = $this->logic->get($data);
-//			if ($res) {
-//				return $this->success($res);
-//			} else {
-//				return $this->error($res);
-//			}
-//		} catch (\Exception $e) {
-//			return $this->error($e->getMessage());
-//		}
-//	}
+	public function getlist()
+	{
+		try {
+			$res = $this->logic->getlist();
+			return $this->success($res);
+		} catch (\Exception $e) {
+			return $this->error($e->getMessage());
+		}
+	}
+
+	public function getdetails(Request $request)
+	{
+		try {
+			$this->validate($request, [
+				'id' => 'required|integer|min:1',
+			], [
+				'id.required' => '文档ID不能为空',
+			]);
+			$res = $this->logic->getdetails($request->input('id'));
+			return $this->success($res);
+		} catch (\Exception $e) {
+			return $this->error($e->getMessage());
+		}
+	}
 
 	public function create(Request $request)
 	{
@@ -53,16 +60,19 @@ class DocumentController extends Controller
 				'username.required' => '用户名不能为空',
 			]);
 
-			$name = $request->input('name');
+			$name = trim($request->input('name'));
 			$username = $request->input('username');
-			$description = $request->input('description');
 
 			$user = $this->user->getUser(['username'=>$username]);
 
 			$data = [];
 			$data['name'] = $name;
 			$data['creator_id'] = $user['id'];
-			$data['description'] = $description;
+			if ($request->input('description')) {
+				$data['description'] = $request->input('description');
+			} else {
+				$data['description'] = '';
+			}
 
 			$res = $this->logic->create($data);
 			if ($res) {
@@ -88,19 +98,19 @@ class DocumentController extends Controller
 			$username = $request->input('username');
 			$documentId = $request->input('id');
 
-			$relation = $this->relation($username,$documentId);
-			if ($relation !== true){
+			$relation = $this->logic->relation($username, $documentId);
+			if ($relation !== true) {
 				return $this->error($relation);
 			}
 
 			$data = [];
-			if ($request->input('name')){
+			if ($request->input('name')) {
 				$data['name'] = $request->input('name');
 			}
-			if ($request->input('description')){
+			if ($request->input('description')) {
 				$data['description'] = $request->input('description');
 			}
-			if ($request->input('url')){
+			if ($request->input('url')) {
 				$data['url'] = $request->input('url');
 			}
 
@@ -125,8 +135,8 @@ class DocumentController extends Controller
 				'id.required' => '文档ID不能为空',
 				'username.required' => '用户名不能为空',
 			]);
-			$relation = $this->relation($request->input('username'),$request->input('id'));
-			if ($relation !== true){
+			$relation = $this->logic->relation($request->input('username'), $request->input('id'));
+			if ($relation !== true) {
 				return $this->error($relation);
 			}
 
@@ -141,24 +151,18 @@ class DocumentController extends Controller
 		}
 	}
 
-	private function relation($username,$documentId)
+	public function search(Request $request)
 	{
 		try {
-			$user = $this->user->getUser(['username'=>$username]);
-			$document = $this->logic->get(['id'=>$documentId]);
-			if (!$user){
-				return '用户不存在';
-			}
-			if (!$document){
-				return '文档不存在';
-			}
-			if ($user['id'] != $document['creator_id']){
-				return '只有文档创建者才可以操作';
-			}
-			return true;
+			$this->validate($request, [
+				'name' => 'required',
+			], [
+				'name.required' => '文档名称不能为空',
+			]);
+			$res = $this->logic->search(trim($request->input('name')));
+			return $this->success($res);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
 		}
-
 	}
 }

@@ -28,14 +28,38 @@ class UserController extends Controller
 	{
 		try {
 			$res = $this->logic->getUserlist();
-			if ($res) {
-				return $this->success($res);
-			}
-			return $this->error($res);
+			return $this->success($res);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
 		}
 	}
+
+	public function getUserDocList(Request $request)
+	{
+		try {
+			$res = $this->logic->getUserDocList($request->document_user_auth['document']);
+			return $this->success($res);
+		} catch (\Exception $e) {
+			return $this->error($e->getMessage());
+		}
+	}
+
+	public function pullDocUserList(Request $request)
+	{
+		try {
+			$this->validate($request, [
+				'id' => 'required',
+			], [
+				'username.required' => '请输入用户姓名',
+			]);
+			$res = $this->logic->pullDocUserList($request->input('id'));
+			return $this->success($res);
+		} catch (\Exception $e) {
+			return $this->error($e->getMessage());
+		}
+	}
+
+
 
 	public function addUser(Request $request)
 	{
@@ -47,10 +71,11 @@ class UserController extends Controller
 				'username.required' => '请输入用户姓名',
 				'userpass.required' => '请输入用户密码',
 			]);
-
+			$username = trim($request->input('username'));
+			$userpass = trim($request->input('userpass'));
 			$data = [
-				'username' => $request->input('username'),
-				'userpass' => md5(md5($request->input('name').$request->input('userpass'))),
+				'username' => $username,
+				'userpass' => md5(md5($username.$userpass)),
 			];
 
 			$res = $this->logic->createUser($data);
@@ -132,7 +157,7 @@ class UserController extends Controller
 			$user_val = $this->logic->getUser(['id'=>$request->input('id')]);
 			if ($user_val) {
 				$data = [
-					'userpass' => md5(md5($user_val['username'].$request->input('userpass'))),
+					'userpass' => md5(md5($user_val['username'].trim($request->input('userpass')))),
 				];
 				$res = $this->logic->updateUser(intval($request->input('id')), $data);
 				if ($res) {
@@ -154,7 +179,7 @@ class UserController extends Controller
 			], [
 				'username.required' => '用户名称不能为空',
 			]);
-			$res = $this->logic->searchUser(['username'=>$request->input('username')]);
+			$res = $this->logic->searchUser(['username'=>trim($request->input('username'))]);
 			return $this->success($res);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
