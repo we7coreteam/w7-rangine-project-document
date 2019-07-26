@@ -8,11 +8,9 @@ use W7\App\Model\Entity\Document;
 
 class DocumentLogic extends BaseLogic
 {
-	public function get($data)
+	public function getdetails($id)
 	{
-		if (isset($data['id'])){
-			return Document::find($data['id']);
-		}
+		return Document::find($id);
 	}
 
 	public function create($data)

@@ -43,7 +43,5 @@ irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'
 	$route->get('/auth/index', 'Admin\UserAuthorizationController@index');
 	$route->post('/auth/update', 'Admin\UserAuthorizationController@update');
 
-	$route->post('/document/create', 'Admin\DocumentController@create');
-	$route->post('/document/update', 'Admin\DocumentController@update');
-	$route->post('/document/del', 'Admin\DocumentController@del');
+
 });
