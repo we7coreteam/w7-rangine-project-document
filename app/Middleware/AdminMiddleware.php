@@ -36,8 +36,8 @@ class AdminMiddleware extends MiddlewareAbstract
 			return App::getApp()->getContext()->getResponse()->json(['message' => '错误的票据', 'data' => null, 'status' => false, 'code' => 444]);
 		}
 		$request->document_user_id = $access_token;
-		//$logic = new App\Model\Logic\UserAuthorizationLogic();
-		//$request->document_user_auth = $logic->getUserAuthorizations($access_token);
+		$logic = new App\Model\Logic\UserAuthorizationLogic();
+		$request->document_user_auth = $logic->getUserAuthorizations($access_token);
 
 		return $handler->handle($request);
 	}
