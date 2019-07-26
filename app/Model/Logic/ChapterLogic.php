@@ -39,7 +39,6 @@ class ChapterLogic extends BaseLogic
 
 	public function updateChapter($id, $data)
 	{
-		Chapter::where('id', $id)->update($data);
 		$chapter = Chapter::find($id);
 		if ($chapter) {
 			if (APP_AUTH_ALL !== $data['auth'] && !in_array($chapter->document_id, $data['auth'])) {
@@ -93,30 +92,30 @@ class ChapterLogic extends BaseLogic
 		}
 	}
 
-	public function getDocument($id)
+	public function getChapter($document_id,$id)
 	{
-		if (icache()->get('document_'.$id)) {
-			return $this->get('document_'.$id);
+//		if (icache()->get('document_'.$id)) {
+//			return $this->get('document_'.$id);
+//		}
+		$chapter = Chapter::where('id', $id)->where('document_id',$document_id)->first();
+		if (!$chapter) {
+			throw new \Exception('该章节不存在！');
 		}
-		$document = Chapter::where('id', $id)->first();
-		if (!$document) {
-			throw new \Exception('该文档不存在！');
-		}
-		$description = ChapterContent::where('document_id', $id)->first();
+		$description = ChapterContent::where('chapter_id', $id)->first();
 		if ($description) {
-			$document['content'] = $description['content'];
+			$chapter['content'] = $description['content'];
 		} else {
-			$document['content'] = '';
+			$chapter['content'] = '';
 		}
-		icache()->set('document_'.$id, $document, 24*3600);
+//		icache()->set('document_'.$id, $document, 24*3600);
 
-		return $document;
+		return $chapter;
 	}
 
 	public function searchDocument($keyword)
 	{
-		$document_ids = ChapterContent::where('content', 'like', '%'.$keyword.'%')->pluck('document_id')->toArray();
-		$documents = Chapter::whereIn('id', $document_ids)->where('is_show', 1)->get()->toArray();
+		$document_ids = ChapterContent::where('content', 'like', '%'.$keyword.'%')->pluck('chapter_id')->toArray();
+		$documents = Chapter::whereIn('id', $document_ids)->get()->toArray();
 		foreach ($documents as &$document) {
 			$document['content'] = ChapterContent::find($document['id'])->content ?? '';
 		}
@@ -132,14 +131,14 @@ class ChapterLogic extends BaseLogic
 		$chapter = Chapter::find($id);
 		if ($chapter) {
 			if (APP_AUTH_ALL !== $auth && !in_array($chapter->document_id, $auth)) {
-				throw new \Exception('sorry,you are not authorized to modify this chapter!');
+				throw new \Exception('无权操作');
 			}
 			$chapter->delete();
 			ChapterContent::destroy($id);
 			ChangeDocumentEvent::instance()->attach('id', $id)->dispatch();
 			return $chapter;
 		}
-		throw new \Exception('this chapter is not exist,please refresh the web page!');
+		throw new \Exception('该章节不存在，请刷新页面');
 	}
 
 	public function saveContent($id, $content, $auth)
@@ -147,10 +146,10 @@ class ChapterLogic extends BaseLogic
 		$document_id = Chapter::where('id', $id)->value('document_id');
 		var_dump($document_id);
 		if (!$document_id) {
-			throw new \Exception('sorry,the chapter is deleted,please refresh the web page!');
+			throw new \Exception('该章节不存在，请刷新页面');
 		}
 		if (APP_AUTH_ALL !== $auth && !in_array($document_id, $auth)) {
-			throw new \Exception('sorry,you are not authorized to modify this chapter content!');
+			throw new \Exception('无权操作');
 		}
 		$chapterContent = ChapterContent::find($id);
 		if ($chapterContent) {
@@ -160,6 +159,16 @@ class ChapterLogic extends BaseLogic
 		} else {
 			ChapterContent::create(['chapter_id'=>$id,'content'=>$content]);
 		}
+	}
+
+	public function searchChapter($id,$keywords)
+	{
+		$chapter = Chapter::select('id','parent_id','name')->where('document_id',$id)->where('name','like','%'.$keywords.'%')->first();
+		if($chapter){
+			$chapter['content'] = ChapterContent::find($chapter['id'])->content ?? '';
+			return $chapter;
+		}
+		throw new \Exception('没有匹配到任何章节');
 	}
 
 	public function deleteDocument($document_id)

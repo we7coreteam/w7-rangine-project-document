@@ -24,7 +24,7 @@ abstract class Event {
 		}
 	}
 
-	public function addSubScribers($subscribers)
+	public function addSubscribers($subscribers)
 	{
 		foreach ($subscribers as $subscriber){
 			$this->addSubscriber($subscriber);
@@ -33,7 +33,7 @@ abstract class Event {
 
 	public function dispatch()
 	{
-		$this->addSubScribers($this->localSubscribers);
+		$this->addSubscribers($this->localSubscribers);
 		foreach ($this->subscribers as $subscriber){
 			$subscriber = new $subscriber();
 			if($subscriber instanceof Subscriber){

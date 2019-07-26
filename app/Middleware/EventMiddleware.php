@@ -26,7 +26,7 @@ class EventMiddleware extends MiddlewareAbstract
 		App\Event\ChangeDocumentEvent::instance()->addSubscriber(App\Subscriber\ClearDocumentCacheSubscriber::class);
 		App\Event\ChangeAuthEvent::instance()->addSubscriber(App\Subscriber\ClearAuthCacheSubscriber::class);
 
-		App\Event\CreateDocumentEvent::instance()->addSubScribers([
+		App\Event\CreateDocumentEvent::instance()->addSubscribers([
 			App\Subscriber\ClearAuthCacheSubscriber::class,
 			App\Subscriber\ClearCategoryCacheSubscriber::class
 		]);

@@ -77,12 +77,13 @@ class ChapterController extends Controller
         try {
             $this->validate($request, [
 	            'name' => 'string|required|max:30',
-	            'sort' => 'integer|min:0',
+	            'sort' => 'required|integer|min:0',
 	            'id' => 'required|integer|min:1',
             ], [
 	            'name.required' => '章节名称必填',
 	            'name.max' => '章节名最大３０个字符',
 	            'sort.min' => '排序最小值为０',
+	            'sort.required' => '排序必填',
 	            'id.required' => '文档id必填',
 	            'id.min' => '文档id最小为0',
             ]);
@@ -186,6 +187,26 @@ class ChapterController extends Controller
 		    $content = $request->input('content','');
 		    $this->logic->saveContent($id,$content,$request->document_user_auth);
 		    return $this->success(['chapter_id'=>$id,'content'=>$content]);
+	    }catch (\Exception $e){
+		    return $this->error($e->getMessage());
+	    }
+    }
+
+    public function searchChapter(Request $request)
+    {
+	    try{
+		    $this->validate($request, [
+			    'keywords' => 'required',
+			    'document_id' => 'required|integer|min:1',
+		    ], [
+			    'document_id.required' => '文档id必填',
+			    'document_id.min' => '文档id最小为0',
+			    'keywords.required' => '关键字必填',
+		    ]);
+		    $id = $request->input('document_id');
+		    $keywords = $request->input('keywords');
+		    $result = $this->logic->searchChapter($id,$keywords);
+		    return $this->success($result);
 	    }catch (\Exception $e){
 		    return $this->error($e->getMessage());
 	    }
