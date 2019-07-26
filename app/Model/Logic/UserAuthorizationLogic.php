@@ -114,58 +114,21 @@ class UserAuthorizationLogic extends BaseLogic
 		} else {
 			return [];
 		}
-		$auth['document'] = UserAuthorization::where('user_id', $user_id)->where('function_name', 'document')->get()->keyBy('function_id')->toArray();
+		$auth['document'] = UserAuthorization::where('user_id', $user_id)->pluck('document_id')->toArray();
 		icache()->set('auth_'.$user_id, $auth,24*3600);
 		return $auth;
 	}
 
-	public function getAuthByCategory($user_id = 0)
+	public function getDocumentUsers($document_id)
 	{
-		$roots = Category::select('id', 'name')->where('parent_id', 0)->orderBy('sort', 'desc')->get()->toArray();
-		foreach ($roots as $k=>$v) {
-			$roots[$k]['type'] = 'category';
-			$roots[$k]['children'] = [];
+		$cacheDocumentUsers = icache()->get('document_users_'.$document_id);
+		if($cacheDocumentUsers){
+			return $cacheDocumentUsers;
 		}
-
-
-		//处理权限
-		if($user_id){
-			$items = $this->getItems($user_id);
-			$this->getCategoryItems($roots,$items['document']);
-		}else{
-			$this->getCategoryItems($roots);
-		}
-		return $roots;
+		$documentUsers = UserAuthorization::where('document_id',$document_id)->pluck('user_id')->toArray();
+		icache()->set('document_users_'.$document_id,$documentUsers,24*3600);
+		return $documentUsers;
 	}
 
-	public function getCategoryItems(&$categories,$items = [])
-	{
-		foreach ($categories as $k=>$v) {
-			if($v['type'] == 'category'){
-				$subordinates = Category::select('id','name')->where('parent_id',$v['id'])->orderBy('sort','desc')->get()->toArray();
-				foreach ($subordinates as $sk => $sv) {
-					$subordinates[$sk]['type'] = 'category';
-					$subordinates[$sk]['children'] = [];
-					$categories[$k]['children'][] = $subordinates[$sk];
-				}
-				$documents = Document::select('id','name')->where('category_id',$v['id'])->orderBy('sort','desc')->get()->each->setAppends([])->toArray();
-				foreach($documents as $dk => $dv){
-					$documents[$dk]['type'] = 'document';
-					if($items){
-						foreach ($items as $ik => $iv){
-							if($iv['id'] == $dv['id']){
-								$documents[$dk]['can_read'] = $iv['can_read'];
-								$documents[$dk]['can_modify'] = $iv['can_modify'];
-								$documents[$dk]['can_delete'] = $iv['can_delete'];
-								$documents[$dk]['checked'] = $iv['checked'];
-								unset($items[$ik]);
-							}
-						}
-					}
-					$categories[$k]['children'][] = $documents[$dk];
-				}
-				$this->getCategoryItems($categories[$k]['children'],$items);
-			}
-		}
-	}
+
 }
