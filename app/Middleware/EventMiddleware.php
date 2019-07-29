@@ -22,13 +22,12 @@ class EventMiddleware extends MiddlewareAbstract
 {
 	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
 	{
-		App\Event\ChangeCategoryEvent::instance()->addSubscriber(App\Subscriber\ClearCategoryCacheSubscriber::class);
 		App\Event\ChangeDocumentEvent::instance()->addSubscriber(App\Subscriber\ClearDocumentCacheSubscriber::class);
 		App\Event\ChangeAuthEvent::instance()->addSubscriber(App\Subscriber\ClearAuthCacheSubscriber::class);
-
+		App\Event\ChangeChapterEvent::instance()->addSubscriber(App\Subscriber\ClearChapterCacheSubscriber::class);
 		App\Event\CreateDocumentEvent::instance()->addSubscribers([
 			App\Subscriber\ClearAuthCacheSubscriber::class,
-			App\Subscriber\ClearCategoryCacheSubscriber::class
+			//App\Subscriber\ClearCategoryCacheSubscriber::class
 		]);
 		return $handler->handle($request);
 	}

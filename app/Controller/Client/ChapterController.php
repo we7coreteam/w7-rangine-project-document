@@ -54,13 +54,17 @@ class ChapterController extends Controller{
 	{
 		try{
 			$this->validate($request, [
-				'keyword' => 'required',
+				'keywords' => 'required',
+				'document_id' => 'required|integer|min:1',
 			],[
-				'keyword.required' => '关键字必填',
+				'keywords.required' => '关键字必填',
+				'document_id.required' => '文档id必填',
+				'document_id.integer' => '文档id非法'
 			]);
 
-			$keyword = $request->input('keyword');
-			$res = $this->logic->searchDocument($keyword);
+			$keyword = $request->input('keywords');
+			$id = $request->input('document_id');
+			$res = $this->logic->searchDocument($id,$keyword);
 			return $this->success($res);
 		}catch (\Exception $e){
 			return $this->error($e->getMessage());

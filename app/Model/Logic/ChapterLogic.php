@@ -12,6 +12,7 @@
 
 namespace W7\App\Model\Logic;
 
+use W7\App\Event\ChangeChapterEvent;
 use W7\App\Event\ChangeDocumentEvent;
 use W7\App\Model\Entity\Chapter;
 use W7\App\Model\Entity\ChapterContent;
@@ -33,7 +34,7 @@ class ChapterLogic extends BaseLogic
 			}
 		}
 		$chapter = Chapter::create($data);
-		ChangeDocumentEvent::instance()->attach('id', $chapter->id)->dispatch();
+		ChangeChapterEvent::instance()->attach('chapter',$chapter)->dispatch();
 		return $chapter;
 	}
 
@@ -47,7 +48,7 @@ class ChapterLogic extends BaseLogic
 			$chapter->name = $data['name'];
 			$chapter->sort = $data['sort'];
 			$chapter->save();
-			ChangeDocumentEvent::instance()->attach('id', $id)->dispatch();
+			ChangeChapterEvent::instance()->attach('chapter',$chapter)->dispatch();
 			return $chapter;
 		}
 		throw new \Exception('this chapter is not exist,please refresh the web page!');
@@ -69,14 +70,20 @@ class ChapterLogic extends BaseLogic
 
 	public function getChapters($id)
 	{
-		$roots = Chapter::select('id', 'name', 'sort')->where('document_id', $id)->where('parent_id', 0)->orderBy('sort', 'desc')->get()->toArray();
-		if ($roots) {
-			foreach ($roots as $k=>$v) {
-				$roots[$k]['children'] = [];
+		$cacheData = icache()->get('chapters_'.$id);
+		if($cacheData){
+			return $cacheData;
+		}else{
+			$roots = Chapter::select('id', 'name', 'sort')->where('document_id', $id)->where('parent_id', 0)->orderBy('sort', 'desc')->get()->toArray();
+			if ($roots) {
+				foreach ($roots as $k=>$v) {
+					$roots[$k]['children'] = [];
+				}
+				$this->getChild($roots);
 			}
-			$this->getChild($roots);
+			icache()->set('chapters_'.$id,$roots);
+			return $roots;
 		}
-		return $roots;
 	}
 
 	public function getChild(&$chapters)
@@ -94,33 +101,50 @@ class ChapterLogic extends BaseLogic
 
 	public function getChapter($document_id,$id)
 	{
-//		if (icache()->get('document_'.$id)) {
-//			return $this->get('document_'.$id);
-//		}
-		$chapter = Chapter::where('id', $id)->where('document_id',$document_id)->first();
-		if (!$chapter) {
-			throw new \Exception('该章节不存在！');
+		if (icache()->get('chapter_'.$id)) {
+			return icache()->get('chapter_'.$id);
+		}else{
+			$chapter = Chapter::where('id', $id)->where('document_id',$document_id)->first();
+			if (!$chapter) {
+				throw new \Exception('该章节不存在！');
+			}
+			$description = ChapterContent::where('chapter_id', $id)->first();
+			if ($description) {
+				$chapter['content'] = $description['content'];
+			} else {
+				$chapter['content'] = '';
+			}
+			icache()->set('chapter_'.$id, $chapter, 24*3600);
+			return $chapter;
 		}
-		$description = ChapterContent::where('chapter_id', $id)->first();
-		if ($description) {
-			$chapter['content'] = $description['content'];
-		} else {
-			$chapter['content'] = '';
-		}
-//		icache()->set('document_'.$id, $document, 24*3600);
 
-		return $chapter;
 	}
 
-	public function searchDocument($keyword)
+	public function searchDocument($id,$keyword)
 	{
 		$document_ids = ChapterContent::where('content', 'like', '%'.$keyword.'%')->pluck('chapter_id')->toArray();
-		$documents = Chapter::whereIn('id', $document_ids)->get()->toArray();
+		$documents = Chapter::whereIn('id', $document_ids)->where('document_id',$id)->get()->toArray();
 		foreach ($documents as &$document) {
 			$document['content'] = ChapterContent::find($document['id'])->content ?? '';
+			$document['path'] = $this->getPath($document['parent_id']);
 		}
 
 		return $documents;
+	}
+
+	public function getPath($parent_id)
+	{
+		$path = $parent_id;
+		while($parent_id != 0){
+			$temporary = Chapter::find($parent_id)->first();
+			if($temporary){
+				$parent_id = $temporary->parent_id;
+				$path = $parent_id.'/'.$path;
+			}else{
+				throw new \Exception('路径信息缺失!');
+			}
+		}
+		return $path;
 	}
 
 	public function deleteChapter($id, $auth)
@@ -135,7 +159,7 @@ class ChapterLogic extends BaseLogic
 			}
 			$chapter->delete();
 			ChapterContent::destroy($id);
-			ChangeDocumentEvent::instance()->attach('id', $id)->dispatch();
+			ChangeChapterEvent::instance()->attach('chapter',$chapter)->dispatch();
 			return $chapter;
 		}
 		throw new \Exception('该章节不存在，请刷新页面');
@@ -178,6 +202,7 @@ class ChapterLogic extends BaseLogic
 		$chapter = Chapter::select('id','parent_id','name')->where('document_id',$id)->where('name','like','%'.$keywords.'%')->first();
 		if($chapter){
 			$chapter['content'] = ChapterContent::find($chapter['id'])->content ?? '';
+			$chapter['path'] = $this->getPath($chapter['parent_id']);
 			return $chapter;
 		}
 		throw new \Exception('没有匹配到任何章节');

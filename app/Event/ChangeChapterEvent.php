@@ -3,10 +3,11 @@ namespace W7\App\Event;
 
 use W7\Core\Helper\Traiter\InstanceTraiter;
 
-class ChangeCategoryEvent extends Event
+class ChangeChapterEvent extends Event
 {
 	use InstanceTraiter;
 
-	public $eventType = 'change_category';
+	public $eventType = 'change_chapter';
+	public $chapter;
 
 }
