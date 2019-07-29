@@ -37,13 +37,14 @@ class ChapterController extends Controller
 	        $this->logic->checkRepeatRequest($request->document_user_id);
             $this->validate($request, [
                 'name' => 'string|required|max:30',
-                'sort' => 'integer|min:0',
+                'sort' => 'require|integer|min:0',
                 'document_id' => 'required|integer|min:1',
 	            'parent_id' => 'required|integer|min:0',
             ], [
                 'name.required' => '章节名称必填',
                 'name.max' => '章节名最大３０个字符',
                 'sort.min' => '排序最小值为０',
+	            'sort.required' => '排序必填',
                 'document_id.required' => '文档id必填',
 	            'document_id.min' => '文档id最小为0',
 	            'parent_id.required' => '父id必填',
@@ -186,6 +187,23 @@ class ChapterController extends Controller
 		    $id = $request->input('chapter_id');
 		    $content = $request->input('content','');
 		    $this->logic->saveContent($id,$content,$request->document_user_auth);
+		    return $this->success(['chapter_id'=>$id,'content'=>$content]);
+	    }catch (\Exception $e){
+		    return $this->error($e->getMessage());
+	    }
+    }
+
+    public function getContent(Request $request)
+    {
+	    try{
+		    $this->validate($request, [
+			    'chapter_id' => 'required|integer|min:1',
+		    ], [
+			    'chapter_id.required' => '文档id必填',
+			    'chapter_id.min' => '文档id最小为0',
+		    ]);
+		    $id = $request->input('chapter_id');
+		    $content = $this->logic->getContent($id,$request->document_user_auth);
 		    return $this->success(['chapter_id'=>$id,'content'=>$content]);
 	    }catch (\Exception $e){
 		    return $this->error($e->getMessage());

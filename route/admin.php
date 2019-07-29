@@ -26,6 +26,7 @@ irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'
 	$route->post('/user/searchuser', 'Admin\UserController@searchUser');
 
 	$route->get('/chapter/index', 'Admin\ChapterController@index');
+	$route->get('/chapter/get_content', 'Admin\ChapterController@getContent');
 	$route->post('/chapter/save_content', 'Admin\ChapterController@saveContent');
 	$route->post('/chapter/publish_or_cancel', 'Admin\ChapterController@publishOrCancel');
 	$route->post('/chapter/create', 'Admin\ChapterController@create');

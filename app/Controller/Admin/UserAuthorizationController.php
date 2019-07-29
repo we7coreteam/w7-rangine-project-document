@@ -73,7 +73,7 @@ class UserAuthorizationController extends Controller
 
 		    $this->logic->leaveDocument($user_id, $document_id);
 
-		    return $this->success([], '离开文档成功');
+		    return $this->success([], '从文档中删除用户成功');
 	    }catch (\Exception $e){
 		    return $this->error($e->getMessage());
 	    }
