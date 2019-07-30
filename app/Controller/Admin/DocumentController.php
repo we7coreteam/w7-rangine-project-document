@@ -14,6 +14,7 @@ namespace W7\App\Controller\Admin;
 
 use W7\App\Event\ChangeAuthEvent;
 use W7\App\Model\Entity\UserAuthorization;
+use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\App\Model\Logic\UserLogic;
 use W7\Http\Message\Server\Request;
@@ -143,14 +144,19 @@ class DocumentController extends Controller
 				return $this->error($relation);
 			}
 
+			idb()->beginTransaction();
 			$res = $this->logic->del($request->input('id'));
 			if ($res) {
+				$this->chapter = new ChapterLogic();
+				$this->chapter->deleteDocument($request->input('id'));
 				ChangeAuthEvent::instance()->attach('user_id', 0)->attach('document_id', $res['id'])->dispatch();
+				idb()->commit();
 				return $this->success($res);
 			} else {
 				return $this->error($res);
 			}
 		} catch (\Exception $e) {
+			idb()->rollBack();
 			return $this->error($e->getMessage());
 		}
 	}
