@@ -12,6 +12,8 @@
 
 namespace W7\App\Controller\Admin;
 
+use W7\App\Event\ChangeAuthEvent;
+use W7\App\Model\Entity\UserAuthorization;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\App\Model\Logic\UserLogic;
 use W7\Http\Message\Server\Request;
@@ -61,10 +63,12 @@ class DocumentController extends Controller
 			]);
 
 			$name = trim($request->input('name'));
-			$username = $request->input('username');
+			$username = trim($request->input('username'));
 
 			$user = $this->user->getUser(['username'=>$username]);
-
+			if (!$user) {
+				return $this->error('用户不存在');
+			}
 			$data = [];
 			$data['name'] = $name;
 			$data['creator_id'] = $user['id'];
@@ -76,6 +80,8 @@ class DocumentController extends Controller
 
 			$res = $this->logic->create($data);
 			if ($res) {
+				UserAuthorization::create(['user_id' => $data['creator_id'],'document_id' => $res['id']]);
+				ChangeAuthEvent::instance()->attach('user_id', $data['creator_id'])->attach('document_id', $res['id'])->dispatch();
 				return $this->success($res);
 			} else {
 				return $this->error($res);
@@ -110,9 +116,6 @@ class DocumentController extends Controller
 			if ($request->input('description')) {
 				$data['description'] = $request->input('description');
 			}
-			if ($request->input('url')) {
-				$data['url'] = $request->input('url');
-			}
 
 			$res = $this->logic->update($documentId, $data);
 			if ($res) {
@@ -142,6 +145,7 @@ class DocumentController extends Controller
 
 			$res = $this->logic->del($request->input('id'));
 			if ($res) {
+				ChangeAuthEvent::instance()->attach('user_id', 0)->attach('document_id', $res['id'])->dispatch();
 				return $this->success($res);
 			} else {
 				return $this->error($res);

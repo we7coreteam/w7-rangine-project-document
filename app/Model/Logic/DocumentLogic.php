@@ -27,9 +27,17 @@ class DocumentLogic extends BaseLogic
 		$res = Document::find($id);
 		if ($res && $res['is_show'] == 1) {
 			$res['is_show'] = '显示';
-		} else {
+		} elseif ($res && $res['is_show'] == 0) {
 			$res['is_show'] = '隐藏';
 		}
+		if ($res && $res['creator_id']) {
+			$this->user = new UserLogic();
+			$user = $this->user->getUser(['id'=>trim($res['creator_id'])]);
+			if ($user) {
+				$res['username'] = $user['username'];
+			}
+		}
+
 		return $res;
 	}
 
@@ -72,31 +80,47 @@ class DocumentLogic extends BaseLogic
 
 	public function handleDocumentRes($res)
 	{
+		$this->user = new UserLogic();
 		foreach ($res as $key => &$val) {
 			if ($val['is_show'] == 1) {
 				$val['is_show'] = '显示';
-			} else {
-				$val['is_show'] = '隐藏';
+			} elseif ($res && $res['is_show'] == 0) {
+				$res['is_show'] = '隐藏';
+			}
+
+			if ($val['creator_id']) {
+				$user = $this->user->getUser(['id'=>trim($val['creator_id'])]);
+				if ($user) {
+					$res[$key]['username'] = $user['username'];
+				}
 			}
 		}
 		return $res;
+	}
+
+	public function getUserCreateDoc($id)
+	{
+		return Document::where('creator_id', $id)->first();
+	}
+
+	public function getShowList($keyword)
+	{
+		if ($keyword) {
+			$res = Document::where('name', 'like', '%'.$keyword['name'].'%')
+						->where('is_show', 1)
+						->orderBy('updated_at', 'desc')
+						->get();
+		} else {
+			$res = Document::where('is_show', 1)
+						->orderBy('updated_at', 'desc')
+						->get();
+		}
+		return $this->handleDocumentRes($res);
 	}
 
 	public function test()
 	{
 		$this->test = new UserAuthorizationLogic();
 		return $this->test->getUserAuthorizations(2);
-	}
-
-	public function getShowList($keyword)
-	{
-		if ($keyword) {
-			$res = Document::where('name', $keyword['name'])
-						->orderBy('updated_at', 'desc')
-						->get();
-		} else {
-			$res = Document::orderBy('updated_at', 'desc')->get();
-		}
-		return $this->handleDocumentRes($res);
 	}
 }

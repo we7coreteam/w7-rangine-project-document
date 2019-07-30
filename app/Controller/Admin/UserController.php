@@ -37,29 +37,12 @@ class UserController extends Controller
 	public function getUserDocList(Request $request)
 	{
 		try {
-			$res = $this->logic->getUserDocList($request->document_user_auth['document']);
+			$res = $this->logic->getUserDocList($request->document_user_auth);
 			return $this->success($res);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
 		}
 	}
-
-	public function pullDocUserList(Request $request)
-	{
-		try {
-			$this->validate($request, [
-				'id' => 'required',
-			], [
-				'username.required' => '请输入用户姓名',
-			]);
-			$res = $this->logic->pullDocUserList($request->input('id'));
-			return $this->success($res);
-		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
-		}
-	}
-
-
 
 	public function addUser(Request $request)
 	{
@@ -129,14 +112,11 @@ class UserController extends Controller
 			], [
 				'ids.required' => 'ID不能为空',
 			]);
-			$ids = array_filter(explode(',', $request->input('ids')));
+			$ids = array_filter(explode(',', trim($request->input('ids'))));
 
 			if ($ids) {
-				$res = $this->logic->delUser($ids);
-				if ($res) {
-					return $this->success($res);
-				}
-				return $this->error($res);
+				$hasDocuments = $this->logic->hasDocuments($ids);
+				return $this->success($hasDocuments);
 			}
 			return $this->error('参数有误');
 		} catch (\Exception $e) {

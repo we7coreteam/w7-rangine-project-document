@@ -15,7 +15,16 @@ namespace W7\App\Model\Entity;
 class User extends BaseModel
 {
 	//属性类型转换
-//    protected $casts = [
-//        'is_ban' => 'boolean',
-//    ];
+	//    protected $casts = [
+	//        'is_ban' => 'boolean',
+	//    ];
+	public function getCreatedAtAttribute($value)
+	{
+		return date('Y-m-d H:i:s', $value);
+	}
+
+	public function getUpdatedAtAttribute($value)
+	{
+		return date('Y-m-d H:i:s', $value);
+	}
 }

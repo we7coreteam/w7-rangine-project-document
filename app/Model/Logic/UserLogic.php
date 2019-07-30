@@ -32,19 +32,15 @@ class UserLogic extends BaseLogic
 			$user = User::where('username', $data['username'])->first();
 		}
 
-		if ($data['phone']) {
-			$user = User::where('phone', $data['phone'])->first();
-		}
-
 		return $user;
 	}
 
 	public function getUserDocList($documents)
 	{
-		if ($documents == 'all'){
-			$res = Document::orderBy('updated_at','desc')->get();
-		}else{
-			$res = Document::orderBy('updated_at','desc')->find($documents);
+		if ($documents == 'all') {
+			$res = Document::orderBy('updated_at', 'desc')->get();
+		} else {
+			$res = Document::orderBy('updated_at', 'desc')->find($documents);
 		}
 		$this->docLogic = new DocumentLogic();
 		return $this->docLogic->handleDocumentRes($res);
@@ -67,7 +63,13 @@ class UserLogic extends BaseLogic
 
 	public function delUser($ids)
 	{
-		return User::destroy($ids);
+		$res = User::destroy($ids);
+		if ($res) {
+			foreach ($ids as $k => $v) {
+				icache()->delete('username_'.$v);
+			}
+		}
+		return $res;
 	}
 
 	public function searchUser($data)
@@ -75,5 +77,21 @@ class UserLogic extends BaseLogic
 		if (isset($data['username'])) {
 			return User::where('username', 'like', '%'.$data['username'].'%')->get();
 		}
+	}
+
+	public function hasDocuments($ids)
+	{
+		$this->docLogic = new DocumentLogic();
+
+		$i = 0;
+		foreach ($ids as $k => $val) {
+			$res = $this->docLogic->getUserCreateDoc($val);
+			if (!$res) {
+				if ($this->delUser($val)) {
+					$i++;
+				}
+			}
+		}
+		return '成功删除'.$i.'用户，其他用户有文档不能直接删除';
 	}
 }

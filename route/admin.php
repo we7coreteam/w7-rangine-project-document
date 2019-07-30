@@ -15,9 +15,9 @@ irouter()->get('/admin/verificationcode/getcodeimg', 'Admin\VerificationcodeCont
 irouter()->get('/admin/verificationcode/getcode', 'Admin\VerificationcodeController@getCode');
 
 irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'/admin'], function (\W7\Core\Route\Route $route) {
-	$route->post('/login/signout', 'Admin\LoginController@signout'); // 退出登录
+	$route->get('/login/signout', 'Admin\LoginController@signout'); // 退出登录
 
-	$route->post('/user/getuserlist', 'Admin\UserController@getUserlist');
+	$route->get('/user/getuserlist', 'Admin\UserController@getUserlist');
 	$route->get('/user/getuserdoclist', 'Admin\UserController@getUserDocList');
 	$route->post('/user/adduser', 'Admin\UserController@addUser');
 	$route->post('/user/updateuser', 'Admin\UserController@updateUser');

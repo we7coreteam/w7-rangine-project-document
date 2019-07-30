@@ -14,6 +14,7 @@ namespace W7\App\Controller\Admin;
 
 use W7\App\Model\Logic\UserLogic;
 use W7\App\Model\Logic\VerificationcodeLogic;
+use W7\App\Model\Service\EncryptorLogic;
 use W7\Http\Message\Server\Request;
 
 class LoginController extends Controller
@@ -40,13 +41,15 @@ class LoginController extends Controller
 
 			$this->user_longin = new UserLogic();
 			$user_val = $this->user_longin->getUser(['username'=>$request->input('username')]);
+
 			if ($user_val) {
 				$user_pwd = md5(md5($request->input('username').$request->input('userpass')));
 				if (isset($user_val['userpass']) && $user_val['userpass'] == $user_pwd) {
-					$key =App\Model\Service\EncryptorLogic::encrypt(time().'_'.$user_val['id']);
+					$key = EncryptorLogic::encrypt(time().'_'.$user_val['id']);
 					icache()->set($key, $user_val['id']);
+					icache()->set('username_'.$user_val['id'], $key); // 用户与access_token关联在一起
 					$data['document_access_token'] = $key;
-					return $this->success($data);
+					return $this->success(['document_access_token' => $key]);
 				} else {
 					return $this->error('用户名或者密码有误');
 				}
@@ -68,7 +71,7 @@ class LoginController extends Controller
 			]);
 			$res = icache()->delete($request->input('document_access_token'));
 			if ($res) {
-				return $this->success('退出成功');
+				return $this->success(['msg'=>'退出成功']);
 			}
 			return $this->error($res);
 		} catch (\Exception $e) {
