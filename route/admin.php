@@ -25,12 +25,14 @@ irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'
 	$route->post('/user/updateuserpass', 'Admin\UserController@updateUserpass');
 	$route->post('/user/searchuser', 'Admin\UserController@searchUser');
 
-	$route->get('/chapter/index', 'Admin\ChapterController@index'); //文档列表
-	$route->post('/chapter/save_content', 'Admin\ChapterController@saveContent'); //文档详情
-	$route->post('/chapter/publish_or_cancel', 'Admin\ChapterController@publishOrCancel'); //发布－取消文档
-	$route->post('/chapter/create', 'Admin\ChapterController@create'); //新增文档
-	$route->post('/chapter/update', 'Admin\ChapterController@update'); //修改文档
-	$route->post('/chapter/destroy', 'Admin\ChapterController@destroy'); //删除文档
+	$route->get('/chapter/index', 'Admin\ChapterController@index');
+	$route->get('/chapter/get_content', 'Admin\ChapterController@getContent');
+	$route->post('/chapter/save_content', 'Admin\ChapterController@saveContent');
+	$route->post('/chapter/publish_or_cancel', 'Admin\ChapterController@publishOrCancel');
+	$route->post('/chapter/create', 'Admin\ChapterController@create');
+	$route->post('/chapter/update', 'Admin\ChapterController@update');
+	$route->post('/chapter/destroy', 'Admin\ChapterController@destroy');
+	$route->get('/chapter/search', 'Admin\ChapterController@searchChapter');
 
 	$route->post('/upload/image', 'Admin\UploadController@image'); //图片上传
 
@@ -41,8 +43,8 @@ irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'
 	$route->post('/category/update', 'Admin\CategoryController@update');
 	$route->get('/category/del', 'Admin\CategoryController@del');
 
-	$route->get('/auth/index', 'Admin\UserAuthorizationController@index');
-	$route->post('/auth/update', 'Admin\UserAuthorizationController@update');
+	$route->post('/auth/invite_user', 'Admin\UserAuthorizationController@inviteUser');
+	$route->post('/auth/leave_document', 'Admin\UserAuthorizationController@leaveDocument');
 
 	$route->get('/document/getlist', 'Admin\DocumentController@getlist');
 	$route->post('/document/create', 'Admin\DocumentController@create');
