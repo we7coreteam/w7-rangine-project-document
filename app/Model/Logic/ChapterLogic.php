@@ -43,7 +43,7 @@ class ChapterLogic extends BaseLogic
 		$chapter = Chapter::find($id);
 		if ($chapter) {
 			if (APP_AUTH_ALL !== $data['auth'] && !in_array($chapter->document_id, $data['auth'])) {
-				throw new \Exception('sorry,you are not authorized to modify this chapter!');
+				throw new \Exception('无权操作!');
 			}
 			$chapter->name = $data['name'];
 			$chapter->sort = $data['sort'];
