@@ -17,6 +17,8 @@ class TestLogic extends BaseLogic
 
     public function getUser($id)
     {
+    	$test = new TestApi();
+    	return $test->getChapter();
         $cacheUser = $this->get('user_'.$id);
         if($cacheUser){
             $user = $cacheUser;
