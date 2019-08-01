@@ -2,12 +2,13 @@
 namespace W7\App\Model\Service\Api;
 
 
-class TestApi extends ApiBase
+class TestApi extends Curl
 {
-    protected $domain = 'http://www.baidu.com';
+    protected $baseUrl = 'www.baidu.com';
 
-    public function getTraceid()
+    public function getChapter($data=[])
     {
-        return $this->get('');
+    	$this->responseType = 'html';
+        dd($this->get('admin/chapter/index',$data));
     }
 }

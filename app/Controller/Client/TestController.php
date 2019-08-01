@@ -14,17 +14,17 @@ class TestController extends Controller{
 
     public function index(Request $request) {
         try{
-            $this->validate($request, [
-                'name' => 'required|max:255',
-                'id' => 'required',
-            ],[
-                'id.required' => 'id必填',
-            ]);
-
-            $name = $request->input('name');
-            $id = $request->input('id');
+//            $this->validate($request, [
+//                'name' => 'required|max:255',
+//                'id' => 'required',
+//            ],[
+//                'id.required' => 'id必填',
+//            ]);
+//
+//            $name = $request->input('name');
+//            $id = $request->input('id');
 //            $res = $this->logic->addUser($name);
-            $res = $this->logic->getUser($id);
+            $res = $this->logic->getUser(0);
             if($res){
                 return $this->success($res);
             }
