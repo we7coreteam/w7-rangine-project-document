@@ -114,8 +114,12 @@ class ChapterLogic extends BaseLogic
 			} else {
 				$chapter['content'] = '';
 			}
-			$chapter['previous_chapter'] = $this->previousChapter($chapter);
-			$chapter['next_chapter'] = $this->nextChapter($chapter);
+			$previous = $this->previousChapter($chapter);
+			$chapter['previous_chapter_id'] = $previous['id'];
+			$chapter['previous_chapter_name'] = $previous['name'];
+			$next = $this->nextChapter($chapter);
+			$chapter['next_chapter_id'] = $next['id'];
+			$chapter['next_chapter_name'] = $next['name'];
 			icache()->set('chapter_'.$id, $chapter, 24*3600);
 			return $chapter;
 		}
@@ -127,12 +131,15 @@ class ChapterLogic extends BaseLogic
 		$sort = $chapter['sort'];
 		$elderBrother = Chapter::where('parent_id', $parent_id)->where('sort', '>', $sort)->orderBy('sort')->first();
 		if ($elderBrother) {
-			return $elderBrother->id;
+			return $elderBrother;
 		}
 		if ($parent_id) {
-			return $parent_id;
+			$parent = Chapter::find($parent_id);
+			if($parent){
+				return $parent;
+			}
 		}
-		return 0;
+		return ['id'=>0,'name'=>''];
 	}
 
 	public function nextChapter($chapter)
@@ -148,7 +155,7 @@ class ChapterLogic extends BaseLogic
 		if ($youngerBrother) {
 			return $youngerBrother;
 		}
-		return 0;
+		return ['id'=>0,'name'=>''];
 	}
 
 	public function searchDocument($id, $keyword)
