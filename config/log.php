@@ -31,18 +31,18 @@ return [
 		'single' => [
 			'driver' => 'daily',
 			'path' => RUNTIME_PATH . DS. 'logs'. DS. 'w7.log',
-			'level' => 'debug',
+			'level' => ienv('LOG_CHANNEL_SINGLE_LEVEL', 'debug'),
 			'days' => '1',
 		],
 		'database' => [
 			'driver' => 'stream',
 			'path' => RUNTIME_PATH . DS. 'logs'. DS. 'db.log',
-			'level' => 'debug',
+			'level' => ienv('LOG_CHANNEL_DATABASE_LEVEL', 'debug'),
 		],
 		'invoice' => [
 			'driver' => 'daily',
 			'path' => RUNTIME_PATH . DS. 'logs'. DS. 'invoice.log',
-			'level' => 'debug',
+			'level' => ienv('LOG_CHANNEL_INVOICE_LEVEL', 'debug'),
 			'days' => 1,
 		],
 		'test' => [

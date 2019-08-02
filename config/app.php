@@ -25,15 +25,17 @@ return [
 		'interval' => 10,
 	],
 	'reload' => [
-		'interval' => 1, //重复检测的间隔时长
-		'debug' => false, //开启后，将不监控文件变化，重复reload，方便调试
+		'interval' => ienv('SETTING_RELOAD_INTERVAL', 5), //重复检测的间隔时长
+		'debug' => ienv('SETTING_RELOAD_DEBUG', false), //开启后，将不监控文件变化，重复reload，方便调试
 	],
 	'cache' => [
 		'default' => [
-			'driver' => 'redis',
-			'host' => 'redis',
-			'port' => '6379',
-			'timeout' => 30,
+			'driver' => ienv('CACHE_DEFAULT_DRIVER', 'redis'),
+			'host' => ienv('CACHE_DEFAULT_HOST', 'redis'),
+			'port' => ienv('CACHE_DEFAULT_PORT', '6379'),
+			'timeout' => ienv('CACHE_DEFAULT_TIMEOUT', 30),
+			'password' => ienv('CACHE_DEFAULT_PASSWORD', ''),
+			'database' => ienv('CACHE_DEFAULT_DATABASE', '0'),
 		],
 		'addons' => [ //可定义多个通道
 			'driver' => 'redis',
@@ -44,11 +46,11 @@ return [
 	],
 	'database' => [
 		'default' => [
-			'driver' => 'mysql',
-			'database' => 'document',
-			'host' => '192.168.11.200',
-			'username' => 'root',
-			'password' => '123456',
+			'driver' => ienv('DATABASE_DEFAULT_DRIVER', 'mysql'),
+			'database' => ienv('DATABASE_DEFAULT_DATABASE', 'document'),
+			'host' => ienv('DATABASE_DEFAULT_HOST', '127.0.0.1'),
+			'username' => ienv('DATABASE_DEFAULT_USERNAME', 'root'),
+			'password' => ienv('DATABASE_DEFAULT_PASSWORD', 'root'),
 			'charset' => 'utf8',
 			'collation' => 'utf8_unicode_ci',
 			'prefix' => '',
