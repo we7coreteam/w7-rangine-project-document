@@ -50,7 +50,7 @@ class VerificationcodeController extends Controller
 			$phrase = $builder->getPhrase();
 
 			$key = 'imgCode_'.time().rand();
-			$this->code->addCode($key, $phrase, 60*60*60*5);
+			$this->code->addCode($key, $phrase, 60*60*5);
 
 			$this->response()->withoutHeader('Content-Type')->withAddedHeader('Content-Type', 'image/jpg');
 			$this->response()->withoutHeader('Cache-Control')->withAddedHeader('Cache-Control', 'no-cache, must-revalidate');

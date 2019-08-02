@@ -9,22 +9,22 @@ class UploadController extends Controller
     public function image(Request $request)
     {
         try {
-            $file = $request->file('icon');
+            $file = $request->file('file');
             if ($file) {
                 $file = $file->toArray();
             } else {
-                return $this->error('icon必传');
+                return $this->error('file');
             }
 
             $allowed_mime = ['image/png', 'image/jpg', 'image/gif', 'image/jpeg'];
             if (0 !== $file['error']) {
-                return $this->error('['.$file['error'].']上传失败！网络错误或文件过大');
+	            return ['success' => 0,'message' => '['.$file['error'].']上传失败！网络错误或文件过大'];
             }
             if (isset($file['type']) && !in_array($file['type'], $allowed_mime, true)) {
-                return $this->error('only jpg,jpeg,png,gif allowed');
+	            return ['success' => 0,'message' => 'only jpg,jpeg,png,gif allowed'];
             }
             if ($file['size'] > 2 * 1024 * 1204) {
-                return $this->error('图片尺寸不得超过2M');
+	            return ['success' => 0,'message' => '图片尺寸不得超过2M'];
             }
 
             $baseName = md5(time().str_random(10).uniqid());
@@ -32,9 +32,9 @@ class UploadController extends Controller
             $cdn = new CdnLogic();
             $url = $cdn->uploadFile('dc/'.$fileName, $file['tmp_file']);
 
-            return $this->success(compact('url'));
+            return ['success' => 1,'message' => '上传成功','url'=>$url];
         } catch (\Exception $e) {
-            return $this->error($e->getMessage());
+	        return ['success' => 0,'message' => $e->getMessage()];
         }
     }
 }
