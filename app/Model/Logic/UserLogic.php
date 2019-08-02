@@ -12,7 +12,6 @@
 
 namespace W7\App\Model\Logic;
 
-use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\User;
 
 class UserLogic extends BaseLogic
@@ -33,17 +32,6 @@ class UserLogic extends BaseLogic
 		}
 
 		return $user;
-	}
-
-	public function getUserDocList($documents)
-	{
-		if ($documents == 'all') {
-			$res = Document::orderBy('updated_at', 'desc')->get();
-		} else {
-			$res = Document::orderBy('updated_at', 'desc')->find($documents);
-		}
-		$this->docLogic = new DocumentLogic();
-		return $this->docLogic->handleDocumentRes($res);
 	}
 
 	public function createUser($data)
@@ -75,7 +63,17 @@ class UserLogic extends BaseLogic
 	public function searchUser($data)
 	{
 		if (isset($data['username'])) {
-			return User::where('username', 'like', '%'.$data['username'].'%')->get();
+			$res = User::select('id', 'username', 'has_privilege')->where('username', 'like', '%'.$data['username'].'%')->get();
+			if ($res) {
+				foreach ($res as $key => &$val) {
+					if ($val['has_privilege'] == 1) {
+						$val['has_privilege'] = '有';
+					} else {
+						$val['has_privilege'] = '无';
+					}
+				}
+			}
+			return $res;
 		}
 	}
 

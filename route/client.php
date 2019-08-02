@@ -11,13 +11,12 @@
  */
 
 irouter()->group(['prefix'=>'/client'], function (\W7\Core\Route\Route $route) {
-	$route->get('/test/index', 'Client\TestController@index');
+	$route->post('/test/index', 'Client\TestController@index');
 
 	$route->post('/chapters', 'Client\ChapterController@chapters');
 	$route->post('/detail', 'Client\ChapterController@detail');
 	$route->post('/search', 'Client\ChapterController@search');
 
-	$route->get('/document/getshowlist', 'Client\DocumentController@getShowList');
-	$route->get('/document/getshowdetails', 'Client\DocumentController@getShowDetails');
+	$route->post('/document/getshowlist', 'Client\DocumentController@getShowList');
+	$route->post('/document/getshowdetails', 'Client\DocumentController@getShowDetails');
 });
-

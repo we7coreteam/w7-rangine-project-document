@@ -11,14 +11,14 @@
  */
 
 irouter()->post('/admin/login/check', 'Admin\LoginController@check');
-irouter()->get('/admin/verificationcode/getcodeimg', 'Admin\VerificationcodeController@getCodeimg');
-irouter()->get('/admin/verificationcode/getcode', 'Admin\VerificationcodeController@getCode');
+irouter()->post('/admin/verificationcode/getcodeimg', 'Admin\VerificationcodeController@getCodeimg');
+irouter()->post('/admin/verificationcode/getcode', 'Admin\VerificationcodeController@getCode');
 
 irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'/admin'], function (\W7\Core\Route\Route $route) {
-	$route->get('/login/signout', 'Admin\LoginController@signout'); // 退出登录
+	$route->post('/login/signout', 'Admin\LoginController@signout'); // 退出登录
 
-	$route->get('/user/getuserlist', 'Admin\UserController@getUserlist');
-	$route->get('/user/getuserdoclist', 'Admin\UserController@getUserDocList');
+	$route->post('/user/getuserlist', 'Admin\UserController@getUserlist');
+	$route->post('/user/getuserdoclist', 'Admin\UserController@getUserDocList');
 	$route->post('/user/adduser', 'Admin\UserController@addUser');
 	$route->post('/user/updateuser', 'Admin\UserController@updateUser');
 	$route->post('/user/deluser', 'Admin\UserController@delUser');
@@ -36,8 +36,8 @@ irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'
 
 	$route->post('/upload/image', 'Admin\UploadController@image'); //图片上传
 
-	$route->get('/category/getlist', 'Admin\CategoryController@getlist');
-	$route->get('/category/getcatalogue', 'Admin\CategoryController@getCatalogue'); // 目录列表
+	$route->post('/category/getlist', 'Admin\CategoryController@getlist');
+	$route->post('/category/getcatalogue', 'Admin\CategoryController@getCatalogue'); // 目录列表
 	$route->post('/category/add', 'Admin\CategoryController@add'); // 添加类别
 	$route->post('/category/getdetails', 'Admin\CategoryController@getdetails');
 	$route->post('/category/update', 'Admin\CategoryController@update');
@@ -46,10 +46,11 @@ irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'
 	$route->post('/auth/invite_user', 'Admin\UserAuthorizationController@inviteUser');
 	$route->post('/auth/leave_document', 'Admin\UserAuthorizationController@leaveDocument');
 
-	$route->get('/document/getlist', 'Admin\DocumentController@getlist');
+	$route->post('/document/getlist', 'Admin\DocumentController@getlist');
+	$route->post('/document/getdocuserlist', 'Admin\DocumentController@getDocUserList');
 	$route->post('/document/create', 'Admin\DocumentController@create');
 	$route->post('/document/update', 'Admin\DocumentController@update');
-	$route->get('/document/getdetails', 'Admin\DocumentController@getdetails');
+	$route->post('/document/getdetails', 'Admin\DocumentController@getdetails');
 	$route->post('/document/del', 'Admin\DocumentController@del');
-	$route->get('/document/search', 'Admin\DocumentController@search');
+	$route->post('/document/search', 'Admin\DocumentController@search');
 });

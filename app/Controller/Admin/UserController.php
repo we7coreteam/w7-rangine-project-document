@@ -34,16 +34,6 @@ class UserController extends Controller
 		}
 	}
 
-	public function getUserDocList(Request $request)
-	{
-		try {
-			$res = $this->logic->getUserDocList($request->document_user_auth);
-			return $this->success($res);
-		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
-		}
-	}
-
 	public function addUser(Request $request)
 	{
 		try {
@@ -155,11 +145,11 @@ class UserController extends Controller
 	{
 		try {
 			$this->validate($request, [
-				'username' => 'required',
+				'keyword' => 'required',
 			], [
-				'username.required' => '用户名称不能为空',
+				'keyword.required' => '关键字不能为空',
 			]);
-			$res = $this->logic->searchUser(['username'=>trim($request->input('username'))]);
+			$res = $this->logic->searchUser(['username'=>trim($request->input('keyword'))]);
 			return $this->success($res);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());

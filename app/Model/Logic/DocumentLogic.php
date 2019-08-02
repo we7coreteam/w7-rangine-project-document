@@ -14,6 +14,7 @@ namespace W7\App\Model\Logic;
 
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\User;
+use W7\App\Model\Entity\UserAuthorization;
 
 class DocumentLogic extends BaseLogic
 {
@@ -27,18 +28,35 @@ class DocumentLogic extends BaseLogic
 		return $this->handleDocumentRes($res, $userId);
 	}
 
-	public function getDocumentUsers($id)
+	public function getDocUserList($id, $userId)
 	{
-		return User::find($id);
+		$documentUsers = UserAuthorization::where('document_id', $id)->pluck('user_id')->toArray();
+		$res = User::select('id', 'username', 'is_ban', 'has_privilege')->find($documentUsers);
+		if ($res) {
+			foreach ($res as $key => &$val) {
+				if ($val['id'] == $userId) {
+					$val['has_creator'] = '创建者';
+				} else {
+					$val['has_creator'] = '操作员';
+				}
+
+				if ($val['has_privilege'] == 1) {
+					$val['has_privilege'] = '有';
+				} else {
+					$val['has_privilege'] = '无';
+				}
+			}
+		}
+		return $res;
 	}
 
 	public function getdetails($id)
 	{
 		$res = Document::find($id);
 		if ($res && $res['is_show'] == 1) {
-			$res['is_show'] = '显示';
+			$res['is_show'] = '发布';
 		} elseif ($res && $res['is_show'] == 0) {
-			$res['is_show'] = '隐藏';
+			$res['is_show'] = '未发布';
 		}
 		if ($res && $res['creator_id']) {
 			$this->user = new UserLogic();
@@ -96,9 +114,9 @@ class DocumentLogic extends BaseLogic
 		$this->user = new UserLogic();
 		foreach ($res as $key => &$val) {
 			if ($val['is_show'] == 1) {
-				$val['is_show'] = '显示';
+				$val['is_show'] = '发布';
 			} elseif ($res && $res['is_show'] == 0) {
-				$val['is_show'] = '隐藏';
+				$val['is_show'] = '未发布';
 			}
 
 			if ($val['has_privilege'] == 1) {
@@ -111,6 +129,8 @@ class DocumentLogic extends BaseLogic
 				$user = $this->user->getUser(['id'=>trim($val['creator_id'])]);
 				if ($user) {
 					$val['username'] = $user['username'];
+				} else {
+					$val['username'] = '';
 				}
 			}
 			if ($val['creator_id'] == $userId) {
