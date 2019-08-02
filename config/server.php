@@ -26,13 +26,13 @@ $serverSetting = [
 	],
 	'tcp' => [
 		'host'  => '0.0.0.0',
-		'port'  => 8888,
+		'port'  => ienv('SERVER_TCP_PORT', '99'),
 		'mode' => SWOOLE_PROCESS,
 		'sock_type'  => SWOOLE_SOCK_TCP,
 	],
 	'http' => [
 		'host'  => '0.0.0.0',
-		'port'  => 88,
+		'port'  => ienv('SERVER_HTTP_PORT', '88'),
 		'mode' => SWOOLE_PROCESS,
 		'sock_type'  => SWOOLE_SOCK_TCP,
 	],
