@@ -36,13 +36,6 @@ irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'
 
 	$route->post('/upload/image', 'Admin\UploadController@image'); //图片上传
 
-	$route->post('/category/getlist', 'Admin\CategoryController@getlist');
-	$route->post('/category/getcatalogue', 'Admin\CategoryController@getCatalogue'); // 目录列表
-	$route->post('/category/add', 'Admin\CategoryController@add'); // 添加类别
-	$route->post('/category/getdetails', 'Admin\CategoryController@getdetails');
-	$route->post('/category/update', 'Admin\CategoryController@update');
-	$route->get('/category/del', 'Admin\CategoryController@del');
-
 	$route->post('/auth/invite_user', 'Admin\UserAuthorizationController@inviteUser');
 	$route->post('/auth/leave_document', 'Admin\UserAuthorizationController@leaveDocument');
 
