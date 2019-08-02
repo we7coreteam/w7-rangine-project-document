@@ -16,6 +16,7 @@ use W7\App\Event\ChangeAuthEvent;
 use W7\App\Model\Entity\UserAuthorization;
 use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Logic\DocumentLogic;
+use W7\App\Model\Logic\UserAuthorizationLogic;
 use W7\App\Model\Logic\UserLogic;
 use W7\Http\Message\Server\Request;
 
@@ -27,10 +28,36 @@ class DocumentController extends Controller
 		$this->user = new UserLogic();
 	}
 
-	public function getlist()
+	public function getlist(Request $request)
 	{
 		try {
-			$res = $this->logic->getlist();
+			$this->validate($request, [
+				'username' => 'required',
+			], [
+				'username.required' => '用户名不能为空',
+			]);
+			$user_val = $this->user->getUser(['username'=>$request->input('username')]);
+//			$request->document_user_auth = [9,10,13,14];
+			$res = $this->logic->getlist($request->document_user_auth, $user_val['id']);
+			return $this->success($res);
+		} catch (\Exception $e) {
+			return $this->error($e->getMessage());
+		}
+	}
+
+	public function getDocUserlist(Request $request)
+	{
+		try {
+			$this->validate($request, [
+				'id' => 'required',
+			], [
+				'id.required' => '文档不能为空',
+			]);
+
+			$this->userAuthor = new UserAuthorizationLogic();
+			$id = $this->userAuthor->getDocumentUsers($request->input('id'));
+
+			$res = $this->logic->getDocumentUsers($id);
 			return $this->success($res);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());

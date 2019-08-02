@@ -13,13 +13,23 @@
 namespace W7\App\Model\Logic;
 
 use W7\App\Model\Entity\Document;
+use W7\App\Model\Entity\User;
 
 class DocumentLogic extends BaseLogic
 {
-	public function getlist()
+	public function getlist($documents, $userId)
 	{
-		$res = Document::orderBy('updated_at', 'desc')->get();
-		return $this->handleDocumentRes($res);
+		if ($documents == 'all') {
+			$res = Document::orderBy('updated_at', 'desc')->get();
+		} else {
+			$res = Document::orderBy('updated_at', 'desc')->find($documents);
+		}
+		return $this->handleDocumentRes($res, $userId);
+	}
+
+	public function getDocumentUsers($id)
+	{
+		return User::find($id);
 	}
 
 	public function getdetails($id)
@@ -65,6 +75,9 @@ class DocumentLogic extends BaseLogic
 	{
 		$this->user = new UserLogic();
 		$user = $this->user->getUser(['username'=>trim($username)]);
+		if ($user['has_privilege'] == 1) {
+			return true;
+		}
 		$document = $this->getdetails($documentId);
 		if (!$user) {
 			return '用户不存在';
@@ -78,21 +91,32 @@ class DocumentLogic extends BaseLogic
 		return true;
 	}
 
-	public function handleDocumentRes($res)
+	public function handleDocumentRes($res, $userId)
 	{
 		$this->user = new UserLogic();
 		foreach ($res as $key => &$val) {
 			if ($val['is_show'] == 1) {
 				$val['is_show'] = '显示';
 			} elseif ($res && $res['is_show'] == 0) {
-				$res['is_show'] = '隐藏';
+				$val['is_show'] = '隐藏';
+			}
+
+			if ($val['has_privilege'] == 1) {
+				$val['has_privilege'] = '有';
+			} else {
+				$val['has_privilege'] = '无';
 			}
 
 			if ($val['creator_id']) {
 				$user = $this->user->getUser(['id'=>trim($val['creator_id'])]);
 				if ($user) {
-					$res[$key]['username'] = $user['username'];
+					$val['username'] = $user['username'];
 				}
+			}
+			if ($val['creator_id'] == $userId) {
+				$val['has_creator'] = '创建者';
+			} else {
+				$val['has_creator'] = '参与者';
 			}
 		}
 		return $res;
@@ -115,7 +139,7 @@ class DocumentLogic extends BaseLogic
 						->orderBy('updated_at', 'desc')
 						->get();
 		}
-		return $this->handleDocumentRes($res);
+		return $this->handleDocumentRes($res, '');
 	}
 
 	public function test()
