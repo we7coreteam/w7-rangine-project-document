@@ -46,8 +46,8 @@ class LoginController extends Controller
 				$user_pwd = md5(md5($request->input('username').$request->input('userpass')));
 				if (isset($user_val['userpass']) && $user_val['userpass'] == $user_pwd) {
 					$key = EncryptorLogic::encrypt(time().'_'.$user_val['id']);
-					icache()->set($key, $user_val['id']);
-					icache()->set('username_'.$user_val['id'], $key); // 用户与access_token关联在一起
+					cache()->set($key, $user_val['id']);
+					cache()->set('username_'.$user_val['id'], $key); // 用户与access_token关联在一起
 					$data['document_access_token'] = $key;
 					return $this->success(['document_access_token' => $key]);
 				} else {
@@ -69,7 +69,7 @@ class LoginController extends Controller
 			], [
 				'document_access_token.required' => '缺少用户票据',
 			]);
-			$res = icache()->delete($request->input('document_access_token'));
+			$res = cache()->delete($request->input('document_access_token'));
 			if ($res) {
 				return $this->success(['msg'=>'退出成功']);
 			}

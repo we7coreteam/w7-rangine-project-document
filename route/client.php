@@ -10,7 +10,7 @@
  * visited https://www.w7.cc for more details
  */
 
-irouter()->group(['prefix'=>'/client'], function (\W7\Core\Route\Route $route) {
+irouter()->middleware(['TestMiddleware'])->group(['prefix'=>'/client'], function (\W7\Core\Route\Route $route) {
 	$route->post('/test/index', 'Client\TestController@index');
 
 	$route->post('/chapters', 'Client\ChapterController@chapters');

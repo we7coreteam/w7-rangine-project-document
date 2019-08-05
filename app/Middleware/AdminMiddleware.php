@@ -31,7 +31,7 @@ class AdminMiddleware extends MiddlewareAbstract
 		if (!$token) {
 			return App::getApp()->getContext()->getResponse()->json(['message' => '缺少用户票据', 'data' => null, 'status' => false, 'code' => 444]);
 		}
-		$access_token = icache()->get($token);
+		$access_token = cache()->get($token);
 		if (!$access_token) {
 			return App::getApp()->getContext()->getResponse()->json(['message' => '错误的票据', 'data' => null, 'status' => false, 'code' => 444]);
 		}

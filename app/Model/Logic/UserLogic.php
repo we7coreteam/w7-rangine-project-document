@@ -54,7 +54,7 @@ class UserLogic extends BaseLogic
 		$res = User::destroy($ids);
 		if ($res) {
 			foreach ($ids as $k => $v) {
-				icache()->delete('username_'.$v);
+				cache()->delete('username_'.$v);
 			}
 		}
 		return $res;

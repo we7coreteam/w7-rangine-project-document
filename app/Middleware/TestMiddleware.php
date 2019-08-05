@@ -22,13 +22,6 @@ class TestMiddleware extends MiddlewareAbstract
 {
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        //这里是中间件一些代码
-        if (false) {
-            return App::getApp()->getContext()->getResponse()->json(
-                ['message' => '权限不足', 'data' => null, 'status' => false]
-            );
-        }
-
         return $handler->handle($request);
     }
 }
