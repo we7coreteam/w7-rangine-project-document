@@ -29,7 +29,7 @@ return [
 		'debug' => ienv('SETTING_RELOAD_DEBUG', false), //开启后，将不监控文件变化，重复reload，方便调试
 	],
 
-	'cache_driver' => ienv('CACHE_DRIVER', 'redis'), //缓存驱动配置
+	'cache_driver' => ienv('CACHE_DRIVER', 'redis'),
 	'cache' => [
 		'default' => [
 			'driver' => ienv('CACHE_DEFAULT_DRIVER', 'redis'),
