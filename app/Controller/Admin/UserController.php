@@ -55,7 +55,7 @@ class UserController extends Controller
 			if ($res) {
 				return $this->success($res);
 			}
-			return $this->error($res);
+			return $this->error('用户名重复，获取数据有误');
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
 		}
@@ -145,11 +145,11 @@ class UserController extends Controller
 	{
 		try {
 			$this->validate($request, [
-				'keyword' => 'required',
+				'keywords' => 'required',
 			], [
-				'keyword.required' => '关键字不能为空',
+				'keywords.required' => '关键字不能为空',
 			]);
-			$res = $this->logic->searchUser(['username'=>trim($request->input('keyword'))]);
+			$res = $this->logic->searchUser(['username'=>trim($request->input('keywords'))]);
 			return $this->success($res);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
