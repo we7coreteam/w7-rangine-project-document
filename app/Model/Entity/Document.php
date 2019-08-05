@@ -14,6 +14,8 @@ namespace W7\App\Model\Entity;
 
 class Document extends BaseModel
 {
+	protected $table = 'document';
+
 	public function getCreatedAtAttribute($value)
 	{
 		return date('Y-m-d H:i:s', $value);
