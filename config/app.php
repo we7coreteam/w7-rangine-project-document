@@ -53,7 +53,7 @@ return [
 			'password' => ienv('DATABASE_DEFAULT_PASSWORD', 'root'),
 			'charset' => 'utf8',
 			'collation' => 'utf8_unicode_ci',
-			'prefix' => '',
+			'prefix' => 'ims_',
 			'port' =>'3306',
 		],
 		'addons' => [

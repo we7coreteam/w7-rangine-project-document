@@ -10,10 +10,13 @@
  * visited https://www.w7.cc for more details
  */
 
-namespace W7\App\Model\Entity;
+namespace W7\App\Model\Entity\Document;
+
+use W7\App\Model\Entity\BaseModel;
 
 class ChapterContent extends BaseModel
 {
 	public $timestamps = false;
+	protected $table = 'document_chapter_content';
 	protected $primaryKey = 'chapter_id';
 }

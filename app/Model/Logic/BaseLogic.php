@@ -3,8 +3,6 @@
 namespace W7\App\Model\Logic;
 
 
-use W7\App\Model\Entity\WindControlConfig;
-use W7\App\Model\Entity\WindControlReport;
 use W7\Core\Cache\Cache;
 use W7\Core\Database\LogicAbstract;
 
@@ -75,20 +73,20 @@ class BaseLogic extends LogicAbstract {
         $this->set('repeat_'.$user_id,1,$ttl);
     }
 
-    public function checkWindControl($user_id,$key)
-    {
-	    $max = WindControlConfig::get($key);//max_number_added_per_day
-	    if($this->get($key.'_'.date('Ymd').'_'.$user_id,0) >= $max){
-	    	//report wind control
-		    $report = WindControlReport::where('operator_id',$user_id)
-			    ->where('config_id',$key)
-			    ->where('created_at','>',strtotime(date('Y-m-d 00:00:00')))
-			    ->first();
-		    if(!$report){
-			    WindControlReport::create(['config_id'=>$key,'detail'=>WindControlConfig::$errors[$key].$max,'operator_id'=>$user_id]);
-		    }
-		    throw new \Exception(WindControlConfig::$errors[$key].$max);
-	    }
-    }
+//    public function checkWindControl($user_id,$key)
+//    {
+//	    $max = WindControlConfig::get($key);//max_number_added_per_day
+//	    if($this->get($key.'_'.date('Ymd').'_'.$user_id,0) >= $max){
+//	    	//report wind control
+//		    $report = WindControlReport::where('operator_id',$user_id)
+//			    ->where('config_id',$key)
+//			    ->where('created_at','>',strtotime(date('Y-m-d 00:00:00')))
+//			    ->first();
+//		    if(!$report){
+//			    WindControlReport::create(['config_id'=>$key,'detail'=>WindControlConfig::$errors[$key].$max,'operator_id'=>$user_id]);
+//		    }
+//		    throw new \Exception(WindControlConfig::$errors[$key].$max);
+//	    }
+//    }
 
 }

@@ -14,8 +14,8 @@ namespace W7\App\Model\Logic;
 
 use W7\App\Event\ChangeChapterEvent;
 use W7\App\Event\ChangeDocumentEvent;
-use W7\App\Model\Entity\Chapter;
-use W7\App\Model\Entity\ChapterContent;
+use W7\App\Model\Entity\Document\Chapter;
+use W7\App\Model\Entity\Document\ChapterContent;
 
 class ChapterLogic extends BaseLogic
 {
