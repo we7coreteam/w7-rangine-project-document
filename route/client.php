@@ -18,5 +18,4 @@ irouter()->middleware(['TestMiddleware'])->group(['prefix'=>'/client'], function
 	$route->post('/search', 'Client\ChapterController@search');
 
 	$route->post('/document/getshowlist', 'Client\DocumentController@getShowList');
-	$route->post('/document/getshowdetails', 'Client\DocumentController@getShowDetails');
 });

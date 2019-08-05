@@ -18,7 +18,8 @@ class UserLogic extends BaseLogic
 {
 	public function getUserlist()
 	{
-		return User::orderBy('id', 'desc')->get();
+		$res = User::orderBy('id', 'desc')->get();
+		return $this->handleUser($res);
 	}
 
 	public function getUser($data)
@@ -39,7 +40,9 @@ class UserLogic extends BaseLogic
 		$users = User::where('username', $data['username'])->count();
 
 		if (!$users) {
-			return User::create($data);
+			$res = User::create($data);
+			$this->handleUser([$res]);
+			return $res;
 		}
 		return false;
 	}
@@ -64,16 +67,7 @@ class UserLogic extends BaseLogic
 	{
 		if (isset($data['username'])) {
 			$res = User::select('id', 'username', 'has_privilege')->where('username', 'like', '%'.$data['username'].'%')->get();
-			if ($res) {
-				foreach ($res as $key => &$val) {
-					if ($val['has_privilege'] == 1) {
-						$val['has_privilege'] = '有';
-					} else {
-						$val['has_privilege'] = '无';
-					}
-				}
-			}
-			return $res;
+			return $this->handleUser($res);
 		}
 	}
 
@@ -90,6 +84,24 @@ class UserLogic extends BaseLogic
 				}
 			}
 		}
-		return '成功删除'.$i.'用户，其他用户有文档不能直接删除';
+		return ['msg'=>'成功删除'.$i.'用户，如果用户有文档不能直接删除'];
+	}
+
+	public function handleUser($res)
+	{
+		if (!$res) {
+			return $res;
+		}
+		foreach ($res as $key => &$val) {
+			if ($val['has_privilege'] == 1) {
+				$val['has_privilege_name'] = '有';
+			} else {
+				$val['has_privilege_name'] = '无';
+			}
+			if ($val['userpass']) {
+				unset($val['userpass']);
+			}
+		}
+		return $res;
 	}
 }

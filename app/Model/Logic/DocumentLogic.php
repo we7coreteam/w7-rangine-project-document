@@ -13,8 +13,8 @@
 namespace W7\App\Model\Logic;
 
 use W7\App\Model\Entity\Document;
+use W7\App\Model\Entity\PermissionDocument;
 use W7\App\Model\Entity\User;
-use W7\App\Model\Entity\UserAuthorization;
 
 class DocumentLogic extends BaseLogic
 {
@@ -23,50 +23,34 @@ class DocumentLogic extends BaseLogic
 		if ($documents == 'all') {
 			$res = Document::orderBy('updated_at', 'desc')->get();
 		} else {
-			$res = Document::orderBy('updated_at', 'desc')->find($documents);
+			$res = Document::orderBy('updated_at', 'desc')->find($documents['document']);
 		}
-		return $this->handleDocumentRes($res, $userId);
+		return $this->handleDocumentRes($res, $userId, $documents);
 	}
 
-	public function getDocUserList($id, $userId)
+	public function getDocUserList($id, $userId, $hasPrivilege)
 	{
-		$documentUsers = UserAuthorization::where('document_id', $id)->pluck('user_id')->toArray();
-		$res = User::select('id', 'username', 'is_ban', 'has_privilege')->find($documentUsers);
+		$documentUsers = PermissionDocument::where('document_id', $id)->pluck('user_id')->toArray();
+		$res = User::select('id', 'username', 'has_privilege')->find($documentUsers);
+		$res = $this->handleDocumentRes($res, $userId, $hasPrivilege);
 		if ($res) {
-			foreach ($res as $key => &$val) {
-				if ($val['id'] == $userId) {
-					$val['has_creator'] = '创建者';
-				} else {
-					$val['has_creator'] = '操作员';
+			foreach ($res as $k => &$v) {
+				if ($v['has_privilege'] || $v['has_privilege'] == 0) {
+					unset($v['has_privilege']);
 				}
-
-				if ($val['has_privilege'] == 1) {
-					$val['has_privilege'] = '有';
-				} else {
-					$val['has_privilege'] = '无';
+				if ($v['is_show_name']) {
+					unset($v['is_show_name']);
 				}
 			}
 		}
 		return $res;
 	}
 
-	public function getdetails($id)
+	public function getdetails($id, $userId, $hasPrivilege)
 	{
 		$res = Document::find($id);
-		if ($res && $res['is_show'] == 1) {
-			$res['is_show'] = '发布';
-		} elseif ($res && $res['is_show'] == 0) {
-			$res['is_show'] = '未发布';
-		}
-		if ($res && $res['creator_id']) {
-			$this->user = new UserLogic();
-			$user = $this->user->getUser(['id'=>trim($res['creator_id'])]);
-			if ($user) {
-				$res['username'] = $user['username'];
-			}
-		}
-
-		return $res;
+		$res = $this->handleDocumentRes([$res], $userId, $hasPrivilege);
+		return $res[0];
 	}
 
 	public function create($data)
@@ -84,19 +68,20 @@ class DocumentLogic extends BaseLogic
 		return Document::destroy($id);
 	}
 
-	public function search($name)
+	public function search($name, $userId, $hasPrivilege)
 	{
-		return Document::where('name', 'like', '%'.$name.'%')->get();
+		$res = Document::where('name', 'like', '%'.$name.'%')->get();
+		return $this->handleDocumentRes($res, $userId, $hasPrivilege);
 	}
 
-	public function relation($username, $documentId)
+	public function relation($userId, $documentId)
 	{
 		$this->user = new UserLogic();
-		$user = $this->user->getUser(['username'=>trim($username)]);
+		$user = $this->user->getUser(['id'=>trim($userId)]);
 		if ($user['has_privilege'] == 1) {
 			return true;
 		}
-		$document = $this->getdetails($documentId);
+		$document = $this->getdetails($documentId, '', '');
 		if (!$user) {
 			return '用户不存在';
 		}
@@ -109,20 +94,14 @@ class DocumentLogic extends BaseLogic
 		return true;
 	}
 
-	public function handleDocumentRes($res, $userId)
+	public function handleDocumentRes($res, $userId, $hasPrivilege)
 	{
 		$this->user = new UserLogic();
 		foreach ($res as $key => &$val) {
 			if ($val['is_show'] == 1) {
-				$val['is_show'] = '发布';
-			} elseif ($res && $res['is_show'] == 0) {
-				$val['is_show'] = '未发布';
-			}
-
-			if ($val['has_privilege'] == 1) {
-				$val['has_privilege'] = '有';
-			} else {
-				$val['has_privilege'] = '无';
+				$val['is_show_name'] = '发布';
+			} elseif ($res) {
+				$val['is_show_name'] = '隐藏';
 			}
 
 			if ($val['creator_id']) {
@@ -133,10 +112,19 @@ class DocumentLogic extends BaseLogic
 					$val['username'] = '';
 				}
 			}
-			if ($val['creator_id'] == $userId) {
-				$val['has_creator'] = '创建者';
+			if ($hasPrivilege == 'all') {
+				$val['has_creator'] = 1;
+				$val['has_creator_name'] = '管理员';
 			} else {
-				$val['has_creator'] = '参与者';
+				if ($userId) {
+					if ($val['creator_id'] == $userId) {
+						$val['has_creator'] = 2;
+						$val['has_creator_name'] = '创建者';
+					} else {
+						$val['has_creator'] = 3;
+						$val['has_creator_name'] = '操作员';
+					}
+				}
 			}
 		}
 		return $res;
@@ -159,12 +147,6 @@ class DocumentLogic extends BaseLogic
 						->orderBy('updated_at', 'desc')
 						->get();
 		}
-		return $this->handleDocumentRes($res, '');
-	}
-
-	public function test()
-	{
-		$this->test = new UserAuthorizationLogic();
-		return $this->test->getUserAuthorizations(2);
+		return $this->handleDocumentRes($res, '', '');
 	}
 }
