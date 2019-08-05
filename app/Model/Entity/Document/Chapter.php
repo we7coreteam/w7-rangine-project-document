@@ -10,13 +10,13 @@
  * visited https://www.w7.cc for more details
  */
 
-namespace W7\App\Model\Entity;
+namespace W7\App\Model\Entity\Document;
+
+use W7\App\Model\Entity\BaseModel;
 
 class Chapter extends BaseModel
 {
-	const SHOW = 1;
-	//protected $appends=['category_name', 'creator_name', 'publish_text'];
-
+	protected $table = 'document_chapter';
 
 	public function getCreatedAtAttribute($value)
 	{
