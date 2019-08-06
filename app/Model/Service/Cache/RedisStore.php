@@ -77,7 +77,6 @@ class RedisStore implements Store
 	public function flush()
 	{
 		icache()->flushdb();
-
 		return true;
 	}
 
@@ -86,6 +85,12 @@ class RedisStore implements Store
 		return true;
 	}
 
-
+	public function getExpireAt($key)
+	{
+		$ttl = icache()->call('TTL',[$this->prefix.$key]);
+		if($ttl >= 0){
+			return $ttl + time();
+		}
+	}
 
 }

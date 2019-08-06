@@ -5,6 +5,7 @@ namespace W7\App\Controller\Client;
 use Illuminate\Cache\CacheManager;
 use W7\App\Model\Logic\TestLogic;
 use W7\App\Model\Service\Session\Manager;
+use W7\App\Model\Service\SessionLogic;
 use W7\Http\Message\Server\Request;
 
 
@@ -17,6 +18,7 @@ class TestController extends Controller{
     public function index(Request $request) {
 
         try{
+        	return $this->success(session('aaa',null));
 	        cache()->set('test','你好，世界 + hello world = PHP',5);
 	        return $this->success(cache()->get('test'));
 //            $this->validate($request, [
