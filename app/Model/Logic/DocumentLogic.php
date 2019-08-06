@@ -12,20 +12,22 @@
 
 namespace W7\App\Model\Logic;
 
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\PermissionDocument;
 use W7\App\Model\Entity\User;
 
 class DocumentLogic extends BaseLogic
 {
-	public function getlist($documents, $userId)
+	public function getlist($documents, $userId,$page)
 	{
 		if ($documents == 'all') {
-			$res = Document::orderBy('updated_at', 'desc')->get();
+			$res = Document::orderBy('updated_at', 'desc')->get()->toArray();
 		} else {
-			$res = Document::orderBy('updated_at', 'desc')->find($documents['document']);
+			$res = Document::orderBy('updated_at', 'desc')->find($documents['document'])->toArray();
 		}
-		return $this->handleDocumentRes($res, $userId, $documents);
+		return $this->paging($this->handleDocumentRes($res, $userId, $documents),15,$page);
 	}
 
 	public function getDocUserList($id, $userId, $hasPrivilege)
@@ -68,10 +70,10 @@ class DocumentLogic extends BaseLogic
 		return Document::destroy($id);
 	}
 
-	public function search($name, $userId, $hasPrivilege)
+	public function search($name, $userId, $hasPrivilege,$page)
 	{
-		$res = Document::where('name', 'like', '%'.$name.'%')->get();
-		return $this->handleDocumentRes($res, $userId, $hasPrivilege);
+		$res = Document::where('name', 'like', '%'.$name.'%')->get()->toArray();
+		return $this->paging($this->handleDocumentRes($res, $userId, $hasPrivilege),15,$page);
 	}
 
 	public function relation($userId, $documentId)
@@ -135,18 +137,43 @@ class DocumentLogic extends BaseLogic
 		return Document::where('creator_id', $id)->first();
 	}
 
-	public function getShowList($keyword)
+	public function getShowList($keyword,$page)
 	{
 		if ($keyword) {
 			$res = Document::where('name', 'like', '%'.$keyword['name'].'%')
 						->where('is_show', 1)
 						->orderBy('updated_at', 'desc')
-						->get();
+						->get()->toArray();
 		} else {
 			$res = Document::where('is_show', 1)
 						->orderBy('updated_at', 'desc')
-						->get();
+						->get()->toArray();
 		}
-		return $this->handleDocumentRes($res, '', '');
+		return $this->paging($this->handleDocumentRes($res, '', ''),15,$page);
 	}
+
+	public function paging($data,$perPage,$page)
+	{
+		$perPage = $perPage <= 0 ? 15 : $perPage;
+		if ($page) {
+			$current_page = $page;
+			$current_page = $current_page <= 0 ? 1 :$current_page;
+		} else {
+			$current_page = 1;
+		}
+		$item = array_slice($data, ($current_page-1)*$perPage, $perPage);
+		$total = count($data);
+
+		$paginator = new LengthAwarePaginator($item, $total, $perPage, $current_page, [
+			'path' => Paginator::resolveCurrentPath(),
+			'pageName' => 'page',
+		]);
+
+		return [
+			'total' => $total,
+			'pageCount' => ceil($total/$perPage),
+			'data' => $paginator->toArray()['data']
+		];
+	}
+
 }

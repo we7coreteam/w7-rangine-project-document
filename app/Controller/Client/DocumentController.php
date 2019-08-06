@@ -29,7 +29,7 @@ class DocumentController extends Controller
 			if (trim($request->input('name'))) {
 				$data['name'] = trim($request->input('name'));
 			}
-			$res = $this->logic->getShowList($data);
+			$res = $this->logic->getShowList($data,$request->input('page'));
 			return $this->success($res);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
