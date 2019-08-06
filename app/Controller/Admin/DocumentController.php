@@ -62,7 +62,11 @@ class DocumentController extends Controller
 				'id.required' => '文档ID不能为空',
 			]);
 			$res = $this->logic->getdetails($request->input('id'), $request->document_user_id);
-			return $this->success($res);
+			if ($res){
+				return $this->success($res);
+			}else{
+				return $this->error('文档不存在');
+			}
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
 		}
