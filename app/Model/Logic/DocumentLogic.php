@@ -27,14 +27,14 @@ class DocumentLogic extends BaseLogic
 		} else {
 			$res = Document::orderBy('updated_at', 'desc')->find($documents['document'])->toArray();
 		}
-		return $this->paging($this->handleDocumentRes($res, $userId, $documents),15,$page);
+		return $this->paging($this->handleDocumentRes($res, $userId),15,$page);
 	}
 
-	public function getDocUserList($id, $userId, $hasPrivilege)
+	public function getDocUserList($id, $userId)
 	{
 		$documentUsers = PermissionDocument::where('document_id', $id)->pluck('user_id')->toArray();
 		$res = User::select('id', 'username', 'has_privilege')->find($documentUsers);
-		$res = $this->handleDocumentRes($res, $userId, $hasPrivilege);
+		$res = $this->handleDocumentRes($res, $userId);
 		if ($res) {
 			foreach ($res as $k => &$v) {
 				if ($v['has_privilege'] || $v['has_privilege'] == 0) {
@@ -48,10 +48,10 @@ class DocumentLogic extends BaseLogic
 		return $res;
 	}
 
-	public function getdetails($id, $userId, $hasPrivilege)
+	public function getdetails($id, $userId)
 	{
 		$res = Document::find($id);
-		$res = $this->handleDocumentRes([$res], $userId, $hasPrivilege);
+		$res = $this->handleDocumentRes([$res], $userId);
 		return $res[0];
 	}
 
@@ -70,10 +70,10 @@ class DocumentLogic extends BaseLogic
 		return Document::destroy($id);
 	}
 
-	public function search($name, $userId, $hasPrivilege,$page)
+	public function search($name, $userId,$page)
 	{
 		$res = Document::where('name', 'like', '%'.$name.'%')->get()->toArray();
-		return $this->paging($this->handleDocumentRes($res, $userId, $hasPrivilege),15,$page);
+		return $this->paging($this->handleDocumentRes($res, $userId),15,$page);
 	}
 
 	public function relation($userId, $documentId)
@@ -96,7 +96,7 @@ class DocumentLogic extends BaseLogic
 		return true;
 	}
 
-	public function handleDocumentRes($res, $userId, $hasPrivilege)
+	public function handleDocumentRes($res, $userId)
 	{
 		$this->user = new UserLogic();
 		foreach ($res as $key => &$val) {
@@ -114,7 +114,7 @@ class DocumentLogic extends BaseLogic
 					$val['username'] = '';
 				}
 			}
-			if ($hasPrivilege == 'all') {
+			if ($val['has_privilege'] == 1) {
 				$val['has_creator'] = 1;
 				$val['has_creator_name'] = '管理员';
 			} else {
@@ -149,7 +149,7 @@ class DocumentLogic extends BaseLogic
 						->orderBy('updated_at', 'desc')
 						->get()->toArray();
 		}
-		return $this->paging($this->handleDocumentRes($res, '', ''),15,$page);
+		return $this->paging($this->handleDocumentRes($res, ''),15,$page);
 	}
 
 	public function paging($data,$perPage,$page)

@@ -22,6 +22,7 @@ irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'
 	$route->post('/user/deluser', 'Admin\UserController@delUser');
 	$route->post('/user/updateuserpass', 'Admin\UserController@updateUserpass');
 	$route->post('/user/searchuser', 'Admin\UserController@searchUser');
+	$route->post('/user/detailsuser', 'Admin\UserController@detailsUser');
 
 	$route->post('/chapter/index', 'Admin\ChapterController@index');
 	$route->post('/chapter/get_content', 'Admin\ChapterController@getContent');

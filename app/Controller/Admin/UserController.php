@@ -37,6 +37,9 @@ class UserController extends Controller
 	public function addUser(Request $request)
 	{
 		try {
+			if ($request->document_user_auth != 'all'){
+				return $this->error('只有管理员才可以操作用户信息');
+			}
 			$this->validate($request, [
 				'username' => 'required',
 				'userpass' => 'required',
@@ -61,9 +64,31 @@ class UserController extends Controller
 		}
 	}
 
+	public function detailsUser(Request $request)
+	{
+		try {
+			$this->validate($request, [
+				'id' => 'required'
+			], [
+				'id.required' => '用户ID不能为空',
+			]);
+
+			$res = $this->logic->detailsUser($request->input('id'));
+			if ($res) {
+				return $this->success($res);
+			}
+			return $this->error($res);
+		} catch (\Exception $e) {
+			return $this->error($e->getMessage());
+		}
+	}
+
 	public function updateUser(Request $request)
 	{
 		try {
+			if ($request->document_user_auth != 'all'){
+				return $this->error('只有管理员才可以操作用户信息');
+			}
 			$this->validate($request, [
 				'id' => 'required'
 			], [
@@ -97,6 +122,9 @@ class UserController extends Controller
 	public function delUser(Request $request)
 	{
 		try {
+			if ($request->document_user_auth != 'all'){
+				return $this->error('只有管理员才可以操作用户信息');
+			}
 			$this->validate($request, [
 				'ids' => 'required'
 			], [
@@ -117,6 +145,9 @@ class UserController extends Controller
 	public function updateUserpass(Request $request)
 	{
 		try {
+			if ($request->document_user_auth != 'all'){
+				return $this->error('只有管理员才可以操作用户信息');
+			}
 			$this->validate($request, [
 				'id' => 'required',
 				'userpass' => 'required',
