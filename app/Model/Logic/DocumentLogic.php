@@ -32,7 +32,14 @@ class DocumentLogic extends BaseLogic
 
 	public function getDocUserList($id, $userId)
 	{
+		$document = Document::find($id);
+		if (!$document) {
+			return false;
+		}
 		$documentUsers = PermissionDocument::where('document_id', $id)->pluck('user_id')->toArray();
+		if (!$documentUsers) {
+			return true;
+		}
 		$res = User::select('id', 'username', 'has_privilege')->find($documentUsers);
 		if ($res) {
 			$res = $this->handleDocumentRes($res, $userId);
