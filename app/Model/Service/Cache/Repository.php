@@ -1,12 +1,21 @@
 <?php
 
+/**
+ * WeEngine Document System
+ *
+ * (c) We7Team 2019 <https://www.w7.cc>
+ *
+ * This is not a free software
+ * Using it under the license terms
+ * visited https://www.w7.cc for more details
+ */
+
 namespace W7\App\Model\Service\Cache;
 
 use Closure;
 use Illuminate\Cache\RetrievesMultipleKeys;
 
 use Illuminate\Support\InteractsWithTime;
-
 
 class Repository
 {
@@ -48,7 +57,7 @@ class Repository
 
 	public function put($key, $value, $ttl = null)
 	{
-		if($ttl === null){
+		if ($ttl === null) {
 			$ttl = $this->default;
 		}
 		$this->store->put($key, $value, $ttl);
@@ -62,7 +71,7 @@ class Repository
 
 	public function putMany(array $values, $ttl)
 	{
-		$this->store->putMany($values,$ttl);
+		$this->store->putMany($values, $ttl);
 	}
 
 	public function setMultiple($values, $ttl = null)
@@ -119,7 +128,6 @@ class Repository
 		return $value;
 	}
 
-
 	public function forget($key)
 	{
 		return $this->store->forget($key);
@@ -144,7 +152,6 @@ class Repository
 		return $this->store->flush();
 	}
 
-
 	public function getDefaultCacheTime()
 	{
 		return $this->default;
@@ -166,7 +173,6 @@ class Repository
 	{
 		return $this->store->getExpireAt($key);
 	}
-
 
 	public function __clone()
 	{

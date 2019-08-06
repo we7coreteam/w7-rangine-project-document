@@ -1,21 +1,20 @@
 <?php
+
+/**
+ * WeEngine Document System
+ *
+ * (c) We7Team 2019 <https://www.w7.cc>
+ *
+ * This is not a free software
+ * Using it under the license terms
+ * visited https://www.w7.cc for more details
+ */
+
 namespace W7\App\Model\Service;
 
-class SessionLogic extends BaseLogic {
+class SessionLogic extends BaseLogic
+{
 	protected $token;
-	protected static $instance;
-
-	public static function createInstance($token)
-	{
-		if(!self::$instance){
-			self::$instance = new self($token);
-		}
-	}
-
-	public static function getInstance()
-	{
-		return self::$instance;
-	}
 
 	public function __construct($token)
 	{
@@ -24,12 +23,17 @@ class SessionLogic extends BaseLogic {
 
 	public function get($key)
 	{
-		return cache()::get($this->getKey($key));
+		return cache()->get($this->getKey($key));
 	}
 
-	public function set($key,$value)
+	public function set($key, $value)
 	{
-		cache()::set($this->getKey($key),$value,$this->getTtl());
+		cache()->set($this->getKey($key), $value, $this->getTtl());
+	}
+
+	public function delete($key)
+	{
+		return cache()->pull($this->getKey($key));
 	}
 
 	public function getKey($key)

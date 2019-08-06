@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * WeEngine Document System
+ *
+ * (c) We7Team 2019 <https://www.w7.cc>
+ *
+ * This is not a free software
+ * Using it under the license terms
+ * visited https://www.w7.cc for more details
+ */
+
 namespace W7\App\Model\Service\Cache;
 
 use Closure;
@@ -7,7 +17,6 @@ use Exception;
 use Illuminate\Cache\RetrievesMultipleKeys;
 
 use Illuminate\Support\InteractsWithTime;
-use Illuminate\Support\Str;
 use W7\App\Model\Entity\Cache;
 
 class DatabaseStore implements Store
@@ -15,7 +24,6 @@ class DatabaseStore implements Store
 	use InteractsWithTime, RetrievesMultipleKeys;
 
 	protected $prefix = 'document_';
-
 
 	public function get($key)
 	{
@@ -28,7 +36,7 @@ class DatabaseStore implements Store
 
 		$cache = is_array($cache) ? (object) $cache : $cache;
 
-		if ($this->currentTime() >= $cache->expiration) {
+		if ($this->getTime() >= $cache->expired_at) {
 			$this->forget($key);
 
 			return;
@@ -37,10 +45,9 @@ class DatabaseStore implements Store
 		return unserialize($cache->value);
 	}
 
-
 	public function put($key, $value, $seconds)
 	{
-		if($seconds <= 0){
+		if ($seconds <= 0) {
 			$seconds = 52560000;
 		}
 		$key = $this->prefix.$key;
@@ -56,14 +63,12 @@ class DatabaseStore implements Store
 		}
 	}
 
-
 	public function increment($key, $value = 1)
 	{
 		return $this->incrementOrDecrement($key, $value, function ($current, $value) {
 			return $current + $value;
 		});
 	}
-
 
 	public function decrement($key, $value = 1)
 	{
@@ -72,7 +77,6 @@ class DatabaseStore implements Store
 		});
 	}
 
-
 	protected function incrementOrDecrement($key, $value, Closure $callback)
 	{
 		return idb()->transaction(function () use ($key, $value, $callback) {
@@ -80,7 +84,6 @@ class DatabaseStore implements Store
 
 			$cache = Cache::where('key', $prefixed)
 				->lockForUpdate()->first();
-
 
 			if (is_null($cache)) {
 				return false;
@@ -123,12 +126,12 @@ class DatabaseStore implements Store
 
 	public function flush()
 	{
-		return (bool) $this->table()->delete();
+		return (bool) Cache::where('id', '>', 0)->delete();
 	}
 
 	public function clearExpired()
 	{
-		Cache::where('expired_at','<',$this->getTime())->delete();
+		Cache::where('expired_at', '<', $this->getTime())->delete();
 	}
 
 	public function getExpireAt($key)
@@ -140,13 +143,10 @@ class DatabaseStore implements Store
 			return -2;
 		}
 
-		if ($this->currentTime() >= $cache->expiration) {
+		if ($this->currentTime() >= $cache->expired_at) {
 			return -2;
 		}
 
-		return $cache->expiration;
+		return $cache->expired_at;
 	}
-
-
-
 }
