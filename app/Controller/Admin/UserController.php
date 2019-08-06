@@ -83,7 +83,7 @@ class UserController extends Controller
 			if ($res) {
 				return $this->success($res);
 			}
-			return $this->error($res);
+			return $this->error('用户不存在');
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
 		}

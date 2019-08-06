@@ -20,19 +20,26 @@ use W7\App\Model\Entity\User;
 
 class DocumentLogic extends BaseLogic
 {
-	public function getlist($documents, $userId,$page)
+	public function getlist($documents, $userId, $page)
 	{
 		if ($documents == 'all') {
 			$res = Document::orderBy('updated_at', 'desc')->get()->toArray();
 		} else {
 			$res = Document::orderBy('updated_at', 'desc')->find($documents['document'])->toArray();
 		}
-		return $this->paging($this->handleDocumentRes($res, $userId),15,$page);
+		return $this->paging($this->handleDocumentRes($res, $userId), 15, $page);
 	}
 
 	public function getDocUserList($id, $userId)
 	{
+		$document = Document::find($id);
+		if (!$document) {
+			return false;
+		}
 		$documentUsers = PermissionDocument::where('document_id', $id)->pluck('user_id')->toArray();
+		if (!$documentUsers) {
+			return true;
+		}
 		$res = User::select('id', 'username', 'has_privilege')->find($documentUsers);
 		if ($res) {
 			$res = $this->handleDocumentRes($res, $userId);
@@ -51,7 +58,7 @@ class DocumentLogic extends BaseLogic
 	public function getdetails($id, $userId)
 	{
 		$res = Document::find($id);
-		if ($res){
+		if ($res) {
 			$res = $this->handleDocumentRes([$res], $userId);
 			return $res[0];
 		}
@@ -73,10 +80,10 @@ class DocumentLogic extends BaseLogic
 		return Document::destroy($id);
 	}
 
-	public function search($name, $userId,$page)
+	public function search($name, $userId, $page)
 	{
 		$res = Document::where('name', 'like', '%'.$name.'%')->get()->toArray();
-		return $this->paging($this->handleDocumentRes($res, $userId),15,$page);
+		return $this->paging($this->handleDocumentRes($res, $userId), 15, $page);
 	}
 
 	public function relation($userId, $documentId)
@@ -101,7 +108,7 @@ class DocumentLogic extends BaseLogic
 
 	public function handleDocumentRes($res, $userId)
 	{
-		if (!$res){
+		if (!$res) {
 			return $res;
 		}
 		$this->user = new UserLogic();
@@ -143,7 +150,7 @@ class DocumentLogic extends BaseLogic
 		return Document::where('creator_id', $id)->first();
 	}
 
-	public function getShowList($keyword,$page)
+	public function getShowList($keyword, $page)
 	{
 		if ($keyword) {
 			$res = Document::where('name', 'like', '%'.$keyword['name'].'%')
@@ -155,10 +162,10 @@ class DocumentLogic extends BaseLogic
 						->orderBy('updated_at', 'desc')
 						->get()->toArray();
 		}
-		return $this->paging($this->handleDocumentRes($res, ''),15,$page);
+		return $this->paging($this->handleDocumentRes($res, ''), 15, $page);
 	}
 
-	public function paging($data,$perPage,$page)
+	public function paging($data, $perPage, $page)
 	{
 		$perPage = $perPage <= 0 ? 15 : $perPage;
 		if ($page) {
@@ -181,5 +188,4 @@ class DocumentLogic extends BaseLogic
 			'data' => $paginator->toArray()['data']
 		];
 	}
-
 }
