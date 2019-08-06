@@ -34,7 +34,7 @@ class LoginController extends Controller
 				'imgcodeKey.required' => '验证码的KEY值不能为空',
 			]);
 			$this->code_logic = new VerificationcodeLogic();
-			return $code_val = cache()->get($request->input('imgcodeKey'));
+			$code_val = cache()->get($request->input('imgcodeKey'));
 			if (!$code_val) {
 				return $this->error('验证码已失效');
 			}
