@@ -37,6 +37,9 @@ class UserController extends Controller
 	public function addUser(Request $request)
 	{
 		try {
+			if ($request->document_user_auth != 'all'){
+				return $this->error('只有管理员才可以操作用户信息');
+			}
 			$this->validate($request, [
 				'username' => 'required',
 				'userpass' => 'required',
@@ -83,6 +86,9 @@ class UserController extends Controller
 	public function updateUser(Request $request)
 	{
 		try {
+			if ($request->document_user_auth != 'all'){
+				return $this->error('只有管理员才可以操作用户信息');
+			}
 			$this->validate($request, [
 				'id' => 'required'
 			], [
@@ -116,6 +122,9 @@ class UserController extends Controller
 	public function delUser(Request $request)
 	{
 		try {
+			if ($request->document_user_auth != 'all'){
+				return $this->error('只有管理员才可以操作用户信息');
+			}
 			$this->validate($request, [
 				'ids' => 'required'
 			], [
@@ -136,6 +145,9 @@ class UserController extends Controller
 	public function updateUserpass(Request $request)
 	{
 		try {
+			if ($request->document_user_auth != 'all'){
+				return $this->error('只有管理员才可以操作用户信息');
+			}
 			$this->validate($request, [
 				'id' => 'required',
 				'userpass' => 'required',
