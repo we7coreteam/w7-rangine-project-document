@@ -53,6 +53,12 @@ class UserLogic extends BaseLogic
 		return User::where('id', $id)->update($data);
 	}
 
+	public function detailsUser($id)
+	{
+		$res = User::find($id);
+		return $this->handleUser([$res]);
+	}
+
 	public function delUser($ids)
 	{
 		$res = User::destroy($ids);

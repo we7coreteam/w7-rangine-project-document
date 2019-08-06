@@ -61,6 +61,25 @@ class UserController extends Controller
 		}
 	}
 
+	public function detailsUser(Request $request)
+	{
+		try {
+			$this->validate($request, [
+				'id' => 'required'
+			], [
+				'id.required' => '用户ID不能为空',
+			]);
+
+			$res = $this->logic->detailsUser($request->input('id'));
+			if ($res) {
+				return $this->success($res);
+			}
+			return $this->error($res);
+		} catch (\Exception $e) {
+			return $this->error($e->getMessage());
+		}
+	}
+
 	public function updateUser(Request $request)
 	{
 		try {

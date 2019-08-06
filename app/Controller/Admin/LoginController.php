@@ -34,7 +34,7 @@ class LoginController extends Controller
 				'imgcodeKey.required' => '验证码的KEY值不能为空',
 			]);
 			$this->code_logic = new VerificationcodeLogic();
-			$code_val = cache()->get($request->input('imgcodeKey'));
+			return $code_val = cache()->get($request->input('imgcodeKey'));
 			if (!$code_val) {
 				return $this->error('验证码已失效');
 			}
@@ -52,7 +52,6 @@ class LoginController extends Controller
 					cache()->set($key, $user_val['id'], 60*60*2);
 					cache()->set('username_'.$user_val['id'], $key); // 用户与access_token关联在一起
 					cache()->delete($request->input('imgcodeKey'));
-					$data['document_access_token'] = $key;
 					return $this->success(['document_access_token' => $key]);
 				} else {
 					return $this->error('用户名或者密码有误');
