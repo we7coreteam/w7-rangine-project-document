@@ -34,8 +34,8 @@ class DocumentLogic extends BaseLogic
 	{
 		$documentUsers = PermissionDocument::where('document_id', $id)->pluck('user_id')->toArray();
 		$res = User::select('id', 'username', 'has_privilege')->find($documentUsers);
-		$res = $this->handleDocumentRes($res, $userId);
 		if ($res) {
+			$res = $this->handleDocumentRes($res, $userId);
 			foreach ($res as $k => &$v) {
 				if ($v['has_privilege'] || $v['has_privilege'] == 0) {
 					unset($v['has_privilege']);
@@ -51,8 +51,11 @@ class DocumentLogic extends BaseLogic
 	public function getdetails($id, $userId)
 	{
 		$res = Document::find($id);
-		$res = $this->handleDocumentRes([$res], $userId);
-		return $res[0];
+		if ($res){
+			$res = $this->handleDocumentRes([$res], $userId);
+			return $res[0];
+		}
+		return $res;
 	}
 
 	public function create($data)
@@ -98,6 +101,9 @@ class DocumentLogic extends BaseLogic
 
 	public function handleDocumentRes($res, $userId)
 	{
+		if (!$res){
+			return $res;
+		}
 		$this->user = new UserLogic();
 		foreach ($res as $key => &$val) {
 			if ($val['is_show'] == 1) {

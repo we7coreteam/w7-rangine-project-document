@@ -19,8 +19,11 @@ class UserLogic extends BaseLogic
 	public function getUserlist($page)
 	{
 		$res = User::orderBy('id', 'desc')->get()->toArray();
-		$this->doclogic = new DocumentLogic();
-		return $this->doclogic->paging($this->handleUser($res),15,$page);
+		if ($res){
+			$this->doclogic = new DocumentLogic();
+			return $this->doclogic->paging($this->handleUser($res),15,$page);
+		}
+		return $res;
 	}
 
 	public function getUser($data)
@@ -56,8 +59,11 @@ class UserLogic extends BaseLogic
 	public function detailsUser($id)
 	{
 		$res = User::find($id);
-		$res = $this->handleUser([$res]);
-		return $res[0];
+		if ($res){
+			$res = $this->handleUser([$res]);
+			return $res[0];
+		}
+		return $res;
 	}
 
 	public function delUser($ids)
@@ -79,8 +85,11 @@ class UserLogic extends BaseLogic
 						->orderBy('id', 'desc')
 						->get()
 						->toArray();
-			$this->doclogic = new DocumentLogic();
-			return $this->doclogic->paging($this->handleUser($res),15,$page);
+			if ($res){
+				$this->doclogic = new DocumentLogic();
+				return $this->doclogic->paging($this->handleUser($res),15,$page);
+			}
+			return $res;
 		}
 	}
 

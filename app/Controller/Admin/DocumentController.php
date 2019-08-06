@@ -121,13 +121,13 @@ class DocumentController extends Controller
 			}
 
 			$data = [];
-			if ($request->input('name')) {
+			if ($request->input('name') !== null) {
 				$data['name'] = $request->input('name');
 			}
-			if ($request->input('description')) {
+			if ($request->input('description') !== null) {
 				$data['description'] = $request->input('description');
 			}
-			if ($request->input('is_show')) {
+			if ($request->input('is_show') !== null) {
 				$data['is_show'] = (int)$request->input('is_show');
 			}
 			$res = $this->logic->update($documentId, $data);
