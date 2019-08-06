@@ -24,10 +24,10 @@ class UserController extends Controller
 		$this->logic = new UserLogic();
 	}
 
-	public function getUserlist()
+	public function getUserlist(Request $request)
 	{
 		try {
-			$res = $this->logic->getUserlist();
+			$res = $this->logic->getUserlist($request->input('page'));
 			return $this->success($res);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
@@ -149,7 +149,7 @@ class UserController extends Controller
 			], [
 				'keywords.required' => '关键字不能为空',
 			]);
-			$res = $this->logic->searchUser(['username'=>trim($request->input('keywords'))]);
+			$res = $this->logic->searchUser(['username'=>trim($request->input('keywords'))],$request->input('page'));
 			return $this->success($res);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());

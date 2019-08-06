@@ -30,7 +30,7 @@ class DocumentController extends Controller
 	public function getlist(Request $request)
 	{
 		try {
-			$res = $this->logic->getlist($request->document_user_auth, $request->document_user_id);
+			$res = $this->logic->getlist($request->document_user_auth, $request->document_user_id,$request->input('page'));
 			return $this->success($res);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
@@ -179,7 +179,7 @@ class DocumentController extends Controller
 			], [
 				'name.required' => '文档名称不能为空',
 			]);
-			$res = $this->logic->search(trim($request->input('name')), $request->document_user_id, $request->document_user_auth);
+			$res = $this->logic->search(trim($request->input('name')), $request->document_user_id, $request->document_user_auth,$request->input('page'));
 			return $this->success($res);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());

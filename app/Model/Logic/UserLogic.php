@@ -16,19 +16,20 @@ use W7\App\Model\Entity\User;
 
 class UserLogic extends BaseLogic
 {
-	public function getUserlist()
+	public function getUserlist($page)
 	{
-		$res = User::orderBy('id', 'desc')->get();
-		return $this->handleUser($res);
+		$res = User::orderBy('id', 'desc')->get()->toArray();
+		$this->doclogic = new DocumentLogic();
+		return $this->doclogic->paging($this->handleUser($res),15,$page);
 	}
 
 	public function getUser($data)
 	{
-		if ($data['id']) {
+		if (isset($data['id']) && $data['id']) {
 			$user = User::find($data['id']);
 		}
 
-		if ($data['username']) {
+		if (isset($data['username']) && $data['username']) {
 			$user = User::where('username', $data['username'])->first();
 		}
 
@@ -63,11 +64,16 @@ class UserLogic extends BaseLogic
 		return $res;
 	}
 
-	public function searchUser($data)
+	public function searchUser($data,$page)
 	{
-		if (isset($data['username'])) {
-			$res = User::select('id', 'username', 'has_privilege')->where('username', 'like', '%'.$data['username'].'%')->get();
-			return $this->handleUser($res);
+		if (isset($data['username']) && $data['username']) {
+			$res = User::select('id', 'username', 'has_privilege')
+						->where('username', 'like', '%'.$data['username'].'%')
+						->orderBy('id', 'desc')
+						->get()
+						->toArray();
+			$this->doclogic = new DocumentLogic();
+			return $this->doclogic->paging($this->handleUser($res),15,$page);
 		}
 	}
 
