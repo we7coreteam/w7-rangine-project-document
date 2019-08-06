@@ -131,6 +131,22 @@ class DatabaseStore implements Store
 		Cache::where('expired_at','<',$this->getTime())->delete();
 	}
 
+	public function getExpireAt($key)
+	{
+		$prefixed = $this->prefix.$key;
+
+		$cache = Cache::where('key', '=', $prefixed)->first();
+		if (is_null($cache)) {
+			return -2;
+		}
+
+		if ($this->currentTime() >= $cache->expiration) {
+			return -2;
+		}
+
+		return $cache->expiration;
+	}
+
 
 
 }

@@ -17,6 +17,7 @@ class TestController extends Controller{
     public function index(Request $request) {
 
         try{
+        	return $this->success($request->getCookieParams());
 	        cache()->set('test','你好，世界 + hello world = PHP',5);
 	        return $this->success(cache()->get('test'));
 //            $this->validate($request, [

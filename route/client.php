@@ -11,7 +11,7 @@
  */
 
 irouter()->middleware(['TestMiddleware'])->group(['prefix'=>'/client'], function (\W7\Core\Route\Route $route) {
-	$route->post('/test/index', 'Client\TestController@index');
+	$route->get('/test/index', 'Client\TestController@index');
 
 	$route->post('/chapters', 'Client\ChapterController@chapters');
 	$route->post('/detail', 'Client\ChapterController@detail');

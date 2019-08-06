@@ -162,6 +162,11 @@ class Repository
 		return $this->store;
 	}
 
+	public function getExpireAt($key)
+	{
+		return $this->store->getExpireAt($key);
+	}
+
 
 	public function __clone()
 	{
