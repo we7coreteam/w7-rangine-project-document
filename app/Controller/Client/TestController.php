@@ -18,7 +18,17 @@ class TestController extends Controller{
     public function index(Request $request) {
 
         try{
-        	return $this->success(session('aaa',null));
+
+        	if(isset($_SESSION['a'])){
+        		var_dump('read');
+	        }else{
+        		var_dump('write');
+		        $_SESSION['a'] = 'is ok';
+	        }
+        	$r = $_SESSION['a'];
+        	unset($_SESSION);
+
+        	return $this->success($r);
 	        cache()->set('test','你好，世界 + hello world = PHP',5);
 	        return $this->success(cache()->get('test'));
 //            $this->validate($request, [

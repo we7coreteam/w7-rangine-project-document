@@ -30,6 +30,7 @@ function session_open()
 function session($key = null, $value='__default__')
 {
 	$session = icontext()->getContextDataByKey('session');
+
 	if ($key) {
 		if ($value === '__default__') {
 			return $session->get($key);

@@ -22,6 +22,10 @@ class TestMiddleware extends MiddlewareAbstract
 {
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+	    //if (session_status() !==PHP_SESSION_ACTIVE) {
+		    session_id(date('YmdHi'));
+		    session_start();
+	   // }
         return $handler->handle($request);
     }
 }

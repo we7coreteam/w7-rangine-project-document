@@ -12,12 +12,17 @@
 
 namespace W7\App\Model\Service;
 
+use mysql_xdevapi\Exception;
+
 class SessionLogic extends BaseLogic
 {
 	protected $token;
 
 	public function __construct($token)
 	{
+		if(!$token){
+			throw new \Exception('请登录后再使用session');
+		}
 		$this->token = $token;
 	}
 
