@@ -56,7 +56,8 @@ class UserLogic extends BaseLogic
 	public function detailsUser($id)
 	{
 		$res = User::find($id);
-		return $this->handleUser([$res]);
+		$res = $this->handleUser([$res]);
+		return $res[0];
 	}
 
 	public function delUser($ids)
