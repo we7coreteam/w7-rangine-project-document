@@ -101,8 +101,11 @@ class UserLogic extends BaseLogic
 		foreach ($ids as $k => $val) {
 			$res = $this->docLogic->getUserCreateDoc($val);
 			if (!$res) {
-				if ($this->delUser($val)) {
-					$i++;
+				$user = User::find($val);
+				if ($user && $user['has_privilege'] != 1){
+					if ($this->delUser($val)) {
+						$i++;
+					}
 				}
 			}
 		}
