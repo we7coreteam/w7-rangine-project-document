@@ -26,11 +26,11 @@ class Curl
 
 	private function getResponse($response)
 	{
-		if($this->responseType == 'json'){
+		if ($this->responseType == 'json') {
 			return json_decode($response, true);
 		}
 
-		if($this->responseType == 'xml'){
+		if ($this->responseType == 'xml') {
 			return json_decode(json_encode(simplexml_load_string($response, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
 		}
 
@@ -80,9 +80,8 @@ class Curl
 	//form-data
 	public function postOrigin($url, array $params=[], $header=[])
 	{
-		foreach($params as $k=>$v)
-		{
-			if(isset($v['type']) && $v['type'] == 'file'){
+		foreach ($params as $k=>$v) {
+			if (isset($v['type']) && $v['type'] == 'file') {
 				$params[$k] = new \CURLFile(realpath($v['path']));
 			}
 		}
@@ -107,7 +106,7 @@ class Curl
 
 	public function postJson($url, $params=[], $header=[])
 	{
-		$params = is_array($params) ? json_encode($params,JSON_UNESCAPED_UNICODE):$params;
+		$params = is_array($params) ? json_encode($params, JSON_UNESCAPED_UNICODE):$params;
 		$header[] = 'Content-Type: application/json';
 		$header[] = 'Content-Length: ' . strlen($params);
 		curl_setopt_array($this->curl, [

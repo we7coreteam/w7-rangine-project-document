@@ -1,7 +1,19 @@
 <?php
+
+/**
+ * WeEngine Document System
+ *
+ * (c) We7Team 2019 <https://www.w7.cc>
+ *
+ * This is not a free software
+ * Using it under the license terms
+ * visited https://www.w7.cc for more details
+ */
+
 namespace W7\App\Model\Service;
 
-class UploadLogic extends BaseLogic {
+class UploadLogic extends BaseLogic
+{
 	protected $root_path = RUNTIME_PATH.'/upload/';
 	protected $path = '';
 	protected $name;
@@ -34,7 +46,7 @@ class UploadLogic extends BaseLogic {
 			//图片储存目录
 			$dir = $this->root_path.$this->path;
 			//文件名称
-			!$this->name && $this->name = date("Ymdhis") . '_' . rand(10000, 99999);
+			!$this->name && $this->name = date('Ymdhis') . '_' . rand(10000, 99999);
 
 			if (!is_dir($dir)) {
 				//如果不存在就创建该目录

@@ -135,7 +135,7 @@ class ChapterLogic extends BaseLogic
 		}
 		if ($parent_id) {
 			$parent = Chapter::find($parent_id);
-			if($parent){
+			if ($parent) {
 				return $parent;
 			}
 		}

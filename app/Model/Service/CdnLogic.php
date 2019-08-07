@@ -1,11 +1,16 @@
 <?php
+
 /**
- * @author donknap
- * @date 19-4-10 下午5:52
+ * WeEngine Document System
+ *
+ * (c) We7Team 2019 <https://www.w7.cc>
+ *
+ * This is not a free software
+ * Using it under the license terms
+ * visited https://www.w7.cc for more details
  */
 
 namespace W7\App\Model\Service;
-
 
 use Qcloud\Cos\Client;
 use W7\Core\Database\LogicAbstract;
@@ -84,7 +89,6 @@ class qCloudCos
 						'Bucket' => $this->bucket,
 					]
 				);
-
 			} catch (\Throwable $e) {
 				throw new \RuntimeException($e->getMessage(), $e->getStatusCode());
 			}

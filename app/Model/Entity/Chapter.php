@@ -17,7 +17,6 @@ class Chapter extends BaseModel
 	const SHOW = 1;
 	//protected $appends=['category_name', 'creator_name', 'publish_text'];
 
-
 	public function getCreatedAtAttribute($value)
 	{
 		return date('Y-m-d H:i:s', $value);

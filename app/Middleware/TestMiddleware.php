@@ -1,13 +1,13 @@
 <?php
 
-/*
- * This file is part of PHP CS Fixer.
+/**
+ * WeEngine Document System
  *
- * (c) Fabien Potencier <fabien@symfony.com>
- *     Dariusz Rumiński <dariusz.ruminski@gmail.com>
+ * (c) We7Team 2019 <https://www.w7.cc>
  *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
+ * This is not a free software
+ * Using it under the license terms
+ * visited https://www.w7.cc for more details
  */
 
 namespace W7\App\Middleware;
@@ -20,15 +20,15 @@ use W7\Core\Middleware\MiddlewareAbstract;
 
 class TestMiddleware extends MiddlewareAbstract
 {
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
-    {
-        //这里是中间件一些代码
-        if (false) {
-            return App::getApp()->getContext()->getResponse()->json(
-                ['message' => '权限不足', 'data' => null, 'status' => false]
-            );
-        }
+	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+	{
+		//这里是中间件一些代码
+		if (false) {
+			return App::getApp()->getContext()->getResponse()->json(
+				['message' => '权限不足', 'data' => null, 'status' => false]
+			);
+		}
 
-        return $handler->handle($request);
-    }
+		return $handler->handle($request);
+	}
 }
