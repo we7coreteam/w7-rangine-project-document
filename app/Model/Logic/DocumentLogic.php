@@ -12,60 +12,56 @@
 
 namespace W7\App\Model\Logic;
 
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use W7\App\Model\Entity\Document;
+use W7\App\Model\Entity\PermissionDocument;
 use W7\App\Model\Entity\User;
-use W7\App\Model\Entity\UserAuthorization;
 
 class DocumentLogic extends BaseLogic
 {
-	public function getlist($documents, $userId)
+	public function getlist($documents, $userId, $page)
 	{
 		if ($documents == 'all') {
-			$res = Document::orderBy('updated_at', 'desc')->get();
+			$res = Document::orderBy('updated_at', 'desc')->get()->toArray();
 		} else {
-			$res = Document::orderBy('updated_at', 'desc')->find($documents);
+			$res = Document::orderBy('updated_at', 'desc')->find($documents['document'])->toArray();
 		}
-		return $this->handleDocumentRes($res, $userId);
+		return $this->paging($this->handleDocumentRes($res, $userId), 15, $page);
 	}
 
 	public function getDocUserList($id, $userId)
 	{
-		$documentUsers = UserAuthorization::where('document_id', $id)->pluck('user_id')->toArray();
-		$res = User::select('id', 'username', 'is_ban', 'has_privilege')->find($documentUsers);
+		$document = Document::find($id);
+		if (!$document) {
+			return false;
+		}
+		$documentUsers = PermissionDocument::where('document_id', $id)->pluck('user_id')->toArray();
+		if (!$documentUsers) {
+			return true;
+		}
+		$res = User::select('id', 'username', 'has_privilege')->find($documentUsers);
 		if ($res) {
-			foreach ($res as $key => &$val) {
-				if ($val['id'] == $userId) {
-					$val['has_creator'] = '创建者';
-				} else {
-					$val['has_creator'] = '操作员';
+			$res = $this->handleDocumentRes($res, $userId);
+			foreach ($res as $k => &$v) {
+				if ($v['has_privilege'] || $v['has_privilege'] == 0) {
+					unset($v['has_privilege']);
 				}
-
-				if ($val['has_privilege'] == 1) {
-					$val['has_privilege'] = '有';
-				} else {
-					$val['has_privilege'] = '无';
+				if ($v['is_show_name']) {
+					unset($v['is_show_name']);
 				}
 			}
 		}
 		return $res;
 	}
 
-	public function getdetails($id)
+	public function getdetails($id, $userId)
 	{
 		$res = Document::find($id);
-		if ($res && $res['is_show'] == 1) {
-			$res['is_show'] = '发布';
-		} elseif ($res && $res['is_show'] == 0) {
-			$res['is_show'] = '未发布';
+		if ($res) {
+			$res = $this->handleDocumentRes([$res], $userId);
+			return $res[0];
 		}
-		if ($res && $res['creator_id']) {
-			$this->user = new UserLogic();
-			$user = $this->user->getUser(['id'=>trim($res['creator_id'])]);
-			if ($user) {
-				$res['username'] = $user['username'];
-			}
-		}
-
 		return $res;
 	}
 
@@ -84,19 +80,20 @@ class DocumentLogic extends BaseLogic
 		return Document::destroy($id);
 	}
 
-	public function search($name)
+	public function search($name, $userId, $page)
 	{
-		return Document::where('name', 'like', '%'.$name.'%')->get();
+		$res = Document::where('name', 'like', '%'.$name.'%')->get()->toArray();
+		return $this->paging($this->handleDocumentRes($res, $userId), 15, $page);
 	}
 
-	public function relation($username, $documentId)
+	public function relation($userId, $documentId)
 	{
 		$this->user = new UserLogic();
-		$user = $this->user->getUser(['username'=>trim($username)]);
+		$user = $this->user->getUser(['id'=>trim($userId)]);
 		if ($user['has_privilege'] == 1) {
 			return true;
 		}
-		$document = $this->getdetails($documentId);
+		$document = $this->getdetails($documentId, '', '');
 		if (!$user) {
 			return '用户不存在';
 		}
@@ -111,18 +108,15 @@ class DocumentLogic extends BaseLogic
 
 	public function handleDocumentRes($res, $userId)
 	{
+		if (!$res) {
+			return $res;
+		}
 		$this->user = new UserLogic();
 		foreach ($res as $key => &$val) {
 			if ($val['is_show'] == 1) {
-				$val['is_show'] = '发布';
-			} elseif ($res && $res['is_show'] == 0) {
-				$val['is_show'] = '未发布';
-			}
-
-			if ($val['has_privilege'] == 1) {
-				$val['has_privilege'] = '有';
-			} else {
-				$val['has_privilege'] = '无';
+				$val['is_show_name'] = '发布';
+			} elseif ($res) {
+				$val['is_show_name'] = '隐藏';
 			}
 
 			if ($val['creator_id']) {
@@ -133,10 +127,19 @@ class DocumentLogic extends BaseLogic
 					$val['username'] = '';
 				}
 			}
-			if ($val['creator_id'] == $userId) {
-				$val['has_creator'] = '创建者';
+			if ($val['has_privilege'] == 1) {
+				$val['has_creator'] = 1;
+				$val['has_creator_name'] = '管理员';
 			} else {
-				$val['has_creator'] = '参与者';
+				if ($userId) {
+					if ($val['creator_id'] == $userId) {
+						$val['has_creator'] = 2;
+						$val['has_creator_name'] = '创建者';
+					} else {
+						$val['has_creator'] = 3;
+						$val['has_creator_name'] = '操作员';
+					}
+				}
 			}
 		}
 		return $res;
@@ -147,24 +150,42 @@ class DocumentLogic extends BaseLogic
 		return Document::where('creator_id', $id)->first();
 	}
 
-	public function getShowList($keyword)
+	public function getShowList($keyword, $page)
 	{
 		if ($keyword) {
 			$res = Document::where('name', 'like', '%'.$keyword['name'].'%')
 						->where('is_show', 1)
 						->orderBy('updated_at', 'desc')
-						->get();
+						->get()->toArray();
 		} else {
 			$res = Document::where('is_show', 1)
 						->orderBy('updated_at', 'desc')
-						->get();
+						->get()->toArray();
 		}
-		return $this->handleDocumentRes($res, '');
+		return $this->paging($this->handleDocumentRes($res, ''), 15, $page);
 	}
 
-	public function test()
+	public function paging($data, $perPage, $page)
 	{
-		$this->test = new UserAuthorizationLogic();
-		return $this->test->getUserAuthorizations(2);
+		$perPage = $perPage <= 0 ? 15 : $perPage;
+		if ($page) {
+			$current_page = $page;
+			$current_page = $current_page <= 0 ? 1 :$current_page;
+		} else {
+			$current_page = 1;
+		}
+		$item = array_slice($data, ($current_page-1)*$perPage, $perPage);
+		$total = count($data);
+
+		$paginator = new LengthAwarePaginator($item, $total, $perPage, $current_page, [
+			'path' => Paginator::resolveCurrentPath(),
+			'pageName' => 'page',
+		]);
+
+		return [
+			'total' => $total,
+			'pageCount' => ceil($total/$perPage),
+			'data' => $paginator->toArray()['data']
+		];
 	}
 }

@@ -29,22 +29,7 @@ class DocumentController extends Controller
 			if (trim($request->input('name'))) {
 				$data['name'] = trim($request->input('name'));
 			}
-			$res = $this->logic->getShowList($data);
-			return $this->success($res);
-		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
-		}
-	}
-
-	public function getShowDetails(Request $request)
-	{
-		try {
-			$this->validate($request, [
-				'id' => 'required|integer|min:1',
-			], [
-				'id.required' => '文档ID不能为空',
-			]);
-			$res = $this->logic->getdetails($request->input('id'));
+			$res = $this->logic->getShowList($data, $request->input('page'));
 			return $this->success($res);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());

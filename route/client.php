@@ -10,13 +10,12 @@
  * visited https://www.w7.cc for more details
  */
 
-irouter()->group(['prefix'=>'/client'], function (\W7\Core\Route\Route $route) {
-	$route->post('/test/index', 'Client\TestController@index');
+irouter()->middleware(['TestMiddleware'])->group(['prefix'=>'/client'], function (\W7\Core\Route\Route $route) {
+	$route->get('/test/index', 'Client\TestController@index');
 
 	$route->post('/chapters', 'Client\ChapterController@chapters');
 	$route->post('/detail', 'Client\ChapterController@detail');
 	$route->post('/search', 'Client\ChapterController@search');
 
 	$route->post('/document/getshowlist', 'Client\DocumentController@getShowList');
-	$route->post('/document/getshowdetails', 'Client\DocumentController@getShowDetails');
 });

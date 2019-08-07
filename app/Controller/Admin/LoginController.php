@@ -34,7 +34,10 @@ class LoginController extends Controller
 				'imgcodeKey.required' => '验证码的KEY值不能为空',
 			]);
 			$this->code_logic = new VerificationcodeLogic();
-			$code_val = $this->code_logic->getCode($request->input('imgcodeKey')); // c6ia
+			$code_val = cache()->get($request->input('imgcodeKey'));
+			if (!$code_val) {
+				return $this->error('验证码已失效');
+			}
 			if ($request->input(strtolower('code')) != strtolower($code_val)) {
 				return $this->error('请输入正确的验证码');
 			}
@@ -46,9 +49,9 @@ class LoginController extends Controller
 				$user_pwd = md5(md5($request->input('username').$request->input('userpass')));
 				if (isset($user_val['userpass']) && $user_val['userpass'] == $user_pwd) {
 					$key = EncryptorLogic::encrypt(time().'_'.$user_val['id']);
-					icache()->set($key, $user_val['id']);
-					icache()->set('username_'.$user_val['id'], $key); // 用户与access_token关联在一起
-					$data['document_access_token'] = $key;
+					cache()->set($key, $user_val['id'], 60*60*2);
+					cache()->set('username_'.$user_val['id'], $key); // 用户与access_token关联在一起
+					cache()->delete($request->input('imgcodeKey'));
 					return $this->success(['document_access_token' => $key]);
 				} else {
 					return $this->error('用户名或者密码有误');
@@ -69,7 +72,7 @@ class LoginController extends Controller
 			], [
 				'document_access_token.required' => '缺少用户票据',
 			]);
-			$res = icache()->delete($request->input('document_access_token'));
+			$res = cache()->delete($request->input('document_access_token'));
 			if ($res) {
 				return $this->success(['msg'=>'退出成功']);
 			}

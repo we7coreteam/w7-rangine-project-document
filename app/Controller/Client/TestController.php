@@ -25,6 +25,18 @@ class TestController extends Controller
 	public function index(Request $request)
 	{
 		try {
+			if (isset($_SESSION['a'])) {
+				var_dump('read');
+			} else {
+				var_dump('write');
+				$_SESSION['a'] = 'is ok';
+			}
+			$r = $_SESSION['a'];
+			unset($_SESSION);
+
+			return $this->success($r);
+			cache()->set('test', '你好，世界 + hello world = PHP', 5);
+			return $this->success(cache()->get('test'));
 			//            $this->validate($request, [
 			//                'name' => 'required|max:255',
 			//                'id' => 'required',
@@ -41,7 +53,7 @@ class TestController extends Controller
 			}
 			return $this->error('用户不存在');
 		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
+			return $this->error($e->getMessage(), 400, [$e->getFile(),$e->getLine()]);
 		}
 	}
 }

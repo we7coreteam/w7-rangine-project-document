@@ -12,6 +12,7 @@
 
 namespace W7\App\Model\Entity;
 
-class Test extends BaseModel
+class PermissionDocument extends BaseModel
 {
+	protected $table = 'permission_document';
 }

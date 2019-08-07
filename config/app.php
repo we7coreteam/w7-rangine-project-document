@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * WeEngine Document System
+ *
+ * (c) We7Team 2019 <https://www.w7.cc>
+ *
+ * This is not a free software
+ * Using it under the license terms
+ * visited https://www.w7.cc for more details
+ */
+
 return [
 	'setting' => [
 		//SETTING_DEVELOPMENT = DEVELOPMENT^CLEAR_LOG
@@ -28,6 +38,8 @@ return [
 		'interval' => ienv('SETTING_RELOAD_INTERVAL', 5), //重复检测的间隔时长
 		'debug' => ienv('SETTING_RELOAD_DEBUG', false), //开启后，将不监控文件变化，重复reload，方便调试
 	],
+
+	'cache_driver' => ienv('CACHE_DRIVER', 'redis'),
 	'cache' => [
 		'default' => [
 			'driver' => ienv('CACHE_DEFAULT_DRIVER', 'redis'),
@@ -53,7 +65,7 @@ return [
 			'password' => ienv('DATABASE_DEFAULT_PASSWORD', 'root'),
 			'charset' => 'utf8',
 			'collation' => 'utf8_unicode_ci',
-			'prefix' => '',
+			'prefix' => 'ims_',
 			'port' =>'3306',
 		],
 		'addons' => [

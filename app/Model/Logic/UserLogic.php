@@ -16,18 +16,23 @@ use W7\App\Model\Entity\User;
 
 class UserLogic extends BaseLogic
 {
-	public function getUserlist()
+	public function getUserlist($page)
 	{
-		return User::orderBy('id', 'desc')->get();
+		$res = User::orderBy('id', 'desc')->get()->toArray();
+		if ($res) {
+			$this->doclogic = new DocumentLogic();
+			return $this->doclogic->paging($this->handleUser($res), 15, $page);
+		}
+		return $res;
 	}
 
 	public function getUser($data)
 	{
-		if ($data['id']) {
+		if (isset($data['id']) && $data['id']) {
 			$user = User::find($data['id']);
 		}
 
-		if ($data['username']) {
+		if (isset($data['username']) && $data['username']) {
 			$user = User::where('username', $data['username'])->first();
 		}
 
@@ -39,7 +44,9 @@ class UserLogic extends BaseLogic
 		$users = User::where('username', $data['username'])->count();
 
 		if (!$users) {
-			return User::create($data);
+			$res = User::create($data);
+			$this->handleUser([$res]);
+			return $res;
 		}
 		return false;
 	}
@@ -49,29 +56,38 @@ class UserLogic extends BaseLogic
 		return User::where('id', $id)->update($data);
 	}
 
+	public function detailsUser($id)
+	{
+		$res = User::find($id);
+		if ($res) {
+			$res = $this->handleUser([$res]);
+			return $res[0];
+		}
+		return $res;
+	}
+
 	public function delUser($ids)
 	{
 		$res = User::destroy($ids);
 		if ($res) {
 			foreach ($ids as $k => $v) {
-				icache()->delete('username_'.$v);
+				cache()->delete('username_'.$v);
 			}
 		}
 		return $res;
 	}
 
-	public function searchUser($data)
+	public function searchUser($data, $page)
 	{
-		if (isset($data['username'])) {
-			$res = User::select('id', 'username', 'has_privilege')->where('username', 'like', '%'.$data['username'].'%')->get();
+		if (isset($data['username']) && $data['username']) {
+			$res = User::select('id', 'username', 'has_privilege')
+						->where('username', 'like', '%'.$data['username'].'%')
+						->orderBy('id', 'desc')
+						->get()
+						->toArray();
 			if ($res) {
-				foreach ($res as $key => &$val) {
-					if ($val['has_privilege'] == 1) {
-						$val['has_privilege'] = '有';
-					} else {
-						$val['has_privilege'] = '无';
-					}
-				}
+				$this->doclogic = new DocumentLogic();
+				return $this->doclogic->paging($this->handleUser($res), 15, $page);
 			}
 			return $res;
 		}
@@ -85,11 +101,32 @@ class UserLogic extends BaseLogic
 		foreach ($ids as $k => $val) {
 			$res = $this->docLogic->getUserCreateDoc($val);
 			if (!$res) {
-				if ($this->delUser($val)) {
-					$i++;
+				$user = User::find($val);
+				if ($user && $user['has_privilege'] != 1) {
+					if ($this->delUser($val)) {
+						$i++;
+					}
 				}
 			}
 		}
-		return '成功删除'.$i.'用户，其他用户有文档不能直接删除';
+		return ['msg'=>'成功删除'.$i.'用户，如果用户有文档不能直接删除'];
+	}
+
+	public function handleUser($res)
+	{
+		if (!$res) {
+			return $res;
+		}
+		foreach ($res as $key => &$val) {
+			if ($val['has_privilege'] == 1) {
+				$val['has_privilege_name'] = '有';
+			} else {
+				$val['has_privilege_name'] = '无';
+			}
+			if ($val['userpass']) {
+				unset($val['userpass']);
+			}
+		}
+		return $res;
 	}
 }

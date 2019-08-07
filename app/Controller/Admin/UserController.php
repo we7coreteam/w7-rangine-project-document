@@ -24,10 +24,13 @@ class UserController extends Controller
 		$this->logic = new UserLogic();
 	}
 
-	public function getUserlist()
+	public function getUserlist(Request $request)
 	{
 		try {
-			$res = $this->logic->getUserlist();
+			if ($request->document_user_auth != 'all') {
+				return $this->error('只有管理员才可以操作用户');
+			}
+			$res = $this->logic->getUserlist($request->input('page'));
 			return $this->success($res);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
@@ -37,6 +40,9 @@ class UserController extends Controller
 	public function addUser(Request $request)
 	{
 		try {
+			if ($request->document_user_auth != 'all') {
+				return $this->error('只有管理员才可以操作用户');
+			}
 			$this->validate($request, [
 				'username' => 'required',
 				'userpass' => 'required',
@@ -55,7 +61,29 @@ class UserController extends Controller
 			if ($res) {
 				return $this->success($res);
 			}
-			return $this->error($res);
+			return $this->error('用户名重复，获取数据有误');
+		} catch (\Exception $e) {
+			return $this->error($e->getMessage());
+		}
+	}
+
+	public function detailsUser(Request $request)
+	{
+		try {
+			if ($request->document_user_auth != 'all') {
+				return $this->error('只有管理员才可以操作用户');
+			}
+			$this->validate($request, [
+				'id' => 'required'
+			], [
+				'id.required' => '用户ID不能为空',
+			]);
+
+			$res = $this->logic->detailsUser($request->input('id'));
+			if ($res) {
+				return $this->success($res);
+			}
+			return $this->error('用户不存在');
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
 		}
@@ -64,6 +92,9 @@ class UserController extends Controller
 	public function updateUser(Request $request)
 	{
 		try {
+			if ($request->document_user_auth != 'all') {
+				return $this->error('只有管理员才可以操作用户');
+			}
 			$this->validate($request, [
 				'id' => 'required'
 			], [
@@ -71,16 +102,16 @@ class UserController extends Controller
 			]);
 
 			$data = [];
-			if ($request->input('username')) {
+			if ($request->input('username') !== null) {
 				$data['username'] = $request->input('username');
 			}
-			if ($request->input('is_ban')) {
+			if ($request->input('is_ban') !== null) {
 				$data['is_ban'] = $request->input('is_ban');
 			}
-			if ($request->input('has_privilege')) {
+			if ($request->input('has_privilege') !== null) {
 				$data['has_privilege'] = $request->input('has_privilege');
 			}
-			if ($request->input('remark')) {
+			if ($request->input('remark') !== null) {
 				$data['remark'] = $request->input('remark');
 			}
 
@@ -97,6 +128,9 @@ class UserController extends Controller
 	public function delUser(Request $request)
 	{
 		try {
+			if ($request->document_user_auth != 'all') {
+				return $this->error('只有管理员才可以操作用户');
+			}
 			$this->validate($request, [
 				'ids' => 'required'
 			], [
@@ -117,6 +151,9 @@ class UserController extends Controller
 	public function updateUserpass(Request $request)
 	{
 		try {
+			if ($request->document_user_auth != 'all') {
+				return $this->error('只有管理员才可以操作用户');
+			}
 			$this->validate($request, [
 				'id' => 'required',
 				'userpass' => 'required',
@@ -145,11 +182,11 @@ class UserController extends Controller
 	{
 		try {
 			$this->validate($request, [
-				'keyword' => 'required',
+				'keywords' => 'required',
 			], [
-				'keyword.required' => '关键字不能为空',
+				'keywords.required' => '关键字不能为空',
 			]);
-			$res = $this->logic->searchUser(['username'=>trim($request->input('keyword'))]);
+			$res = $this->logic->searchUser(['username'=>trim($request->input('keywords'))], $request->input('page'));
 			return $this->success($res);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());

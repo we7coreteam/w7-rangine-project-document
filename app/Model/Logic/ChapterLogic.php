@@ -14,8 +14,8 @@ namespace W7\App\Model\Logic;
 
 use W7\App\Event\ChangeChapterEvent;
 use W7\App\Event\ChangeDocumentEvent;
-use W7\App\Model\Entity\Chapter;
-use W7\App\Model\Entity\ChapterContent;
+use W7\App\Model\Entity\Document\Chapter;
+use W7\App\Model\Entity\Document\ChapterContent;
 
 class ChapterLogic extends BaseLogic
 {
@@ -70,7 +70,7 @@ class ChapterLogic extends BaseLogic
 
 	public function getChapters($id)
 	{
-		$cacheData = icache()->get('chapters_'.$id);
+		$cacheData = cache()->get('chapters_'.$id);
 		if ($cacheData) {
 			return $cacheData;
 		} else {
@@ -81,7 +81,7 @@ class ChapterLogic extends BaseLogic
 				}
 				$this->getChild($roots);
 			}
-			icache()->set('chapters_'.$id, $roots);
+			cache()->set('chapters_'.$id, $roots);
 			return $roots;
 		}
 	}
@@ -101,8 +101,8 @@ class ChapterLogic extends BaseLogic
 
 	public function getChapter($document_id, $id)
 	{
-		if (icache()->get('chapter_'.$id)) {
-			return icache()->get('chapter_'.$id);
+		if (cache()->get('chapter_'.$id)) {
+			return cache()->get('chapter_'.$id);
 		} else {
 			$chapter = Chapter::where('id', $id)->where('document_id', $document_id)->first();
 			if (!$chapter) {
@@ -120,7 +120,7 @@ class ChapterLogic extends BaseLogic
 			$next = $this->nextChapter($chapter);
 			$chapter['next_chapter_id'] = $next['id'];
 			$chapter['next_chapter_name'] = $next['name'];
-			icache()->set('chapter_'.$id, $chapter, 24*3600);
+			cache()->set('chapter_'.$id, $chapter, 24*3600);
 			return $chapter;
 		}
 	}

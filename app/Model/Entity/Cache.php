@@ -12,6 +12,9 @@
 
 namespace W7\App\Model\Entity;
 
-class WindControlReport extends BaseModel
+class Cache extends BaseModel
 {
+	protected $table = 'cache';
+	protected $primaryKey = 'key';
+	public $timestamps = false;
 }

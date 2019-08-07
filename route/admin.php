@@ -12,18 +12,17 @@
 
 irouter()->post('/admin/login/check', 'Admin\LoginController@check');
 irouter()->post('/admin/verificationcode/getcodeimg', 'Admin\VerificationcodeController@getCodeimg');
-irouter()->post('/admin/verificationcode/getcode', 'Admin\VerificationcodeController@getCode');
 
 irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'/admin'], function (\W7\Core\Route\Route $route) {
 	$route->post('/login/signout', 'Admin\LoginController@signout'); // 退出登录
 
 	$route->post('/user/getuserlist', 'Admin\UserController@getUserlist');
-	$route->post('/user/getuserdoclist', 'Admin\UserController@getUserDocList');
 	$route->post('/user/adduser', 'Admin\UserController@addUser');
 	$route->post('/user/updateuser', 'Admin\UserController@updateUser');
 	$route->post('/user/deluser', 'Admin\UserController@delUser');
 	$route->post('/user/updateuserpass', 'Admin\UserController@updateUserpass');
 	$route->post('/user/searchuser', 'Admin\UserController@searchUser');
+	$route->post('/user/detailsuser', 'Admin\UserController@detailsUser');
 
 	$route->post('/chapter/index', 'Admin\ChapterController@index');
 	$route->post('/chapter/get_content', 'Admin\ChapterController@getContent');
