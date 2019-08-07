@@ -20,7 +20,6 @@ irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'
 	$route->post('/user/adduser', 'Admin\UserController@addUser');
 	$route->post('/user/updateuser', 'Admin\UserController@updateUser');
 	$route->post('/user/deluser', 'Admin\UserController@delUser');
-	$route->post('/user/updateuserpass', 'Admin\UserController@updateUserpass');
 	$route->post('/user/searchuser', 'Admin\UserController@searchUser');
 	$route->post('/user/detailsuser', 'Admin\UserController@detailsUser');
 

@@ -96,15 +96,28 @@ class UserController extends Controller
 				return $this->error('只有管理员才可以操作用户');
 			}
 			$this->validate($request, [
-				'id' => 'required'
+				'id' => 'required',
+				'username' => 'required',
+				'userpass' => 'required',
+				'confirm_userpass' => 'required'
 			], [
 				'id.required' => '用户ID不能为空',
+				'username.required' => '用户名不能为空',
+				'userpass.required' => '密码不能为空',
+				'confirm_userpass.required' => '确认密码不能为空',
 			]);
 
-			$data = [];
-			if ($request->input('username') !== null) {
-				$data['username'] = $request->input('username');
+			$username = trim($request->input('username'));
+			$userpass = trim($request->input('userpass'));
+			$confirm_userpass = trim($request->input('confirm_userpass'));
+			if ($userpass != $confirm_userpass) {
+				return $this->error('两次密码不一致');
 			}
+
+			$data = [];
+			$data['username'] = $username;
+			$data['userpass'] = md5(md5($username.$userpass));
+
 			if ($request->input('is_ban') !== null) {
 				$data['is_ban'] = $request->input('is_ban');
 			}
@@ -114,7 +127,6 @@ class UserController extends Controller
 			if ($request->input('remark') !== null) {
 				$data['remark'] = $request->input('remark');
 			}
-
 			$res = $this->logic->updateUser(intval($request->input('id')), $data);
 			if ($res) {
 				return $this->success($res);
@@ -143,36 +155,6 @@ class UserController extends Controller
 				return $this->success($hasDocuments);
 			}
 			return $this->error('参数有误');
-		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
-		}
-	}
-
-	public function updateUserpass(Request $request)
-	{
-		try {
-			if ($request->document_user_auth != 'all') {
-				return $this->error('只有管理员才可以操作用户');
-			}
-			$this->validate($request, [
-				'id' => 'required',
-				'userpass' => 'required',
-			], [
-				'id.required' => '用户ID不能为空',
-				'userpass.required' => '密码不能为空',
-			]);
-			$user_val = $this->logic->getUser(['id'=>$request->input('id')]);
-			if ($user_val) {
-				$data = [
-					'userpass' => md5(md5($user_val['username'].trim($request->input('userpass')))),
-				];
-				$res = $this->logic->updateUser(intval($request->input('id')), $data);
-				if ($res) {
-					return $this->success($res);
-				}
-				return $this->error($res);
-			}
-			return $this->error($user_val);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
 		}
