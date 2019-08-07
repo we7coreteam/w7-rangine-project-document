@@ -69,10 +69,6 @@ return [
 				'enable' => true,
 				'max' => 1000,
 			],
-			'addons' => [
-				'enable' => false,
-				'max' => 20,
-			],
 		],
 		'cache' => [
 			'redis' => [
