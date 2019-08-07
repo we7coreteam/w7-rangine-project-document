@@ -114,6 +114,11 @@ class UserController extends Controller
 				return $this->error('两次密码不一致');
 			}
 
+			$userinfos = $this->logic->getUser(['username'=>$username]);
+			if ($userinfos && $userinfos['id'] != intval($request->input('id'))) {
+				return $this->error('用户名已经存在');
+			}
+
 			$data = [];
 			$data['username'] = $username;
 			$data['userpass'] = md5(md5($username.$userpass));
