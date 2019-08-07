@@ -49,12 +49,6 @@ return [
 			'password' => ienv('CACHE_DEFAULT_PASSWORD', ''),
 			'database' => ienv('CACHE_DEFAULT_DATABASE', '0'),
 		],
-		'addons' => [ //可定义多个通道
-			'driver' => 'redis',
-			'host' => '',
-			'port' => '6379',
-			'timeout' => 30,
-		],
 	],
 	'database' => [
 		'default' => [
@@ -68,32 +62,12 @@ return [
 			'prefix' => 'ims_',
 			'port' =>'3306',
 		],
-		'addons' => [
-			'driver' => 'mysql',
-			'read' => [
-				'host' => ['192.168.11.200'],
-			],
-			'write' => [
-				'host' => '192.168.11.200'
-			],
-			'database' => 'document',
-			'username' => 'root',
-			'password' => '123456',
-			'charset' => 'utf8',
-			'collation' => 'utf8_unicode_ci',
-			'prefix' => '',
-			'port'=>'3306',
-		],
 	],
 	'pool' => [
 		'database' => [
 			'default' => [
 				'enable' => true,
 				'max' => 1000,
-			],
-			'addons' => [
-				'enable' => false,
-				'max' => 20,
 			],
 		],
 		'cache' => [
@@ -104,10 +78,6 @@ return [
 		]
 	],
 	'process' => [
-		'encrypt' => [
-			'enable' => ienv('PROCESS_ENCRYPT_ENABLE', false),
-			'class' => \W7\App\Process\EncryptProcess::class,
-			'number' => ienv('PROCESS_ENCRYPT_NUMBER', 1),
-		]
+
 	],
 ];
