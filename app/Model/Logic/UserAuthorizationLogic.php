@@ -51,7 +51,7 @@ class UserAuthorizationLogic extends BaseLogic
 		} else {
 			return [];
 		}
-		$auth['document'] = PermissionDocument::where('user_id', $user_id)->pluck('document_id')->toArray();
+		$auth = PermissionDocument::where('user_id', $user_id)->pluck('document_id')->toArray();
 		cache()->set('auth_'.$user_id, $auth, 24*3600);
 		return $auth;
 	}

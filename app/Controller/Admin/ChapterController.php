@@ -48,7 +48,7 @@ class ChapterController extends Controller
 			$this->logic->checkRepeatRequest($request->document_user_id);
 			$this->validate($request, [
 				'name' => 'string|required|max:30',
-				'sort' => 'require|integer|min:0',
+				'sort' => 'required|integer|min:0',
 				'document_id' => 'required|integer|min:1',
 				'parent_id' => 'required|integer|min:0',
 			], [
