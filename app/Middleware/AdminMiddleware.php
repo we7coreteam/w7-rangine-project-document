@@ -32,7 +32,6 @@ class AdminMiddleware extends MiddlewareAbstract
 		if (!$access_token) {
 			return App::getApp()->getContext()->getResponse()->json(['message' => '错误的票据', 'data' => null, 'status' => false, 'code' => 444]);
 		}
-		session_start();
 		icontext()->setContextDataByKey('token', $token);
 		session_open();
 		$request->document_user_id = $access_token;

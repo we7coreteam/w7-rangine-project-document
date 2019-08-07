@@ -12,6 +12,7 @@
 
 namespace W7\App\Model\Logic;
 
+use W7\App\Event\ChangeAuthEvent;
 use W7\App\Model\Entity\User;
 
 class UserLogic extends BaseLogic
@@ -53,6 +54,7 @@ class UserLogic extends BaseLogic
 
 	public function updateUser($id, $data)
 	{
+		ChangeAuthEvent::instance()->attach('user_id', $id)->attach('document_id', 0)->dispatch();
 		return User::where('id', $id)->update($data);
 	}
 
