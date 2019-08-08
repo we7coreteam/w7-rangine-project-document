@@ -25,7 +25,7 @@ class DocumentLogic extends BaseLogic
 		if ($documents == 'all') {
 			$res = Document::orderBy('updated_at', 'desc')->get()->toArray();
 		} else {
-			$res = Document::orderBy('updated_at', 'desc')->find($documents['document'])->toArray();
+			$res = Document::orderBy('updated_at', 'desc')->find($documents)->toArray();
 		}
 		return $this->paging($this->handleDocumentRes($res, $userId), 15, $page);
 	}

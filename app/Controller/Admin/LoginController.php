@@ -49,7 +49,7 @@ class LoginController extends Controller
 				$user_pwd = md5(md5($request->input('username').$request->input('userpass')));
 				if (isset($user_val['userpass']) && $user_val['userpass'] == $user_pwd) {
 					$key = EncryptorLogic::encrypt(time().'_'.$user_val['id']);
-					cache()->set($key, $user_val['id'], 60*60*2);
+					cache()->set($key, $user_val['id'], 60*60*6);
 					cache()->set('username_'.$user_val['id'], $key); // 用户与access_token关联在一起
 					cache()->delete($request->input('imgcodeKey'));
 					return $this->success(['document_access_token' => $key]);
