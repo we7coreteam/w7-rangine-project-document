@@ -14,6 +14,7 @@ namespace W7\App\Controller\Admin;
 
 use Gregwar\Captcha\CaptchaBuilder;
 use Gregwar\Captcha\PhraseBuilder;
+use W7\Http\Message\Server\Request;
 
 class VerificationcodeController extends Controller
 {
@@ -25,7 +26,7 @@ class VerificationcodeController extends Controller
 	 * 获取验证码图片
 	 * @return false|string
 	 */
-	public function getCodeimg()
+	public function getCodeimg(Request $request)
 	{
 		try {
 			$phrase = new PhraseBuilder;
@@ -41,8 +42,7 @@ class VerificationcodeController extends Controller
 			$builder->build($width = $this->width, $height = $this->height, $font = null);
 			$phrase = $builder->getPhrase();
 
-			$key = 'imgCode_'.time().rand();
-			cache()->set($key, $phrase, 60*5);
+			$request->session->set('img_code', $phrase);
 			$this->response()->withoutHeader('Content-Type')->withAddedHeader('Content-Type', 'image/jpg');
 			$this->response()->withoutHeader('Cache-Control')->withAddedHeader('Cache-Control', 'no-cache, must-revalidate');
 
@@ -53,8 +53,7 @@ class VerificationcodeController extends Controller
 
 			$img = 'data:image/jpg;base64,'.base64_encode($img);
 			$data = [
-				'img' => $img,
-				'imgcodeKey' => $key
+				'img' => $img
 			];
 			return $this->success($data);
 		} catch (\Exception $e) {

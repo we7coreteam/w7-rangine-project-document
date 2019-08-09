@@ -26,17 +26,14 @@ class LoginController extends Controller
 				'username' => 'required',
 				'userpass' => 'required',
 				'code'=> 'required',
-				'imgcodeKey'=> 'required',
 			], [
 				'username.required' => '用户名不能为空',
 				'userpass.required' => '密码不能为空',
 				'code.required' => '验证码不能为空',
-				'imgcodeKey.required' => '验证码的KEY值不能为空',
 			]);
-			$this->code_logic = new VerificationcodeLogic();
-			$code_val = cache()->get($request->input('imgcodeKey'));
+			$code_val = $request->session->get('img_code');
 			if (!$code_val) {
-				return $this->error('验证码已失效');
+				return $this->error('验证码不存在');
 			}
 			if ($request->input(strtolower('code')) != strtolower($code_val)) {
 				return $this->error('请输入正确的验证码');
@@ -49,9 +46,7 @@ class LoginController extends Controller
 				$user_pwd = md5(md5($request->input('username').$request->input('userpass')));
 				if (isset($user_val['userpass']) && $user_val['userpass'] == $user_pwd) {
 					$key = EncryptorLogic::encrypt(time().'_'.$user_val['id']);
-					cache()->set($key, $user_val['id'], 60*60*6);
-					cache()->set('username_'.$user_val['id'], $key); // 用户与access_token关联在一起
-					cache()->delete($request->input('imgcodeKey'));
+					$request->session->set('user_id', $user_val['id']);
 					return $this->success(['document_access_token' => $key]);
 				} else {
 					return $this->error('用户名或者密码有误');
