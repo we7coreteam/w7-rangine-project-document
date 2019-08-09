@@ -42,15 +42,12 @@ class VerificationcodeController extends Controller
 			$builder->build($width = $this->width, $height = $this->height, $font = null);
 			$phrase = $builder->getPhrase();
 
-			$request->session->set('img_code', $phrase);
-			$this->response()->withoutHeader('Content-Type')->withAddedHeader('Content-Type', 'image/jpg');
-			$this->response()->withoutHeader('Cache-Control')->withAddedHeader('Cache-Control', 'no-cache, must-revalidate');
-
 			ob_start();
 			$builder->output();
 			$img = ob_get_contents();
 			ob_end_clean();
 
+			$request->session->set('img_code', $phrase);
 			$img = 'data:image/jpg;base64,'.base64_encode($img);
 			$data = [
 				'img' => $img
