@@ -25,6 +25,8 @@ class TestController extends Controller
 	public function index(Request $request)
 	{
 		try {
+//			$request->session->set('user_id', '10086');
+			return $this->success($request->session->get('user_id'));
 			if (isset($_SESSION['a'])) {
 				var_dump('read');
 			} else {
