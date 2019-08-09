@@ -32,9 +32,7 @@ class LoginController extends Controller
 				'code.required' => '验证码不能为空',
 			]);
 			$code_val = $request->session->get('img_code');
-			if (!$code_val) {
-				return $this->error('验证码不存在');
-			}
+
 			if ($request->input(strtolower('code')) != strtolower($code_val)) {
 				return $this->error('请输入正确的验证码');
 			}
@@ -45,9 +43,8 @@ class LoginController extends Controller
 			if ($user_val) {
 				$user_pwd = md5(md5($request->input('username').$request->input('userpass')));
 				if (isset($user_val['userpass']) && $user_val['userpass'] == $user_pwd) {
-					$key = EncryptorLogic::encrypt(time().'_'.$user_val['id']);
 					$request->session->set('user_id', $user_val['id']);
-					return $this->success(['document_access_token' => $key]);
+					return $this->success();
 				} else {
 					return $this->error('用户名或者密码有误');
 				}
