@@ -14,7 +14,17 @@ namespace W7\App\Model\Service\Cache;
 
 class CacheManager
 {
+	public static $store;
 	protected $stores = [];
+
+	public static function getStore($name = null)
+	{
+		if(!self::$store){
+			$self = new self();
+			self::$store = $self->store($name);
+		}
+		return self::$store;
+	}
 
 	public function store($name = null)
 	{

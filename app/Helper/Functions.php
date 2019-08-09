@@ -17,29 +17,5 @@ use W7\App;
  */
 function cache()
 {
-	$manager = new App\Model\Service\Cache\CacheManager();
-	return $manager->store();
-}
-
-function session_open()
-{
-	$token = icontext()->getContextDataByKey('token');
-	icontext()->setContextDataByKey('session', new App\Model\Service\SessionLogic($token));
-}
-
-function session($key = null, $value='__default__')
-{
-	$session = icontext()->getContextDataByKey('session');
-
-	if ($key) {
-		if ($value === '__default__') {
-			return $session->get($key);
-		}
-		if ($value === null) {
-			return $session->delete($key);
-		}
-		$session->set($key, $value);
-	} else {
-		return $session;
-	}
+	return App\Model\Service\Cache\CacheManager::getStore();
 }
