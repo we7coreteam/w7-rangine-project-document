@@ -59,12 +59,7 @@ class LoginController extends Controller
 	public function signOut(Request $request)
 	{
 		try {
-			$this->validate($request, [
-				'document_access_token' => 'required',
-			], [
-				'document_access_token.required' => '缺少用户票据',
-			]);
-			$res = cache()->delete($request->input('document_access_token'));
+			$res = $request->session->destroy();
 			if ($res) {
 				return $this->success(['msg'=>'退出成功']);
 			}

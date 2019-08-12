@@ -70,13 +70,7 @@ class UserLogic extends BaseLogic
 
 	public function delUser($ids)
 	{
-		$res = User::destroy($ids);
-		if ($res) {
-			foreach ($ids as $k => $v) {
-				cache()->delete('username_'.$v);
-			}
-		}
-		return $res;
+		return User::destroy($ids);
 	}
 
 	public function searchUser($data, $page)
@@ -120,12 +114,12 @@ class UserLogic extends BaseLogic
 			return $res;
 		}
 		foreach ($res as $key => &$val) {
-			if ($val['has_privilege'] == 1) {
+			if (isset($val['has_privilege']) && $val['has_privilege'] == 1) {
 				$val['has_privilege_name'] = '有';
 			} else {
 				$val['has_privilege_name'] = '无';
 			}
-			if ($val['userpass']) {
+			if (isset($val['userpass']) && $val['userpass']) {
 				unset($val['userpass']);
 			}
 		}

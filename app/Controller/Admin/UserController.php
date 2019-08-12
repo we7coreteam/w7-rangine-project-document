@@ -154,7 +154,6 @@ class UserController extends Controller
 				'ids.required' => 'ID不能为空',
 			]);
 			$ids = array_filter(explode(',', trim($request->input('ids'))));
-
 			if ($ids) {
 				$hasDocuments = $this->logic->hasDocuments($ids);
 				return $this->success($hasDocuments);

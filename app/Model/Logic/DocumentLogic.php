@@ -113,13 +113,13 @@ class DocumentLogic extends BaseLogic
 		}
 		$this->user = new UserLogic();
 		foreach ($res as $key => &$val) {
-			if ($val['is_show'] == 1) {
+			if (isset($val['is_show']) && $val['is_show'] == 1) {
 				$val['is_show_name'] = '发布';
 			} elseif ($res) {
 				$val['is_show_name'] = '隐藏';
 			}
 
-			if ($val['creator_id']) {
+			if (isset($val['creator_id']) && $val['creator_id']) {
 				$user = $this->user->getUser(['id'=>trim($val['creator_id'])]);
 				if ($user) {
 					$val['username'] = $user['username'];
@@ -127,7 +127,7 @@ class DocumentLogic extends BaseLogic
 					$val['username'] = '';
 				}
 			}
-			if ($val['has_privilege'] == 1) {
+			if (isset($val['has_privilege']) && $val['has_privilege'] == 1) {
 				$val['has_creator'] = 1;
 				$val['has_creator_name'] = '管理员';
 			} else {
