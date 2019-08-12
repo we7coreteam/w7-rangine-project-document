@@ -63,6 +63,15 @@ return [
 			'port' =>'3306',
 		],
 	],
+
+	'session' => [
+		'path' => ienv('SESSION_PATH', '/'),
+		'http_only' => ienv('SESSION_HTTP_ONLY', false),
+		'domain' => ienv('SESSION_DOMAIN', ''),
+		'secure' => ienv('SESSION_SECURE', false),
+		'expires' => ienv('SESSION_EXPIRES', 0),//不设置，默认取session.gc_maxlifetime配置
+	],
+
 	'pool' => [
 		'database' => [
 			'default' => [

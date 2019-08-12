@@ -55,12 +55,17 @@ class DatabaseStore implements Store
 		$value = serialize($value);
 
 		$expired_at = $this->getTime() + (int) $seconds;
-
-		try {
-			Cache::create(compact('key', 'value', 'expired_at'));
-		} catch (Exception $e) {
+		if(Cache::where('key', $key)->first()){
 			Cache::where('key', $key)->update(compact('value', 'expired_at'));
+		}else{
+			Cache::create(compact('key', 'value', 'expired_at'));
 		}
+
+//		try {
+//			Cache::create(compact('key', 'value', 'expired_at'));
+//		} catch (Exception $e) {
+//			Cache::where('key', $key)->update(compact('value', 'expired_at'));
+//		}
 	}
 
 	public function increment($key, $value = 1)
