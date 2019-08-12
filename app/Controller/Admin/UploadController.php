@@ -24,7 +24,7 @@ class UploadController extends Controller
 			if ($file) {
 				$file = $file->toArray();
 			} else {
-				return $this->error('file');
+				return $this->error('file必传');
 			}
 
 			$allowed_mime = ['image/png', 'image/jpg', 'image/gif', 'image/jpeg'];
