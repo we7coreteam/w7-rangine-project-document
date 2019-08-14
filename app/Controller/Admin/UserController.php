@@ -44,10 +44,8 @@ class UserController extends Controller
 			if ($userId){
 				$res = $this->logic->getUser(['id' => $userId]);
 				if ($res){
-					if (isset($res['userpass'])){
-						unset($res['userpass']);
-					}
-					return $this->success($res);
+					$res = $this->logic->handleUser([$res]);
+					return $this->success($res[0]);
 				}else{
 					return $this->error('获取用户失败，请重试');
 				}

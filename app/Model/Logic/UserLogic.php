@@ -39,8 +39,7 @@ class UserLogic extends BaseLogic
 		if (!$user){
 			return $user;
 		}
-		$user = $this->handleUser([$user]);
-		return $user[0];
+		return $user;
 	}
 
 	public function createUser($data)
