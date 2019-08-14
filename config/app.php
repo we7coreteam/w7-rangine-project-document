@@ -39,7 +39,6 @@ return [
 		'debug' => ienv('SETTING_RELOAD_DEBUG', false), //开启后，将不监控文件变化，重复reload，方便调试
 	],
 
-	'cache_driver' => ienv('CACHE_DRIVER', 'redis'),
 	'cache' => [
 		'default' => [
 			'driver' => ienv('CACHE_DEFAULT_DRIVER', 'redis'),
@@ -64,7 +63,7 @@ return [
 		],
 	],
 
-	'session' => [
+	'cookie' => [
 		'path' => ienv('SESSION_PATH', '/'),
 		'http_only' => ienv('SESSION_HTTP_ONLY', false),
 		'domain' => ienv('SESSION_DOMAIN', ''),
