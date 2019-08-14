@@ -36,8 +36,11 @@ class UserLogic extends BaseLogic
 		if (isset($data['username']) && $data['username']) {
 			$user = User::where('username', $data['username'])->first();
 		}
-
-		return $user;
+		if (!$user){
+			return $user;
+		}
+		$user = $this->handleUser([$user]);
+		return $user[0];
 	}
 
 	public function createUser($data)

@@ -17,6 +17,7 @@ irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'
 	$route->post('/login/signout', 'Admin\LoginController@signout'); // 退出登录
 
 	$route->post('/user/getuserlist', 'Admin\UserController@getUserlist');
+	$route->post('/user/getuser', 'Admin\UserController@getUser');
 	$route->post('/user/adduser', 'Admin\UserController@addUser');
 	$route->post('/user/updateuser', 'Admin\UserController@updateUser');
 	$route->post('/user/deluser', 'Admin\UserController@delUser');

@@ -37,6 +37,29 @@ class UserController extends Controller
 		}
 	}
 
+	public function getUser(Request $request)
+	{
+		try {
+			$userId = $request->session->get('user_id');
+			if ($userId){
+				$res = $this->logic->getUser(['id' => $userId]);
+				if ($res){
+					if (isset($res['userpass'])){
+						unset($res['userpass']);
+					}
+					return $this->success($res);
+				}else{
+					return $this->error('获取用户失败，请重试');
+				}
+			}else{
+				return $this->error('用户不存在');
+			}
+
+		} catch (\Exception $e) {
+			return $this->error($e->getMessage());
+		}
+	}
+
 	public function addUser(Request $request)
 	{
 		try {
