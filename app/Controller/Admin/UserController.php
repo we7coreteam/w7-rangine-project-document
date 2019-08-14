@@ -79,6 +79,9 @@ class UserController extends Controller
 				'username' => $username,
 				'userpass' => md5(md5($username.$userpass)),
 			];
+			if ($request->input('remark') !== null) {
+				$data['remark'] = $request->input('remark');
+			}
 
 			$res = $this->logic->createUser($data);
 			if ($res) {
