@@ -83,12 +83,18 @@ class UserLogic extends BaseLogic
 						->orderBy('id', 'desc')
 						->get()
 						->toArray();
-			if ($res) {
-				$this->doclogic = new DocumentLogic();
-				return $this->doclogic->paging($this->handleUser($res), 15, $page);
-			}
-			return $res;
+
+		}else{
+			$res = User::select('id', 'username', 'has_privilege')
+				->orderBy('id', 'desc')
+				->get()
+				->toArray();
 		}
+		if ($res) {
+			$this->doclogic = new DocumentLogic();
+			return $this->doclogic->paging($this->handleUser($res), 15, $page);
+		}
+		return $res;
 	}
 
 	public function hasDocuments($ids)

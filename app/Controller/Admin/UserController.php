@@ -191,11 +191,6 @@ class UserController extends Controller
 	public function searchUser(Request $request)
 	{
 		try {
-			$this->validate($request, [
-				'keywords' => 'required',
-			], [
-				'keywords.required' => '关键字不能为空',
-			]);
 			$res = $this->logic->searchUser(['username'=>trim($request->input('keywords'))], $request->input('page'));
 			return $this->success($res);
 		} catch (\Exception $e) {
