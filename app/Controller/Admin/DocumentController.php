@@ -30,7 +30,9 @@ class DocumentController extends Controller
 	public function getlist(Request $request)
 	{
 		try {
-			$res = $this->logic->getlist($request->document_user_auth, $request->document_user_id, $request->input('page'));
+			$name = trim($request->input('name'));
+			$res = $this->logic->getlist($request->document_user_auth, $request->document_user_id, $request->input('page'), $name);
+
 			return $this->success($res);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
@@ -175,21 +177,6 @@ class DocumentController extends Controller
 			}
 		} catch (\Exception $e) {
 			idb()->rollBack();
-			return $this->error($e->getMessage());
-		}
-	}
-
-	public function search(Request $request)
-	{
-		try {
-			$this->validate($request, [
-				'name' => 'required',
-			], [
-				'name.required' => '文档名称不能为空',
-			]);
-			$res = $this->logic->search(trim($request->input('name')), $request->document_user_id, $request->input('page'));
-			return $this->success($res);
-		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
 		}
 	}
