@@ -17,9 +17,9 @@ use W7\App\Model\Entity\User;
 
 class UserLogic extends BaseLogic
 {
-	public function getUserlist($page)
+	public function getUserlist($page,$username)
 	{
-		$res = User::orderBy('id', 'desc')->get()->toArray();
+		$res = User::where('username', 'like', '%'.$username.'%')->orderBy('id', 'desc')->get()->toArray();
 		if ($res) {
 			$this->doclogic = new DocumentLogic();
 			return $this->doclogic->paging($this->handleUser($res), 15, $page);
@@ -73,28 +73,6 @@ class UserLogic extends BaseLogic
 	public function delUser($ids)
 	{
 		return User::destroy($ids);
-	}
-
-	public function searchUser($data, $page)
-	{
-		if (isset($data['username']) && $data['username']) {
-			$res = User::select('id', 'username', 'has_privilege')
-						->where('username', 'like', '%'.$data['username'].'%')
-						->orderBy('id', 'desc')
-						->get()
-						->toArray();
-
-		}else{
-			$res = User::select('id', 'username', 'has_privilege')
-				->orderBy('id', 'desc')
-				->get()
-				->toArray();
-		}
-		if ($res) {
-			$this->doclogic = new DocumentLogic();
-			return $this->doclogic->paging($this->handleUser($res), 15, $page);
-		}
-		return $res;
 	}
 
 	public function hasDocuments($ids)

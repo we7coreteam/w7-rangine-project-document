@@ -30,7 +30,8 @@ class UserController extends Controller
 			if ($request->document_user_auth != 'all') {
 				return $this->error('只有管理员才可以操作用户');
 			}
-			$res = $this->logic->getUserlist($request->input('page'));
+			$username = trim($request->input('username'));
+			$res = $this->logic->getUserlist($request->input('page'),$username);
 			return $this->success($res);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
@@ -165,7 +166,7 @@ class UserController extends Controller
 			return $this->error($e->getMessage());
 		}
 	}
-	
+
 	public function delUser(Request $request)
 	{
 		try {
@@ -183,16 +184,6 @@ class UserController extends Controller
 				return $this->success($hasDocuments);
 			}
 			return $this->error('参数有误');
-		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
-		}
-	}
-
-	public function searchUser(Request $request)
-	{
-		try {
-			$res = $this->logic->searchUser(['username'=>trim($request->input('keywords'))], $request->input('page'));
-			return $this->success($res);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
 		}
