@@ -203,7 +203,7 @@ class ChapterLogic extends BaseLogic
 		throw new \Exception('该章节不存在，请刷新页面');
 	}
 
-	public function saveContent($id, $content, $auth)
+	public function saveContent($id, $content, $layout, $auth)
 	{
 		$document_id = Chapter::where('id', $id)->value('document_id');
 		if (!$document_id) {
@@ -215,10 +215,11 @@ class ChapterLogic extends BaseLogic
 		$chapterContent = ChapterContent::find($id);
 		if ($chapterContent) {
 			$chapterContent->content = $content;
+			$chapterContent->layout = $layout;
 			$chapterContent->save();
 			return $chapterContent;
 		} else {
-			ChapterContent::create(['chapter_id'=>$id,'content'=>$content]);
+			ChapterContent::create(['chapter_id'=>$id,'content'=>$content,'layout'=>$layout]);
 		}
 	}
 
@@ -231,8 +232,7 @@ class ChapterLogic extends BaseLogic
 		if (APP_AUTH_ALL !== $auth && !in_array($document_id, $auth)) {
 			throw new \Exception('无权操作');
 		}
-		$chapterContent = ChapterContent::find($id);
-		return $chapterContent->content;
+		return ChapterContent::find($id);
 	}
 
 	public function searchChapter($id, $keywords)

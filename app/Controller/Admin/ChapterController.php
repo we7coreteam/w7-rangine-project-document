@@ -136,16 +136,16 @@ class ChapterController extends Controller
 		try {
 			$this->validate($request, [
 				'chapter_id' => 'required|integer|min:1',
-				//'content' => 'required',
+				'layout' => 'required|integer|min:1',
 			], [
 				'chapter_id.required' => '文档id必填',
-				'chapter_id.min' => '文档id最小为0',
-				//'content.required' => '内容必填',
+				'layout' => '文档布局必填',
 			]);
 			$id = $request->input('chapter_id');
 			$content = $request->input('content', '');
-			$this->logic->saveContent($id, $content, $request->document_user_auth);
-			return $this->success(['chapter_id'=>$id,'content'=>$content]);
+			$layout = $request->input('layout', '');
+			$this->logic->saveContent($id, $content, $layout, $request->document_user_auth);
+			return $this->success(['chapter_id'=>$id,'content'=>$content,'layout'=>$layout]);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
 		}
@@ -162,7 +162,7 @@ class ChapterController extends Controller
 			]);
 			$id = $request->input('chapter_id');
 			$content = $this->logic->getContent($id, $request->document_user_auth);
-			return $this->success(['chapter_id'=>$id,'content'=>$content]);
+			return $this->success($content);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
 		}
