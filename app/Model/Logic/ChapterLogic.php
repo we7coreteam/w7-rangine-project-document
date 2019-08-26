@@ -14,8 +14,10 @@ namespace W7\App\Model\Logic;
 
 use W7\App\Event\ChangeChapterEvent;
 use W7\App\Event\ChangeDocumentEvent;
+use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\Document\Chapter;
 use W7\App\Model\Entity\Document\ChapterContent;
+use W7\App\Model\Entity\User;
 
 class ChapterLogic extends BaseLogic
 {
@@ -108,9 +110,18 @@ class ChapterLogic extends BaseLogic
 			if (!$chapter) {
 				throw new \Exception('该章节不存在！');
 			}
+			$document = Document::where('id', $document_id)->first();
+			if ($document && $document['creator_id']){
+				$userinfo = User::where('id', $document['creator_id'])->first();
+				if ($userinfo){
+					$chapter['creator_id'] = $userinfo['id'];
+					$chapter['username'] = $userinfo['username'];
+				}
+			}
 			$description = ChapterContent::where('chapter_id', $id)->first();
 			if ($description) {
 				$chapter['content'] = $description['content'];
+				$chapter['layout'] = $description['layout'];
 			} else {
 				$chapter['content'] = '';
 			}
@@ -225,14 +236,28 @@ class ChapterLogic extends BaseLogic
 
 	public function getContent($id, $auth)
 	{
-		$document_id = Chapter::where('id', $id)->value('document_id');
-		if (!$document_id) {
+		$documentinfo = Chapter::where('id', $id)->first();
+		if (!$documentinfo || !$documentinfo['document_id']) {
 			throw new \Exception('该章节不存在，请刷新页面');
 		}
-		if (APP_AUTH_ALL !== $auth && !in_array($document_id, $auth)) {
+		if (APP_AUTH_ALL !== $auth && !in_array($documentinfo['document_id'], $auth)) {
 			throw new \Exception('无权操作');
 		}
-		return ChapterContent::find($id);
+		$chapter = ChapterContent::find($id);
+		if (!$chapter){
+			return $chapter;
+		}
+		$document = Document::where('id', $documentinfo['document_id'])->first();
+		if ($document && $document['creator_id']){
+			$userinfo = User::where('id', $document['creator_id'])->first();
+			if ($userinfo){
+				$chapter['creator_id'] = $userinfo['id'];
+				$chapter['username'] = $userinfo['username'];
+			}
+		}
+		$chapter['created_at'] = $documentinfo['created_at'];
+		$chapter['updated_at'] = $documentinfo['updated_at'];
+		return $chapter;
 	}
 
 	public function searchChapter($id, $keywords)
