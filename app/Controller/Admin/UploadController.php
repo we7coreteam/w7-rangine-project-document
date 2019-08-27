@@ -43,9 +43,9 @@ class UploadController extends Controller
 			$cdn = new CdnLogic();
 			$url = $cdn->uploadFile('dc/'.$fileName, $file['tmp_file']);
 
-			return ['state' => 'SUCCESS' ,'success' => 1,'message' => '上传成功','url'=>$url];
+			return $this->success(['state' => 'SUCCESS' ,'success' => 1,'message' => '上传成功','url'=>$url]);
 		} catch (\Exception $e) {
-			return ['success' => 0,'message' => $e->getMessage()];
+			return $this->error(['success' => 0,'message' => $e->getMessage()]);
 		}
 	}
 
