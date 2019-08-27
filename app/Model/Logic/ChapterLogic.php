@@ -76,7 +76,7 @@ class ChapterLogic extends BaseLogic
 		if ($cacheData) {
 			return $cacheData;
 		} else {
-			$roots = Chapter::select('id', 'name', 'sort')->where('document_id', $id)->where('parent_id', 0)->orderBy('sort', 'desc')->get()->toArray();
+			$roots = Chapter::select('id', 'name', 'sort')->where('document_id', $id)->where('parent_id', 0)->orderBy('sort', 'asc')->get()->toArray();
 			if ($roots) {
 				foreach ($roots as $k=>$v) {
 					$roots[$k]['children'] = [];
@@ -91,7 +91,7 @@ class ChapterLogic extends BaseLogic
 	public function getChild(&$chapters)
 	{
 		foreach ($chapters as $k=>$v) {
-			$subordinates = Chapter::select('id', 'name', 'sort')->where('parent_id', $v['id'])->orderBy('sort', 'desc')->get()->toArray();
+			$subordinates = Chapter::select('id', 'name', 'sort')->where('parent_id', $v['id'])->orderBy('sort', 'asc')->get()->toArray();
 			foreach ($subordinates as $sk => $sv) {
 				$subordinates[$sk]['children'] = [];
 				$chapters[$k]['children'][] = $subordinates[$sk];
@@ -158,11 +158,11 @@ class ChapterLogic extends BaseLogic
 		$parent_id = $chapter['parent_id'];
 		$sort = $chapter['sort'];
 		$id = $chapter['id'];
-		$child = Chapter::where('parent_id', $id)->orderBy('sort', 'desc')->first();
+		$child = Chapter::where('parent_id', $id)->orderBy('sort', 'asc')->first();
 		if ($child) {
 			return $child;
 		}
-		$youngerBrother = Chapter::where('parent_id', $parent_id)->where('sort', '<', $sort)->orderBy('sort', 'desc')->first();
+		$youngerBrother = Chapter::where('parent_id', $parent_id)->where('sort', '<', $sort)->orderBy('sort', 'asc')->first();
 		if ($youngerBrother) {
 			return $youngerBrother;
 		}

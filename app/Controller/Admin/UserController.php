@@ -27,9 +27,6 @@ class UserController extends Controller
 	public function getUserlist(Request $request)
 	{
 		try {
-			if ($request->document_user_auth != 'all') {
-				return $this->error('只有管理员才可以操作用户');
-			}
 			$username = trim($request->input('username'));
 			$res = $this->logic->getUserlist($request->input('page'),$username);
 			return $this->success($res);
