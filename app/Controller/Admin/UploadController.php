@@ -48,4 +48,13 @@ class UploadController extends Controller
 			return ['success' => 0,'message' => $e->getMessage()];
 		}
 	}
+
+	public function index(Request $request){
+		$action = $request->input('action');
+		if ($action == 'config'){
+			$CONFIG = json_decode(preg_replace("/\/\*[\s\S]+?\*\//", "", file_get_contents(BASE_PATH."/config/ueditor.json")), true);
+			return $this->success($CONFIG);
+		}
+		return $this->error('action值有误');
+	}
 }
