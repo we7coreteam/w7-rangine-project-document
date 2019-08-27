@@ -13,6 +13,7 @@
 irouter()->post('/admin/login/check', 'Admin\LoginController@check');
 irouter()->post('/admin/verificationcode/getcodeimg', 'Admin\VerificationcodeController@getCodeimg');
 irouter()->get('/js/php/controller.php', 'Admin\UploadController@index');
+irouter()->post('/js/php/controller.php', 'Admin\UploadController@image');
 
 irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'/admin'], function (\W7\Core\Route\Route $route) {
 	$route->post('/login/signout', 'Admin\LoginController@signout'); // 退出登录

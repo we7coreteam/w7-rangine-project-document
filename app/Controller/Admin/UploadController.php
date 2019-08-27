@@ -43,7 +43,7 @@ class UploadController extends Controller
 			$cdn = new CdnLogic();
 			$url = $cdn->uploadFile('dc/'.$fileName, $file['tmp_file']);
 
-			return ['success' => 1,'message' => '上传成功','url'=>$url];
+			return ['state' => 'SUCCESS' ,'success' => 1,'message' => '上传成功','url'=>$url];
 		} catch (\Exception $e) {
 			return ['success' => 0,'message' => $e->getMessage()];
 		}
@@ -53,7 +53,7 @@ class UploadController extends Controller
 		$action = $request->input('action');
 		if ($action == 'config'){
 			$CONFIG = json_decode(preg_replace("/\/\*[\s\S]+?\*\//", "", file_get_contents(BASE_PATH."/config/ueditor.json")), true);
-			return $this->success($CONFIG);
+			return $CONFIG;
 		}
 		return $this->error('action值有误');
 	}
