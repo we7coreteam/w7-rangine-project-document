@@ -218,10 +218,14 @@ class ChapterLogic extends BaseLogic
 			if (APP_AUTH_ALL !== $auth && !in_array($chapter->document_id, $auth)) {
 				throw new \Exception('无权操作');
 			}
-			$chapter->delete();
-			ChapterContent::destroy($id);
+			$resChapter = $chapter->delete();
+			$resChapterContent = ChapterContent::destroy($id);
 			ChangeChapterEvent::instance()->attach('chapter', $chapter)->dispatch();
-			return $chapter;
+			if ($resChapter && $resChapterContent){
+				return $chapter;
+			}else{
+				return false;
+			}
 		}
 		throw new \Exception('该章节不存在，请刷新页面');
 	}

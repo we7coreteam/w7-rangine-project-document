@@ -122,11 +122,15 @@ class ChapterController extends Controller
 			}
 
 			idb()->beginTransaction();
-			$this->logic->deleteChapter($id, $request->document_user_auth);
-			idb()->commit();
-			return $this->success();
+			$res = $this->logic->deleteChapter($id, $request->document_user_auth);
+			if ($res){
+				idb()->commit();
+				return $this->success();
+			}else{
+				idb()->rollBack();
+				return $this->error();
+			}
 		} catch (\Exception $e) {
-			idb()->rollBack();
 			return $this->error($e->getMessage());
 		}
 	}

@@ -173,10 +173,10 @@ class DocumentController extends Controller
 				idb()->commit();
 				return $this->success($res);
 			} else {
+				idb()->rollBack();
 				return $this->error($res);
 			}
 		} catch (\Exception $e) {
-			idb()->rollBack();
 			return $this->error($e->getMessage());
 		}
 	}
