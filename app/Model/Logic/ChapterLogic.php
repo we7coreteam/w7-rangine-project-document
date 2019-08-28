@@ -232,14 +232,14 @@ class ChapterLogic extends BaseLogic
 
 	public function saveContent($id, $content, $layout, $auth)
 	{
-		$document_id = Chapter::where('id', $id)->value('document_id');
-		if (!$document_id) {
+		$documentInfo = Chapter::find($id);
+		if (!$documentInfo['document_id']) {
 			throw new \Exception('该章节不存在，请刷新页面');
 		}
-		if (APP_AUTH_ALL !== $auth && !in_array($document_id, $auth)) {
+		if (APP_AUTH_ALL !== $auth && !in_array($documentInfo['document_id'], $auth)) {
 			throw new \Exception('无权操作');
 		}
-		$documents = Document::find($document_id);
+		$documents = Document::find($documentInfo['document_id']);
 		$chapterContent = ChapterContent::find($id);
 		if ($chapterContent) {
 			$chapterContent->content = $content;
@@ -252,8 +252,8 @@ class ChapterLogic extends BaseLogic
 			}
 		}
 		$username = User::where('id', $documents['creator_id'])->value('username');
-		$chapterContent['created_at'] = $documents['created_at'];
-		$chapterContent['updated_at'] = $documents['updated_at'];
+		$chapterContent['created_at'] = $documentInfo['created_at'];
+		$chapterContent['updated_at'] = $documentInfo['updated_at'];
 		$chapterContent['username'] = $username;
 		return $chapterContent;
 	}
