@@ -239,7 +239,7 @@ class ChapterLogic extends BaseLogic
 		if (APP_AUTH_ALL !== $auth && !in_array($document_id, $auth)) {
 			throw new \Exception('无权操作');
 		}
-		$documents = Document::find($id);
+		$documents = Document::find($document_id);
 		$chapterContent = ChapterContent::find($id);
 		if ($chapterContent) {
 			$chapterContent->content = $content;
