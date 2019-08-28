@@ -239,15 +239,23 @@ class ChapterLogic extends BaseLogic
 		if (APP_AUTH_ALL !== $auth && !in_array($document_id, $auth)) {
 			throw new \Exception('无权操作');
 		}
+		$documents = Document::find($id);
 		$chapterContent = ChapterContent::find($id);
 		if ($chapterContent) {
 			$chapterContent->content = $content;
 			$chapterContent->layout = $layout;
 			$chapterContent->save();
-			return $chapterContent;
 		} else {
-			ChapterContent::create(['chapter_id'=>$id,'content'=>$content,'layout'=>$layout]);
+			$chapterContent = ChapterContent::create(['chapter_id'=>$id,'content'=>$content,'layout'=>$layout]);
+			if (!$chapterContent){
+				return false;
+			}
 		}
+		$username = User::where('id', $documents['creator_id'])->value('username');
+		$chapterContent['created_at'] = $documents['created_at'];
+		$chapterContent['updated_at'] = $documents['updated_at'];
+		$chapterContent['username'] = $username;
+		return $chapterContent;
 	}
 
 	public function getContent($id, $auth)

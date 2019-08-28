@@ -154,8 +154,12 @@ class ChapterController extends Controller
 			$id = $request->input('chapter_id');
 			$content = $request->input('content', '');
 			$layout = $request->input('layout', '');
-			$this->logic->saveContent($id, $content, $layout, $request->document_user_auth);
-			return $this->success(['chapter_id'=>$id,'content'=>$content,'layout'=>$layout]);
+			$res = $this->logic->saveContent($id, $content, $layout, $request->document_user_auth);
+			if ($res){
+				$res['layout'] = $layout;
+				return $this->success($res);
+			}
+			return $this->error('保存失败');
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
 		}
