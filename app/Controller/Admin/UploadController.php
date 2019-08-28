@@ -49,10 +49,16 @@ class UploadController extends Controller
 		}
 	}
 
-	public function index(Request $request){
+	public function index(Request $request)
+	{
+		$this->validate($request, [
+			'action' => 'required',
+		], [
+			'action.required' => 'action必填',
+		]);
 		$action = $request->input('action');
-		if ($action == 'config'){
-			$CONFIG = json_decode(preg_replace("/\/\*[\s\S]+?\*\//", "", file_get_contents(BASE_PATH."/config/ueditor.json")), true);
+		if ($action == 'config') {
+			$CONFIG = json_decode(preg_replace("/\/\*[\s\S]+?\*\//", '', file_get_contents(BASE_PATH.'/config/ueditor.json')), true);
 			return $CONFIG;
 		}
 		return $this->error('action值有误');

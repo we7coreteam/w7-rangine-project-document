@@ -111,9 +111,9 @@ class ChapterLogic extends BaseLogic
 				throw new \Exception('该章节不存在！');
 			}
 			$document = Document::where('id', $document_id)->first();
-			if ($document && $document['creator_id']){
+			if ($document && $document['creator_id']) {
 				$userinfo = User::where('id', $document['creator_id'])->first();
-				if ($userinfo){
+				if ($userinfo) {
 					$chapter['creator_id'] = $userinfo['id'];
 					$chapter['username'] = $userinfo['username'];
 				}
@@ -175,16 +175,16 @@ class ChapterLogic extends BaseLogic
 		$documents = Chapter::whereIn('id', $document_ids)->where('document_id', $id)->get()->toArray();
 		foreach ($documents as &$document) {
 			$document['content'] = ChapterContent::find($document['id'])->content ?? '';
-			if ($document['content']){
-				$document['content'] = substr($document['content'],0,780);
+			if ($document['content']) {
+				$document['content'] = substr($document['content'], 0, 780);
 			}
 			$document['layout'] = ChapterContent::find($document['id'])->layout;
 			$document['path'] = $this->getPath($document['parent_id']);
 		}
 		$documentinfo = Document::where('id', $id)->first();
-		if ($documentinfo && $documentinfo['creator_id']){
+		if ($documentinfo && $documentinfo['creator_id']) {
 			$userinfo = User::where('id', $documentinfo['creator_id'])->first();
-			if ($userinfo){
+			if ($userinfo) {
 				$document['creator_id'] = $userinfo['id'];
 				$document['username'] = $userinfo['username'];
 			}
@@ -219,11 +219,11 @@ class ChapterLogic extends BaseLogic
 				throw new \Exception('无权操作');
 			}
 			$resChapter = $chapter->delete();
-			$resChapterContent = ChapterContent::destroy($id);
+			ChapterContent::destroy($id);
 			ChangeChapterEvent::instance()->attach('chapter', $chapter)->dispatch();
-			if ($resChapter && $resChapterContent){
+			if ($resChapter) {
 				return $chapter;
-			}else{
+			} else {
 				return false;
 			}
 		}
@@ -260,13 +260,13 @@ class ChapterLogic extends BaseLogic
 			throw new \Exception('无权操作');
 		}
 		$chapter = ChapterContent::find($id);
-		if (!$chapter){
+		if (!$chapter) {
 			return $chapter;
 		}
 		$document = Document::where('id', $documentinfo['document_id'])->first();
-		if ($document && $document['creator_id']){
+		if ($document && $document['creator_id']) {
 			$userinfo = User::where('id', $document['creator_id'])->first();
-			if ($userinfo){
+			if ($userinfo) {
 				$chapter['creator_id'] = $userinfo['id'];
 				$chapter['username'] = $userinfo['username'];
 			}

@@ -37,4 +37,12 @@ class Controller extends ControllerAbstract
 			'message' => $message,
 		];
 	}
+
+	public function documentAuth($id, $auth)
+	{
+		if (APP_AUTH_ALL !== $auth && !in_array($id, $auth)) {
+			return ['status' => false,'msg' => '无权操作'];
+		}
+		return ['status' => true];
+	}
 }

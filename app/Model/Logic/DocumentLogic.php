@@ -82,8 +82,8 @@ class DocumentLogic extends BaseLogic
 
 	public function relation($userId, $documentId)
 	{
-		$this->user = new UserLogic();
-		$user = $this->user->getUser(['id'=>trim($userId)]);
+		$user = new UserLogic();
+		$user = $user->getUser(['id'=>trim($userId)]);
 		if ($user['has_privilege'] == 1) {
 			return true;
 		}

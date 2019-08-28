@@ -18,18 +18,14 @@ use Psr\Http\Server\RequestHandlerInterface;
 use W7\App;
 use W7\Core\Middleware\MiddlewareAbstract;
 
-class AdminMiddleware extends MiddlewareAbstract
+class CheckRepeatRequestMiddleware extends MiddlewareAbstract
 {
 	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
 	{
-		$user_id = $request->session->get('user_id');
-		if (!$user_id) {
-			return App::getApp()->getContext()->getResponse()->json(['message' => '用户未登录', 'data' => null, 'status' => false, 'code' => 444]);
+		if (icache()->get('repeat_'.$request->document_user_id)) {
+			return App::getApp()->getContext()->getResponse()->json(['message' => '重复请求，请稍后再试', 'data' => null, 'status' => false, 'code' => 444]);
 		}
-		$request->document_user_id = $user_id;
-		$logic = new App\Model\Logic\UserAuthorizationLogic();
-		$request->document_user_auth = $logic->getUserAuthorizations($user_id);
-
+		icache()->set('repeat_'.$request->document_user_id, 1, 2);
 		return $handler->handle($request);
 	}
 }

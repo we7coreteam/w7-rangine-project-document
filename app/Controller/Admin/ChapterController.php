@@ -25,13 +25,17 @@ class ChapterController extends Controller
 	public function index(Request $request)
 	{
 		try {
+			$this->validate($request, [
+				'document_id' => 'required|integer',
+			], [
+				'document_id.required' => '文档ID必传',
+			]);
 			$id = (int)$request->input('document_id');
-			if (!$id) {
-				return $this->error('id is required!');
-			}
+
 			$auth = $request->document_user_auth;
-			if (APP_AUTH_ALL !== $auth && !in_array($id, $auth)) {
-				return $this->error('无权查看!');
+			$documentAuth = $this->documentAuth($id, $auth);
+			if ($documentAuth['status'] == false) {
+				return $this->error($documentAuth['msg']);
 			}
 
 			$result = $this->logic->getChapters($id);
@@ -45,7 +49,6 @@ class ChapterController extends Controller
 	public function create(Request $request)
 	{
 		try {
-			$this->logic->checkRepeatRequest($request->document_user_id);
 			$this->validate($request, [
 				'name' => 'string|required|max:30',
 				'sort' => 'required|integer|min:0',
@@ -67,8 +70,9 @@ class ChapterController extends Controller
 			$data['parent_id'] = $request->input('parent_id');
 
 			$auth = $request->document_user_auth;
-			if (APP_AUTH_ALL !== $auth && !in_array($data['document_id'], $auth)) {
-				return $this->error('无权操作');
+			$documentAuth = $this->documentAuth($data['document_id'], $auth);
+			if ($documentAuth['status'] == false) {
+				return $this->error($documentAuth['msg']);
 			}
 
 			$result = $this->logic->createChapter($data);
@@ -116,21 +120,23 @@ class ChapterController extends Controller
 	public function destroy(Request $request)
 	{
 		try {
+			$this->validate($request, [
+				'id' => 'required|integer',
+			], [
+				'id.required' => 'id is required',
+			]);
 			$id = $request->input('id');
-			if (!$id) {
-				return $this->error('id必传');
-			}
-
 			idb()->beginTransaction();
 			$res = $this->logic->deleteChapter($id, $request->document_user_auth);
-			if ($res){
+			if ($res) {
 				idb()->commit();
 				return $this->success();
-			}else{
+			} else {
 				idb()->rollBack();
 				return $this->error();
 			}
 		} catch (\Exception $e) {
+			idb()->rollBack();
 			return $this->error($e->getMessage());
 		}
 	}

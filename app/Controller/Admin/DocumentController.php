@@ -16,7 +16,6 @@ use W7\App\Event\ChangeAuthEvent;
 use W7\App\Model\Entity\PermissionDocument;
 use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Logic\DocumentLogic;
-use W7\App\Model\Logic\UserLogic;
 use W7\Http\Message\Server\Request;
 
 class DocumentController extends Controller
@@ -24,12 +23,14 @@ class DocumentController extends Controller
 	public function __construct()
 	{
 		$this->logic = new DocumentLogic();
-		$this->user = new UserLogic();
 	}
 
-	public function getlist(Request $request)
+	public function getList(Request $request)
 	{
 		try {
+			$this->validate($request, [
+				'name' => '',
+			]);
 			$name = trim($request->input('name'));
 			$res = $this->logic->getlist($request->document_user_auth, $request->document_user_id, $request->input('page'), $name);
 
@@ -59,7 +60,7 @@ class DocumentController extends Controller
 		}
 	}
 
-	public function getdetails(Request $request)
+	public function getDetails(Request $request)
 	{
 		try {
 			$this->validate($request, [
@@ -89,9 +90,6 @@ class DocumentController extends Controller
 
 			$name = trim($request->input('name'));
 
-			if (!$request->document_user_id) {
-				return $this->error('用户不存在');
-			}
 			$data = [];
 			$data['name'] = $name;
 			$data['creator_id'] = $request->document_user_id;
@@ -151,7 +149,7 @@ class DocumentController extends Controller
 		}
 	}
 
-	public function del(Request $request)
+	public function delete(Request $request)
 	{
 		try {
 			$this->validate($request, [
@@ -177,6 +175,7 @@ class DocumentController extends Controller
 				return $this->error($res);
 			}
 		} catch (\Exception $e) {
+			idb()->rollBack();
 			return $this->error($e->getMessage());
 		}
 	}
