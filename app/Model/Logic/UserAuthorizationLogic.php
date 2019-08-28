@@ -38,32 +38,32 @@ class UserAuthorizationLogic extends BaseLogic
 
 	public function getUserAuthorizations($user_id)
 	{
-		$cacheAuth = cache()->get('auth_'.$user_id);
+		$cacheAuth = icache()->get('auth_'.$user_id);
 		if ($cacheAuth) {
 			return $cacheAuth;
 		}
 		$user = User::find($user_id);
 		if ($user) {
 			if ($user->has_privilege) {
-				cache()->set('auth_'.$user_id, APP_AUTH_ALL, 24*3600);
+				icache()->set('auth_'.$user_id, APP_AUTH_ALL, 24*3600);
 				return APP_AUTH_ALL;
 			}
 		} else {
 			return [];
 		}
 		$auth = PermissionDocument::where('user_id', $user_id)->pluck('document_id')->toArray();
-		cache()->set('auth_'.$user_id, $auth, 24*3600);
+		icache()->set('auth_'.$user_id, $auth, 24*3600);
 		return $auth;
 	}
 
 	public function getDocumentUsers($document_id)
 	{
-		$cacheDocumentUsers = cache()->get('document_users_'.$document_id);
+		$cacheDocumentUsers = icache()->get('document_users_'.$document_id);
 		if ($cacheDocumentUsers) {
 			return $cacheDocumentUsers;
 		}
 		$documentUsers = PermissionDocument::where('document_id', $document_id)->pluck('user_id')->toArray();
-		cache()->set('document_users_'.$document_id, $documentUsers, 24*3600);
+		icache()->set('document_users_'.$document_id, $documentUsers, 24*3600);
 		return $documentUsers;
 	}
 }

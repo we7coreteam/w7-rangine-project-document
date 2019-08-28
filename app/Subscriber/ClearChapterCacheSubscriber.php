@@ -16,7 +16,7 @@ class ClearChapterCacheSubscriber extends Subscriber
 {
 	public function run($event)
 	{
-		cache()->delete('chapters_'.$event->chapter['document_id']);
-		cache()->delete('chapter_'.$event->chapter['id']);
+		icache()->delete('chapters_'.$event->chapter['document_id']);
+		icache()->delete('chapter_'.$event->chapter['id']);
 	}
 }
