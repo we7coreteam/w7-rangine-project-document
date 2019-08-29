@@ -119,13 +119,14 @@ class ChapterController extends Controller
 
 	public function destroy(Request $request)
 	{
+		$this->validate($request, [
+			'id' => 'required|integer',
+		], [
+			'id.required' => 'id is required',
+		]);
+		$id = $request->input('id');
+
 		try {
-			$this->validate($request, [
-				'id' => 'required|integer',
-			], [
-				'id.required' => 'id is required',
-			]);
-			$id = $request->input('id');
 			idb()->beginTransaction();
 			$res = $this->logic->deleteChapter($id, $request->document_user_auth);
 			if ($res) {

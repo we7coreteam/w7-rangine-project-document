@@ -21,8 +21,8 @@ class UserLogic extends BaseLogic
 	{
 		$res = User::where('username', 'like', '%'.$username.'%')->orderBy('id', 'desc')->get()->toArray();
 		if ($res) {
-			$this->doclogic = new DocumentLogic();
-			return $this->doclogic->paging($this->handleUser($res), 15, $page);
+			$doclogic = new DocumentLogic();
+			return $doclogic->paging($this->handleUser($res), 15, $page);
 		}
 		return $res;
 	}
@@ -77,11 +77,11 @@ class UserLogic extends BaseLogic
 
 	public function deleteUsers($ids)
 	{
-		$this->docLogic = new DocumentLogic();
+		$doclogic = new DocumentLogic();
 
 		$i = 0;
 		foreach ($ids as $k => $val) {
-			$res = $this->docLogic->getUserCreateDoc($val);
+			$res = $doclogic->getUserCreateDoc($val);
 			if (!$res) {
 				$user = User::find($val);
 				if ($user && $user['has_privilege'] != 1) {

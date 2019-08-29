@@ -105,7 +105,7 @@ class DocumentLogic extends BaseLogic
 		if (!$res) {
 			return $res;
 		}
-		$this->user = new UserLogic();
+		$userLogic = new UserLogic();
 		foreach ($res as $key => &$val) {
 			if (isset($val['is_show']) && $val['is_show'] == 1) {
 				$val['is_show_name'] = '发布';
@@ -114,7 +114,7 @@ class DocumentLogic extends BaseLogic
 			}
 
 			if (isset($val['creator_id']) && $val['creator_id']) {
-				$user = $this->user->getUser(['id'=>trim($val['creator_id'])]);
+				$user = $userLogic->getUser(['id'=>trim($val['creator_id'])]);
 				if ($user) {
 					$val['username'] = $user['username'];
 				} else {

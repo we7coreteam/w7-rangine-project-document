@@ -16,10 +16,10 @@ class LoginLongic extends BaseLogic
 {
 	public function check($data)
 	{
-		$this->user = new UserLogic();
-		$res = $this->user->getUser(['username'=>$data['username']]);
+		$userLogic = new UserLogic();
+		$res = $userLogic->getUser(['username'=>$data['username']]);
 		if ($res) {
-			$userpass = $this->user->userpassEncryption($data['username'], $data['userpass']);
+			$userpass = $userLogic->userpassEncryption($data['username'], $data['userpass']);
 			if ($res['userpass'] == $userpass) {
 				return ['code'=>1,'id'=>$res['id']];
 			} else {

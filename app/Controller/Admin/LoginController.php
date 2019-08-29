@@ -17,6 +17,8 @@ use W7\Http\Message\Server\Request;
 
 class LoginController extends Controller
 {
+	public $login;
+
 	public function check(Request $request)
 	{
 		try {
