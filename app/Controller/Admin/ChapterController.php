@@ -33,12 +33,8 @@ class ChapterController extends Controller
 			$id = (int)$request->input('document_id');
 
 			$auth = $request->document_user_auth;
-			$documentAuth = $this->documentAuth($id, $auth);
-			if ($documentAuth['status'] == false) {
-				return $this->error($documentAuth['msg']);
-			}
 
-			$result = $this->logic->getChapters($id);
+			$result = $this->logic->getChapters($id,$auth);
 
 			return $this->success($result);
 		} catch (\Exception $e) {
@@ -69,13 +65,7 @@ class ChapterController extends Controller
 			$data['document_id'] = $request->input('document_id');
 			$data['parent_id'] = $request->input('parent_id');
 
-			$auth = $request->document_user_auth;
-			$documentAuth = $this->documentAuth($data['document_id'], $auth);
-			if ($documentAuth['status'] == false) {
-				return $this->error($documentAuth['msg']);
-			}
-
-			$result = $this->logic->createChapter($data);
+			$result = $this->logic->createChapter($data,$request->document_user_auth);
 			if ($result) {
 				return $this->success($result);
 			}
@@ -106,6 +96,7 @@ class ChapterController extends Controller
 			$data['sort'] = $request->input('sort');
 			$data['auth'] = $request->document_user_auth;
 			$id = $request->input('id');
+
 			$result = $this->logic->updateChapter($id, $data);
 			if ($result) {
 				return $this->success($result);
@@ -119,13 +110,14 @@ class ChapterController extends Controller
 
 	public function destroy(Request $request)
 	{
+		$this->validate($request, [
+			'id' => 'required|integer',
+		], [
+			'id.required' => 'id is required',
+		]);
+		$id = $request->input('id');
+
 		try {
-			$this->validate($request, [
-				'id' => 'required|integer',
-			], [
-				'id.required' => 'id is required',
-			]);
-			$id = $request->input('id');
 			idb()->beginTransaction();
 			$res = $this->logic->deleteChapter($id, $request->document_user_auth);
 			if ($res) {

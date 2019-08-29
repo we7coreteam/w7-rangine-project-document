@@ -14,12 +14,12 @@ namespace W7\App\Model\Logic;
 
 class LoginLongic extends BaseLogic
 {
-	public function check($data)
+	public function check($username,$userpass)
 	{
-		$this->user = new UserLogic();
-		$res = $this->user->getUser(['username'=>$data['username']]);
+		$userLogic = new UserLogic();
+		$res = $userLogic->getUser(['username'=>$username]);
 		if ($res) {
-			$userpass = $this->user->userpassEncryption($data['username'], $data['userpass']);
+			$userpass = $userLogic->userpassEncryption($username, $userpass);
 			if ($res['userpass'] == $userpass) {
 				return ['code'=>1,'id'=>$res['id']];
 			} else {

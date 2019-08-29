@@ -17,6 +17,8 @@ use W7\Http\Message\Server\Request;
 
 class LoginController extends Controller
 {
+	public $login;
+
 	public function check(Request $request)
 	{
 		try {
@@ -36,12 +38,7 @@ class LoginController extends Controller
 			}
 
 			$this->login = new LoginLongic();
-			$data = [
-				'username' => trim($request->input('username')),
-				'userpass' => trim($request->input('userpass')),
-			];
-
-			$res = $this->login->check($data);
+			$res = $this->login->check(trim($request->input('username')),trim($request->input('userpass')));
 			if ($res && $res['code'] == 1) {
 				$request->session->set('user_id', $res['id']);
 				return $this->success();

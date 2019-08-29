@@ -151,17 +151,17 @@ class DocumentController extends Controller
 
 	public function delete(Request $request)
 	{
-		try {
-			$this->validate($request, [
-				'id' => 'required|integer|min:1',
-			], [
-				'id.required' => '文档ID不能为空',
-			]);
-			$relation = $this->logic->relation($request->document_user_id, $request->input('id'));
-			if ($relation !== true) {
-				return $this->error($relation);
-			}
+		$this->validate($request, [
+			'id' => 'required|integer|min:1',
+		], [
+			'id.required' => '文档ID不能为空',
+		]);
+		$relation = $this->logic->relation($request->document_user_id, $request->input('id'));
+		if ($relation !== true) {
+			return $this->error($relation);
+		}
 
+		try {
 			idb()->beginTransaction();
 			$res = $this->logic->del($request->input('id'));
 			if ($res) {
