@@ -17,9 +17,9 @@ use W7\App\Model\Entity\User;
 
 class UserLogic extends BaseLogic
 {
-	public function getUserlist($page)
+	public function getUserlist($page, $username)
 	{
-		$res = User::orderBy('id', 'desc')->get()->toArray();
+		$res = User::where('username', 'like', '%'.$username.'%')->orderBy('id', 'desc')->get()->toArray();
 		if ($res) {
 			$this->doclogic = new DocumentLogic();
 			return $this->doclogic->paging($this->handleUser($res), 15, $page);
@@ -30,21 +30,19 @@ class UserLogic extends BaseLogic
 	public function getUser($data)
 	{
 		if (isset($data['id']) && $data['id']) {
-			$user = User::find($data['id']);
+			return User::find($data['id']);
 		}
 
 		if (isset($data['username']) && $data['username']) {
-			$user = User::where('username', $data['username'])->first();
+			return User::where('username', $data['username'])->first();
 		}
-		if (!$user){
-			return $user;
-		}
-		$user = $this->handleUser([$user]);
-		return $user[0];
+
+		return '';
 	}
 
 	public function createUser($data)
 	{
+		$data['userpass'] = $this->userpassEncryption($data['username'], $data['userpass']);
 		$users = User::where('username', $data['username'])->count();
 
 		if (!$users) {
@@ -57,6 +55,7 @@ class UserLogic extends BaseLogic
 
 	public function updateUser($id, $data)
 	{
+		$data['userpass'] = $this->userpassEncryption($data['username'], $data['userpass']);
 		ChangeAuthEvent::instance()->attach('user_id', $id)->attach('document_id', 0)->dispatch();
 		return User::where('id', $id)->update($data);
 	}
@@ -76,23 +75,7 @@ class UserLogic extends BaseLogic
 		return User::destroy($ids);
 	}
 
-	public function searchUser($data, $page)
-	{
-		if (isset($data['username']) && $data['username']) {
-			$res = User::select('id', 'username', 'has_privilege')
-						->where('username', 'like', '%'.$data['username'].'%')
-						->orderBy('id', 'desc')
-						->get()
-						->toArray();
-			if ($res) {
-				$this->doclogic = new DocumentLogic();
-				return $this->doclogic->paging($this->handleUser($res), 15, $page);
-			}
-			return $res;
-		}
-	}
-
-	public function hasDocuments($ids)
+	public function deleteUsers($ids)
 	{
 		$this->docLogic = new DocumentLogic();
 
@@ -127,5 +110,10 @@ class UserLogic extends BaseLogic
 			}
 		}
 		return $res;
+	}
+
+	public function userpassEncryption($username, $userpass)
+	{
+		return md5(md5($username.$userpass));
 	}
 }

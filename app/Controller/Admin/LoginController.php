@@ -12,9 +12,7 @@
 
 namespace W7\App\Controller\Admin;
 
-use W7\App\Model\Logic\UserLogic;
-use W7\App\Model\Logic\VerificationcodeLogic;
-use W7\App\Model\Service\EncryptorLogic;
+use W7\App\Model\Logic\LoginLongic;
 use W7\Http\Message\Server\Request;
 
 class LoginController extends Controller
@@ -33,23 +31,22 @@ class LoginController extends Controller
 			]);
 			$code_val = $request->session->get('img_code');
 
-			if ($request->input(strtolower('code')) != strtolower($code_val)) {
+			if (strtolower($request->input('code')) != strtolower($code_val)) {
 				return $this->error('请输入正确的验证码');
 			}
 
-			$this->user_longin = new UserLogic();
-			$user_val = $this->user_longin->getUser(['username'=>$request->input('username')]);
+			$this->login = new LoginLongic();
+			$data = [
+				'username' => trim($request->input('username')),
+				'userpass' => trim($request->input('userpass')),
+			];
 
-			if ($user_val) {
-				$user_pwd = md5(md5($request->input('username').$request->input('userpass')));
-				if (isset($user_val['userpass']) && $user_val['userpass'] == $user_pwd) {
-					$request->session->set('user_id', $user_val['id']);
-					return $this->success();
-				} else {
-					return $this->error('用户名或者密码有误');
-				}
+			$res = $this->login->check($data);
+			if ($res && $res['code'] == 1) {
+				$request->session->set('user_id', $res['id']);
+				return $this->success();
 			} else {
-				return $this->error('用户不存在');
+				return $this->error($res['msg']);
 			}
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());

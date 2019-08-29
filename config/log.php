@@ -39,11 +39,5 @@ return [
 			'path' => RUNTIME_PATH . DS. 'logs'. DS. 'db.log',
 			'level' => ienv('LOG_CHANNEL_DATABASE_LEVEL', 'debug'),
 		],
-		'invoice' => [
-			'driver' => 'daily',
-			'path' => RUNTIME_PATH . DS. 'logs'. DS. 'invoice.log',
-			'level' => ienv('LOG_CHANNEL_INVOICE_LEVEL', 'debug'),
-			'days' => 1,
-		]
 	],
 ];

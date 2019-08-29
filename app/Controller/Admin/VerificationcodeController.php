@@ -19,8 +19,6 @@ use W7\Http\Message\Server\Request;
 class VerificationcodeController extends Controller
 {
 	protected $codeNum = 4;
-	protected $width = 100;
-	protected $height = 60;
 
 	/**
 	 * 获取验证码图片
@@ -39,7 +37,7 @@ class VerificationcodeController extends Controller
 			$builder->setMaxAngle(25);
 			$builder->setMaxBehindLines(0);
 			$builder->setMaxFrontLines(0);
-			$builder->build($width = $this->width, $height = $this->height, $font = null);
+			$builder->build();
 			$phrase = $builder->getPhrase();
 
 			ob_start();

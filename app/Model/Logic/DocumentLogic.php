@@ -20,12 +20,12 @@ use W7\App\Model\Entity\User;
 
 class DocumentLogic extends BaseLogic
 {
-	public function getlist($documents, $userId, $page)
+	public function getlist($documents, $userId, $page, $name)
 	{
 		if ($documents == 'all') {
-			$res = Document::orderBy('updated_at', 'desc')->get()->toArray();
+			$res = Document::where('name', 'like', '%'.$name.'%')->orderBy('updated_at', 'desc')->get()->toArray();
 		} else {
-			$res = Document::orderBy('updated_at', 'desc')->find($documents)->toArray();
+			$res = Document::where('name', 'like', '%'.$name.'%')->orderBy('updated_at', 'desc')->find($documents)->toArray();
 		}
 		return $this->paging($this->handleDocumentRes($res, $userId), 15, $page);
 	}
@@ -80,16 +80,10 @@ class DocumentLogic extends BaseLogic
 		return Document::destroy($id);
 	}
 
-	public function search($name, $userId, $page)
-	{
-		$res = Document::where('name', 'like', '%'.$name.'%')->get()->toArray();
-		return $this->paging($this->handleDocumentRes($res, $userId), 15, $page);
-	}
-
 	public function relation($userId, $documentId)
 	{
-		$this->user = new UserLogic();
-		$user = $this->user->getUser(['id'=>trim($userId)]);
+		$user = new UserLogic();
+		$user = $user->getUser(['id'=>trim($userId)]);
 		if ($user['has_privilege'] == 1) {
 			return true;
 		}

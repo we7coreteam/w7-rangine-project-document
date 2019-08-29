@@ -16,7 +16,6 @@ use W7\App\Event\ChangeAuthEvent;
 use W7\App\Model\Entity\PermissionDocument;
 use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Logic\DocumentLogic;
-use W7\App\Model\Logic\UserLogic;
 use W7\Http\Message\Server\Request;
 
 class DocumentController extends Controller
@@ -24,13 +23,17 @@ class DocumentController extends Controller
 	public function __construct()
 	{
 		$this->logic = new DocumentLogic();
-		$this->user = new UserLogic();
 	}
 
-	public function getlist(Request $request)
+	public function getList(Request $request)
 	{
 		try {
-			$res = $this->logic->getlist($request->document_user_auth, $request->document_user_id, $request->input('page'));
+			$this->validate($request, [
+				'name' => '',
+			]);
+			$name = trim($request->input('name'));
+			$res = $this->logic->getlist($request->document_user_auth, $request->document_user_id, $request->input('page'), $name);
+
 			return $this->success($res);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
@@ -57,7 +60,7 @@ class DocumentController extends Controller
 		}
 	}
 
-	public function getdetails(Request $request)
+	public function getDetails(Request $request)
 	{
 		try {
 			$this->validate($request, [
@@ -87,9 +90,6 @@ class DocumentController extends Controller
 
 			$name = trim($request->input('name'));
 
-			if (!$request->document_user_id) {
-				return $this->error('用户不存在');
-			}
 			$data = [];
 			$data['name'] = $name;
 			$data['creator_id'] = $request->document_user_id;
@@ -149,7 +149,7 @@ class DocumentController extends Controller
 		}
 	}
 
-	public function del(Request $request)
+	public function delete(Request $request)
 	{
 		try {
 			$this->validate($request, [
@@ -171,25 +171,11 @@ class DocumentController extends Controller
 				idb()->commit();
 				return $this->success($res);
 			} else {
+				idb()->rollBack();
 				return $this->error($res);
 			}
 		} catch (\Exception $e) {
 			idb()->rollBack();
-			return $this->error($e->getMessage());
-		}
-	}
-
-	public function search(Request $request)
-	{
-		try {
-			$this->validate($request, [
-				'name' => 'required',
-			], [
-				'name.required' => '文档名称不能为空',
-			]);
-			$res = $this->logic->search(trim($request->input('name')), $request->document_user_id, $request->input('page'));
-			return $this->success($res);
-		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
 		}
 	}

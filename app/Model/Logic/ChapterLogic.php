@@ -14,8 +14,10 @@ namespace W7\App\Model\Logic;
 
 use W7\App\Event\ChangeChapterEvent;
 use W7\App\Event\ChangeDocumentEvent;
+use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\Document\Chapter;
 use W7\App\Model\Entity\Document\ChapterContent;
+use W7\App\Model\Entity\User;
 
 class ChapterLogic extends BaseLogic
 {
@@ -70,18 +72,18 @@ class ChapterLogic extends BaseLogic
 
 	public function getChapters($id)
 	{
-		$cacheData = cache()->get('chapters_'.$id);
+		$cacheData = icache()->get('chapters_'.$id);
 		if ($cacheData) {
 			return $cacheData;
 		} else {
-			$roots = Chapter::select('id', 'name', 'sort')->where('document_id', $id)->where('parent_id', 0)->orderBy('sort', 'desc')->get()->toArray();
+			$roots = Chapter::select('id', 'name', 'sort')->where('document_id', $id)->where('parent_id', 0)->orderBy('sort', 'asc')->get()->toArray();
 			if ($roots) {
 				foreach ($roots as $k=>$v) {
 					$roots[$k]['children'] = [];
 				}
 				$this->getChild($roots);
 			}
-			cache()->set('chapters_'.$id, $roots);
+			icache()->set('chapters_'.$id, $roots);
 			return $roots;
 		}
 	}
@@ -89,7 +91,7 @@ class ChapterLogic extends BaseLogic
 	public function getChild(&$chapters)
 	{
 		foreach ($chapters as $k=>$v) {
-			$subordinates = Chapter::select('id', 'name', 'sort')->where('parent_id', $v['id'])->orderBy('sort', 'desc')->get()->toArray();
+			$subordinates = Chapter::select('id', 'name', 'sort')->where('parent_id', $v['id'])->orderBy('sort', 'asc')->get()->toArray();
 			foreach ($subordinates as $sk => $sv) {
 				$subordinates[$sk]['children'] = [];
 				$chapters[$k]['children'][] = $subordinates[$sk];
@@ -101,16 +103,25 @@ class ChapterLogic extends BaseLogic
 
 	public function getChapter($document_id, $id)
 	{
-		if (cache()->get('chapter_'.$id)) {
-			return cache()->get('chapter_'.$id);
+		if (icache()->get('chapter_'.$id)) {
+			return icache()->get('chapter_'.$id);
 		} else {
 			$chapter = Chapter::where('id', $id)->where('document_id', $document_id)->first();
 			if (!$chapter) {
 				throw new \Exception('该章节不存在！');
 			}
+			$document = Document::where('id', $document_id)->first();
+			if ($document && $document['creator_id']) {
+				$userinfo = User::where('id', $document['creator_id'])->first();
+				if ($userinfo) {
+					$chapter['creator_id'] = $userinfo['id'];
+					$chapter['username'] = $userinfo['username'];
+				}
+			}
 			$description = ChapterContent::where('chapter_id', $id)->first();
 			if ($description) {
 				$chapter['content'] = $description['content'];
+				$chapter['layout'] = $description['layout'];
 			} else {
 				$chapter['content'] = '';
 			}
@@ -120,7 +131,7 @@ class ChapterLogic extends BaseLogic
 			$next = $this->nextChapter($chapter);
 			$chapter['next_chapter_id'] = $next['id'];
 			$chapter['next_chapter_name'] = $next['name'];
-			cache()->set('chapter_'.$id, $chapter, 24*3600);
+			icache()->set('chapter_'.$id, $chapter, 24*3600);
 			return $chapter;
 		}
 	}
@@ -147,11 +158,11 @@ class ChapterLogic extends BaseLogic
 		$parent_id = $chapter['parent_id'];
 		$sort = $chapter['sort'];
 		$id = $chapter['id'];
-		$child = Chapter::where('parent_id', $id)->orderBy('sort', 'desc')->first();
+		$child = Chapter::where('parent_id', $id)->orderBy('sort', 'asc')->first();
 		if ($child) {
 			return $child;
 		}
-		$youngerBrother = Chapter::where('parent_id', $parent_id)->where('sort', '<', $sort)->orderBy('sort', 'desc')->first();
+		$youngerBrother = Chapter::where('parent_id', $parent_id)->where('sort', '<', $sort)->orderBy('sort', 'asc')->first();
 		if ($youngerBrother) {
 			return $youngerBrother;
 		}
@@ -164,7 +175,19 @@ class ChapterLogic extends BaseLogic
 		$documents = Chapter::whereIn('id', $document_ids)->where('document_id', $id)->get()->toArray();
 		foreach ($documents as &$document) {
 			$document['content'] = ChapterContent::find($document['id'])->content ?? '';
+			if ($document['content']) {
+				$document['content'] = substr($document['content'], 0, 780);
+			}
+			$document['layout'] = ChapterContent::find($document['id'])->layout;
 			$document['path'] = $this->getPath($document['parent_id']);
+		}
+		$documentinfo = Document::where('id', $id)->first();
+		if ($documentinfo && $documentinfo['creator_id']) {
+			$userinfo = User::where('id', $documentinfo['creator_id'])->first();
+			if ($userinfo) {
+				$document['creator_id'] = $userinfo['id'];
+				$document['username'] = $userinfo['username'];
+			}
 		}
 
 		return $documents;
@@ -195,44 +218,70 @@ class ChapterLogic extends BaseLogic
 			if (APP_AUTH_ALL !== $auth && !in_array($chapter->document_id, $auth)) {
 				throw new \Exception('无权操作');
 			}
-			$chapter->delete();
+			$resChapter = $chapter->delete();
 			ChapterContent::destroy($id);
 			ChangeChapterEvent::instance()->attach('chapter', $chapter)->dispatch();
-			return $chapter;
+			if ($resChapter) {
+				return $chapter;
+			} else {
+				return false;
+			}
 		}
 		throw new \Exception('该章节不存在，请刷新页面');
 	}
 
-	public function saveContent($id, $content, $auth)
+	public function saveContent($id, $content, $layout, $auth)
 	{
-		$document_id = Chapter::where('id', $id)->value('document_id');
-		if (!$document_id) {
+		$documentInfo = Chapter::find($id);
+		if (!$documentInfo['document_id']) {
 			throw new \Exception('该章节不存在，请刷新页面');
 		}
-		if (APP_AUTH_ALL !== $auth && !in_array($document_id, $auth)) {
+		if (APP_AUTH_ALL !== $auth && !in_array($documentInfo['document_id'], $auth)) {
 			throw new \Exception('无权操作');
 		}
+		$documents = Document::find($documentInfo['document_id']);
 		$chapterContent = ChapterContent::find($id);
 		if ($chapterContent) {
 			$chapterContent->content = $content;
+			$chapterContent->layout = $layout;
 			$chapterContent->save();
-			return $chapterContent;
 		} else {
-			ChapterContent::create(['chapter_id'=>$id,'content'=>$content]);
+			$chapterContent = ChapterContent::create(['chapter_id'=>$id,'content'=>$content,'layout'=>$layout]);
+			if (!$chapterContent){
+				return false;
+			}
 		}
+		$username = User::where('id', $documents['creator_id'])->value('username');
+		$chapterContent['created_at'] = $documentInfo['created_at'];
+		$chapterContent['updated_at'] = $documentInfo['updated_at'];
+		$chapterContent['username'] = $username;
+		return $chapterContent;
 	}
 
 	public function getContent($id, $auth)
 	{
-		$document_id = Chapter::where('id', $id)->value('document_id');
-		if (!$document_id) {
+		$documentinfo = Chapter::where('id', $id)->first();
+		if (!$documentinfo || !$documentinfo['document_id']) {
 			throw new \Exception('该章节不存在，请刷新页面');
 		}
-		if (APP_AUTH_ALL !== $auth && !in_array($document_id, $auth)) {
+		if (APP_AUTH_ALL !== $auth && !in_array($documentinfo['document_id'], $auth)) {
 			throw new \Exception('无权操作');
 		}
-		$chapterContent = ChapterContent::find($id);
-		return $chapterContent->content;
+		$chapter = ChapterContent::find($id);
+		if (!$chapter) {
+			return $chapter;
+		}
+		$document = Document::where('id', $documentinfo['document_id'])->first();
+		if ($document && $document['creator_id']) {
+			$userinfo = User::where('id', $document['creator_id'])->first();
+			if ($userinfo) {
+				$chapter['creator_id'] = $userinfo['id'];
+				$chapter['username'] = $userinfo['username'];
+			}
+		}
+		$chapter['created_at'] = $documentinfo['created_at'];
+		$chapter['updated_at'] = $documentinfo['updated_at'];
+		return $chapter;
 	}
 
 	public function searchChapter($id, $keywords)

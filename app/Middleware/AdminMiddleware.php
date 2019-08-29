@@ -23,7 +23,7 @@ class AdminMiddleware extends MiddlewareAbstract
 	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
 	{
 		$user_id = $request->session->get('user_id');
-		if(!$user_id){
+		if (!$user_id) {
 			return App::getApp()->getContext()->getResponse()->json(['message' => '用户未登录', 'data' => null, 'status' => false, 'code' => 444]);
 		}
 		$request->document_user_id = $user_id;

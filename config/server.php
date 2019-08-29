@@ -21,7 +21,9 @@ $serverSetting = [
 		'task_ipc_mode' => 2,
 		'message_queue_key' => 0x70001001,
 		'task_tmpdir' => BASE_PATH . '/runtime/task',
-		'open_http2_protocol' => false
+		'open_http2_protocol' => false,
+		'document_root' => BASE_PATH . '/public',
+		'enable_static_handler' => true,
 
 	],
 	'tcp' => [

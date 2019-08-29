@@ -25,13 +25,17 @@ class ChapterController extends Controller
 	public function index(Request $request)
 	{
 		try {
+			$this->validate($request, [
+				'document_id' => 'required|integer',
+			], [
+				'document_id.required' => '文档ID必传',
+			]);
 			$id = (int)$request->input('document_id');
-			if (!$id) {
-				return $this->error('id is required!');
-			}
+
 			$auth = $request->document_user_auth;
-			if (APP_AUTH_ALL !== $auth && !in_array($id, $auth)) {
-				return $this->error('无权查看!');
+			$documentAuth = $this->documentAuth($id, $auth);
+			if ($documentAuth['status'] == false) {
+				return $this->error($documentAuth['msg']);
 			}
 
 			$result = $this->logic->getChapters($id);
@@ -45,7 +49,6 @@ class ChapterController extends Controller
 	public function create(Request $request)
 	{
 		try {
-			$this->logic->checkRepeatRequest($request->document_user_id);
 			$this->validate($request, [
 				'name' => 'string|required|max:30',
 				'sort' => 'required|integer|min:0',
@@ -67,8 +70,9 @@ class ChapterController extends Controller
 			$data['parent_id'] = $request->input('parent_id');
 
 			$auth = $request->document_user_auth;
-			if (APP_AUTH_ALL !== $auth && !in_array($data['document_id'], $auth)) {
-				return $this->error('无权操作');
+			$documentAuth = $this->documentAuth($data['document_id'], $auth);
+			if ($documentAuth['status'] == false) {
+				return $this->error($documentAuth['msg']);
 			}
 
 			$result = $this->logic->createChapter($data);
@@ -116,15 +120,21 @@ class ChapterController extends Controller
 	public function destroy(Request $request)
 	{
 		try {
+			$this->validate($request, [
+				'id' => 'required|integer',
+			], [
+				'id.required' => 'id is required',
+			]);
 			$id = $request->input('id');
-			if (!$id) {
-				return $this->error('id必传');
-			}
-
 			idb()->beginTransaction();
-			$this->logic->deleteChapter($id, $request->document_user_auth);
-			idb()->commit();
-			return $this->success();
+			$res = $this->logic->deleteChapter($id, $request->document_user_auth);
+			if ($res) {
+				idb()->commit();
+				return $this->success();
+			} else {
+				idb()->rollBack();
+				return $this->error();
+			}
 		} catch (\Exception $e) {
 			idb()->rollBack();
 			return $this->error($e->getMessage());
@@ -136,16 +146,20 @@ class ChapterController extends Controller
 		try {
 			$this->validate($request, [
 				'chapter_id' => 'required|integer|min:1',
-				//'content' => 'required',
+				'layout' => 'required|integer|min:1',
 			], [
 				'chapter_id.required' => '文档id必填',
-				'chapter_id.min' => '文档id最小为0',
-				//'content.required' => '内容必填',
+				'layout' => '文档布局必填',
 			]);
 			$id = $request->input('chapter_id');
 			$content = $request->input('content', '');
-			$this->logic->saveContent($id, $content, $request->document_user_auth);
-			return $this->success(['chapter_id'=>$id,'content'=>$content]);
+			$layout = $request->input('layout', '');
+			$res = $this->logic->saveContent($id, $content, $layout, $request->document_user_auth);
+			if ($res){
+				$res['layout'] = $layout;
+				return $this->success($res);
+			}
+			return $this->error('保存失败');
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
 		}
@@ -162,7 +176,7 @@ class ChapterController extends Controller
 			]);
 			$id = $request->input('chapter_id');
 			$content = $this->logic->getContent($id, $request->document_user_auth);
-			return $this->success(['chapter_id'=>$id,'content'=>$content]);
+			return $this->success($content);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
 		}
