@@ -29,7 +29,7 @@ class ChapterController extends Controller
 			if (!$id) {
 				return $this->error('文档id必填');
 			}
-			$result = $this->logic->getChapters($id);
+			$result = $this->logic->getChapters($id,'all');
 			return $this->success($result);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
