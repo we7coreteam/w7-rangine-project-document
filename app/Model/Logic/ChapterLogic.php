@@ -72,20 +72,14 @@ class ChapterLogic extends BaseLogic
 	public function getChapters($id,$auth)
 	{
 		$this->documentAuth($id,$auth);
-		$cacheData = icache()->get('chapters_'.$id);
-		if ($cacheData) {
-			return $cacheData;
-		} else {
-			$roots = Chapter::select('id', 'name', 'sort')->where('document_id', $id)->where('parent_id', 0)->orderBy('sort', 'asc')->get()->toArray();
-			if ($roots) {
-				foreach ($roots as $k=>$v) {
-					$roots[$k]['children'] = [];
-				}
-				$this->getChild($roots);
+		$roots = Chapter::select('id', 'name', 'sort')->where('document_id', $id)->where('parent_id', 0)->orderBy('sort', 'asc')->get()->toArray();
+		if ($roots) {
+			foreach ($roots as $k=>$v) {
+				$roots[$k]['children'] = [];
 			}
-			icache()->set('chapters_'.$id, $roots);
-			return $roots;
+			$this->getChild($roots);
 		}
+		return $roots;
 	}
 
 	public function getChild(&$chapters)
@@ -103,37 +97,32 @@ class ChapterLogic extends BaseLogic
 
 	public function getChapter($document_id, $id)
 	{
-		if (icache()->get('chapter_'.$id)) {
-			return icache()->get('chapter_'.$id);
-		} else {
-			$chapter = Chapter::where('id', $id)->where('document_id', $document_id)->first();
-			if (!$chapter) {
-				throw new \Exception('该章节不存在！');
-			}
-			$document = Document::where('id', $document_id)->first();
-			if ($document && $document['creator_id']) {
-				$userinfo = User::where('id', $document['creator_id'])->first();
-				if ($userinfo) {
-					$chapter['creator_id'] = $userinfo['id'];
-					$chapter['username'] = $userinfo['username'];
-				}
-			}
-			$description = ChapterContent::where('chapter_id', $id)->first();
-			if ($description) {
-				$chapter['content'] = $description['content'];
-				$chapter['layout'] = $description['layout'];
-			} else {
-				$chapter['content'] = '';
-			}
-			$previous = $this->previousChapter($chapter);
-			$chapter['previous_chapter_id'] = $previous['id'];
-			$chapter['previous_chapter_name'] = $previous['name'];
-			$next = $this->nextChapter($chapter);
-			$chapter['next_chapter_id'] = $next['id'];
-			$chapter['next_chapter_name'] = $next['name'];
-			icache()->set('chapter_'.$id, $chapter, 24*3600);
-			return $chapter;
+		$chapter = Chapter::where('id', $id)->where('document_id', $document_id)->first();
+		if (!$chapter) {
+			throw new \Exception('该章节不存在！');
 		}
+		$document = Document::where('id', $document_id)->first();
+		if ($document && $document['creator_id']) {
+			$userinfo = User::where('id', $document['creator_id'])->first();
+			if ($userinfo) {
+				$chapter['creator_id'] = $userinfo['id'];
+				$chapter['username'] = $userinfo['username'];
+			}
+		}
+		$description = ChapterContent::where('chapter_id', $id)->first();
+		if ($description) {
+			$chapter['content'] = $description['content'];
+			$chapter['layout'] = $description['layout'];
+		} else {
+			$chapter['content'] = '';
+		}
+		$previous = $this->previousChapter($chapter);
+		$chapter['previous_chapter_id'] = $previous['id'];
+		$chapter['previous_chapter_name'] = $previous['name'];
+		$next = $this->nextChapter($chapter);
+		$chapter['next_chapter_id'] = $next['id'];
+		$chapter['next_chapter_name'] = $next['name'];
+		return $chapter;
 	}
 
 	public function previousChapter($chapter)
