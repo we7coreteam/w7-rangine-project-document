@@ -35,4 +35,20 @@ class DocumentController extends Controller
 			return $this->error($e->getMessage());
 		}
 	}
+
+	public function getDetails(Request $request)
+	{
+		try {
+			$this->validate($request, [
+				'document_id' => 'required|integer|min:1',
+			], [
+				'document_id.required' => '文档id必填',
+				'document_id.integer' => '文档id非法'
+			]);
+			$res = $this->logic->details($request->input('document_id'));
+			return $this->success($res);
+		} catch (\Exception $e) {
+			return $this->error($e->getMessage());
+		}
+	}
 }
