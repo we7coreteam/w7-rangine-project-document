@@ -160,22 +160,27 @@ class ChapterLogic extends BaseLogic
 
 	public function searchDocument($id, $keyword)
 	{
-		$document_ids = ChapterContent::where('content', 'like', '%'.$keyword.'%')->pluck('chapter_id')->toArray();
+		$content_ids = ChapterContent::where('content', 'like', '%'.$keyword.'%')->pluck('chapter_id')->toArray();
+		$document_ids = Chapter::where('name', 'like', '%'.$keyword.'%')->where('document_id', $id)->pluck('id')->toArray();
+		$document_ids = array_merge($content_ids,$document_ids);
 		$documents = Chapter::whereIn('id', $document_ids)->where('document_id', $id)->get()->toArray();
 		foreach ($documents as &$document) {
 			$document['content'] = ChapterContent::find($document['id'])->content ?? '';
-			if ($document['content']) {
+			if ($document['content'] ) {
 				$document['content'] = mb_substr($document['content'], 0, 264, 'utf-8');
 			}
-			$document['layout'] = ChapterContent::find($document['id'])->layout;
+			$document['layout'] = ChapterContent::find($document['id'])->layout ?? '';
 			$document['path'] = $this->getPath($document['parent_id']);
 		}
+
 		$documentinfo = Document::where('id', $id)->first();
 		if ($documentinfo && $documentinfo['creator_id']) {
 			$userinfo = User::where('id', $documentinfo['creator_id'])->first();
 			if ($userinfo) {
-				$document['creator_id'] = $userinfo['id'];
-				$document['username'] = $userinfo['username'];
+				foreach ($documents as $key => &$val) {
+					$val['creator_id'] = $userinfo['id'];
+					$val['username'] = $userinfo['username'];
+				}
 			}
 		}
 
