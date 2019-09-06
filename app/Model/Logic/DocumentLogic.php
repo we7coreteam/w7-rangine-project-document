@@ -67,7 +67,7 @@ class DocumentLogic extends BaseLogic
 
 	public function details($id)
 	{
-		return Document::where('is_show',1)->find($id);
+		return Document::find($id);
 	}
 
 	public function create($data)
