@@ -212,13 +212,7 @@ ALTER TABLE `ims_user`
 </details>
 
 
-3、导入后台admin账号 (账号:amdin 密码:123456)
-
-```
-INSERT INTO ims_user ( username, userpass, remark, has_privilege) VALUES ('admin','d7c6c07a0a04ba4e65921e2f90726384','超管',1);
-```
-
-4、修改配置文件
+3、修改配置文件
 
 ```
 配置根目录下的config/app.php文件，数据库(database)和缓存(cache)。
@@ -247,6 +241,13 @@ INSERT INTO ims_user ( username, userpass, remark, has_privilege) VALUES ('admin
     ],
 ]
 ```
+
+4、导入后台admin账号 (账号:amdin 密码:123456)
+
+```
+INSERT INTO ims_user ( username, userpass, remark, has_privilege) VALUES ('admin','d7c6c07a0a04ba4e65921e2f90726384','超管',1);
+```
+
 5、启动
 
 ```
@@ -254,6 +255,11 @@ cd ./文档根目录
 
 执行: php bin/server.php http start
 ```
+
+6、访问
+
+http://域名:88/index.html
+
 
 # 文档
 
