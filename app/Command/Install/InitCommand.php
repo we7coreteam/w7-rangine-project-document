@@ -12,10 +12,8 @@
 
 namespace W7\App\Command\Install;
 
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use W7\Console\Command\CommandAbstract;
+use W7\Core\Exception\CommandException;
 
 class InitCommand extends CommandAbstract {
 	protected function handle($options) {
@@ -60,13 +58,13 @@ class InitCommand extends CommandAbstract {
 
 		$config = [];
 		foreach ($list as $key => $item) {
-			$config[$key] = $this->askDb($item['name'], $item['default']);
+			$config[$key] = $this->output->ask('请输入数据库' . $item['name'], $item['default']);
+			if (empty($config[$key])) {
+				throw new CommandException('参数' . $item['name'] . '不能为空');
+			}
 		}
 
-		return $config;
-	}
 
-	private function askDb($name, $default) {
-		return $this->output->ask('请输入数据库' . $name, $default);
+		return $config;
 	}
 }
