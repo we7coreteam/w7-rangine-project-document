@@ -17,7 +17,7 @@ use W7\App\Model\Entity\User;
 
 class UserLogic extends BaseLogic
 {
-	public function getUserList($page, $username)
+	public function getUserlist($page, $username)
 	{
 		$res = User::where('username', 'like', '%'.$username.'%')->orderBy('id', 'desc')->get()->toArray();
 		if ($res) {
