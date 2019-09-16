@@ -14,6 +14,7 @@ namespace W7\App\Model\Logic;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
+use W7\App\Event\ChangeAuthEvent;
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\PermissionDocument;
 use W7\App\Model\Entity\User;
@@ -72,7 +73,12 @@ class DocumentLogic extends BaseLogic
 
 	public function create($data)
 	{
-		return Document::create($data);
+		$res = Document::create($data);
+		if ($res) {
+			PermissionDocument::create(['user_id' => $data['creator_id'],'document_id' => $res['id']]);
+			ChangeAuthEvent::instance()->attach('user_id', $data['creator_id'])->attach('document_id', $res['id'])->dispatch();
+		}
+		return $res;
 	}
 
 	public function update($id, $data)
@@ -82,7 +88,17 @@ class DocumentLogic extends BaseLogic
 
 	public function del($id)
 	{
-		return Document::destroy($id);
+		idb()->beginTransaction();
+		$res = Document::destroy($id);
+		if ($res) {
+			$chapter = new ChapterLogic();
+			$chapter->deleteDocument($id);
+			ChangeAuthEvent::instance()->attach('user_id', 0)->attach('document_id', $res['id'])->dispatch();
+			idb()->commit();
+		}else{
+			idb()->rollBack();
+		}
+		return $res;
 	}
 
 	public function relation($userId, $documentId)
