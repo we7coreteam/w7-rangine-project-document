@@ -22,15 +22,11 @@ class UserController extends Controller
 		$this->logic = new UserLogic();
 	}
 
-	public function getUserlist(Request $request)
+	public function getUserList(Request $request)
 	{
 		try {
-			$this->validate($request, [
-				'username' => '',
-				'page' => '',
-			]);
 			$username = trim($request->input('username'));
-			$res = $this->logic->getUserlist($request->input('page'), $username);
+			$res = $this->logic->getUserList($request->input('page'), $username);
 			return $this->success($res);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());

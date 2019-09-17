@@ -14,6 +14,7 @@ namespace W7\App\Model\Logic;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
+use W7\App\Event\ChangeAuthEvent;
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\PermissionDocument;
 use W7\App\Model\Entity\User;
@@ -23,9 +24,9 @@ class DocumentLogic extends BaseLogic
 	public function getlist($documents, $userId, $page, $name)
 	{
 		if ($documents == 'all') {
-			$res = Document::where('name', 'like', '%'.$name.'%')->orderBy('updated_at', 'desc')->get()->toArray();
+			$res = Document::query()->where('name', 'like', '%'.$name.'%')->with('username')->orderBy('updated_at', 'desc')->get()->toArray();
 		} else {
-			$res = Document::where('name', 'like', '%'.$name.'%')->orderBy('updated_at', 'desc')->find($documents)->toArray();
+			$res = Document::query()->where('name', 'like', '%'.$name.'%')->with('name')->orderBy('updated_at', 'desc')->find($documents)->toArray();
 		}
 		return $this->paging($this->handleDocumentRes($res, $userId), 15, $page);
 	}
@@ -72,7 +73,12 @@ class DocumentLogic extends BaseLogic
 
 	public function create($data)
 	{
-		return Document::create($data);
+		$res = Document::create($data);
+		if ($res) {
+			PermissionDocument::create(['user_id' => $data['creator_id'],'document_id' => $res['id']]);
+			ChangeAuthEvent::instance()->attach('user_id', $data['creator_id'])->attach('document_id', $res['id'])->dispatch();
+		}
+		return $res;
 	}
 
 	public function update($id, $data)
@@ -82,7 +88,16 @@ class DocumentLogic extends BaseLogic
 
 	public function del($id)
 	{
-		return Document::destroy($id);
+		$res = Document::destroy($id);
+		if ($res) {
+			$chapter = new ChapterLogic();
+			$chapter->deleteDocument($id);
+			ChangeAuthEvent::instance()->attach('user_id', 0)->attach('document_id', $res['id'])->dispatch();
+			idb()->commit();
+		} else {
+			idb()->rollBack();
+		}
+		return $res;
 	}
 
 	public function relation($userId, $documentId)
@@ -110,7 +125,7 @@ class DocumentLogic extends BaseLogic
 		if (!$res) {
 			return $res;
 		}
-		$userLogic = new UserLogic();
+
 		foreach ($res as $key => &$val) {
 			if (isset($val['is_show']) && $val['is_show'] == 1) {
 				$val['is_show_name'] = '发布';
@@ -118,14 +133,10 @@ class DocumentLogic extends BaseLogic
 				$val['is_show_name'] = '隐藏';
 			}
 
-			if (isset($val['creator_id']) && $val['creator_id']) {
-				$user = $userLogic->getUser(['id'=>trim($val['creator_id'])]);
-				if ($user) {
-					$val['username'] = $user['username'];
-				} else {
-					$val['username'] = '';
-				}
+			if (isset($val['username']) && $val['username']) {
+				$val['username'] = $val['username']['username'];
 			}
+
 			if (isset($val['has_privilege']) && $val['has_privilege'] == 1) {
 				$val['has_creator'] = 1;
 				$val['has_creator_name'] = '管理员';

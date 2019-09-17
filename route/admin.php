@@ -19,7 +19,7 @@ irouter()->post('/js/php/controller.php', 'Admin\UploadController@image');
 irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'/admin'], function (\W7\Core\Route\Route $route) {
 	$route->post('/login/signout', 'Admin\LoginController@signOut'); // 退出登录
 
-	$route->post('/user/getuserlist', 'Admin\UserController@getUserlist');
+	$route->post('/user/getuserlist', 'Admin\UserController@getUserList');
 	$route->post('/user/getuser', 'Admin\UserController@getUser');
 	$route->post('/user/adduser', 'Admin\UserController@addUser');
 	$route->post('/user/updateuser', 'Admin\UserController@updateUser');

@@ -17,3 +17,5 @@
 
 //应用常量
 ! defined('APP_AUTH_ALL') && define('APP_AUTH_ALL', 'all');
+! defined('DOCUMENT_INFO') && define('DOCUMENT_INFO', 'document_info_');
+! defined('DOCUMENT_INFO_CACHE_TIME') && define('DOCUMENT_INFO_CACHE_TIME', 31536000);
