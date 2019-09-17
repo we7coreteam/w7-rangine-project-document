@@ -47,4 +47,7 @@ irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'
 	$route->post('/document/getdetails', 'Admin\DocumentController@getDetails');
 	$route->post('/document/delete', 'Admin\DocumentController@delete');
 	$route->post('/document/search', 'Admin\DocumentController@search');
+
+	$route->post('/cdn/index', 'Admin\CdnController@index');
+	$route->post('/cdn/save', 'Admin\CdnController@save');
 });
