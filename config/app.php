@@ -27,7 +27,7 @@ return [
 			RUNTIME_PATH . DIRECTORY_SEPARATOR . 'logs',
 			RUNTIME_PATH . DIRECTORY_SEPARATOR . 'task',
 			RUNTIME_PATH . DIRECTORY_SEPARATOR . 'upload',
-			BASE_PATH  . DIRECTORY_SEPARATOR . 'vendor',
+			BASE_PATH  . DIRECTORY_SEPARATOR . 'vendor'
 		]
 	],
 	'crontab' => [
@@ -61,9 +61,14 @@ return [
 			'collation' => 'utf8_unicode_ci',
 			'prefix' => 'ims_',
 			'port' =>'3306',
-		],
+		]
 	],
-
+	'view' => [
+		//框架下个版本优化
+		'template_path' => [
+			BASE_PATH . '/public'
+		]
+	],
 	'session' => [
 		'path' => ienv('SESSION_PATH', '/'),
 		'http_only' => ienv('SESSION_HTTP_ONLY', false),
