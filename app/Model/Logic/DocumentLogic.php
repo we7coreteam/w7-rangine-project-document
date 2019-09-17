@@ -25,10 +25,8 @@ class DocumentLogic extends BaseLogic
 	{
 		if ($documents == 'all') {
 			$res = Document::query()->where('name', 'like', '%'.$name.'%')->with('username')->orderBy('updated_at', 'desc')->get()->toArray();
-//			$res = Document::where('name', 'like', '%'.$name.'%')->with('username')->orderBy('updated_at', 'desc')->get()->toArray();
 		} else {
 			$res = Document::query()->where('name', 'like', '%'.$name.'%')->with('name')->orderBy('updated_at', 'desc')->find($documents)->toArray();
-//			$res = Document::where('name', 'like', '%'.$name.'%')->with('username')->orderBy('updated_at', 'desc')->find($documents)->toArray();
 		}
 		return $this->paging($this->handleDocumentRes($res, $userId), 15, $page);
 	}
@@ -96,7 +94,7 @@ class DocumentLogic extends BaseLogic
 			$chapter->deleteDocument($id);
 			ChangeAuthEvent::instance()->attach('user_id', 0)->attach('document_id', $res['id'])->dispatch();
 			idb()->commit();
-		}else{
+		} else {
 			idb()->rollBack();
 		}
 		return $res;

@@ -36,7 +36,10 @@ class ChapterLogic extends BaseLogic
 				throw new \Exception('章节最大层级为３层！');
 			}
 		}
-		$chapter = Chapter::create($data);
+		$res = $chapter = Chapter::create($data);
+		if ($res && icache()->has(DOCUMENT_INFO.$data['document_id'])) {
+			icache()->delete(DOCUMENT_INFO.$data['document_id']);
+		}
 		ChangeChapterEvent::instance()->attach('chapter', $chapter)->dispatch();
 		return $chapter;
 	}
@@ -48,7 +51,10 @@ class ChapterLogic extends BaseLogic
 		if ($chapter) {
 			$chapter->name = $data['name'];
 			$chapter->sort = $data['sort'];
-			$chapter->save();
+			$res = $chapter->save();
+			if ($res && icache()->has(DOCUMENT_INFO.$chapter['document_id'])) {
+				icache()->delete(DOCUMENT_INFO.$chapter['document_id']);
+			}
 			ChangeChapterEvent::instance()->attach('chapter', $chapter)->dispatch();
 			return $chapter;
 		}
@@ -71,6 +77,9 @@ class ChapterLogic extends BaseLogic
 
 	public function getChapters($id, $auth)
 	{
+		if (icache()->has(DOCUMENT_INFO.$id)) {
+			return icache()->get(DOCUMENT_INFO.$id);
+		}
 		$this->documentAuth($id, $auth);
 		$roots = Chapter::select('id', 'name', 'sort')->where('document_id', $id)->where('parent_id', 0)->orderBy('sort', 'asc')->get()->toArray();
 		if ($roots) {
@@ -78,6 +87,7 @@ class ChapterLogic extends BaseLogic
 				$roots[$k]['children'] = [];
 			}
 			$this->getChild($roots);
+			icache()->set(DOCUMENT_INFO.$id, $roots, DOCUMENT_INFO_CACHE_TIME);
 		}
 		return $roots;
 	}
@@ -162,11 +172,11 @@ class ChapterLogic extends BaseLogic
 	{
 		$content_ids = ChapterContent::where('content', 'like', '%'.$keyword.'%')->pluck('chapter_id')->toArray();
 		$document_ids = Chapter::where('name', 'like', '%'.$keyword.'%')->where('document_id', $id)->pluck('id')->toArray();
-		$document_ids = array_merge($content_ids,$document_ids);
+		$document_ids = array_merge($content_ids, $document_ids);
 		$documents = Chapter::whereIn('id', $document_ids)->where('document_id', $id)->get()->toArray();
 		foreach ($documents as &$document) {
 			$document['content'] = ChapterContent::find($document['id'])->content ?? '';
-			if ($document['content'] ) {
+			if ($document['content']) {
 				$document['content'] = mb_substr($document['content'], 0, 264, 'utf-8');
 			}
 			$document['layout'] = ChapterContent::find($document['id'])->layout ?? '';
@@ -214,6 +224,9 @@ class ChapterLogic extends BaseLogic
 			ChapterContent::destroy($id);
 			ChangeChapterEvent::instance()->attach('chapter', $chapter)->dispatch();
 			if ($resChapter) {
+				if ($resChapter && icache()->has(DOCUMENT_INFO.$chapter['document_id'])) {
+					icache()->delete(DOCUMENT_INFO.$chapter['document_id']);
+				}
 				return $chapter;
 			} else {
 				return false;
@@ -234,7 +247,11 @@ class ChapterLogic extends BaseLogic
 		if ($chapterContent) {
 			$chapterContent->content = $content;
 			$chapterContent->layout = $layout;
-			$chapterContent->save();
+			$res = $chapterContent->save();
+			if ($res) {
+				$documentInfo->updated_at = time();
+				$documentInfo->save();
+			}
 		} else {
 			$chapterContent = ChapterContent::create(['chapter_id'=>$id,'content'=>$content,'layout'=>$layout]);
 			if (!$chapterContent) {
@@ -289,6 +306,9 @@ class ChapterLogic extends BaseLogic
 		foreach ($chapters as $chapter) {
 			ChapterContent::where('chapter_id', $chapter->id)->delete();
 			$chapter->delete();
+		}
+		if ($chapters && icache()->has(DOCUMENT_INFO.$document_id)) {
+			icache()->delete(DOCUMENT_INFO.$document_id);
 		}
 		return true;
 	}
