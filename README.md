@@ -15,7 +15,7 @@
 
 #### 下载安装包
 
-https://gitee.com/we7coreteam/document-apiserver/releases 下载最新版的文档系统源码
+https://gitee.com/we7coreteam/document-apiserver/releases/ 下载最新版的文档系统源码
 
 #### 初始化系统
 
