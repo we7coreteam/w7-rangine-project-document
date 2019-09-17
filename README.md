@@ -35,7 +35,7 @@ Gitee : https://gitee.com/we7coreteam/document-apiserver.git
 ```
 # 解压项目
 $ cd work_dir
-$ unzip /tmp/document_1.0.1.zip -d ./document
+$ unzip /tmp/document.zip -d ./document
 $ cd document
 
 # 项目初始化
