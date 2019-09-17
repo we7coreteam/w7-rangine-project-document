@@ -13,7 +13,6 @@
 namespace W7\App\Controller\Admin;
 
 use W7\App\Event\ChangeAuthEvent;
-use W7\App\Model\Entity\PermissionDocument;
 use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\Http\Message\Server\Request;
@@ -93,17 +92,10 @@ class DocumentController extends Controller
 			$data = [];
 			$data['name'] = $name;
 			$data['creator_id'] = $request->document_user_id;
-			if ($request->input('description')) {
-				$data['description'] = $request->input('description');
-			} else {
-				$data['description'] = '';
-			}
-			$data['is_show'] = 2;
+			$data['description'] = $request->input('description');
 
 			$res = $this->logic->create($data);
 			if ($res) {
-				PermissionDocument::create(['user_id' => $data['creator_id'],'document_id' => $res['id']]);
-				ChangeAuthEvent::instance()->attach('user_id', $data['creator_id'])->attach('document_id', $res['id'])->dispatch();
 				return $this->success($res);
 			} else {
 				return $this->error($res);
@@ -162,20 +154,13 @@ class DocumentController extends Controller
 		}
 
 		try {
-			idb()->beginTransaction();
 			$res = $this->logic->del($request->input('id'));
 			if ($res) {
-				$this->chapter = new ChapterLogic();
-				$this->chapter->deleteDocument($request->input('id'));
-				ChangeAuthEvent::instance()->attach('user_id', 0)->attach('document_id', $res['id'])->dispatch();
-				idb()->commit();
 				return $this->success($res);
 			} else {
-				idb()->rollBack();
 				return $this->error($res);
 			}
 		} catch (\Exception $e) {
-			idb()->rollBack();
 			return $this->error($e->getMessage());
 		}
 	}

@@ -17,4 +17,5 @@ irouter()->group(['prefix'=>'/client'], function (\W7\Core\Route\Route $route) {
 	$route->post('/search', 'Client\ChapterController@search');
 
 	$route->post('/document/getshowlist', 'Client\DocumentController@getShowList');
+	$route->post('/document/getdetails', 'Client\DocumentController@getDetails');
 });

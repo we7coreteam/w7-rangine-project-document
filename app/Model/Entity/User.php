@@ -28,4 +28,9 @@ class User extends BaseModel
 	{
 		return date('Y-m-d H:i:s', $value);
 	}
+
+	public function document()
+	{
+		return $this->belongsTo(Document::class);
+	}
 }
