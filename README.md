@@ -1,6 +1,6 @@
 ### 简介
 
-一款基于软擎框架（https://www.rangine.com/）的开源Markdown文档系统。
+一款基于软擎框架（[https://www.rangine.com/](https://www.rangine.com/)）的开源Markdown文档系统。
 
 常驻内存，不依赖传统的 Nginx/Apache 和 PHP-FPM，全异步非阻塞、协程实现。
 
