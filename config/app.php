@@ -22,6 +22,7 @@ return [
 			'/home/wwwroot/we7/swoole',
 			'/tmp',
 			sys_get_temp_dir(),
+			BASE_PATH,
 			APP_PATH,
 			RUNTIME_PATH,
 			RUNTIME_PATH . DIRECTORY_SEPARATOR . 'logs',

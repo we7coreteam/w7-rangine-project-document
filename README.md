@@ -30,32 +30,26 @@ Gitee : https://gitee.com/we7coreteam/document-apiserver.git
 
 # 安装
 
-1、composer 安装
+> [下载文档源码](https://gitee.com/we7coreteam/document-apiserver.git), 放到你的项目目录
 
 ```
-git clone https://gitee.com/we7coreteam/w7swoole_empty ./document
+# 下载项目源码
+$ cd work_dir
+$ wget https://gitee.com/we7coreteam/document.zip
+$ unzip document.zip -d ./document
+$ cd document
 
-cd document
+# 项目初始化
+$ php bin/gerent.php install:init
 
-sudo composer install
+# 初始化完成后台,项目启动
+$ php bin/server.php http start
 ```
 
-2、环境配置
+访问地址: http://ip:88
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[参考微擎框架](https://s.w7.cc/index.php?c=wiki&do=view&id=317&list=2709)
+# 设置域名
 
-3、导入数据库
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 导入根目录下 document.sql 文件 (账号:admin 密码:123456)
-
-4、服务配置和启动
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[参考微擎框架](https://s.w7.cc/index.php?c=wiki&do=view&id=317&list=2285)
-
-
-# API文档
-
-https://s.w7.cc/index.php?c=wiki&do=view&id=527&list=3081
 
 
 

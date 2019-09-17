@@ -25,6 +25,7 @@
 		]
 	},
 	"require": {
+		"ext-json": "*",
 		"w7/swoole": "*",
 		"gregwar/captcha": "^1.1",
 		"qcloud/cos-sdk-v5": "^1.3"
