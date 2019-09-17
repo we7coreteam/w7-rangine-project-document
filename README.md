@@ -45,8 +45,6 @@ $ php bin/gerent.php install:init
 $ php bin/server.php http start
 ```
 
-访问地址: http://ip:88/
-
 
 
 
