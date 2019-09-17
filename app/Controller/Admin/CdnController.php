@@ -1,8 +1,16 @@
 <?php
 
+/**
+ * WeEngine Document System
+ *
+ * (c) We7Team 2019 <https://www.w7.cc>
+ *
+ * This is not a free software
+ * Using it under the license terms
+ * visited https://www.w7.cc for more details
+ */
 
 namespace W7\App\Controller\Admin;
-
 
 use W7\App\Model\Logic\CdnLogic;
 use W7\Http\Message\Server\Request;
@@ -45,7 +53,7 @@ class CdnController extends Controller
 			];
 			$cdn = new CdnLogic();
 			$res = $cdn->save($data);
-			if ($res){
+			if ($res) {
 				return $this->success($res);
 			}
 			return $this->error('保存失败');
