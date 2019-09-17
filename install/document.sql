@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主机： db
--- 生成日期： 2019-09-12 01:11:26
+-- 生成日期： 2019-09-17 01:19:14
 -- 服务器版本： 8.0.16
 -- PHP 版本： 7.2.19
 
@@ -113,13 +113,6 @@ CREATE TABLE `ims_user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- 转存表中的数据 `ims_user`
---
-
-INSERT INTO `ims_user` (`id`, `username`, `is_ban`, `userpass`, `remark`, `has_privilege`, `created_at`, `updated_at`) VALUES
-(1, 'admin', 0, 'd7c6c07a0a04ba4e65921e2f90726384', '超管', 1, 0, 0);
-
---
 -- 转储表的索引
 --
 
@@ -197,7 +190,7 @@ ALTER TABLE `ims_permission_document`
 -- 使用表AUTO_INCREMENT `ims_user`
 --
 ALTER TABLE `ims_user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

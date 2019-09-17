@@ -1,11 +1,12 @@
 {
 	"name": "w7/document-api",
 	"type": "project",
-	"description": "基于 Swoole 的常驻内存型 PHP 高性能框架",
+	"description": "基于软擎框架的开源文档系统",
 	"license": "Apache-2.0",
 	"keywords": [
 		"we7",
-		"swoole"
+		"swoole",
+		"rangine"
 	],
 	"homepage": "https://www.rangine.com/",
 	"authors": [
@@ -25,7 +26,8 @@
 		]
 	},
 	"require": {
-		"w7/swoole": "*",
+		"w7/rangine": "*",
+		"ext-json": "*",
 		"gregwar/captcha": "^1.1",
 		"qcloud/cos-sdk-v5": "^1.3"
 	},

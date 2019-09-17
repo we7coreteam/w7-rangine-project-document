@@ -22,6 +22,7 @@ return [
 			'/home/wwwroot/we7/swoole',
 			'/tmp',
 			sys_get_temp_dir(),
+			BASE_PATH,
 			APP_PATH,
 			RUNTIME_PATH,
 			RUNTIME_PATH . DIRECTORY_SEPARATOR . 'logs',
@@ -60,7 +61,7 @@ return [
 			'charset' => 'utf8',
 			'collation' => 'utf8_unicode_ci',
 			'prefix' => 'ims_',
-			'port' =>'3306',
+			'port' =>ienv('DATABASE_DEFAULT_PORT', 3306),
 		],
 	],
 
