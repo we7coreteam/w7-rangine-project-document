@@ -30,25 +30,23 @@ Gitee : https://gitee.com/we7coreteam/document-apiserver.git
 
 # 安装
 
-> [下载文档源码](https://gitee.com/we7coreteam/document-apiserver.git), 放到你的项目目录
+> 首先[下载源码](https://gitee.com/we7coreteam/document-apiserver/releases), 下载完成后上传到你的服务器, 解压并初始化项目
 
 ```
-# 下载项目源码
+# 解压项目
 $ cd work_dir
-$ wget https://gitee.com/we7coreteam/document.zip
-$ unzip document.zip -d ./document
+$ unzip /tmp/document_1.0.1.zip -d ./document
 $ cd document
 
 # 项目初始化
 $ php bin/gerent.php install:init
 
-# 初始化完成后台,项目启动
+# 项目启动
 $ php bin/server.php http start
 ```
 
-访问地址: http://ip:88
+访问地址: http://ip:88/
 
-# 设置域名
 
 
 

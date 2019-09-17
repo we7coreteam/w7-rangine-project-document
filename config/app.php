@@ -61,7 +61,7 @@ return [
 			'charset' => 'utf8',
 			'collation' => 'utf8_unicode_ci',
 			'prefix' => 'ims_',
-			'port' =>'3306',
+			'port' =>ienv('DATABASE_DEFAULT_PORT', 3306),
 		],
 	],
 

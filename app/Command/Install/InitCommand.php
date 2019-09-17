@@ -12,8 +12,6 @@
 
 namespace W7\App\Command\Install;
 
-use Illuminate\Support\Facades\DB;
-use W7\App\Model\Entity\User;
 use W7\App\Model\Logic\UserLogic;
 use W7\Console\Command\CommandAbstract;
 use W7\Core\Exception\CommandException;
@@ -141,7 +139,7 @@ class InitCommand extends CommandAbstract
 	{
 		// 验证规则
 		$validate = [
-			'host' => '/[\w-\.]+/',
+			'host' => '/[\w-\.]{5,64}/',
 			'port' => '/[1-9]\d{0,4}/',
 			'password' => '/\w{6,32}/'
 		];
