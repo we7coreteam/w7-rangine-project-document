@@ -19,10 +19,10 @@ https://gitee.com/we7coreteam/document-apiserver/releases/ 下载最新版的文
 
 #### 初始化系统
 
-解压源码后，进入解压后的源码目录执行以下命令，根据提示完成初始化操作
+解压源码后，进入解压后的源码根目录执行以下命令，根据提示完成初始化操作
 
 ```
-$ php bin/gerent.php install:init
+./vendor/bin/rangine-gerent install:init
 ```
 
 #### 运行系统
@@ -30,7 +30,7 @@ $ php bin/gerent.php install:init
 > 如果您的80端口被其它应用占用，您需要手动修改.env文件中的 SERVER_HTTP_PORT 选项
 
 ```
-$ php bin/server.php http start
+./vendor/bin/rangine-server http start
 ```
 
 
