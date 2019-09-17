@@ -49,6 +49,9 @@ class InitCommand extends CommandAbstract
 	private function generateConfig($config)
 	{
 		$env = file_get_contents(BASE_PATH . '/install/.env.template');
+		// server
+		$env = str_replace('{{SERVER_HTTP_PORT}}', $config['server_port'], $env);
+
 		// db
 		$env = str_replace('{{DATABASE_DEFAULT_DATABASE}}', $config['db_database'], $env);
 		$env = str_replace('{{DATABASE_DEFAULT_HOST}}', $config['db_host'], $env);
@@ -144,6 +147,16 @@ class InitCommand extends CommandAbstract
 			'password' => '/\w{6,32}/'
 		];
 		$install = [
+			'server' => [
+				'option' => '服务',
+				'value' => [
+					'port' => [
+						'name' => '端口',
+						'default' => 80,
+						'validate' => $validate['port']
+					]
+				]
+			],
 			'db' => [
 				'option' => '数据库',
 				'value' => [
