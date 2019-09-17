@@ -24,7 +24,7 @@ class InitCommand extends CommandAbstract
 			// 是否已安装
 			$lockFile = RUNTIME_PATH . '/install.lock';
 			if (file_exists($lockFile)) {
-				throw new CommandException('请不要重复安装');
+				throw new CommandException('文档系统已经安装，如果需要重新安装请手动删除 runtime/install.lock 文件');
 			}
 
 			// 版本检查
