@@ -40,8 +40,9 @@ class InitCommand extends CommandAbstract
 			// 生成lock文件
 			file_put_contents($lockFile, 'success');
 
-			$this->output->success('安装已完成！');
+			$this->output->success('安装已完成！提示：请按照文档配置，启动相关服务');
 		} catch (\Exception $e) {
+			$this->dropDatabase($config);
 			$this->output->error($e->getMessage());
 		}
 	}
@@ -51,7 +52,6 @@ class InitCommand extends CommandAbstract
 		$env = file_get_contents(BASE_PATH . '/install/.env.template');
 		// server
 		$env = str_replace('{{SERVER_HTTP_PORT}}', $config['server_port'], $env);
-
 		// db
 		$env = str_replace('{{DATABASE_DEFAULT_DATABASE}}', $config['db_database'], $env);
 		$env = str_replace('{{DATABASE_DEFAULT_HOST}}', $config['db_host'], $env);
@@ -59,7 +59,6 @@ class InitCommand extends CommandAbstract
 		$env = str_replace('{{DATABASE_DEFAULT_USERNAME}}', $config['db_username'], $env);
 		$env = str_replace('{{DATABASE_DEFAULT_PASSWORD}}', $config['db_password'], $env);
 		$env = str_replace('{{DATABASE_DEFAULT_PREFIX}}', $config['db_prefix'], $env);
-
 		// cache
 		if ($config['cache_driver'] == 'redis') {
 			$env = str_replace('{{CACHE_DRIVER}}', $config['cache_driver'], $env);
@@ -117,6 +116,14 @@ class InitCommand extends CommandAbstract
 		}
 	}
 
+	private function dropDatabase($config)
+	{
+		$connect = new \PDO("mysql:host={$config['db_host']};port={$config['db_port']}", $config['db_username'], $config['db_password']);
+		$sql = "DROP DATABASE IF EXISTS {$config['db_database']};";
+		$connect->exec($sql);
+		$connect = null;
+	}
+
 	/**
 	 * @param $config
 	 * @throws CommandException
@@ -143,7 +150,7 @@ class InitCommand extends CommandAbstract
 
 	private function checkExtension()
 	{
-		$this->output->info("检查PHP扩展: ");
+		$this->output->info('检查PHP扩展: ');
 		$this->output->writeln('');
 
 		if (version_compare(PHP_VERSION, '7.0.0', '<')) {
