@@ -1,55 +1,40 @@
-[![Php Version](https://img.shields.io/badge/php-%3E=7.1-brightgreen.svg)](https://secure.php.net/)
-[![Swoole Version](https://img.shields.io/badge/swoole-%3E=4.3.0-brightgreen.svg)](https://github.com/swoole/swoole-src)
-[![Rangine Framework Version](https://img.shields.io/badge/rangine-%3E=0.0.1-brightgreen.svg)](https://gitee.com/we7coreteam/w7swoole)
-[![Illuminate Database Version](https://img.shields.io/badge/illuminate/database-%3E=5.6.0-brightgreen.svg)](https://github.com/illuminate/database)
-[![Rangine Doc](https://img.shields.io/badge/docs-passing-green.svg?maxAge=2592000)](https://s.we7.cc/index.php?c=wiki&do=view&id=317)
-# w7Swoole
+### 简介
 
-一款基于Swoole高性能应用框架。常驻内存，不依赖传统的 PHP-FPM，全异步非阻塞、协程实现。可以用于构建高性能的Web系统、API、中间件、基础服务等等。
+一款基于软擎框架（[https://www.rangine.com/](https://www.rangine.com/)）的开源Markdown文档系统。
 
-# 代码
+常驻内存，不依赖传统的 Nginx/Apache 和 PHP-FPM，全异步非阻塞、协程实现。
 
-Github : https://github.com/we7coreteam/w7swoole_empty.git
+### 环境要求
 
-Gitee : https://gitee.com/we7coreteam/w7swoole_empty.git
+  * PHP > 7.0.0
+  * PHP Swoole 扩展 >= 4.3.0
+  * PHP Mbstring 扩展
+  * PHP Pdo MySql 扩展
 
-# 安装
+### 安装
 
-composer install 前更改 composer 源，防止报错。
+#### 下载安装包
+
+https://gitee.com/we7coreteam/document-apiserver/releases/ 下载最新版的文档系统源码
+
+#### 初始化系统
+
+解压源码后，进入解压后的源码根目录执行以下命令，根据提示完成初始化操作
 
 ```
-composer config -g repo.packagist composer https://packagist.laravel-china.org
+./vendor/bin/rangine-gerent install:init
+```
 
-git clone https://gitee.com/we7coreteam/w7swoole_empty ./rangine-test
+#### 运行系统
 
-cd rangine-test
+> 如果您的80端口被其它应用占用，您需要手动修改.env文件中的 SERVER_HTTP_PORT 选项
 
-sudo composer install
+```
+./vendor/bin/rangine-server http start
 ```
 
 
-# 文档
 
-https://s.we7.cc/index.php?c=wiki&do=view&id=317
-
-# 功能
-
-- 基于 Swoole 扩展
-- HTTP 服务器 (PSR-7消息)
-- RPC 服务器 *
-- WebSocket 服务器 *
-- MVC 分层设计
-- 中间件 (PSR-15)
-- URL路由 ([FastRoute](https://github.com/nikic/FastRoute))
-- 协程数据库连接(Pdo, Mysql)
-- 数据库连接池
-- ORM 模型 ([Laravel Database](https://laravel-china.org/docs/laravel/5.5/eloquent/1332))
-- DB查询门面  ([Laravel Database](https://laravel-china.org/docs/laravel/5.5/queries/1327))
-- 日志系统 ([MonoLog](https://github.com/Seldaek/monolog))
-- 协程、异步任务投递
-- 类 Crontab 计划任务
-- 异步任务
-- 自定义事件侦听
 
 
 

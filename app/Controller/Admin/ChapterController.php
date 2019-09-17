@@ -145,7 +145,7 @@ class ChapterController extends Controller
 			]);
 			$id = $request->input('chapter_id');
 			$content = $request->input('content', '');
-			$layout = $request->input('layout', '');
+			$layout = $request->input('layout');
 			$res = $this->logic->saveContent($id, $content, $layout, $request->document_user_auth);
 			if ($res){
 				$res['layout'] = $layout;
