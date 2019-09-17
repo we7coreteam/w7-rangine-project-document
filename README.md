@@ -19,7 +19,7 @@ https://gitee.com/we7coreteam/document-apiserver/releases/ 下载最新版的文
 
 #### 初始化系统
 
-解压源码后，进入目录执行以下，按照提示完成初始化操作
+解压源码后，进入解压后的源码目录执行以下命令，根据提示完成初始化操作
 
 ```
 $ php bin/gerent.php install:init
