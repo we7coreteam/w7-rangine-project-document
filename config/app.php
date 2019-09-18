@@ -17,7 +17,7 @@ return [
 		//SETTING_DEVELOPMENT = RELEASE|CLEAR_LOG
 		'env' => ienv('SETTING_DEVELOPMENT', RELEASE),
 		//最新版可用
-		'error_level' => E_ALL ^ E_NOTICE,
+		'error_reporting' => E_ALL ^ E_NOTICE ^ E_USER_DEPRECATED,
 		'basedir' => [
 			'/home/wwwroot/we7/swoole',
 			'/tmp',
