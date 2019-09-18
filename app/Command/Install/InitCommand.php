@@ -42,7 +42,6 @@ class InitCommand extends CommandAbstract
 
 			$this->output->success('安装已完成！提示：请按照文档配置，启动相关服务');
 		} catch (\Exception $e) {
-			$this->dropDatabase($config);
 			$this->output->error($e->getMessage());
 		}
 	}
@@ -116,14 +115,6 @@ class InitCommand extends CommandAbstract
 		}
 	}
 
-	private function dropDatabase($config)
-	{
-		$connect = new \PDO("mysql:host={$config['db_host']};port={$config['db_port']}", $config['db_username'], $config['db_password']);
-		$sql = "DROP DATABASE IF EXISTS {$config['db_database']};";
-		$connect->exec($sql);
-		$connect = null;
-	}
-
 	/**
 	 * @param $config
 	 * @throws CommandException
@@ -168,11 +159,13 @@ class InitCommand extends CommandAbstract
 			throw new CommandException('swoole 版本必须>= 4.2.3');
 		}
 
-		$file = BASE_PATH . '/install.txt';
-		if (file_put_contents($file, '') === false) {
+		if (is_writable(BASE_PATH) === false) {
 			throw new CommandException('请检查' . BASE_PATH . '目录权限！');
 		}
-		unlink($file);
+
+		if (is_writable(RUNTIME_PATH) === false) {
+			throw new CommandException('请检查' . RUNTIME_PATH . '目录权限！');
+		}
 
 		$this->output->success('PHP扩展已检查完毕！');
 		$this->segmentation();
