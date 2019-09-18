@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主机： db
--- 生成日期： 2019-09-17 01:19:14
+-- 生成日期： 2019-09-18 08:48:38
 -- 服务器版本： 8.0.16
 -- PHP 版本： 7.2.19
 
@@ -33,6 +33,17 @@ CREATE TABLE `ims_cache` (
   `key` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `value` text COLLATE utf8mb4_general_ci,
   `expired_at` int(11) DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- 表的结构 `ims_cdn`
+--
+
+CREATE TABLE `ims_cdn` (
+  `key` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '值'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -124,6 +135,12 @@ ALTER TABLE `ims_cache`
   ADD UNIQUE KEY `unique` (`key`) USING BTREE;
 
 --
+-- 表的索引 `ims_cdn`
+--
+ALTER TABLE `ims_cdn`
+  ADD PRIMARY KEY (`key`);
+
+--
 -- 表的索引 `ims_document`
 --
 ALTER TABLE `ims_document`
@@ -178,6 +195,12 @@ ALTER TABLE `ims_document`
 -- 使用表AUTO_INCREMENT `ims_document_chapter`
 --
 ALTER TABLE `ims_document_chapter`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- 使用表AUTO_INCREMENT `ims_document_chapter_content`
+--
+ALTER TABLE `ims_document_chapter_content`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --

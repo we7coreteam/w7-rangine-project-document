@@ -86,7 +86,7 @@ class InitCommand extends CommandAbstract
 		try {
 			$connect = new \PDO("mysql:host={$config['db_host']};port={$config['db_port']}", $config['db_username'], $config['db_password']);
 			$connect->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-			$sql = "CREATE DATABASE IF NOT EXISTS {$config['db_database']} DEFAULT CHARSET utf8 COLLATE utf8_unicode_ci;";
+			$sql = "CREATE DATABASE IF NOT EXISTS {$config['db_database']} DEFAULT CHARSET utf8 COLLATE utf8mb4_general_ci;";
 			$connect->exec($sql);
 			$statement = $connect->query("SHOW DATABASES LIKE '{$config['db_database']}';");
 			if (empty($statement->fetch())) {
