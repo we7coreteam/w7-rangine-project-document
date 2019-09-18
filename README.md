@@ -23,7 +23,7 @@ https://gitee.com/we7coreteam/document-apiserver/releases/ 下载最新版的文
 
 进入文档系统源码目录，```cd /home/wwwroot/w7-document```
 
-#### 初始化系统
+#### 安装系统
 
 执行以下命令，根据提示完成文档安装
 
