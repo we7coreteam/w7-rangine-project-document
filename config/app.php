@@ -17,7 +17,7 @@ return [
 		//SETTING_DEVELOPMENT = RELEASE|CLEAR_LOG
 		'env' => ienv('SETTING_DEVELOPMENT', RELEASE),
 		//最新版可用
-		'error_level' => E_ALL ^ E_NOTICE,
+		'error_reporting' => E_ALL ^ E_NOTICE ^ E_USER_DEPRECATED,
 		'basedir' => [
 			'/home/wwwroot/we7/swoole',
 			'/tmp',
@@ -28,7 +28,7 @@ return [
 			RUNTIME_PATH . DIRECTORY_SEPARATOR . 'logs',
 			RUNTIME_PATH . DIRECTORY_SEPARATOR . 'task',
 			RUNTIME_PATH . DIRECTORY_SEPARATOR . 'upload',
-			BASE_PATH  . DIRECTORY_SEPARATOR . 'vendor',
+			BASE_PATH  . DIRECTORY_SEPARATOR . 'vendor'
 		]
 	],
 	'crontab' => [
@@ -40,7 +40,6 @@ return [
 		'debug' => ienv('SETTING_RELOAD_DEBUG', false), //开启后，将不监控文件变化，重复reload，方便调试
 	],
 
-	'cache_driver' => ienv('CACHE_DRIVER', 'redis'),
 	'cache' => [
 		'default' => [
 			'driver' => ienv('CACHE_DEFAULT_DRIVER', 'redis'),
@@ -64,8 +63,13 @@ return [
 			'port' =>ienv('DATABASE_DEFAULT_PORT', 3306),
 		],
 	],
-
-	'session' => [
+	'view' => [
+		//框架下个版本优化
+		'template_path' => [
+			'public' => BASE_PATH . '/public'
+		]
+	],
+	'cookie' => [
 		'path' => ienv('SESSION_PATH', '/'),
 		'http_only' => ienv('SESSION_HTTP_ONLY', false),
 		'domain' => ienv('SESSION_DOMAIN', ''),
