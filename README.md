@@ -17,9 +17,15 @@
 
 https://gitee.com/we7coreteam/document-apiserver/releases/ 下载最新版的文档系统源码
 
+#### 解压文件
+
+下载源码后，解压到服务器目录（如：/home/wwwroot）
+
+进入文档系统源码目录，```cd /home/wwwroot/w7-document```
+
 #### 初始化系统
 
-解压源码后，进入解压后的源码根目录执行以下命令，根据提示完成初始化操作
+执行以下命令，根据提示完成初始化操作
 
 ```
 ./vendor/bin/rangine-gerent install:init
