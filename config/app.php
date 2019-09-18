@@ -59,7 +59,7 @@ return [
 			'password' => ienv('DATABASE_DEFAULT_PASSWORD', 'root'),
 			'charset' => 'utf8',
 			'collation' => 'utf8_unicode_ci',
-			'prefix' => 'ims_',
+			'prefix' => ienv('DATABASE_DEFAULT_PREFIX', 'ims_'),
 			'port' =>ienv('DATABASE_DEFAULT_PORT', 3306),
 		],
 	],
