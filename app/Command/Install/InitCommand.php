@@ -217,7 +217,7 @@ class InitCommand extends CommandAbstract
 					],
 					'prefix' => [
 						'name' => '表前缀',
-						'default' => 'imi_',
+						'default' => 'ims_',
 						'validate' => '/[a-z][a-z_]{1,20}/'
 					],
 					'username' => [
