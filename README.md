@@ -25,7 +25,7 @@ https://gitee.com/we7coreteam/document-apiserver/releases/ 下载最新版的文
 
 #### 初始化系统
 
-执行以下命令，根据提示完成初始化操作
+执行以下命令，根据提示完成文档安装
 
 ```
 ./vendor/bin/rangine-gerent install:init
@@ -33,7 +33,7 @@ https://gitee.com/we7coreteam/document-apiserver/releases/ 下载最新版的文
 
 #### 运行系统
 
-> 如果您的80端口被其它应用占用，您需要手动修改.env文件中的 SERVER_HTTP_PORT 选项
+> 如果您的80端口被其他应用占用，您需要手动修改.env文件中的 SERVER_HTTP_PORT 选项
 
 ```
 ./vendor/bin/rangine-server http start
