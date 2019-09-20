@@ -15,7 +15,7 @@ namespace W7\App\Command\Install;
 use W7\Console\Command\CommandAbstract;
 use W7\Core\Exception\CommandException;
 
-class SyncdataCommand extends CommandAbstract
+class SyncDataCommand extends CommandAbstract
 {
 	protected function handle($options)
 	{
