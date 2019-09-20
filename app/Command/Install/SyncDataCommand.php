@@ -15,7 +15,7 @@ namespace W7\App\Command\Install;
 use W7\Console\Command\CommandAbstract;
 use W7\Core\Exception\CommandException;
 
-class SyncdataCommand extends CommandAbstract
+class SyncDataCommand extends CommandAbstract
 {
 	protected function handle($options)
 	{
@@ -140,12 +140,14 @@ class SyncdataCommand extends CommandAbstract
 				} elseif ($table == 'ims_members') {
 					$i = 0;
 					foreach ($data as $k => $v) {
-						$sql .= 'INSERT INTO ims_user (id, username, is_ban) VALUES( ';
-						$sql .= " '".$v['id']."', '".$v['username']."','".$v['is_ban']."' ); ".PHP_EOL;
+						if ($v['username'] != 'admin') {
+							$sql .= 'INSERT INTO ims_user (id, username, is_ban) VALUES( ';
+							$sql .= " '".$v['id']."', '".$v['username']."','".$v['is_ban']."' ); ".PHP_EOL;
 
-						$res = $this->setContent($i, count($data), $sql, $handle);
-						if ($res) {
-							$sql = '';
+							$res = $this->setContent($i, count($data), $sql, $handle);
+							if ($res) {
+								$sql = '';
+							}
 						}
 						$i++;
 					}
