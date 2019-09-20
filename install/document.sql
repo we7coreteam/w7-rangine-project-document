@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主机： db
--- 生成日期： 2019-09-18 08:48:38
+-- 生成日期： 2019-09-20 11:03:33
 -- 服务器版本： 8.0.16
 -- PHP 版本： 7.2.19
 
@@ -31,19 +31,8 @@ SET time_zone = "+00:00";
 CREATE TABLE `ims_cache` (
   `id` int(11) NOT NULL,
   `key` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `value` text COLLATE utf8mb4_general_ci,
+  `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   `expired_at` int(11) DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- 表的结构 `ims_cdn`
---
-
-CREATE TABLE `ims_cdn` (
-  `key` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '值'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -109,6 +98,18 @@ CREATE TABLE `ims_permission_document` (
 -- --------------------------------------------------------
 
 --
+-- 表的结构 `ims_setting`
+--
+
+CREATE TABLE `ims_setting` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `key` varchar(60) COLLATE utf8mb4_general_ci NOT NULL,
+  `value` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- 表的结构 `ims_user`
 --
 
@@ -126,19 +127,6 @@ CREATE TABLE `ims_user` (
 --
 -- 转储表的索引
 --
-
---
--- 表的索引 `ims_cache`
---
-ALTER TABLE `ims_cache`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `unique` (`key`) USING BTREE;
-
---
--- 表的索引 `ims_cdn`
---
-ALTER TABLE `ims_cdn`
-  ADD PRIMARY KEY (`key`);
 
 --
 -- 表的索引 `ims_document`
@@ -165,8 +153,14 @@ ALTER TABLE `ims_document_chapter_content`
 -- 表的索引 `ims_permission_document`
 --
 ALTER TABLE `ims_permission_document`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- 表的索引 `ims_setting`
+--
+ALTER TABLE `ims_setting`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `uniqid_idx` (`user_id`,`document_id`);
+  ADD KEY `key` (`key`);
 
 --
 -- 表的索引 `ims_user`
@@ -178,12 +172,6 @@ ALTER TABLE `ims_user`
 --
 -- 在导出的表使用AUTO_INCREMENT
 --
-
---
--- 使用表AUTO_INCREMENT `ims_cache`
---
-ALTER TABLE `ims_cache`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- 使用表AUTO_INCREMENT `ims_document`
@@ -207,6 +195,12 @@ ALTER TABLE `ims_document_chapter_content`
 -- 使用表AUTO_INCREMENT `ims_permission_document`
 --
 ALTER TABLE `ims_permission_document`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- 使用表AUTO_INCREMENT `ims_setting`
+--
+ALTER TABLE `ims_setting`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
