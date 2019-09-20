@@ -104,7 +104,7 @@ class SyncdataCommand extends CommandAbstract
 					$i = 0;
 					foreach ($data as $k => $v) {
 						$sql .= 'INSERT INTO ims_document (id, name, description,creator_id,created_at,updated_at,is_show) VALUES( ';
-						$sql .= " '".$v['id']."', '".$v['name']."', '".$v['description']."', '".$v['creator_id']."', '".$v['created_at']."','".$v['updated_at']."', '".$v['is_show']."' );";
+						$sql .= " '".$v['id']."', '".$v['name']."', '".$v['description']."', '".$v['creator_id']."', '".$v['created_at']."','".$v['updated_at']."', '".$v['is_show']."' );".PHP_EOL;
 
 						$res = $this->setContent($i, count($data), $sql, $handle);
 						if ($res) {
@@ -116,7 +116,7 @@ class SyncdataCommand extends CommandAbstract
 					$i = 0;
 					foreach ($data as $k => $v) {
 						$sql .= 'INSERT INTO ims_document_chapter (id, parent_id, name,document_id,sort,levels,created_at,updated_at) VALUES( ';
-						$sql .= " '".$v['id']."', '".$v['parent_id']."', '".$v['name']."', '".$v['document_id']."', '".$v['sort']."', '".$v['levels']."', '".$v['created_at']."', '".$v['updated_at']."' ); ";
+						$sql .= " '".$v['id']."', '".$v['parent_id']."', '".$v['name']."', '".$v['document_id']."', '".$v['sort']."', '".$v['levels']."', '".$v['created_at']."', '".$v['updated_at']."' ); ".PHP_EOL;
 
 						$res = $this->setContent($i, count($data), $sql, $handle);
 						if ($res) {
@@ -131,7 +131,7 @@ class SyncdataCommand extends CommandAbstract
 						$content = htmlspecialchars_decode(html_entity_decode($v['content']));
 						$content = str_replace('&#039;', "'", $content);
 						$content = addslashes($content);
-						$sql .= " '".$v['id']."', '".$v['chapter_id']."', '".$content."', '".$v['layout']."' ); ";
+						$sql .= " '".$v['id']."', '".$v['chapter_id']."', '".$content."', '".$v['layout']."' ); ".PHP_EOL;
 						$res = $this->setContent($i, count($data), $sql, $handle);
 						if ($res) {
 							$sql = '';
@@ -142,7 +142,7 @@ class SyncdataCommand extends CommandAbstract
 					$i = 0;
 					foreach ($data as $k => $v) {
 						$sql .= 'INSERT INTO ims_user (id, username, is_ban) VALUES( ';
-						$sql .= " '".$v['id']."', '".$v['username']."','".$v['is_ban']."' ); ";
+						$sql .= " '".$v['id']."', '".$v['username']."','".$v['is_ban']."' ); ".PHP_EOL;
 
 						$res = $this->setContent($i, count($data), $sql, $handle);
 						if ($res) {
@@ -271,12 +271,13 @@ class SyncdataCommand extends CommandAbstract
 
 	private function checkDatabase($database)
 	{
-		if (isset($database['host']) && $database['host']) {
-			$pat = "/^(((1?\d{1,2})|(2[0-4]\d)|(25[0-5]))\.){3}((1?\d{1,2})|(2[0-4]\d)|(25[0-5])):[0-9]{2,6}$/";
-			if (!preg_match($pat, $database['host'])) {
-				throw new CommandException('host填写错误');
-			}
-		}
+//		if (isset($database['host']) && $database['host']) {
+//			$pat = "/^(((1?\d{1,2})|(2[0-4]\d)|(25[0-5]))\.){3}((1?\d{1,2})|(2[0-4]\d)|(25[0-5])):[0-9]{2,6}$/";
+//			$pat2 = "/[\w][\w-]*\.(?:com\.cn|com|cn|co|net|org|gov|cc|biz|info)(\/|$)/isU";
+//			if (!preg_match($pat, $database['host']) && !preg_match($pat2, $database['host'])) {
+//				throw new CommandException('host填写错误');
+//			}
+//		}
 		if (!isset($database['username']) || !$database['username']) {
 			throw new CommandException('username不能为空');
 		}
