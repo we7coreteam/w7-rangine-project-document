@@ -13,7 +13,7 @@
 namespace W7\App\Model\Service;
 
 use Qcloud\Cos\Client;
-use W7\App\Model\Entity\Cdn;
+use W7\App\Model\Entity\Setting;
 use W7\Core\Database\LogicAbstract;
 use W7\Core\Helper\Traiter\InstanceTraiter;
 
@@ -74,20 +74,20 @@ class qCloudCos
 
 	public function __construct()
 	{
-		$cdn = Cdn::query()->where('key','cdn')->first();
-		$cdnValue = json_decode($cdn['value'],true);
+		$setting = Setting::query()->where('key','cloud_cosv5')->first();
+		$settingValue = json_decode($setting['value'],true);
 
-		if (empty($cdnValue)) {
-			throw new \RuntimeException('CDN is empty');
+		if (empty($settingValue)) {
+			throw new \RuntimeException('cloud_cosv5 is empty');
 		}
 
-		$this->secretId = $cdnValue['CDN_QCLOUD_COSV5_SECRET_ID'];
-		$this->secretKey = $cdnValue['CDN_QCLOUD_COSV5_SECRET_KEY'];
-		$this->bucket = sprintf('%s-%s', $cdnValue['CDN_QCLOUD_COSV5_BUCKET'], $cdnValue['CDN_QCLOUD_COSV5_APP_ID']);
-		$this->rootUrl = $cdnValue['CDN_QCLOUD_COSV5_CDN'];
+		$this->secretId = $settingValue['secret_id'];
+		$this->secretKey = $settingValue['secret_key'];
+		$this->bucket = sprintf('%s-%s', $settingValue['bucket'], $settingValue['app_id']);
+		$this->rootUrl = $settingValue['cdn'];
 
 		if (empty($this->secretKey) || empty($this->secretId)) {
-			throw new \RuntimeException('Invalid cos config');
+			throw new \RuntimeException('Invalid cloud_cosv5 config');
 		}
 
 		if (!empty($this->bucket)) {

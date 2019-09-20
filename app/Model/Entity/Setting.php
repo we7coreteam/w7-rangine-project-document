@@ -12,9 +12,9 @@
 
 namespace W7\App\Model\Entity;
 
-class Cdn extends BaseModel
+class Setting extends BaseModel
 {
 	public $timestamps = false;
-	protected $table = 'cdn';
+	protected $table = 'setting';
 	protected $primaryKey = 'key';
 }

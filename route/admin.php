@@ -48,6 +48,6 @@ irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'
 	$route->post('/document/delete', 'Admin\DocumentController@delete');
 	$route->post('/document/search', 'Admin\DocumentController@search');
 
-	$route->post('/cdn/index', 'Admin\CdnController@index');
-	$route->post('/cdn/save', 'Admin\CdnController@save');
+	$route->post('/setting/show', 'Admin\SettingController@show');
+	$route->post('/setting/save', 'Admin\SettingController@save');
 });

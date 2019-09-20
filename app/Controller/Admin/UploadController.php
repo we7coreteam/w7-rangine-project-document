@@ -38,7 +38,7 @@ class UploadController extends Controller
 				return ['success' => 0,'message' => '图片尺寸不得超过2M'];
 			}
 
-			$baseName = md5(time().str_random(10).uniqid());
+			$baseName = md5(time().irandom(1000,9999).uniqid());
 			$fileName = $baseName.'.'.explode('/', $file['type'])[1];
 			$cdn = new CdnLogic();
 			$url = $cdn->uploadFile('dc/'.$fileName, $file['tmp_name']);
