@@ -34,9 +34,6 @@ class InitCommand extends CommandAbstract
 			$config = $this->installConfig();
 			$this->generateConfig($config);
 
-			// 测试Redis连接是否正常
-			$this->checkConnectRedis($config);
-
 			// 初始化数据库
 			$this->initDatabase($config);
 
@@ -62,12 +59,14 @@ class InitCommand extends CommandAbstract
 		$env = str_replace('{{DATABASE_DEFAULT_PASSWORD}}', $config['db_password'], $env);
 		$env = str_replace('{{DATABASE_DEFAULT_PREFIX}}', $config['db_prefix'], $env);
 		// cache
-		$env = str_replace('{{CACHE_DEFAULT_HOST}}', $config['cache_host'], $env);
-		$env = str_replace('{{CACHE_DEFAULT_PORT}}', $config['cache_port'], $env);
-		if ($config['cache_password']) {
-			$env = str_replace('{{CACHE_DEFAULT_PASSWORD}}', $config['cache_password'], $env);
+		if ($config['cache_driver'] == 'redis') {
+			$env = str_replace('{{CACHE_DRIVER}}', $config['cache_driver'], $env);
+			$env = str_replace('{{CACHE_DEFAULT_HOST}}', $config['cache_host'], $env);
+			$env = str_replace('{{CACHE_DEFAULT_PORT}}', $config['cache_port'], $env);
 		} else {
-			$env = preg_replace('/CACHE_DEFAULT_PASSWORD[\s\S]+?}}/', '', $env);
+			$env = str_replace('{{CACHE_DRIVER}}', $config['cache_driver'], $env);
+			$env = preg_replace('/CACHE_DEFAULT_HOST[\s\S]+?}}/', '', $env);
+			$env = preg_replace('/CACHE_DEFAULT_PORT[\s\S]+?}}/', '', $env);
 		}
 
 		if (file_put_contents(BASE_PATH . '/.env', $env) === false) {
@@ -149,7 +148,7 @@ class InitCommand extends CommandAbstract
 			throw new CommandException('PHP 版本必须>= 7.0.0');
 		}
 
-		$extension = ['pdo_mysql', 'mbstring', 'swoole', 'redis'];
+		$extension = ['pdo_mysql', 'mbstring', 'swoole'];
 		foreach ($extension as $ext) {
 			if (!extension_loaded($ext)) {
 				throw new CommandException($ext . ' 扩展未安装');
@@ -170,15 +169,6 @@ class InitCommand extends CommandAbstract
 
 		$this->output->success('PHP扩展已检查完毕！');
 		$this->segmentation();
-	}
-
-	private function checkConnectRedis($config) {
-		try {
-			$redis = new \Redis();
-			$connect = $redis->connect($config['cache_host'], $config['cache_port']);
-		} catch (\Exception $e) {
-			throw new CommandException('Redis 连接失败');
-		}
 	}
 
 	private function installConfig()
@@ -237,8 +227,13 @@ class InitCommand extends CommandAbstract
 				]
 			],
 			'cache' => [
-				'option' => '缓存(redis)',
+				'option' => '缓存',
 				'value' => [
+					'driver' => [
+						'name' => '驱动, 只支持[database,redis]',
+						'default' => 'database', // database, redis
+						'validate' => '/(database|redis)/'
+					],
 					'host' => [
 						'name' => '地址',
 						'default' => '127.0.0.1',
@@ -248,10 +243,6 @@ class InitCommand extends CommandAbstract
 						'name' => '端口',
 						'default' => 6379,
 						'validate' => $validate['port']
-					],
-					'password' => [
-						'name' => '密码, 无密码可直接回车',
-						'default' => '',
 					],
 				]
 			],
@@ -295,8 +286,13 @@ class InitCommand extends CommandAbstract
 					$config[$configKey] = $this->output->ask("请输入{$value['option']}{$item['name']}", $item['default']);
 				}
 
+				// 如果缓存不使用redis,直接跳过
+				if ($option == 'cache' && $config[$configKey] == 'database') {
+					break;
+				}
+
 				// 数据验证
-				$reg = '';
+				$reg = '/\w+/';
 				if (isset($item['validate']) && $item['validate']) {
 					$reg = $item['validate'];
 				}
@@ -305,7 +301,7 @@ class InitCommand extends CommandAbstract
 						throw new CommandException('两次输入的密码不一样！');
 					}
 				} else {
-					if ($reg && !preg_match($reg, $config[$configKey])) {
+					if (!preg_match($reg, $config[$configKey])) {
 						throw new CommandException("{$value['option']}{$item['name']}格式不正确！");
 					}
 				}
