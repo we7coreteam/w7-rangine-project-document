@@ -20,20 +20,19 @@ class SyncDataCommand extends CommandAbstract
 	protected function handle($options)
 	{
 		try {
-//			获取文档数据 (旧文档数据库配置)
 			$get = [
-				'host' => '192.168.11.114:33069',
-				'username' => 'root',
-				'password' => 'root',
-				'database' => 'we7_wiki',
+				'host' => ienv('DATABASE_ADDONS_HOST'),
+				'username' => ienv('DATABASE_ADDONS_USERNAME'),
+				'password' => ienv('DATABASE_ADDONS_PASSWORD'),
+				'database' => ienv('DATABASE_ADDONS_DATABASE'),
 			];
 
 //			获取用户 (商城数据库配置)
 			$userDataBase = [
-				'host' => '192.168.11.200:3306',
-				'username' => 'root',
-				'password' => '123456',
-				'database' => 'we7_license',
+				'host' => ienv('DATABASE_ADDONS_HOST'),
+				'username' => ienv('DATABASE_ADDONS_USERNAME'),
+				'password' => ienv('DATABASE_ADDONS_PASSWORD'),
+				'database' => ienv('DATABASE_ADDONS_DATABASE'),
 			];
 
 //			要获取数据的所有表名称
