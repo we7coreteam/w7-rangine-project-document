@@ -38,7 +38,7 @@ class ChapterLogic extends BaseLogic
 		}
 		$res = $chapter = Chapter::create($data);
 		if ($res && icache()->has(DOCUMENT_INFO.$data['document_id'])) {
-			icache()->delete(DOCUMENT_INFO.$data['document_id']);
+			icache()->del(DOCUMENT_INFO.$data['document_id']);
 		}
 		ChangeChapterEvent::instance()->attach('chapter', $chapter)->dispatch();
 		return $chapter;
@@ -53,7 +53,7 @@ class ChapterLogic extends BaseLogic
 			$chapter->sort = $data['sort'];
 			$res = $chapter->save();
 			if ($res && icache()->has(DOCUMENT_INFO.$chapter['document_id'])) {
-				icache()->delete(DOCUMENT_INFO.$chapter['document_id']);
+				icache()->del(DOCUMENT_INFO.$chapter['document_id']);
 			}
 			ChangeChapterEvent::instance()->attach('chapter', $chapter)->dispatch();
 			return $chapter;
@@ -225,7 +225,7 @@ class ChapterLogic extends BaseLogic
 			ChangeChapterEvent::instance()->attach('chapter', $chapter)->dispatch();
 			if ($resChapter) {
 				if ($resChapter && icache()->has(DOCUMENT_INFO.$chapter['document_id'])) {
-					icache()->delete(DOCUMENT_INFO.$chapter['document_id']);
+					icache()->del(DOCUMENT_INFO.$chapter['document_id']);
 				}
 				return $chapter;
 			} else {
@@ -308,7 +308,7 @@ class ChapterLogic extends BaseLogic
 			$chapter->delete();
 		}
 		if ($chapters && icache()->has(DOCUMENT_INFO.$document_id)) {
-			icache()->delete(DOCUMENT_INFO.$document_id);
+			icache()->del(DOCUMENT_INFO.$document_id);
 		}
 		return true;
 	}
