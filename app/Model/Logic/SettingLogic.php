@@ -37,7 +37,7 @@ class SettingLogic extends BaseLogic
 		return $this->handleData($key,$res);
 	}
 
-	public function handleData($key,$data)
+	private function handleData($key,$data)
 	{
 		if ($data && isset($data['value'])) {
 			return ['key'=>$key,'value'=>json_decode($data['value'], true)];

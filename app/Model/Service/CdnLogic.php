@@ -14,6 +14,7 @@ namespace W7\App\Model\Service;
 
 use Qcloud\Cos\Client;
 use W7\App\Model\Entity\Setting;
+use W7\App\Model\Logic\SettingLogic;
 use W7\Core\Database\LogicAbstract;
 use W7\Core\Helper\Traiter\InstanceTraiter;
 
@@ -74,12 +75,13 @@ class qCloudCos
 
 	public function __construct()
 	{
-		$setting = Setting::query()->where('key','cloud_cosv5')->first();
-		$settingValue = json_decode($setting['value'],true);
+		$settingLogic = new SettingLogic();
+		$settingValue = $settingLogic->show('cloud_cosv5');
 
-		if (empty($settingValue)) {
+		if (empty($settingValue) && !isset($settingValue['value'])) {
 			throw new \RuntimeException('cloud_cosv5 is empty');
 		}
+		$settingValue = $settingValue['value'];
 
 		$this->secretId = $settingValue['secret_id'];
 		$this->secretKey = $settingValue['secret_key'];
