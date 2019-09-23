@@ -65,10 +65,10 @@ class DbHandler extends HandlerAbstract
 			return -1;
 		}
 
-		$value = Cache::query()->where('key', $key)->first();
+		$value = $this->getValue($key);
 		if ($value) {
-			$this->getValue = $value;
 			if ($value['expired_at'] >= time()) {
+				$this->getValue = $value;
 				return 1;
 			} else {
 				$this->delete($key);
@@ -154,10 +154,7 @@ class DbHandler extends HandlerAbstract
 	}
 
 	private function getValue($key) {
-		$result = Cache::query()->where('key', $key)->first();
-		if ($result) {
-			$this->getValue = $result;
-		}
+		return Cache::query()->where('key', $key)->first();
 	}
 
 	private function getTtl($ttl): int {
