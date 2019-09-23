@@ -18,11 +18,11 @@ use W7\Core\Cache\Handler\HandlerAbstract;
 class DbHandler extends HandlerAbstract
 {
 	private $getValue = null;
+	private $time = 9999999999;
 
 	public static function getHandler($config): HandlerAbstract
 	{
-		//改为获取数据库实例
-		return idb();
+		return new static();
 	}
 
 	public function set($key, $value, $ttl = null)
@@ -31,12 +31,10 @@ class DbHandler extends HandlerAbstract
 			return false;
 		}
 
-		$ttl = $this->getTtl($ttl);
-
 		$cache = new Cache();
 		$cache->key = $key;
-		$cache->value = $this->serialize($value);
-		$cache->expired_at = time() + $ttl;
+		$cache->value = $value;
+		$cache->expired_at = $this->getTtl($ttl);
 		$result = $cache->save();
 		if ($result) {
 			return true;
@@ -54,7 +52,7 @@ class DbHandler extends HandlerAbstract
 			if ($this->getValue === false || $this->getValue === null) {
 				return $default;
 			}
-			return $this->unserialize($this->getValue);
+			return $this->getValue;
 		}
 		return $default;
 	}
@@ -62,37 +60,30 @@ class DbHandler extends HandlerAbstract
 	public function has($key)
 	{
 		if (!$key) {
-			return -1;
+			return false;
 		}
 
 		$value = $this->getValue($key);
 		if ($value) {
-			if ($value['expired_at'] >= time()) {
+			if ($value['expired_at'] == $this->time || $value['expired_at'] >= time()) {
 				$this->getValue = $value;
 				return 1;
 			} else {
 				$this->delete($key);
 			}
 		}
-		return -1;
+		return false;
 	}
 
 	public function setMultiple($values, $ttl = null)
 	{
-		//设置多个缓存
-		/*
-		[
-			'key' => 'value',
-			'key1' => 'value1'
-		]
-		*/
-		if (is_array($values)) {
-			$ttl = $this->getTtl($ttl);
+		if ($values) {
 			idb()->beginTransaction();
 			foreach ($values as $key => $val) {
-				$result = $this->set($key, $val, time() + $ttl);
+				$result = $this->set($key, $val, $this->getTtl($ttl));
 				if ($result === false) {
 					idb()->rollBack();
+					return false;
 				}
 			}
 			idb()->commit();
@@ -103,16 +94,8 @@ class DbHandler extends HandlerAbstract
 
 	public function getMultiple($keys, $default = null)
 	{
-		//获取多个缓存
-		//返回的数据格式为
-		/*
-		[
-			'value',
-			'value1'
-		]
-		*/
 		$values = [];
-		if (is_array($keys)) {
+		if ($keys) {
 			foreach ($keys as $key => $val) {
 				$values[] = $this->get($val);
 			}
@@ -134,12 +117,13 @@ class DbHandler extends HandlerAbstract
 
 	public function deleteMultiple($keys)
 	{
-		if (is_array($keys)) {
+		if ($keys) {
 			idb()->beginTransaction();
 			foreach ($keys as $key => $val) {
 				$result = $this->delete($val);
 				if ($result === false) {
 					idb()->rollBack();
+					return false;
 				}
 			}
 			idb()->commit();
@@ -154,18 +138,12 @@ class DbHandler extends HandlerAbstract
 	}
 
 	private function getValue($key) {
-		return Cache::query()->where('key', $key)->first();
+		$result = Cache::query()->where('key', $key)->first();
+		var_dump($result);
+		return $result;
 	}
 
 	private function getTtl($ttl): int {
-		return ($ttl === null) ? 0 : (int)$ttl;
-	}
-
-	private function unserialize($data) {
-		return is_numeric($data) ? $data : unserialize($data);
-	}
-
-	private function serialize($data) {
-		return is_numeric($data) ? $data : serialize($data);
+		return ($ttl === null) ? $this->time : time() + (int)$ttl;
 	}
 }
