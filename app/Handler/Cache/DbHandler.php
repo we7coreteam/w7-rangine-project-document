@@ -18,7 +18,7 @@ use W7\Core\Cache\Handler\HandlerAbstract;
 class DbHandler extends HandlerAbstract
 {
 	private $getValue = null;
-	private $time = 9999999999;
+	private $time = 999999999;
 
 	public static function getHandler($config): HandlerAbstract
 	{
@@ -32,10 +32,15 @@ class DbHandler extends HandlerAbstract
 		}
 
 		$cache = new Cache();
-		$cache->key = $key;
-		$cache->value = $value;
-		$cache->expired_at = $this->getTtl($ttl);
-		$result = $cache->save();
+
+		if ($this->has($key)) {
+			$result = $cache->update(['value'=>$this->getValue , 'expired_at' => $this->getTtl($ttl)]);
+		} else {
+			$cache->key = $key;
+			$cache->value = $value;
+			$cache->expired_at = $this->getTtl($ttl);
+			$result = $cache->save();
+		}
 		if ($result) {
 			return true;
 		}
@@ -48,7 +53,7 @@ class DbHandler extends HandlerAbstract
 			return false;
 		}
 
-		if ($this->has($key) == 1) {
+		if ($this->has($key) === true) {
 			if ($this->getValue === false || $this->getValue === null) {
 				return $default;
 			}
@@ -66,8 +71,8 @@ class DbHandler extends HandlerAbstract
 		$value = $this->getValue($key);
 		if ($value) {
 			if ($value['expired_at'] == $this->time || $value['expired_at'] >= time()) {
-				$this->getValue = $value;
-				return 1;
+				$this->getValue = $value['value'];
+				return true;
 			} else {
 				$this->delete($key);
 			}
@@ -80,7 +85,7 @@ class DbHandler extends HandlerAbstract
 		if ($values) {
 			idb()->beginTransaction();
 			foreach ($values as $key => $val) {
-				$result = $this->set($key, $val, $this->getTtl($ttl));
+				$result = $this->set($key, $val, $ttl);
 				if ($result === false) {
 					idb()->rollBack();
 					return false;
@@ -105,14 +110,7 @@ class DbHandler extends HandlerAbstract
 
 	public function delete($key)
 	{
-		if (!$key) {
-			return true;
-		}
-
-		if ($this->has($key) == 1) {
-			return Cache::query()->where('key', $key)->delete();
-		}
-		return false;
+		return Cache::query()->where('key', $key)->delete();
 	}
 
 	public function deleteMultiple($keys)
@@ -138,12 +136,10 @@ class DbHandler extends HandlerAbstract
 	}
 
 	private function getValue($key) {
-		$result = Cache::query()->where('key', $key)->first();
-		var_dump($result);
-		return $result;
+		return Cache::query()->where('key', $key)->first();
 	}
 
 	private function getTtl($ttl): int {
-		return ($ttl === null) ? $this->time : time() + (int)$ttl;
+		return ($ttl === null) ? $this->time : (time() + (int)$ttl);
 	}
 }
