@@ -17,7 +17,7 @@ use W7\Core\Cache\Handler\HandlerAbstract;
 
 class DbHandler extends HandlerAbstract
 {
-	private $getValue = '';
+	private $getValue = null;
 
 	public static function getHandler($config): HandlerAbstract
 	{
