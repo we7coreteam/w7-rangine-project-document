@@ -17,6 +17,8 @@ use W7\Core\Cache\Handler\HandlerAbstract;
 
 class DbHandler extends HandlerAbstract
 {
+	private $getValue = '';
+
 	public static function getHandler($config): HandlerAbstract
 	{
 		//改为获取数据库实例
@@ -49,11 +51,10 @@ class DbHandler extends HandlerAbstract
 		}
 
 		if ($this->has($key) == 1) {
-			$result = Cache::query()->where('key', $key)->first();
-			if ($result === false || $result === null) {
+			if ($this->getValue === false || $this->getValue === null) {
 				return $default;
 			}
-			return $this->unserialize($result);
+			return $this->unserialize($this->getValue);
 		}
 		return $default;
 	}
@@ -66,6 +67,7 @@ class DbHandler extends HandlerAbstract
 
 		$value = Cache::query()->where('key', $key)->first();
 		if ($value) {
+			$this->getValue = $value;
 			if ($value['expired_at'] >= time()) {
 				return 1;
 			} else {
@@ -151,15 +153,22 @@ class DbHandler extends HandlerAbstract
 		return Cache::query()->delete();
 	}
 
+	private function getValue($key) {
+		$result = Cache::query()->where('key', $key)->first();
+		if ($result) {
+			$this->getValue = $result;
+		}
+	}
+
 	private function getTtl($ttl): int {
 		return ($ttl === null) ? 0 : (int)$ttl;
 	}
 
-	protected function unserialize($data) {
+	private function unserialize($data) {
 		return is_numeric($data) ? $data : unserialize($data);
 	}
 
-	protected function serialize($data) {
+	private function serialize($data) {
 		return is_numeric($data) ? $data : serialize($data);
 	}
 }
