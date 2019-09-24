@@ -18,7 +18,7 @@ use W7\Core\Cache\Handler\HandlerAbstract;
 class DbHandler extends HandlerAbstract
 {
 	private $getValue = null;
-	private $time = 999999999;
+	private $time = 0;
 
 	public static function getHandler($config): HandlerAbstract
 	{
@@ -31,15 +31,10 @@ class DbHandler extends HandlerAbstract
 			return false;
 		}
 
-		$cache = new Cache();
-
 		if ($this->has($key)) {
-			$result = $cache->update(['value'=>$this->getValue , 'expired_at' => $this->getTtl($ttl)]);
+			$result = Cache::query()->where('key', $key)->update(['value'=>$value , 'expired_at' => $this->getTtl($ttl)]);
 		} else {
-			$cache->key = $key;
-			$cache->value = $value;
-			$cache->expired_at = $this->getTtl($ttl);
-			$result = $cache->save();
+			$result = Cache::query()->insert(['key'=>$key,'value'=>$value , 'expired_at' => $this->getTtl($ttl)]);
 		}
 		if ($result) {
 			return true;
@@ -135,11 +130,13 @@ class DbHandler extends HandlerAbstract
 		return Cache::query()->delete();
 	}
 
-	private function getValue($key) {
+	private function getValue($key)
+	{
 		return Cache::query()->where('key', $key)->first();
 	}
 
-	private function getTtl($ttl): int {
+	private function getTtl($ttl): int
+	{
 		return ($ttl === null) ? $this->time : (time() + (int)$ttl);
 	}
 }
