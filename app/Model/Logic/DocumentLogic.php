@@ -33,13 +33,14 @@ class DocumentLogic extends BaseLogic
 
 	public function getDocUserList($id, $userId)
 	{
+		$res = '';
 		$document = Document::find($id);
 		if (!$document) {
-			return false;
+			return $res;
 		}
 		$documentUsers = PermissionDocument::where('document_id', $id)->pluck('user_id')->toArray();
 		if (!$documentUsers) {
-			return true;
+			return $res;
 		}
 		$res = User::select('id', 'username', 'has_privilege')->find($documentUsers);
 		if ($res) {
@@ -88,6 +89,7 @@ class DocumentLogic extends BaseLogic
 
 	public function del($id)
 	{
+		idb()->beginTransaction();
 		$res = Document::destroy($id);
 		if ($res) {
 			$chapter = new ChapterLogic();
@@ -103,14 +105,14 @@ class DocumentLogic extends BaseLogic
 	public function relation($userId, $documentId)
 	{
 		$user = new UserLogic();
-		$user = $user->getUser(['id'=>trim($userId)]);
+		$user = $user->getUser(['id'=>$userId]);
 		if ($user['has_privilege'] == 1) {
 			return true;
 		}
-		$document = $this->getdetails($documentId, '', '');
 		if (!$user) {
 			return '用户不存在';
 		}
+		$document = $this->getdetails($documentId, '', '');
 		if (!$document) {
 			return '文档不存在';
 		}

@@ -40,10 +40,10 @@ class UserAuthorizationController extends Controller
 
 			$document = Document::find($document_id);
 			if (!$document) {
-				return $this->error('该文档不存在');
+				throw new \Exception('该文档不存在!');
 			}
 			if ($request->document_user_auth !== APP_AUTH_ALL && $document->creator_id != $request->document_user_id) {
-				return $this->error('无权邀请');
+				throw new \Exception('无权邀请!');
 			}
 
 			$result = $this->logic->inviteUser($user_id, $document_id);

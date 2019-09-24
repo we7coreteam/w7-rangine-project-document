@@ -27,10 +27,11 @@ class ChapterLogic extends BaseLogic
 			$data['levels'] = 1;
 		} else {
 			$parent = Chapter::find($data['parent_id']);
-			$this->documentAuth($parent['document_id'], $auth);
 			if (!$parent) {
 				throw new \Exception('父章节不存在');
 			}
+			$this->documentAuth($parent['document_id'], $auth);
+
 			$data['levels'] = $parent->levels + 1;
 			if ($data['levels'] > 3) {
 				throw new \Exception('章节最大层级为３层！');
@@ -47,8 +48,9 @@ class ChapterLogic extends BaseLogic
 	public function updateChapter($id, $data)
 	{
 		$chapter = Chapter::find($id);
-		$this->documentAuth($chapter['document_id'], $data['auth']);
 		if ($chapter) {
+			$this->documentAuth($chapter['document_id'], $data['auth']);
+
 			$chapter->name = $data['name'];
 			$chapter->sort = $data['sort'];
 			$res = $chapter->save();
@@ -220,6 +222,7 @@ class ChapterLogic extends BaseLogic
 		$chapter = Chapter::find($id);
 		if ($chapter) {
 			$this->documentAuth($chapter['document_id'], $auth);
+			idb()->beginTransaction();
 			$resChapter = $chapter->delete();
 			ChapterContent::destroy($id);
 			ChangeChapterEvent::instance()->attach('chapter', $chapter)->dispatch();
@@ -227,8 +230,10 @@ class ChapterLogic extends BaseLogic
 				if ($resChapter && icache()->has(DOCUMENT_INFO.$chapter['document_id'])) {
 					icache()->delete(DOCUMENT_INFO.$chapter['document_id']);
 				}
+				idb()->commit();
 				return $chapter;
 			} else {
+				idb()->rollBack();
 				return false;
 			}
 		}
@@ -242,7 +247,6 @@ class ChapterLogic extends BaseLogic
 			throw new \Exception('该章节不存在，请刷新页面');
 		}
 		$this->documentAuth($documentInfo['document_id'], $auth);
-		$documents = Document::find($documentInfo['document_id']);
 		$chapterContent = ChapterContent::find($id);
 		if ($chapterContent) {
 			$chapterContent->content = $content;
@@ -258,6 +262,7 @@ class ChapterLogic extends BaseLogic
 				return false;
 			}
 		}
+		$documents = Document::find($documentInfo['document_id']);
 		$username = User::where('id', $documents['creator_id'])->value('username');
 		$chapterContent['created_at'] = $documentInfo['created_at'];
 		$chapterContent['updated_at'] = $documentInfo['updated_at'];

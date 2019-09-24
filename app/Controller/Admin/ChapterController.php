@@ -34,7 +34,7 @@ class ChapterController extends Controller
 
 			$auth = $request->document_user_auth;
 
-			$result = $this->logic->getChapters($id,$auth);
+			$result = $this->logic->getChapters($id, $auth);
 
 			return $this->success($result);
 		} catch (\Exception $e) {
@@ -65,7 +65,7 @@ class ChapterController extends Controller
 			$data['document_id'] = $request->input('document_id');
 			$data['parent_id'] = $request->input('parent_id');
 
-			$result = $this->logic->createChapter($data,$request->document_user_auth);
+			$result = $this->logic->createChapter($data, $request->document_user_auth);
 			if ($result) {
 				return $this->success($result);
 			}
@@ -118,13 +118,10 @@ class ChapterController extends Controller
 		$id = $request->input('id');
 
 		try {
-			idb()->beginTransaction();
 			$res = $this->logic->deleteChapter($id, $request->document_user_auth);
 			if ($res) {
-				idb()->commit();
 				return $this->success();
 			} else {
-				idb()->rollBack();
 				return $this->error();
 			}
 		} catch (\Exception $e) {
@@ -144,10 +141,10 @@ class ChapterController extends Controller
 				'layout' => '文档布局必填',
 			]);
 			$id = $request->input('chapter_id');
-			$content = $request->input('content', '');
+			$content = $request->input('content');
 			$layout = $request->input('layout');
 			$res = $this->logic->saveContent($id, $content, $layout, $request->document_user_auth);
-			if ($res){
+			if ($res) {
 				$res['layout'] = $layout;
 				return $this->success($res);
 			}

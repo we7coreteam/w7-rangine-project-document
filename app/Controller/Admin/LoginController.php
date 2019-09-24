@@ -12,7 +12,7 @@
 
 namespace W7\App\Controller\Admin;
 
-use W7\App\Model\Logic\LoginLongic;
+use W7\App\Model\Logic\LoginLogic;
 use W7\Http\Message\Server\Request;
 
 class LoginController extends Controller
@@ -37,8 +37,8 @@ class LoginController extends Controller
 				return $this->error('请输入正确的验证码');
 			}
 
-			$this->login = new LoginLongic();
-			$res = $this->login->check(trim($request->input('username')),trim($request->input('userpass')));
+			$this->login = new LoginLogic();
+			$res = $this->login->check(trim($request->input('username')), trim($request->input('userpass')));
 			if ($res && $res['code'] == 1) {
 				$request->session->set('user_id', $res['id']);
 				return $this->success();

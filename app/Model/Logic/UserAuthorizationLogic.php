@@ -43,14 +43,11 @@ class UserAuthorizationLogic extends BaseLogic
 			return $cacheAuth;
 		}
 		$user = User::find($user_id);
-		if ($user) {
-			if ($user->has_privilege) {
-				icache()->set('auth_'.$user_id, APP_AUTH_ALL, 24*3600);
-				return APP_AUTH_ALL;
-			}
-		} else {
-			return [];
+		if ($user->has_privilege) {
+			icache()->set('auth_'.$user_id, APP_AUTH_ALL, 24*3600);
+			return APP_AUTH_ALL;
 		}
+
 		$auth = PermissionDocument::where('user_id', $user_id)->pluck('document_id')->toArray();
 		icache()->set('auth_'.$user_id, $auth, 24*3600);
 		return $auth;
