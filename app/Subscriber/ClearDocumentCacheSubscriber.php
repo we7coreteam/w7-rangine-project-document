@@ -16,6 +16,6 @@ class ClearDocumentCacheSubscriber extends Subscriber
 {
 	public function run($event)
 	{
-		icache()->del('document_'.$event->id);
+		icache()->channel('db')->delete('document_'.$event->id);
 	}
 }

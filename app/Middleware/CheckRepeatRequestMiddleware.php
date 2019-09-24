@@ -22,10 +22,10 @@ class CheckRepeatRequestMiddleware extends MiddlewareAbstract
 {
 	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
 	{
-		if (icache()->get('repeat_'.$request->document_user_id)) {
+		if (icache()->channel('db')->get('repeat_'.$request->document_user_id)) {
 			return App::getApp()->getContext()->getResponse()->json(['message' => '重复请求，请稍后再试', 'data' => null, 'status' => false, 'code' => 444]);
 		}
-		icache()->set('repeat_'.$request->document_user_id, 1, 2);
+		icache()->channel('db')->set('repeat_'.$request->document_user_id, 1, 2);
 		return $handler->handle($request);
 	}
 }

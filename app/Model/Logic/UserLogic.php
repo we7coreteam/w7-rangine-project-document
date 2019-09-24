@@ -116,4 +116,25 @@ class UserLogic extends BaseLogic
 	{
 		return md5(md5($username.$userpass));
 	}
+
+	public function checkUserpass($userpass, $confirm_userpass)
+	{
+		if ($userpass != $confirm_userpass) {
+			throw new \Exception('两次密码不一致');
+		}
+	}
+
+	public function checkUsername($id, $postId)
+	{
+		if ($id != $postId) {
+			throw new \Exception('用户名已经存在');
+		}
+	}
+
+	public function userAuth($auth)
+	{
+		if ($auth != 'all') {
+			throw new \Exception('只有管理员才可以操作用户');
+		}
+	}
 }

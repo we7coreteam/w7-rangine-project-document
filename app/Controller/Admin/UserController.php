@@ -48,9 +48,8 @@ class UserController extends Controller
 	public function addUser(Request $request)
 	{
 		try {
-			if ($request->document_user_auth != 'all') {
-				return $this->error('只有管理员才可以操作用户');
-			}
+			$this->logic->userAuth($request->document_user_auth);
+
 			$this->validate($request, [
 				'username' => 'required',
 				'userpass' => 'required',
@@ -81,9 +80,8 @@ class UserController extends Controller
 	public function detailsUser(Request $request)
 	{
 		try {
-			if ($request->document_user_auth != 'all') {
-				return $this->error('只有管理员才可以操作用户');
-			}
+			$this->logic->userAuth($request->document_user_auth);
+
 			$this->validate($request, [
 				'id' => 'required'
 			], [
@@ -103,9 +101,8 @@ class UserController extends Controller
 	public function updateUser(Request $request)
 	{
 		try {
-			if ($request->document_user_auth != 'all') {
-				return $this->error('只有管理员才可以操作用户');
-			}
+			$this->logic->userAuth($request->document_user_auth);
+
 			$this->validate($request, [
 				'id' => 'required',
 				'username' => 'required',
@@ -123,13 +120,13 @@ class UserController extends Controller
 			$username = trim($request->input('username'));
 			$userpass = trim($request->input('userpass'));
 			$confirm_userpass = trim($request->input('confirm_userpass'));
-			if ($userpass != $confirm_userpass) {
-				return $this->error('两次密码不一致');
-			}
+
+			$this->logic->checkUserpass($userpass, $confirm_userpass);
 
 			$userinfos = $this->logic->getUser(['username'=>$username]);
-			if ($userinfos && $userinfos['id'] != intval($request->input('id'))) {
-				return $this->error('用户名已经存在');
+
+			if ($userinfos) {
+				$this->logic->checkUsername($userinfos['id'], intval($request->input('id')));
 			}
 
 			$data = [];
@@ -158,9 +155,8 @@ class UserController extends Controller
 	public function deleteUser(Request $request)
 	{
 		try {
-			if ($request->document_user_auth != 'all') {
-				return $this->error('只有管理员才可以操作用户');
-			}
+			$this->logic->userAuth($request->document_user_auth);
+
 			$this->validate($request, [
 				'ids' => 'required'
 			], [

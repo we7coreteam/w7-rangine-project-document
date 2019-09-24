@@ -16,7 +16,7 @@ class ClearAuthCacheSubscriber extends Subscriber
 {
 	public function run($event)
 	{
-		icache()->del('auth_'.$event->user_id);
-		icache()->del('document_users_'.$event->document_id);
+		icache()->channel('db')->delete('auth_'.$event->user_id);
+		icache()->channel('db')->delete('document_users_'.$event->document_id);
 	}
 }

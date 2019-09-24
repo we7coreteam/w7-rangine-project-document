@@ -49,6 +49,9 @@ return [
 			'password' => ienv('CACHE_DEFAULT_PASSWORD', ''),
 			'database' => ienv('CACHE_DEFAULT_DATABASE', '0'),
 		],
+		'db' => [
+			'driver' => ienv('CACHE_DEFAULT_DRIVER','db')
+		]
 	],
 	'database' => [
 		'default' => [
