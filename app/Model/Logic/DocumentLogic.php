@@ -134,7 +134,9 @@ class DocumentLogic extends BaseLogic
 			}
 
 			if (isset($val['username']) && $val['username']) {
-				$val['username'] = $val['username']['username'];
+				if (is_array($val['username'])) {
+					$val['username'] = $val['username']['username'];
+				}
 			}
 
 			if (isset($val['has_privilege']) && $val['has_privilege'] == 1) {
