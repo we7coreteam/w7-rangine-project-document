@@ -141,8 +141,8 @@ class SyncDataCommand extends CommandAbstract
 					$i = 0;
 					foreach ($data as $k => $v) {
 						if ($v['username'] != 'admin') {
-							$sql .= 'INSERT INTO ims_user (id, username, is_ban) VALUES( ';
-							$sql .= " '".$v['id']."', '".$v['username']."','".$v['is_ban']."' ); ".PHP_EOL;
+							$sql .= 'INSERT INTO ims_user (id, username, is_ban, created_at, updated_at) VALUES( ';
+							$sql .= " '".$v['id']."', '".$v['username']."','".$v['is_ban']."',".$v['created_at'].",".$v['updated_at']."); ".PHP_EOL;
 
 							$res = $this->setContent($i, count($data), $sql, $handle);
 							if ($res) {
@@ -190,7 +190,7 @@ class SyncDataCommand extends CommandAbstract
 		} elseif ($table == 'ims_wiki_view') {
 			$sql = "select id,listid,content from $table ";
 		} elseif ($table == 'ims_members') {
-			$sql = "select uid,username,password,status from $table ";
+			$sql = "select uid,username,password,status,joindate from $table ";
 		}
 
 		$retval = mysqli_query($conn, $sql);
@@ -254,6 +254,8 @@ class SyncDataCommand extends CommandAbstract
 				$tmp_data[$k]['id'] = $v['uid'];
 				$tmp_data[$k]['username'] = $v['username'];
 				$tmp_data[$k]['is_ban'] = $v['status'];
+				$tmp_data[$k]['created_at'] = $v['joindate'];
+				$tmp_data[$k]['updated_at'] = $v['joindate'];
 			}
 		}
 		return $tmp_data;
