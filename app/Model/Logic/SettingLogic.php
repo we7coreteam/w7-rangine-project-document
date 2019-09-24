@@ -27,10 +27,8 @@ class SettingLogic extends BaseLogic
 		$data = json_encode($data);
 		$res = Setting::query()->where('key', $key)->first();
 		if ($res) {
-			$res = Setting::query()->update(['key' => $key,'value' => $data]);
-			if ($res) {
-				$res = ['value' => $data];
-			}
+			Setting::query()->where('key',$key)->update(['value' => $data]);
+			$res = ['value' => $data];
 		} else {
 			$res = Setting::query()->create(['key' => $key,'value' => $data]);
 		}

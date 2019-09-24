@@ -40,8 +40,9 @@ class UploadController extends Controller
 
 			$baseName = md5(time().irandom(1000,9999).uniqid());
 			$fileName = $baseName.'.'.explode('/', $file['type'])[1];
+
 			$cdn = new CdnLogic();
-			$url = $cdn->uploadFile('dc/'.$fileName, $file['tmp_name']);
+			$url = $cdn->uploadFile('dc/'.$fileName, $file['tmp_file']);
 
 			return ['state' => 'SUCCESS' ,'success' => 1,'message' => '上传成功','url'=>$url];
 		} catch (\Exception $e) {
