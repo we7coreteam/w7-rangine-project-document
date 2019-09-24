@@ -37,8 +37,8 @@ class ChapterLogic extends BaseLogic
 			}
 		}
 		$res = $chapter = Chapter::create($data);
-		if ($res && icache()->channel('db')->has(DOCUMENT_INFO.$data['document_id'])) {
-			icache()->channel('db')->delete(DOCUMENT_INFO.$data['document_id']);
+		if ($res && icache()->has(DOCUMENT_INFO.$data['document_id'])) {
+			icache()->delete(DOCUMENT_INFO.$data['document_id']);
 		}
 		ChangeChapterEvent::instance()->attach('chapter', $chapter)->dispatch();
 		return $chapter;
@@ -52,8 +52,8 @@ class ChapterLogic extends BaseLogic
 			$chapter->name = $data['name'];
 			$chapter->sort = $data['sort'];
 			$res = $chapter->save();
-			if ($res && icache()->channel('db')->has(DOCUMENT_INFO.$chapter['document_id'])) {
-				icache()->channel('db')->delete(DOCUMENT_INFO.$chapter['document_id']);
+			if ($res && icache()->has(DOCUMENT_INFO.$chapter['document_id'])) {
+				icache()->delete(DOCUMENT_INFO.$chapter['document_id']);
 			}
 			ChangeChapterEvent::instance()->attach('chapter', $chapter)->dispatch();
 			return $chapter;
@@ -77,8 +77,8 @@ class ChapterLogic extends BaseLogic
 
 	public function getChapters($id, $auth)
 	{
-		if (icache()->channel('db')->has(DOCUMENT_INFO.$id)) {
-			return icache()->channel('db')->get(DOCUMENT_INFO.$id);
+		if (icache()->has(DOCUMENT_INFO.$id)) {
+			return icache()->get(DOCUMENT_INFO.$id);
 		}
 		$this->documentAuth($id, $auth);
 		$roots = Chapter::select('id', 'name', 'sort')->where('document_id', $id)->where('parent_id', 0)->orderBy('sort', 'asc')->get()->toArray();
@@ -87,7 +87,7 @@ class ChapterLogic extends BaseLogic
 				$roots[$k]['children'] = [];
 			}
 			$this->getChild($roots);
-			icache()->channel('db')->set(DOCUMENT_INFO.$id, $roots, DOCUMENT_INFO_CACHE_TIME);
+			icache()->set(DOCUMENT_INFO.$id, $roots, DOCUMENT_INFO_CACHE_TIME);
 		}
 		return $roots;
 	}
@@ -224,8 +224,8 @@ class ChapterLogic extends BaseLogic
 			ChapterContent::destroy($id);
 			ChangeChapterEvent::instance()->attach('chapter', $chapter)->dispatch();
 			if ($resChapter) {
-				if ($resChapter && icache()->channel('db')->has(DOCUMENT_INFO.$chapter['document_id'])) {
-					icache()->channel('db')->delete(DOCUMENT_INFO.$chapter['document_id']);
+				if ($resChapter && icache()->has(DOCUMENT_INFO.$chapter['document_id'])) {
+					icache()->delete(DOCUMENT_INFO.$chapter['document_id']);
 				}
 				return $chapter;
 			} else {
@@ -307,8 +307,8 @@ class ChapterLogic extends BaseLogic
 			ChapterContent::where('chapter_id', $chapter->id)->delete();
 			$chapter->delete();
 		}
-		if ($chapters && icache()->channel('db')->has(DOCUMENT_INFO.$document_id)) {
-			icache()->channel('db')->delete(DOCUMENT_INFO.$document_id);
+		if ($chapters && icache()->has(DOCUMENT_INFO.$document_id)) {
+			icache()->delete(DOCUMENT_INFO.$document_id);
 		}
 		return true;
 	}
