@@ -87,6 +87,7 @@ class qCloudCos
 		$this->secretKey = $settingValue['secret_key'];
 		$this->bucket = sprintf('%s-%s', $settingValue['bucket'], $settingValue['app_id']);
 		$this->rootUrl = $settingValue['cdn'];
+		$this->region = $settingValue['region'];
 
 		if (empty($this->secretKey) || empty($this->secretId)) {
 			throw new \RuntimeException('Invalid cloud_cosv5 config');
