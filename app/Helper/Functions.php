@@ -15,7 +15,4 @@ use W7\App;
 /**
  * 公共函数，已加载
  */
-function cache()
-{
-	return App\Model\Service\Cache\CacheManager::getStore();
-}
+
