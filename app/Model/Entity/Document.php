@@ -26,8 +26,8 @@ class Document extends BaseModel
 		return date('Y-m-d H:i:s', $value);
 	}
 
-	public function username()
+	public function user()
 	{
-		return $this->hasOne(User::class,'id','creator_id');
+		return $this->hasOne(User::class, 'id', 'creator_id');
 	}
 }

@@ -24,9 +24,9 @@ class DocumentLogic extends BaseLogic
 	public function getlist($documents, $userId, $page, $name)
 	{
 		if ($documents == 'all') {
-			$res = Document::query()->where('name', 'like', '%'.$name.'%')->with('username')->orderBy('updated_at', 'desc')->get()->toArray();
+			$res = Document::query()->where('name', 'like', '%'.$name.'%')->with('user')->orderBy('updated_at', 'desc')->get()->toArray();
 		} else {
-			$res = Document::query()->where('name', 'like', '%'.$name.'%')->with('name')->orderBy('updated_at', 'desc')->find($documents)->toArray();
+			$res = Document::query()->where('name', 'like', '%'.$name.'%')->with('user')->orderBy('updated_at', 'desc')->find($documents)->toArray();
 		}
 		return $this->paging($this->handleDocumentRes($res, $userId), 15, $page);
 	}
@@ -135,11 +135,12 @@ class DocumentLogic extends BaseLogic
 				$val['is_show_name'] = '隐藏';
 			}
 
-			if (isset($val['username']) && $val['username']) {
-				if (is_array($val['username'])) {
-					$val['username'] = $val['username']['username'];
-				}
+			if (isset($val['user']) && $val['user'] && is_array($val['user'])) {
+				$val['username'] = $val['user']['username'];
+			} else {
+				$val['username'] = '';
 			}
+			unset($val['user']);
 
 			if (isset($val['has_privilege']) && $val['has_privilege'] == 1) {
 				$val['has_creator'] = 1;
