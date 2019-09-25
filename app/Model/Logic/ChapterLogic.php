@@ -12,6 +12,7 @@
 
 namespace W7\App\Model\Logic;
 
+use W7\App;
 use W7\App\Event\ChangeChapterEvent;
 use W7\App\Event\ChangeDocumentEvent;
 use W7\App\Model\Entity\Document;
@@ -77,8 +78,10 @@ class ChapterLogic extends BaseLogic
 		throw new \Exception('该文档不存在');
 	}
 
-	public function getChapters($id, $auth)
+	public function getChapters($id)
 	{
+		$request = App::getApp()->getContext()->getRequest();
+		$auth = $request->document_user_auth;
 		if (icache()->has(DOCUMENT_INFO.$id)) {
 			return icache()->get(DOCUMENT_INFO.$id);
 		}
