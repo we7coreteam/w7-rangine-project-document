@@ -23,7 +23,6 @@ if (!function_exists('auth')) {
 		 * App::getApp()->getContext()->setRequest($request);
 		 */
 		$auth = App::getApp()->getContext()->getRequest()->document_user_auth;
-		var_dump($auth);
 		if (APP_AUTH_ALL != $auth && !in_array($documentId, $auth)) {
 			throw new \Exception('无权操作');
 		}
