@@ -323,7 +323,7 @@ class ChapterLogic extends BaseLogic
 	{
 		$request = App::getApp()->getContext()->getRequest();
 		$auth = $request->document_user_auth;
-		if (APP_AUTH_ALL !== $auth && !in_array($documentId, $auth)) {
+		if ($auth != null && is_array($auth) && APP_AUTH_ALL !== $auth && !in_array($documentId, $auth)) {
 			throw new \Exception('无权操作');
 		}
 	}
