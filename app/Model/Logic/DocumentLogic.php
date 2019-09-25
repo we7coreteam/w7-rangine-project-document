@@ -137,8 +137,6 @@ class DocumentLogic extends BaseLogic
 
 			if (isset($val['user']) && $val['user'] && is_array($val['user'])) {
 				$val['username'] = $val['user']['username'];
-			} else {
-				$val['username'] = '';
 			}
 			unset($val['user']);
 
