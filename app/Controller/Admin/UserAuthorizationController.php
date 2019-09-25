@@ -37,15 +37,6 @@ class UserAuthorizationController extends Controller
 			]);
 			$user_id = $request->input('user_id');
 			$document_id = $request->input('document_id');
-
-			$document = Document::find($document_id);
-			if (!$document) {
-				throw new \Exception('该文档不存在!');
-			}
-			if ($request->document_user_auth !== APP_AUTH_ALL && $document->creator_id != $request->document_user_id) {
-				throw new \Exception('无权邀请!');
-			}
-
 			$result = $this->logic->inviteUser($user_id, $document_id);
 
 			return $this->success($result, '邀请成功');
@@ -68,19 +59,6 @@ class UserAuthorizationController extends Controller
 			]);
 			$document_id = $request->input('document_id');
 			$user_id = $request->input('user_id');
-
-			$document = Document::find($document_id);
-			if (!$document) {
-				return $this->error('该文档不存在');
-			}
-			if ($request->document_user_auth !== APP_AUTH_ALL && $document->creator_id != $request->document_user_id) {
-				return $this->error('无权删除');
-			}
-
-			if ($document->creator_id == $user_id) {
-				return $this->error('创建者无法离开文档');
-			}
-
 			$this->logic->leaveDocument($user_id, $document_id);
 
 			return $this->success([], '从文档中删除用户成功');

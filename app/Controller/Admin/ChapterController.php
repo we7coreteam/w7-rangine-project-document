@@ -31,10 +31,7 @@ class ChapterController extends Controller
 				'document_id.required' => '文档ID必传',
 			]);
 			$id = (int)$request->input('document_id');
-
-			$auth = $request->document_user_auth;
-
-			$result = $this->logic->getChapters($id, $auth);
+			$result = $this->logic->getChapters($id);
 
 			return $this->success($result);
 		} catch (\Exception $e) {
