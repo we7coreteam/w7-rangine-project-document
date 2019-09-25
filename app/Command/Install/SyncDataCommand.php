@@ -110,6 +110,9 @@ class SyncDataCommand extends CommandAbstract
 						$sql .= 'INSERT INTO ims_document (id, name, description,creator_id,created_at,updated_at,is_show) VALUES( ';
 						$sql .= " '".$v['id']."', '".$v['name']."', '".$v['description']."', '".$v['creator_id']."', '".$v['created_at']."','".$v['updated_at']."', '".$v['is_show']."' );".PHP_EOL;
 
+						$sql .= 'INSERT INTO ims_permission_document (id, user_id, document_id,created_at,updated_at) VALUES( ';
+						$sql .= " '".$v['id']."', '".$v['creator_id']."', '".$v['id']."', '".$v['created_at']."', '".$v['updated_at']."' );".PHP_EOL;
+
 						$res = $this->setContent($i, count($data), $sql, $handle);
 						if ($res) {
 							$sql = '';
