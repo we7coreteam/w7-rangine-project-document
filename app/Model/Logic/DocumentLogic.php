@@ -41,6 +41,7 @@ class DocumentLogic extends BaseLogic
 		$userId = $request->document_user_id;
 		$res = '';
 		$document = Document::find($id);
+
 		if (!$document) {
 			return $res;
 		}
@@ -155,7 +156,10 @@ class DocumentLogic extends BaseLogic
 				$val['has_creator_name'] = '管理员';
 			} else {
 				if ($userId) {
-					if ($val['creator_id'] == $userId) {
+					if ($userId == 1) {
+						$val['has_creator'] = 1;
+						$val['has_creator_name'] = '管理员';
+					} elseif ($val['creator_id'] == $userId) {
 						$val['has_creator'] = 2;
 						$val['has_creator_name'] = '创建者';
 					} else {
