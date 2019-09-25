@@ -230,9 +230,9 @@ class InitCommand extends CommandAbstract
 				'option' => '缓存',
 				'value' => [
 					'driver' => [
-						'name' => '驱动, 只支持[database,redis]',
-						'default' => 'database', // database, redis
-						'validate' => '/(database|redis)/'
+						'name' => '驱动, 只支持[db,redis]',
+						'default' => 'db', // db, redis
+						'validate' => '/(db|redis)/'
 					],
 					'host' => [
 						'name' => '地址',
