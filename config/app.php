@@ -35,11 +35,6 @@ return [
 		'enabled' => false,
 		'interval' => 10,
 	],
-	'reload' => [
-		'interval' => ienv('SETTING_RELOAD_INTERVAL', 5), //重复检测的间隔时长
-		'debug' => ienv('SETTING_RELOAD_DEBUG', false), //开启后，将不监控文件变化，重复reload，方便调试
-	],
-
 	'cache' => [
 		'default' => [
 			'driver' => ienv('CACHE_DEFAULT_DRIVER', 'redis'),
@@ -64,7 +59,6 @@ return [
 		],
 	],
 	'view' => [
-		//框架下个版本优化
 		'template_path' => [
 			'public' => BASE_PATH . '/public'
 		]
@@ -86,8 +80,8 @@ return [
 		],
 		'cache' => [
 			'redis' => [
-				'enable' => false,
-				'max' => 20,
+				'enable' => true,
+				'max' => 1000,
 			],
 		]
 	],
