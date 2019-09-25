@@ -22,7 +22,7 @@ use W7\App\Model\Entity\User;
 
 class ChapterLogic extends BaseLogic
 {
-	public function createChapter($data, $auth)
+	public function createChapter($data)
 	{
 		if ($data['parent_id'] == 0) {
 			$data['levels'] = 1;
@@ -31,7 +31,7 @@ class ChapterLogic extends BaseLogic
 			if (!$parent) {
 				throw new \Exception('父章节不存在');
 			}
-			$this->documentAuth($parent['document_id'], $auth);
+			$this->documentAuth($parent['document_id']);
 
 			$data['levels'] = $parent->levels + 1;
 			if ($data['levels'] > 3) {
@@ -50,7 +50,7 @@ class ChapterLogic extends BaseLogic
 	{
 		$chapter = Chapter::find($id);
 		if ($chapter) {
-			$this->documentAuth($chapter['document_id'], $data['auth']);
+			$this->documentAuth($chapter['document_id']);
 
 			$chapter->name = $data['name'];
 			$chapter->sort = $data['sort'];
@@ -80,12 +80,10 @@ class ChapterLogic extends BaseLogic
 
 	public function getChapters($id)
 	{
-		$request = App::getApp()->getContext()->getRequest();
-		$auth = $request->document_user_auth;
 		if (icache()->has(DOCUMENT_INFO.$id)) {
 			return icache()->get(DOCUMENT_INFO.$id);
 		}
-		$this->documentAuth($id, $auth);
+		$this->documentAuth($id);
 		$roots = Chapter::select('id', 'name', 'sort')->where('document_id', $id)->where('parent_id', 0)->orderBy('sort', 'asc')->get()->toArray();
 		if ($roots) {
 			foreach ($roots as $k=>$v) {
@@ -217,14 +215,14 @@ class ChapterLogic extends BaseLogic
 		return $path;
 	}
 
-	public function deleteChapter($id, $auth)
+	public function deleteChapter($id)
 	{
 		if (Chapter::where('parent_id', $id)->count() > 0) {
 			throw new \Exception('该章节下有子章节，不可删除！');
 		}
 		$chapter = Chapter::find($id);
 		if ($chapter) {
-			$this->documentAuth($chapter['document_id'], $auth);
+			$this->documentAuth($chapter['document_id']);
 			idb()->beginTransaction();
 			$resChapter = $chapter->delete();
 			ChapterContent::destroy($id);
@@ -243,13 +241,13 @@ class ChapterLogic extends BaseLogic
 		throw new \Exception('该章节不存在，请刷新页面');
 	}
 
-	public function saveContent($id, $content, $layout, $auth)
+	public function saveContent($id, $content, $layout)
 	{
 		$documentInfo = Chapter::find($id);
 		if (!$documentInfo['document_id']) {
 			throw new \Exception('该章节不存在，请刷新页面');
 		}
-		$this->documentAuth($documentInfo['document_id'], $auth);
+		$this->documentAuth($documentInfo['document_id']);
 		$chapterContent = ChapterContent::find($id);
 		if ($chapterContent) {
 			$chapterContent->content = $content;
@@ -273,13 +271,13 @@ class ChapterLogic extends BaseLogic
 		return $chapterContent;
 	}
 
-	public function getContent($id, $auth)
+	public function getContent($id)
 	{
 		$documentinfo = Chapter::where('id', $id)->first();
 		if (!$documentinfo || !$documentinfo['document_id']) {
 			throw new \Exception('该章节不存在，请刷新页面');
 		}
-		$this->documentAuth($documentinfo['document_id'], $auth);
+		$this->documentAuth($documentinfo['document_id']);
 		$chapter = ChapterContent::find($id);
 		if (!$chapter) {
 			return $chapter;
@@ -321,8 +319,10 @@ class ChapterLogic extends BaseLogic
 		return true;
 	}
 
-	public function documentAuth($documentId, $auth)
+	public function documentAuth($documentId)
 	{
+		$request = App::getApp()->getContext()->getRequest();
+		$auth = $request->document_user_auth;
 		if (APP_AUTH_ALL !== $auth && !in_array($documentId, $auth)) {
 			throw new \Exception('无权操作');
 		}

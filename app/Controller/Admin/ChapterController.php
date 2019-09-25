@@ -62,7 +62,7 @@ class ChapterController extends Controller
 			$data['document_id'] = $request->input('document_id');
 			$data['parent_id'] = $request->input('parent_id');
 
-			$result = $this->logic->createChapter($data, $request->document_user_auth);
+			$result = $this->logic->createChapter($data);
 			if ($result) {
 				return $this->success($result);
 			}
@@ -91,7 +91,6 @@ class ChapterController extends Controller
 
 			$data['name'] = $request->input('name');
 			$data['sort'] = $request->input('sort');
-			$data['auth'] = $request->document_user_auth;
 			$id = $request->input('id');
 
 			$result = $this->logic->updateChapter($id, $data);
@@ -115,7 +114,7 @@ class ChapterController extends Controller
 		$id = $request->input('id');
 
 		try {
-			$res = $this->logic->deleteChapter($id, $request->document_user_auth);
+			$res = $this->logic->deleteChapter($id);
 			if ($res) {
 				return $this->success();
 			} else {
@@ -140,7 +139,7 @@ class ChapterController extends Controller
 			$id = $request->input('chapter_id');
 			$content = $request->input('content');
 			$layout = $request->input('layout');
-			$res = $this->logic->saveContent($id, $content, $layout, $request->document_user_auth);
+			$res = $this->logic->saveContent($id, $content, $layout);
 			if ($res) {
 				$res['layout'] = $layout;
 				return $this->success($res);
@@ -161,7 +160,7 @@ class ChapterController extends Controller
 				'chapter_id.min' => '文档id最小为0',
 			]);
 			$id = $request->input('chapter_id');
-			$content = $this->logic->getContent($id, $request->document_user_auth);
+			$content = $this->logic->getContent($id);
 			return $this->success($content);
 		} catch (\Exception $e) {
 			return $this->error($e->getMessage());
