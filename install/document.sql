@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主机： db
--- 生成日期： 2019-09-25 03:42:45
+-- 生成日期： 2019-09-25 07:19:25
 -- 服务器版本： 8.0.16
 -- PHP 版本： 7.2.19
 
@@ -31,8 +31,8 @@ SET time_zone = "+00:00";
 CREATE TABLE `ims_cache` (
   `id` int(11) NOT NULL,
   `key` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
-  `expired_at` int(11) DEFAULT '0'
+  `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `expired_at` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -133,15 +133,15 @@ CREATE TABLE `ims_user` (
 --
 ALTER TABLE `ims_cache`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `key_2` (`key`),
-  ADD KEY `key` (`key`);
+  ADD UNIQUE KEY `key` (`key`);
 
 --
 -- 表的索引 `ims_document`
 --
 ALTER TABLE `ims_document`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `creator_id` (`creator_id`);
+  ADD KEY `creator_id` (`creator_id`),
+  ADD KEY `updated_at` (`updated_at`);
 
 --
 -- 表的索引 `ims_document_chapter`
