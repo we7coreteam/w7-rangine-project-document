@@ -60,11 +60,11 @@ class InitCommand extends CommandAbstract
 		$env = str_replace('{{DATABASE_DEFAULT_PREFIX}}', $config['db_prefix'], $env);
 		// cache
 		if ($config['cache_driver'] == 'redis') {
-			$env = str_replace('{{CACHE_DRIVER}}', $config['cache_driver'], $env);
+			$env = str_replace('{{CACHE_DEFAULT_DRIVER}}', $config['cache_driver'], $env);
 			$env = str_replace('{{CACHE_DEFAULT_HOST}}', $config['cache_host'], $env);
 			$env = str_replace('{{CACHE_DEFAULT_PORT}}', $config['cache_port'], $env);
 		} else {
-			$env = str_replace('{{CACHE_DRIVER}}', $config['cache_driver'], $env);
+			$env = str_replace('{{CACHE_DEFAULT_DRIVER}}', $config['cache_driver'], $env);
 			$env = preg_replace('/CACHE_DEFAULT_HOST[\s\S]+?}}/', '', $env);
 			$env = preg_replace('/CACHE_DEFAULT_PORT[\s\S]+?}}/', '', $env);
 		}
