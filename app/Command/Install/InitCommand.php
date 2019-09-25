@@ -287,7 +287,7 @@ class InitCommand extends CommandAbstract
 				}
 
 				// 如果缓存不使用redis,直接跳过
-				if ($option == 'cache' && $config[$configKey] == 'database') {
+				if ($option == 'cache' && $config[$configKey] == 'db') {
 					break;
 				}
 
