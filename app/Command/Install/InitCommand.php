@@ -59,14 +59,15 @@ class InitCommand extends CommandAbstract
 		$env = str_replace('{{DATABASE_DEFAULT_PASSWORD}}', $config['db_password'], $env);
 		$env = str_replace('{{DATABASE_DEFAULT_PREFIX}}', $config['db_prefix'], $env);
 		// cache
+		$env = str_replace('{{CACHE_DEFAULT_DRIVER}}', $config['cache_driver'], $env);
 		if ($config['cache_driver'] == 'redis') {
-			$env = str_replace('{{CACHE_DEFAULT_DRIVER}}', $config['cache_driver'], $env);
 			$env = str_replace('{{CACHE_DEFAULT_HOST}}', $config['cache_host'], $env);
 			$env = str_replace('{{CACHE_DEFAULT_PORT}}', $config['cache_port'], $env);
+			$env = str_replace('{{CACHE_DEFAULT_PASSWORD}}', '', $env);
 		} else {
-			$env = str_replace('{{CACHE_DEFAULT_DRIVER}}', $config['cache_driver'], $env);
 			$env = preg_replace('/CACHE_DEFAULT_HOST[\s\S]+?}}/', '', $env);
 			$env = preg_replace('/CACHE_DEFAULT_PORT[\s\S]+?}}/', '', $env);
+			$env = preg_replace('/CACHE_DEFAULT_PASSWORD[\s\S]+?}}/', '', $env);
 		}
 
 		if (file_put_contents(BASE_PATH . '/.env', $env) === false) {
