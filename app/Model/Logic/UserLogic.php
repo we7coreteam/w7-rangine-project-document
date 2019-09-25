@@ -12,6 +12,7 @@
 
 namespace W7\App\Model\Logic;
 
+use W7\App;
 use W7\App\Event\ChangeAuthEvent;
 use W7\App\Model\Entity\User;
 
@@ -129,8 +130,10 @@ class UserLogic extends BaseLogic
 		}
 	}
 
-	public function userAuth($auth)
+	public function userAuth()
 	{
+		$request = App::getApp()->getContext()->getRequest();
+		$auth = $request->document_user_auth;
 		if ($auth != 'all') {
 			throw new \Exception('只有管理员才可以操作用户');
 		}

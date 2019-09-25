@@ -48,7 +48,7 @@ class UserController extends Controller
 	public function addUser(Request $request)
 	{
 		try {
-			$this->logic->userAuth($request->document_user_auth);
+			$this->logic->userAuth();
 
 			$this->validate($request, [
 				'username' => 'required',
@@ -78,7 +78,7 @@ class UserController extends Controller
 	public function detailsUser(Request $request)
 	{
 		try {
-			$this->logic->userAuth($request->document_user_auth);
+			$this->logic->userAuth();
 
 			$this->validate($request, [
 				'id' => 'required'
@@ -99,7 +99,7 @@ class UserController extends Controller
 	public function updateUser(Request $request)
 	{
 		try {
-			$this->logic->userAuth($request->document_user_auth);
+			$this->logic->userAuth();
 
 			$this->validate($request, [
 				'id' => 'required',
@@ -153,7 +153,7 @@ class UserController extends Controller
 	public function deleteUser(Request $request)
 	{
 		try {
-			$this->logic->userAuth($request->document_user_auth);
+			$this->logic->userAuth();
 
 			$this->validate($request, [
 				'ids' => 'required'
