@@ -84,7 +84,7 @@ class InitCommand extends CommandAbstract
 	{
 		// 创建数据库
 		try {
-			$connect = new \PDO("mysql:host={$config['db_host']};port={$config['db_port']}", $config['db_username'], $config['db_password']);
+			$connect = new \PDO("mysql:host={$config['db_host']};port={$config['db_port']};charset=utf8mb4", $config['db_username'], $config['db_password']);
 			$connect->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 			$sql = "CREATE DATABASE IF NOT EXISTS {$config['db_database']} DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;";
 			$connect->exec($sql);
@@ -122,7 +122,7 @@ class InitCommand extends CommandAbstract
 	private function createAdmin($config)
 	{
 		try {
-			$connect = new \PDO("mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_database']}", $config['db_username'], $config['db_password']);
+			$connect = new \PDO("mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_database']};charset=utf8mb4", $config['db_username'], $config['db_password']);
 			$userLogic = new UserLogic();
 			$username = $config['admin_username'];
 			$password = $userLogic->userpassEncryption($username, $config['admin_password']);
