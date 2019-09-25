@@ -15,4 +15,17 @@ use W7\App;
 /**
  * 公共函数，已加载
  */
-
+if (!function_exists('auth')) {
+	function auth($documentId)
+	{
+		/**
+		 * 需要在初始化document_user_auth后执行
+		 * App::getApp()->getContext()->setRequest($request);
+		 */
+		$auth = App::getApp()->getContext()->getRequest()->document_user_auth;
+		var_dump($auth);
+		if (APP_AUTH_ALL != $auth && !in_array($documentId, $auth)) {
+			throw new \Exception('无权操作');
+		}
+	}
+}

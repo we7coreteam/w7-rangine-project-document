@@ -29,7 +29,7 @@ class AdminMiddleware extends MiddlewareAbstract
 		$request->document_user_id = $user_id;
 		$logic = new App\Model\Logic\UserAuthorizationLogic();
 		$request->document_user_auth = $logic->getUserAuthorizations($user_id);
-
+		App::getApp()->getContext()->setRequest($request);
 		return $handler->handle($request);
 	}
 }
