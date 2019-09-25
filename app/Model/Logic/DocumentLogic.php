@@ -14,6 +14,7 @@ namespace W7\App\Model\Logic;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
+use W7\App;
 use W7\App\Event\ChangeAuthEvent;
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\PermissionDocument;
@@ -21,8 +22,11 @@ use W7\App\Model\Entity\User;
 
 class DocumentLogic extends BaseLogic
 {
-	public function getlist($documents, $userId, $page, $name)
+	public function getlist($page, $name)
 	{
+		$request = App::getApp()->getContext()->getRequest();
+		$documents = $request->document_user_auth;
+		$userId = $request->document_user_id;
 		if ($documents == 'all') {
 			$res = Document::query()->where('name', 'like', '%'.$name.'%')->with('user')->orderBy('updated_at', 'desc')->get()->toArray();
 		} else {
@@ -31,8 +35,10 @@ class DocumentLogic extends BaseLogic
 		return $this->paging($this->handleDocumentRes($res, $userId), 15, $page);
 	}
 
-	public function getDocUserList($id, $userId)
+	public function getDocUserList($id)
 	{
+		$request = App::getApp()->getContext()->getRequest();
+		$userId = $request->document_user_id;
 		$res = '';
 		$document = Document::find($id);
 		if (!$document) {
@@ -57,8 +63,10 @@ class DocumentLogic extends BaseLogic
 		return $res;
 	}
 
-	public function getdetails($id, $userId)
+	public function getdetails($id)
 	{
+		$request = App::getApp()->getContext()->getRequest();
+		$userId = $request->document_user_id;
 		$res = Document::find($id);
 		if ($res) {
 			$res = $this->handleDocumentRes([$res], $userId);
@@ -102,8 +110,10 @@ class DocumentLogic extends BaseLogic
 		return $res;
 	}
 
-	public function relation($userId, $documentId)
+	public function relation($documentId)
 	{
+		$request = App::getApp()->getContext()->getRequest();
+		$userId = $request->document_user_id;
 		$user = new UserLogic();
 		$user = $user->getUser(['id'=>$userId]);
 		if ($user['has_privilege'] == 1) {
@@ -112,7 +122,7 @@ class DocumentLogic extends BaseLogic
 		if (!$user) {
 			return '用户不存在';
 		}
-		$document = $this->getdetails($documentId, '', '');
+		$document = $this->getdetails($documentId);
 		if (!$document) {
 			return '文档不存在';
 		}

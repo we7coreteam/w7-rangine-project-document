@@ -29,7 +29,7 @@ class DocumentController extends Controller
 				'name' => '',
 			]);
 			$name = trim($request->input('name'));
-			$res = $this->logic->getlist($request->document_user_auth, $request->document_user_id, $request->input('page'), $name);
+			$res = $this->logic->getlist($request->input('page'), $name);
 
 			return $this->success($res);
 		} catch (\Exception $e) {
@@ -46,7 +46,7 @@ class DocumentController extends Controller
 				'id.required' => '文档不能为空',
 			]);
 
-			$res = $this->logic->getDocUserList($request->input('id'), $request->document_user_id);
+			$res = $this->logic->getDocUserList($request->input('id'));
 			if ($res) {
 				return $this->success($res);
 			} else {
@@ -65,7 +65,7 @@ class DocumentController extends Controller
 			], [
 				'id.required' => '文档ID不能为空',
 			]);
-			$res = $this->logic->getdetails($request->input('id'), $request->document_user_id);
+			$res = $this->logic->getdetails($request->input('id'));
 			if ($res) {
 				return $this->success($res);
 			} else {
@@ -113,7 +113,7 @@ class DocumentController extends Controller
 			]);
 			$documentId = $request->input('id');
 
-			$relation = $this->logic->relation($request->document_user_id, $documentId);
+			$relation = $this->logic->relation($documentId);
 			if ($relation !== true) {
 				return $this->error($relation);
 			}
@@ -146,7 +146,7 @@ class DocumentController extends Controller
 		], [
 			'id.required' => '文档ID不能为空',
 		]);
-		$relation = $this->logic->relation($request->document_user_id, $request->input('id'));
+		$relation = $this->logic->relation($request->input('id'));
 		if ($relation !== true) {
 			return $this->error($relation);
 		}
