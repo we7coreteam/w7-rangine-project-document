@@ -17,6 +17,8 @@ use W7\Core\Exception\CommandException;
 
 class SyncDataCommand extends CommandAbstract
 {
+	private $userIds;
+
 	protected function handle($options)
 	{
 		try {
@@ -102,6 +104,9 @@ class SyncDataCommand extends CommandAbstract
 				if ($table == 'ims_wiki') {
 					$i = 0;
 					foreach ($data as $k => $v) {
+
+						$this->userIds[$k] = $v['creator_id'];
+
 						$sql .= 'INSERT INTO ims_document (id, name, description,creator_id,created_at,updated_at,is_show) VALUES( ';
 						$sql .= " '".$v['id']."', '".$v['name']."', '".$v['description']."', '".$v['creator_id']."', '".$v['created_at']."','".$v['updated_at']."', '".$v['is_show']."' );".PHP_EOL;
 
@@ -190,7 +195,12 @@ class SyncDataCommand extends CommandAbstract
 		} elseif ($table == 'ims_wiki_view') {
 			$sql = "select id,listid,content from $table ";
 		} elseif ($table == 'ims_members') {
-			$sql = "select uid,username,password,status,joindate from $table ";
+			if ($this->userIds) {
+				$this->userIds = rtrim(implode(',',array_unique($this->userIds)),',');
+				$sql = "select uid,username,password,status,joindate from $table where uid in ($this->userIds) ";
+			}else{
+				throw new CommandException('获取不到用户ID');
+			}
 		}
 
 		$retval = mysqli_query($conn, $sql);
