@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主机： db
--- 生成日期： 2019-09-25 07:19:25
+-- 生成日期： 2019-09-25 08:43:47
 -- 服务器版本： 8.0.16
 -- PHP 版本： 7.2.19
 
@@ -104,7 +104,7 @@ CREATE TABLE `ims_permission_document` (
 CREATE TABLE `ims_setting` (
   `id` int(10) UNSIGNED NOT NULL,
   `key` varchar(60) COLLATE utf8mb4_general_ci NOT NULL,
-  `value` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL
+  `value` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
