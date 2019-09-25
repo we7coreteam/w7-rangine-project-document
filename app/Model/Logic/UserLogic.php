@@ -42,13 +42,11 @@ class UserLogic extends BaseLogic
 
 	public function createUser($data)
 	{
-		$data['userpass'] = $this->userpassEncryption($data['username'], $data['userpass']);
 		$users = User::where('username', $data['username'])->count();
 
 		if (!$users) {
-			$res = User::create($data);
-			$this->handleUser([$res]);
-			return $res;
+			$data['userpass'] = $this->userpassEncryption($data['username'], $data['userpass']);
+			return User::create($data);
 		}
 		return false;
 	}

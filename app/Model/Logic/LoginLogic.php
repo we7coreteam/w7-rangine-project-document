@@ -12,9 +12,9 @@
 
 namespace W7\App\Model\Logic;
 
-class LoginLongic extends BaseLogic
+class LoginLogic extends BaseLogic
 {
-	public function check($username,$userpass)
+	public function check($username, $userpass)
 	{
 		$userLogic = new UserLogic();
 		$res = $userLogic->getUser(['username'=>$username]);

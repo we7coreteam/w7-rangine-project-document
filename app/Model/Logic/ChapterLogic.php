@@ -27,18 +27,19 @@ class ChapterLogic extends BaseLogic
 			$data['levels'] = 1;
 		} else {
 			$parent = Chapter::find($data['parent_id']);
-			$this->documentAuth($parent['document_id'], $auth);
 			if (!$parent) {
 				throw new \Exception('父章节不存在');
 			}
+			$this->documentAuth($parent['document_id'], $auth);
+
 			$data['levels'] = $parent->levels + 1;
 			if ($data['levels'] > 3) {
 				throw new \Exception('章节最大层级为３层！');
 			}
 		}
 		$res = $chapter = Chapter::create($data);
-		if ($res && icache()->channel('db')->has(DOCUMENT_INFO.$data['document_id'])) {
-			icache()->channel('db')->delete(DOCUMENT_INFO.$data['document_id']);
+		if ($res && icache()->has(DOCUMENT_INFO.$data['document_id'])) {
+			icache()->delete(DOCUMENT_INFO.$data['document_id']);
 		}
 		ChangeChapterEvent::instance()->attach('chapter', $chapter)->dispatch();
 		return $chapter;
@@ -47,13 +48,14 @@ class ChapterLogic extends BaseLogic
 	public function updateChapter($id, $data)
 	{
 		$chapter = Chapter::find($id);
-		$this->documentAuth($chapter['document_id'], $data['auth']);
 		if ($chapter) {
+			$this->documentAuth($chapter['document_id'], $data['auth']);
+
 			$chapter->name = $data['name'];
 			$chapter->sort = $data['sort'];
 			$res = $chapter->save();
-			if ($res && icache()->channel('db')->has(DOCUMENT_INFO.$chapter['document_id'])) {
-				icache()->channel('db')->delete(DOCUMENT_INFO.$chapter['document_id']);
+			if ($res && icache()->has(DOCUMENT_INFO.$chapter['document_id'])) {
+				icache()->delete(DOCUMENT_INFO.$chapter['document_id']);
 			}
 			ChangeChapterEvent::instance()->attach('chapter', $chapter)->dispatch();
 			return $chapter;
@@ -77,8 +79,8 @@ class ChapterLogic extends BaseLogic
 
 	public function getChapters($id, $auth)
 	{
-		if (icache()->channel('db')->has(DOCUMENT_INFO.$id)) {
-			return icache()->channel('db')->get(DOCUMENT_INFO.$id);
+		if (icache()->has(DOCUMENT_INFO.$id)) {
+			return icache()->get(DOCUMENT_INFO.$id);
 		}
 		$this->documentAuth($id, $auth);
 		$roots = Chapter::select('id', 'name', 'sort')->where('document_id', $id)->where('parent_id', 0)->orderBy('sort', 'asc')->get()->toArray();
@@ -87,7 +89,7 @@ class ChapterLogic extends BaseLogic
 				$roots[$k]['children'] = [];
 			}
 			$this->getChild($roots);
-			icache()->channel('db')->set(DOCUMENT_INFO.$id, $roots, DOCUMENT_INFO_CACHE_TIME);
+			icache()->set(DOCUMENT_INFO.$id, $roots, DOCUMENT_INFO_CACHE_TIME);
 		}
 		return $roots;
 	}
@@ -220,15 +222,18 @@ class ChapterLogic extends BaseLogic
 		$chapter = Chapter::find($id);
 		if ($chapter) {
 			$this->documentAuth($chapter['document_id'], $auth);
+			idb()->beginTransaction();
 			$resChapter = $chapter->delete();
 			ChapterContent::destroy($id);
 			ChangeChapterEvent::instance()->attach('chapter', $chapter)->dispatch();
 			if ($resChapter) {
-				if ($resChapter && icache()->channel('db')->has(DOCUMENT_INFO.$chapter['document_id'])) {
-					icache()->channel('db')->delete(DOCUMENT_INFO.$chapter['document_id']);
+				if ($resChapter && icache()->has(DOCUMENT_INFO.$chapter['document_id'])) {
+					icache()->delete(DOCUMENT_INFO.$chapter['document_id']);
 				}
+				idb()->commit();
 				return $chapter;
 			} else {
+				idb()->rollBack();
 				return false;
 			}
 		}
@@ -242,7 +247,6 @@ class ChapterLogic extends BaseLogic
 			throw new \Exception('该章节不存在，请刷新页面');
 		}
 		$this->documentAuth($documentInfo['document_id'], $auth);
-		$documents = Document::find($documentInfo['document_id']);
 		$chapterContent = ChapterContent::find($id);
 		if ($chapterContent) {
 			$chapterContent->content = $content;
@@ -258,6 +262,7 @@ class ChapterLogic extends BaseLogic
 				return false;
 			}
 		}
+		$documents = Document::find($documentInfo['document_id']);
 		$username = User::where('id', $documents['creator_id'])->value('username');
 		$chapterContent['created_at'] = $documentInfo['created_at'];
 		$chapterContent['updated_at'] = $documentInfo['updated_at'];
@@ -307,8 +312,8 @@ class ChapterLogic extends BaseLogic
 			ChapterContent::where('chapter_id', $chapter->id)->delete();
 			$chapter->delete();
 		}
-		if ($chapters && icache()->channel('db')->has(DOCUMENT_INFO.$document_id)) {
-			icache()->channel('db')->delete(DOCUMENT_INFO.$document_id);
+		if ($chapters && icache()->has(DOCUMENT_INFO.$document_id)) {
+			icache()->delete(DOCUMENT_INFO.$document_id);
 		}
 		return true;
 	}

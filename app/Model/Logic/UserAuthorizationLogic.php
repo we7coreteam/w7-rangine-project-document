@@ -38,32 +38,29 @@ class UserAuthorizationLogic extends BaseLogic
 
 	public function getUserAuthorizations($user_id)
 	{
-		$cacheAuth = icache()->channel('db')->get('auth_'.$user_id);
+		$cacheAuth = icache()->get('auth_'.$user_id);
 		if ($cacheAuth) {
 			return $cacheAuth;
 		}
 		$user = User::find($user_id);
-		if ($user) {
-			if ($user->has_privilege) {
-				icache()->channel('db')->set('auth_'.$user_id, APP_AUTH_ALL, 24*3600);
-				return APP_AUTH_ALL;
-			}
-		} else {
-			return [];
+		if ($user->has_privilege) {
+			icache()->set('auth_'.$user_id, APP_AUTH_ALL, 24*3600);
+			return APP_AUTH_ALL;
 		}
+
 		$auth = PermissionDocument::where('user_id', $user_id)->pluck('document_id')->toArray();
-		icache()->channel('db')->set('auth_'.$user_id, $auth, 24*3600);
+		icache()->set('auth_'.$user_id, $auth, 24*3600);
 		return $auth;
 	}
 
 	public function getDocumentUsers($document_id)
 	{
-		$cacheDocumentUsers = icache()->channel('db')->get('document_users_'.$document_id);
+		$cacheDocumentUsers = icache()->get('document_users_'.$document_id);
 		if ($cacheDocumentUsers) {
 			return $cacheDocumentUsers;
 		}
 		$documentUsers = PermissionDocument::where('document_id', $document_id)->pluck('user_id')->toArray();
-		icache()->channel('db')->set('document_users_'.$document_id, $documentUsers, 24*3600);
+		icache()->set('document_users_'.$document_id, $documentUsers, 24*3600);
 		return $documentUsers;
 	}
 }
