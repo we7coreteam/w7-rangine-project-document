@@ -34,15 +34,16 @@ class UploadController extends Controller
 			if (isset($file['type']) && !in_array($file['type'], $allowed_mime, true)) {
 				return ['success' => 0,'message' => 'only jpg,jpeg,png,gif allowed'];
 			}
+
 			if ($file['size'] > 2 * 1024 * 1204) {
 				return ['success' => 0,'message' => '图片尺寸不得超过2M'];
 			}
 
-			$baseName = md5(time().irandom(1000,9999).uniqid());
+			$baseName = md5(time().irandom(1000, 9999).uniqid());
 			$fileName = $baseName.'.'.explode('/', $file['type'])[1];
 
 			$cdn = new CdnLogic();
-			$url = $cdn->uploadFile('dc/'.$fileName, $file['tmp_name']);
+			$url = $cdn->uploadFile($fileName, $file['tmp_name']);
 
 			return ['state' => 'SUCCESS' ,'success' => 1,'message' => '上传成功','url'=>$url];
 		} catch (\Exception $e) {

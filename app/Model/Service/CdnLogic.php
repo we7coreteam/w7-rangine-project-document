@@ -72,6 +72,7 @@ class qCloudCos
 	private $bucket;
 	private $rootUrl;
 	private $region = 'ap-shanghai';
+	private $path = '/';
 
 	public function __construct()
 	{
@@ -86,8 +87,9 @@ class qCloudCos
 		$this->secretId = $settingValue['secret_id'];
 		$this->secretKey = $settingValue['secret_key'];
 		$this->bucket = sprintf('%s-%s', $settingValue['bucket'], $settingValue['app_id']);
-		$this->rootUrl = $settingValue['cdn'];
+		$this->rootUrl = $settingValue['url'];
 		$this->region = $settingValue['region'];
+		$this->path = rtrim($settingValue['path'], '/');
 
 		if (empty($this->secretKey) || empty($this->secretId)) {
 			throw new \RuntimeException('Invalid cloud_cosv5 config');
@@ -101,7 +103,7 @@ class qCloudCos
 					]
 				);
 			} catch (\Throwable $e) {
-				throw new \RuntimeException($e->getMessage(), $e->getStatusCode());
+				throw new \RuntimeException('附件上传Bucket不存在或是无法访问。', $e->getStatusCode());
 			}
 		}
 	}
@@ -133,6 +135,8 @@ class qCloudCos
 	public function uploadFile($uploadPath, $realPath)
 	{
 		try {
+			$uploadPath = $this->path . '/' . $uploadPath;
+
 			$result = $this->connection()->putObject(
 				[
 					'Key' => $uploadPath,
