@@ -65,6 +65,10 @@ class SettingController extends Controller
 				'path' => rtrim($request->input('path'), '/'),
 			];
 
+			if (empty($data['url'])) {
+				$data['url'] = sprintf('https://%s-%s.cos.%s.myqcloud.com', $data['bucket'], $data['app_id'], $data['region']);
+			}
+print_r($data);exit;
 			$setting = new SettingLogic();
 			$res = $setting->save($request->input('key'), $data);
 			if ($res) {
