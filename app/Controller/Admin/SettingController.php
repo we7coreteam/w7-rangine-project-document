@@ -43,15 +43,17 @@ class SettingController extends Controller
 				'secret_key' => 'required',
 				'bucket' => 'required',
 				'region' => 'required',
-				'cdn' => 'required',
+				'url' => 'sometimes|url',
+				'path' => 'sometimes|regex:/^\/[a-zA-Z\-_0-9]+$/i'
 			], [
 				'key.required' => 'key必填',
 				'app_id.required' => 'app_id必填',
 				'secret_id.required' => 'secret_id必填',
 				'secret_key.required' => 'secret_key必填',
 				'bucket.required' => 'bucket必填',
-				'region.required' => 'region必填',
-				'cdn.required' => 'cdn必填',
+				'region.required' => '所属地址必填',
+				'url.url' => '附件访问域名格式错误',
+				'path.regex' => '保存目录填写错误，格式例如：/savepath '
 			]);
 			$data = [
 				'app_id' => $request->input('app_id'),
@@ -59,8 +61,10 @@ class SettingController extends Controller
 				'secret_key' => $request->input('secret_key'),
 				'bucket' => $request->input('bucket'),
 				'region' => $request->input('region'),
-				'cdn' => $request->input('cdn'),
+				'url' => rtrim($request->input('url'), '/'),
+				'path' => rtrim($request->input('path'), '/'),
 			];
+
 			$setting = new SettingLogic();
 			$res = $setting->save($request->input('key'), $data);
 			if ($res) {
