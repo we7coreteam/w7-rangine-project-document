@@ -87,7 +87,7 @@ class qCloudCos
 		$this->secretId = $settingValue['secret_id'];
 		$this->secretKey = $settingValue['secret_key'];
 		$this->bucket = sprintf('%s-%s', $settingValue['bucket'], $settingValue['app_id']);
-		$this->rootUrl = $settingValue['url'];
+		$this->rootUrl = str_replace(array('http://', 'https://'), '', $settingValue['url']);
 		$this->region = $settingValue['region'];
 		$this->path = rtrim($settingValue['path'], '/');
 

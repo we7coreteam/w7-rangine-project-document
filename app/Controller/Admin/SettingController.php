@@ -67,8 +67,6 @@ class SettingController extends Controller
 
 			if (empty($data['url'])) {
 				$data['url'] = sprintf('%s-%s.cos.%s.myqcloud.com', $data['bucket'], $data['app_id'], $data['region']);
-			} else {
-				$data['url'] = str_replace(array('http://', 'https://'), '', $data['url']);
 			}
 
 			$setting = new SettingLogic();
