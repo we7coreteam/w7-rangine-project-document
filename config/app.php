@@ -63,6 +63,9 @@ return [
 			'public' => BASE_PATH . '/public'
 		]
 	],
+	'session' => [
+		'expires' => 86400
+	],
 	'cookie' => [
 		'path' => ienv('SESSION_PATH', '/'),
 		'http_only' => ienv('SESSION_HTTP_ONLY', false),
