@@ -17,14 +17,16 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use W7\Core\Middleware\MiddlewareAbstract;
 
-class TestMiddleware extends MiddlewareAbstract
+class PermissionReadDocumentMiddleware extends MiddlewareAbstract
 {
+	/**
+	 * 前台阅读文档的权限验证
+	 * @param ServerRequestInterface $request
+	 * @param RequestHandlerInterface $handler
+	 * @return ResponseInterface
+	 */
 	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
 	{
-		//if (session_status() !==PHP_SESSION_ACTIVE) {
-		session_id(date('YmdHi'));
-		session_start();
-		// }
 		return $handler->handle($request);
 	}
 }

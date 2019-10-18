@@ -19,9 +19,21 @@ use W7\App\Event\ChangeAuthEvent;
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\PermissionDocument;
 use W7\App\Model\Entity\User;
+use W7\Core\Helper\Traiter\InstanceTraiter;
 
 class DocumentLogic extends BaseLogic
 {
+
+	use InstanceTraiter;
+
+	public function getById($id) {
+		$id = intval($id);
+		if (empty($id)) {
+			return [];
+		}
+		return Document::query()->find($id);
+	}
+
 	public function getlist($page, $name)
 	{
 		$request = App::getApp()->getContext()->getRequest();

@@ -19,9 +19,12 @@ use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\Document\Chapter;
 use W7\App\Model\Entity\Document\ChapterContent;
 use W7\App\Model\Entity\User;
+use W7\Core\Helper\Traiter\InstanceTraiter;
 
 class ChapterLogic extends BaseLogic
 {
+	use InstanceTraiter;
+
 	public function createChapter($data)
 	{
 		if ($data['parent_id'] == 0) {
@@ -78,63 +81,63 @@ class ChapterLogic extends BaseLogic
 		throw new \Exception('该文档不存在');
 	}
 
-	public function getChapters($id)
+	public function getCatalog($id)
 	{
-		if (icache()->has(DOCUMENT_INFO.$id)) {
-			return icache()->get(DOCUMENT_INFO.$id);
+		$list = Chapter::query()
+			->select('id', 'name', 'sort', 'parent_id')
+			->where('document_id', $id)
+			->orderBy('parent_id', 'asc')
+			->orderBy('sort', 'asc')->get()->toArray();
+
+		if (empty($list)) {
+			return [];
 		}
-		$this->documentAuth($id);
-		$roots = Chapter::select('id', 'name', 'sort')->where('document_id', $id)->where('parent_id', 0)->orderBy('sort', 'asc')->get()->toArray();
-		if ($roots) {
-			foreach ($roots as $k=>$v) {
-				$roots[$k]['children'] = [];
+
+		$result = [];
+		foreach ($list as $id => $item) {
+			$result[$item['id']] = $item;
+			$result[$item['id']]['children'] = [];
+		}
+
+		foreach ($result as $id => $item) {
+			if ($item['parent_id'] != 0) {
+				$result[$item['parent_id']]['children'][] = &$result[$id];
 			}
-			$this->getChild($roots);
-			icache()->set(DOCUMENT_INFO.$id, $roots, DOCUMENT_INFO_CACHE_TIME);
 		}
-		return $roots;
+
+		return $result;
 	}
 
-	public function getChild(&$chapters)
-	{
-		foreach ($chapters as $k=>$v) {
-			$subordinates = Chapter::select('id', 'name', 'sort')->where('parent_id', $v['id'])->orderBy('sort', 'asc')->get()->toArray();
-			foreach ($subordinates as $sk => $sv) {
-				$subordinates[$sk]['children'] = [];
-				$chapters[$k]['children'][] = $subordinates[$sk];
-			}
+	public function getById($id, $documentId = 0) {
+		$id = intval($id);
+		$documentId = intval($documentId);
 
-			$this->getChild($chapters[$k]['children']);
+		$query = Chapter::query()->where('id', $id);
+		if (!empty($documentId)) {
+			$query = $query->where('document_id', $documentId);
 		}
+
+		return $query->first();
 	}
 
-	public function getChapter($document_id, $id)
+	public function getDetail($id, $documentId)
 	{
-		$chapter = Chapter::where('id', $id)->where('document_id', $document_id)->first();
+		$chapter = $this->getById($id, $documentId);
 		if (!$chapter) {
 			throw new \Exception('该章节不存在！');
 		}
-		$document = Document::where('id', $document_id)->first();
-		if ($document && $document['creator_id']) {
-			$userinfo = User::where('id', $document['creator_id'])->first();
-			if ($userinfo) {
-				$chapter['creator_id'] = $userinfo['id'];
-				$chapter['username'] = $userinfo['username'];
-			}
-		}
-		$description = ChapterContent::where('chapter_id', $id)->first();
-		if ($description) {
-			$chapter['content'] = $description['content'];
-			$chapter['layout'] = $description['layout'];
-		} else {
-			$chapter['content'] = '';
-		}
+
 		$previous = $this->previousChapter($chapter);
 		$chapter['previous_chapter_id'] = $previous['id'];
 		$chapter['previous_chapter_name'] = $previous['name'];
 		$next = $this->nextChapter($chapter);
 		$chapter['next_chapter_id'] = $next['id'];
 		$chapter['next_chapter_name'] = $next['name'];
+
+		$document = DocumentLogic::instance()->getById($documentId);
+
+		$chapter['creator_id'] = $document->user->id;
+		$chapter['username'] = $document->user->username;
 		return $chapter;
 	}
 
@@ -152,7 +155,7 @@ class ChapterLogic extends BaseLogic
 				return $parent;
 			}
 		}
-		return ['id'=>0,'name'=>''];
+		return ['id' => 0,'name' => ''];
 	}
 
 	public function nextChapter($chapter)
@@ -168,7 +171,7 @@ class ChapterLogic extends BaseLogic
 		if ($youngerBrother) {
 			return $youngerBrother;
 		}
-		return ['id'=>0,'name'=>''];
+		return ['id' => 0,'name' => ''];
 	}
 
 	public function searchDocument($id, $keyword)
@@ -258,7 +261,7 @@ class ChapterLogic extends BaseLogic
 				$documentInfo->save();
 			}
 		} else {
-			$chapterContent = ChapterContent::create(['chapter_id'=>$id,'content'=>$content,'layout'=>$layout]);
+			$chapterContent = ChapterContent::create(['chapter_id' => $id,'content' => $content,'layout' => $layout]);
 			if (!$chapterContent) {
 				return false;
 			}

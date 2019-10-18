@@ -10,11 +10,12 @@
  * visited https://www.w7.cc for more details
  */
 
-irouter()->group(['prefix'=>'/client'], function (\W7\Core\Route\Route $route) {
-
-	$route->post('/chapters', 'Client\ChapterController@chapters');
-	$route->post('/detail', 'Client\ChapterController@detail');
-	$route->post('/search', 'Client\ChapterController@search');
+irouter()->middleware([
+	'PermissionReadDocumentMiddleware',
+])->group(['prefix' => '/document'], function (\W7\Core\Route\Route $route) {
+	$route->post('/chapter/list', 'Document\ChapterController@catalog');
+	$route->post('/chapter/detail', 'Document\ChapterController@detail');
+	$route->post('/chapter/search', 'Document\ChapterController@search');
 
 	$route->post('/document/getshowlist', 'Client\DocumentController@getShowList');
 	$route->post('/document/getdetails', 'Client\DocumentController@getDetails');
