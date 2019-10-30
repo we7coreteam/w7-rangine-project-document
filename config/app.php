@@ -12,14 +12,10 @@
 
 return [
 	'setting' => [
-		//SETTING_DEVELOPMENT = DEVELOPMENT^CLEAR_LOG
-		//SETTING_DEVELOPMENT = DEBUG|CLEAR_LOG
-		//SETTING_DEVELOPMENT = RELEASE|CLEAR_LOG
 		'env' => ienv('SETTING_DEVELOPMENT', RELEASE),
-		//最新版可用
-		'error_reporting' => E_ALL ^ E_NOTICE ^ E_USER_DEPRECATED,
+		'error_reporting' => ienv('SETTING_ERROR_REPORTING', E_ALL),
+		'server' => ienv('SETTING_SERVERS', 'http'),
 		'basedir' => [
-			'/home/wwwroot/we7/swoole',
 			'/tmp',
 			sys_get_temp_dir(),
 			BASE_PATH,
@@ -29,11 +25,8 @@ return [
 			RUNTIME_PATH . DIRECTORY_SEPARATOR . 'task',
 			RUNTIME_PATH . DIRECTORY_SEPARATOR . 'upload',
 			BASE_PATH  . DIRECTORY_SEPARATOR . 'vendor'
-		]
-	],
-	'crontab' => [
-		'enabled' => false,
-		'interval' => 10,
+		],
+		'lang' => 'zh-CN',
 	],
 	'cache' => [
 		'default' => [
@@ -55,7 +48,7 @@ return [
 			'charset' => 'utf8mb4',
 			'collation' => 'utf8mb4_general_ci',
 			'prefix' => ienv('DATABASE_DEFAULT_PREFIX', 'ims_'),
-			'port' =>ienv('DATABASE_DEFAULT_PORT', 3306),
+			'port' => ienv('DATABASE_DEFAULT_PORT', 3306),
 		],
 	],
 	'view' => [
