@@ -41,6 +41,10 @@ $fixers = array(
 	'standardize_not_equals'                     => true, //使用 <> 代替 !=；
 	'blank_line_after_opening_tag'               => true, //PHP开始标记后换行
 	'indentation_type'                           => true,
+	'no_multiline_whitespace_around_double_arrow' => true, //去掉数组=>多余的空格
+	'object_operator_without_whitespace' => true, //去掉->间的空格
+	'ternary_operator_spaces' => true, //标准化三元运算符
+	'binary_operator_spaces' => true, //操作符间的空格
 	'header_comment' => [
 	    'comment_type' => 'PHPDoc',
 	    'header' => SOFT_NAME . " \r\n\r\n(c) We7Team 2019 <https://www.w7.cc> \r\n\r\nThis is not a free software \r\nUsing it under the license terms\r\nvisited https://www.w7.cc for more details",
