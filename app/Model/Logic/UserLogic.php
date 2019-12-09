@@ -15,9 +15,35 @@ namespace W7\App\Model\Logic;
 use W7\App;
 use W7\App\Event\ChangeAuthEvent;
 use W7\App\Model\Entity\User;
+use W7\Core\Helper\Traiter\InstanceTraiter;
 
 class UserLogic extends BaseLogic
 {
+	use InstanceTraiter;
+
+	/**
+	 * 根据用户名获取用户
+	 * @param $username
+	 * @return array|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|null|object
+	 */
+	public function getByUsername($username) {
+		if (empty($username)) {
+			return [];
+		}
+		$user = User::query()->where('username', $username)->first();
+		return $user;
+	}
+
+	/**
+	 * 将用户提交的密码转化为数据库存储密码
+	 * @param User $user
+	 * @param $postPassword
+	 * @return string
+	 */
+	public function getPasswordEncryption(User $user, $postPassword) {
+		return md5(md5($user->username . $postPassword));
+	}
+
 	public function getUserlist($page, $username)
 	{
 		$res = User::where('username', 'like', '%'.$username.'%')->orderBy('id', 'desc')->get()->toArray();
