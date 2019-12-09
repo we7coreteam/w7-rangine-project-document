@@ -13,9 +13,9 @@
 namespace W7\App\Exception;
 
 use Psr\Http\Message\ResponseInterface;
-use W7\Core\Exception\HttpException;
+use W7\Core\Exception\ResponseExceptionAbstract;
 
-class ErrorHttpException extends HttpException
+class ErrorHttpException extends ResponseExceptionAbstract
 {
 	protected $data;
 
