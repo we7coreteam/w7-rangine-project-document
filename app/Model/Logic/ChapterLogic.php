@@ -81,6 +81,11 @@ class ChapterLogic extends BaseLogic
 		throw new \Exception('该文档不存在');
 	}
 
+	/**
+	 * 获取章节目录
+	 * @param $id
+	 * @return array
+	 */
 	public function getCatalog($id)
 	{
 		$list = Chapter::query()
@@ -108,6 +113,13 @@ class ChapterLogic extends BaseLogic
 		return $result;
 	}
 
+
+	/**
+	 * 获取章节数据
+	 * @param $id
+	 * @param int $documentId
+	 * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|null|object
+	 */
 	public function getById($id, $documentId = 0) {
 		$id = intval($id);
 		$documentId = intval($documentId);
@@ -118,60 +130,6 @@ class ChapterLogic extends BaseLogic
 		}
 
 		return $query->first();
-	}
-
-	public function getDetail($id, $documentId)
-	{
-		$chapter = $this->getById($id, $documentId);
-		if (!$chapter) {
-			throw new \Exception('该章节不存在！');
-		}
-
-		$previous = $this->previousChapter($chapter);
-		$chapter['previous_chapter_id'] = $previous['id'];
-		$chapter['previous_chapter_name'] = $previous['name'];
-		$next = $this->nextChapter($chapter);
-		$chapter['next_chapter_id'] = $next['id'];
-		$chapter['next_chapter_name'] = $next['name'];
-
-		$document = DocumentLogic::instance()->getById($documentId);
-
-		$chapter['creator_id'] = $document->user->id;
-		$chapter['username'] = $document->user->username;
-		return $chapter;
-	}
-
-	public function previousChapter($chapter)
-	{
-		$parent_id = $chapter['parent_id'];
-		$sort = $chapter['sort'];
-		$elderBrother = Chapter::where('parent_id', $parent_id)->where('sort', '>', $sort)->orderBy('sort')->first();
-		if ($elderBrother) {
-			return $elderBrother;
-		}
-		if ($parent_id) {
-			$parent = Chapter::find($parent_id);
-			if ($parent) {
-				return $parent;
-			}
-		}
-		return ['id' => 0,'name' => ''];
-	}
-
-	public function nextChapter($chapter)
-	{
-		$parent_id = $chapter['parent_id'];
-		$sort = $chapter['sort'];
-		$id = $chapter['id'];
-		$child = Chapter::where('parent_id', $id)->orderBy('sort', 'asc')->first();
-		if ($child) {
-			return $child;
-		}
-		$youngerBrother = Chapter::where('parent_id', $parent_id)->where('sort', '<', $sort)->orderBy('sort', 'asc')->first();
-		if ($youngerBrother) {
-			return $youngerBrother;
-		}
-		return ['id' => 0,'name' => ''];
 	}
 
 	public function searchDocument($id, $keyword)

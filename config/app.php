@@ -15,17 +15,7 @@ return [
 		'env' => ienv('SETTING_DEVELOPMENT', RELEASE),
 		'error_reporting' => ienv('SETTING_ERROR_REPORTING', E_ALL),
 		'server' => ienv('SETTING_SERVERS', 'http'),
-		'basedir' => [
-			'/tmp',
-			sys_get_temp_dir(),
-			BASE_PATH,
-			APP_PATH,
-			RUNTIME_PATH,
-			RUNTIME_PATH . DIRECTORY_SEPARATOR . 'logs',
-			RUNTIME_PATH . DIRECTORY_SEPARATOR . 'task',
-			RUNTIME_PATH . DIRECTORY_SEPARATOR . 'upload',
-			BASE_PATH  . DIRECTORY_SEPARATOR . 'vendor'
-		],
+		'basedir' => [],
 		'lang' => 'zh-CN',
 	],
 	'cache' => [

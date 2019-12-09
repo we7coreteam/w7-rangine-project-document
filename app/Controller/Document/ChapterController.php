@@ -15,6 +15,7 @@ namespace W7\App\Controller\Document;
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Logic\ChapterLogic;
+use W7\App\Model\Logic\DocumentLogic;
 use W7\Http\Message\Server\Request;
 
 class ChapterController extends BaseController
@@ -50,30 +51,52 @@ class ChapterController extends BaseController
 		}
 
 		try {
-			$result = ChapterLogic::instance()->getDetail($id, $documentId);
+			$chapter = ChapterLogic::instance()->getById($id, $documentId);
 		} catch (\Exception $e) {
 			throw new ErrorHttpException($e->getMessage());
 		}
+
+		if (!$chapter) {
+			throw new ErrorHttpException('该章节不存在！');
+		}
+
+		$document = DocumentLogic::instance()->getById($documentId);
+
+		$result = [
+			'id' => $chapter->id,
+			'parent_id' => $chapter->parent_id,
+			'name' => $chapter->name,
+			'document_id' => $chapter->document_id,
+			'created_at' => $chapter->created_at->toDateTimeString(),
+			'updated_at' => $chapter->updated_at->toDateTimeString(),
+			'content' => $chapter->description->content,
+			'prev_item' => [
+				'id' => $chapter->prevItem->id ?? '',
+				'name' => $chapter->prevItem->name ?? '',
+			],
+			'next_item' => [
+				'id' => $chapter->nextItem->id ?? '',
+				'name' => $chapter->nextItem->name ?? '',
+			],
+			'author' => [
+				'uid' => $document->user->id,
+				'username' => $document->user->username,
+			]
+		];
+
+		return $this->data($result);
 	}
 
 	public function search(Request $request)
 	{
-		try {
-			$this->validate($request, [
-				'keywords' => 'required',
-				'document_id' => 'required|integer|min:1',
-			], [
-				'keywords.required' => '关键字必填',
-				'document_id.required' => '文档id必填',
-				'document_id.integer' => '文档id非法'
-			]);
+		$this->validate($request, [
+			'keywords' => 'required',
+		], [
+			'keywords.required' => '关键字必填',
+		]);
 
-			$keyword = $request->input('keywords');
-			$id = $request->input('document_id');
-			$res = $this->logic->searchDocument($id, $keyword);
-			return $this->success($res);
-		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
-		}
+		$keyword = $request->input('keywords');
+		$documentId = intval($request->input('document_id'));
+
 	}
 }

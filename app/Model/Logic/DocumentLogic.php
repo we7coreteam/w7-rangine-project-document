@@ -23,10 +23,10 @@ use W7\Core\Helper\Traiter\InstanceTraiter;
 
 class DocumentLogic extends BaseLogic
 {
-
 	use InstanceTraiter;
 
-	public function getById($id) {
+	public function getById($id)
+	{
 		$id = intval($id);
 		if (empty($id)) {
 			return [];
@@ -128,7 +128,7 @@ class DocumentLogic extends BaseLogic
 		$request = App::getApp()->getContext()->getRequest();
 		$userId = $request->document_user_id;
 		$user = new UserLogic();
-		$user = $user->getUser(['id'=>$userId]);
+		$user = $user->getUser(['id' => $userId]);
 		if ($user['has_privilege'] == 1) {
 			return true;
 		}
@@ -209,11 +209,11 @@ class DocumentLogic extends BaseLogic
 		$perPage = $perPage <= 0 ? 15 : $perPage;
 		if ($page) {
 			$current_page = $page;
-			$current_page = $current_page <= 0 ? 1 :$current_page;
+			$current_page = $current_page <= 0 ? 1 : $current_page;
 		} else {
 			$current_page = 1;
 		}
-		$item = array_slice($data, ($current_page-1)*$perPage, $perPage);
+		$item = array_slice($data, ($current_page - 1) * $perPage, $perPage);
 		$total = count($data);
 
 		$paginator = new LengthAwarePaginator($item, $total, $perPage, $current_page, [
@@ -223,7 +223,7 @@ class DocumentLogic extends BaseLogic
 
 		return [
 			'total' => $total,
-			'pageCount' => ceil($total/$perPage),
+			'pageCount' => ceil($total / $perPage),
 			'data' => $paginator->toArray()['data']
 		];
 	}

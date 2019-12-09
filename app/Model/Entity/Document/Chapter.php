@@ -18,27 +18,18 @@ class Chapter extends BaseModel
 {
 	protected $table = 'document_chapter';
 
-	public function getCreatedAtAttribute($value)
-	{
-		return date('Y-m-d H:i:s', $value);
-	}
-
-	public function getUpdatedAtAttribute($value)
-	{
-		return date('Y-m-d H:i:s', $value);
-	}
-
 	public function description()
 	{
 		return $this->hasOne(ChapterContent::class, 'chapter_id', 'id');
 	}
 
 	public function getPrevItemAttribute() {
-		$item = static::query()->where('parent_id', $this->parent_id)->where('sort', '>', $this->sort)->orderBy('sort')->first();
+		$item = static::query()->where('parent_id', $this->parent_id)->where('sort', '<=', $this->sort)->where('id', '!=', $this->id)->orderBy('sort')->first();
 		return $item;
 	}
 
 	public function getNextItemAttribute() {
-
+		$item = static::query()->where('parent_id', $this->parent_id)->where('sort', '>=', $this->sort)->where('id', '!=', $this->id)->orderBy('sort')->first();
+		return $item;
 	}
 }

@@ -10,8 +10,6 @@
  * visited https://www.w7.cc for more details
  */
 
-irouter()->post('/admin/login/check', 'Admin\LoginController@check');
-irouter()->post('/admin/verificationcode/getcodeimg', 'Admin\VerificationcodeController@getCodeimg');
 irouter()->get('/js/php/controller.php', 'Admin\UploadController@index');
 irouter()->post('/js/php/controller.php', 'Admin\UploadController@image');
 
