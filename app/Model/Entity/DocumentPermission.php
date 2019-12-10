@@ -9,18 +9,6 @@ class DocumentPermission extends BaseModel {
 
 	protected $table = 'document_permission';
 
-	public function asManager() {
-		$this->permission = self::MANAGER_PERMISSION;
-	}
-
-	public function asOperator() {
-		$this->permission = self::OPERATOR_PERMISSION;
-	}
-
-	public function asReader() {
-		$this->permission = self::READER_PERMISSION;
-	}
-
 	public function isManager() : bool {
 		return $this->permission == self::MANAGER_PERMISSION;
 	}
