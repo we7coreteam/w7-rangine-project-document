@@ -30,7 +30,7 @@ class ErrorHttpException extends ResponseExceptionAbstract
 
 	public function render(): ResponseInterface
 	{
-		return $this->response->withStatus($this->getCode())->withContent(json_encode([
+		return $this->response->withStatus(200)->withContent(json_encode([
 			'status' => false,
 			'code' => $this->getCode(),
 			'data' => $this->data,
