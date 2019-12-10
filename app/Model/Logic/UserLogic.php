@@ -34,6 +34,15 @@ class UserLogic extends BaseLogic
 		return $user;
 	}
 
+	public function getByUid($uid) {
+		$uid = intval($uid);
+		if (empty($uid)) {
+			return [];
+		}
+		$user = User::query()->where('id', $uid)->first();
+		return $user;
+	}
+
 	/**
 	 * 将用户提交的密码转化为数据库存储密码
 	 * @param User $user
@@ -43,6 +52,8 @@ class UserLogic extends BaseLogic
 	public function getPasswordEncryption(User $user, $postPassword) {
 		return md5(md5($user->username . $postPassword));
 	}
+
+
 
 	public function getUserlist($page, $username)
 	{

@@ -63,4 +63,18 @@ class AuthController extends BaseController
 		$request->session->destroy();
 		return $this->data('success');
 	}
+
+	public function user(Request $request) {
+		$userSession = $request->session->get('user');
+		$user = UserLogic::instance()->getByUid($userSession['uid']);
+
+		$result = [
+			'id' => $user->id,
+			'username' => $user->username,
+			'created_at' => $user->created_at->toDateTimeString(),
+			'updated_at' => $user->updated_at->toDateTimeString(),
+		];
+
+		return $this->data($result);
+	}
 }
