@@ -34,6 +34,8 @@ class DocumentLogic extends BaseLogic
 		return Document::query()->find($id);
 	}
 
+
+
 	public function getlist($page, $name)
 	{
 		$request = App::getApp()->getContext()->getRequest();

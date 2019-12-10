@@ -23,7 +23,7 @@ class User extends BaseModel
 		return $this->belongsTo(Document::class);
 	}
 
-	public function getIsAdminAttribute() {
+	public function getIsFounderAttribute() {
 		return $this->group_id == self::GROUP_ADMIN;
 	}
 }

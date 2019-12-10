@@ -20,4 +20,8 @@ class DocumentPermission extends BaseModel {
 	public function isReader() : bool {
 		return $this->permission == self::READER_PERMISSION;
 	}
+
+	public function document() {
+		return $this->hasOne(Document::class, 'id', 'document_id');
+	}
 }

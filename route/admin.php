@@ -13,6 +13,13 @@
 irouter()->get('/js/php/controller.php', 'Admin\UploadController@index');
 irouter()->post('/js/php/controller.php', 'Admin\UploadController@image');
 
+irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], function (\W7\Core\Route\Route $route) {
+	//管理文档列表
+	$route->post('/document/all', 'Admin\DocumentController@all');
+	//文档管理设置
+	$route->post('/document/detail', 'Admin\DocumentController@detail');
+});
+
 irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'/admin'], function (\W7\Core\Route\Route $route) {
 	$route->post('/login/signout', 'Admin\LoginController@signOut'); // 退出登录
 
@@ -38,11 +45,10 @@ irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'
 	$route->post('/auth/invite_user', 'Admin\UserAuthorizationController@inviteUser');
 	$route->post('/auth/leave_document', 'Admin\UserAuthorizationController@leaveDocument');
 
-	$route->post('/document/getlist', 'Admin\DocumentController@getList');
 	$route->post('/document/getdocuserlist', 'Admin\DocumentController@getDocUserList');
 	$route->post('/document/create', 'Admin\DocumentController@create');
 	$route->post('/document/update', 'Admin\DocumentController@update');
-	$route->post('/document/getdetails', 'Admin\DocumentController@getDetails');
+
 	$route->post('/document/delete', 'Admin\DocumentController@delete');
 	$route->post('/document/search', 'Admin\DocumentController@search');
 
