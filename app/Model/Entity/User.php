@@ -12,6 +12,15 @@
 
 namespace W7\App\Model\Entity;
 
+/**
+ * Class User
+ * @package W7\App\Model\Entity
+ *
+ * @property $isFounder
+ * @property $isManage
+ * @property $isOperator
+ * @property $isReader
+ */
 class User extends BaseModel
 {
 	const GROUP_ADMIN = 1;
@@ -23,7 +32,8 @@ class User extends BaseModel
 		return $this->belongsTo(Document::class);
 	}
 
-	public function getIsFounderAttribute() {
+	public function getIsFounderAttribute()
+	{
 		return $this->group_id == self::GROUP_ADMIN;
 	}
 }

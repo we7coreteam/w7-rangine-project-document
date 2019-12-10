@@ -30,6 +30,21 @@ class DocumentPermission extends BaseModel
 		return $this->hasOne(Document::class, 'id', 'document_id');
 	}
 
+	public function isManage()
+	{
+		return $this->permission == self::MANAGER_PERMISSION;
+	}
+
+	public function isOperator()
+	{
+		return $this->permission == self::MANAGER_PERMISSION || $this->permission == self::OPERATOR_PERMISSION;
+	}
+
+	public function isReader()
+	{
+		return $this->permission == self::MANAGER_PERMISSION || $this->permission == self::OPERATOR_PERMISSION || $this->permission == self::READER_PERMISSION;
+	}
+
 	/**
 	 * 判断用户是否有读该文档权限
 	 * @return bool
