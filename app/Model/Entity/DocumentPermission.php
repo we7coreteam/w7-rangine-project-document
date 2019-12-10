@@ -20,4 +20,16 @@ class DocumentPermission extends BaseModel {
 	public function isReader() : bool {
 		return $this->permission == self::READER_PERMISSION;
 	}
+
+	public function save(array $options = []) {
+		if ($this->isManager() || $this->isOperator() || $this->isReader()) {
+			return parent::save($options);
+		}
+
+		return false;
+	}
+
+	public function users() {
+		return $this->hasMany(User::class, 'id', 'user_id');
+	}
 }
