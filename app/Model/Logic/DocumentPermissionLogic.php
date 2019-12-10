@@ -4,8 +4,11 @@ namespace W7\App\Model\Logic;
 
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\DocumentPermission;
+use W7\Core\Helper\Traiter\InstanceTraiter;
 
 class DocumentPermissionLogic extends BaseLogic {
+	use InstanceTraiter;
+
 	public function add($documentId, $userId, $permission) {
 		if (!Document::query()->find($documentId)) {
 			throw new \RuntimeException('该文档不存在');
