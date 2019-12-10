@@ -20,6 +20,11 @@ class DocumentPermissionLogic extends BaseLogic
 {
 	use InstanceTraiter;
 
+	public function getAclList()
+	{
+		return (new DocumentPermission())->getPermissionList();
+	}
+
 	public function add($documentId, $userId, $permission)
 	{
 		if (!Document::query()->find($documentId)) {
@@ -67,11 +72,11 @@ class DocumentPermissionLogic extends BaseLogic
 			$result[] = [
 				'id' => $documentPermission->id,
 				'user_name' => $documentPermission->user->username,
-				'user_role' => $documentPermission->permission,
+				'acl_name' => $documentPermission->ACLName,
 				'permission' => [
-					'has_delete' => $documentPermission->hasManage(),
+					'has_manage' => $documentPermission->hasManage(),
 					'has_edit' => $documentPermission->hasManage(),
-					'has_manage' => $documentPermission->hasManage()
+					'has_delete' => $documentPermission->hasManage()
 				]
 			];
 		}
