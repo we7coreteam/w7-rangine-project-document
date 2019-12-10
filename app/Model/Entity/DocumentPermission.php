@@ -36,4 +36,8 @@ class DocumentPermission extends BaseModel {
 	public function hasManager() {
 		return $this->permission == self::MANAGER_PERMISSION;
 	}
+
+	public function user() {
+		return $this->hasOne(User::class, 'id', 'user_id');
+	}
 }
