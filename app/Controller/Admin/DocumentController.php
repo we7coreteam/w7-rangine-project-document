@@ -14,15 +14,16 @@ namespace W7\App\Controller\Admin;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use W7\App\Controller\BaseController;
+use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\DocumentPermission;
 use W7\App\Model\Logic\DocumentLogic;
+use W7\App\Model\Logic\DocumentPermissionLogic;
+use W7\App\Model\Logic\UserLogic;
 use W7\Http\Message\Server\Request;
 
 class DocumentController extends BaseController
 {
-	const PAGE_SIZE = 10;
-
 	public function __construct()
 	{
 		$this->logic = new DocumentLogic();
@@ -43,7 +44,7 @@ class DocumentController extends BaseController
 			/**
 			 * @var LengthAwarePaginator $result
 			 */
-			$list = $query->paginate(self::PAGE_SIZE, '*', 'page', $page);
+			$list = $query->paginate(null, '*', 'page', $page);
 
 			$document = $list->items();
 			if (!empty($document)) {
@@ -53,11 +54,7 @@ class DocumentController extends BaseController
 						'name' => $row->name,
 						'description' => $row->descriptionShort,
 						'is_show' => $row->is_show,
-						'permission' => [
-							'has_delete' => true,
-							'has_edit' => true,
-							'has_manage' => true,
-						]
+						'acl' => DocumentPermissionLogic::instance()->getFounderACL(),
 					];
 				}
 			}
@@ -82,11 +79,7 @@ class DocumentController extends BaseController
 						'name' => $row->document->name,
 						'description' => $row->document->descriptionShort,
 						'is_show' => $row->document->is_show,
-						'permission' => [
-							'has_delete' => $row->permission == DocumentPermission::MANAGER_PERMISSION,
-							'has_edit' => $row->permission == DocumentPermission::MANAGER_PERMISSION || $row->permission == DocumentPermission::OPERATOR_PERMISSION,
-							'has_manage' => $row->permission == DocumentPermission::MANAGER_PERMISSION,
-						],
+						'acl' => $row->acl,
 					];
 				}
 			}
@@ -99,44 +92,106 @@ class DocumentController extends BaseController
 		return $this->data($result);
 	}
 
-	public function getDocUserList(Request $request)
-	{
-		try {
-			$this->validate($request, [
-				'id' => 'required',
-			], [
-				'id.required' => '文档不能为空',
-			]);
-
-			$res = $this->logic->getDocUserList($request->input('id'));
-			if ($res) {
-				return $this->success($res);
-			} else {
-				return $this->error('文档不存在');
-			}
-		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
-		}
-	}
-
 	public function detail(Request $request)
 	{
-		try {
-			$this->validate($request, [
-				'id' => 'required|integer|min:1',
-			], [
-				'id.required' => '文档ID不能为空',
-			]);
+		$this->validate($request, [
+			'document_id' => 'required|integer|min:1',
+		], [
+			'document_id.required' => '文档ID不能为空',
+		]);
 
-			$res = $this->logic->getdetails($request->input('id'));
-			if ($res) {
-				return $this->success($res);
-			} else {
-				return $this->error('文档不存在');
-			}
-		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
+		if (!$request->getAttribute('user')->isManager) {
+			throw new ErrorHttpException('您没有权限管理该文档');
 		}
+
+		$document = DocumentLogic::instance()->getById($request->post('document_id'));
+		$result = [
+			'id' => $document->id,
+			'name' => $document->name,
+			'description' => $document->description,
+			'is_show' => $document->is_show,
+		];
+
+		$operator = $document->operator()->with('user')->orderBy('permission')->get();
+		if (!empty($operator)) {
+			$operator->each(function ($row, $i) use (&$result) {
+				$result['operator'][] = [
+					'id' => $row->user->id,
+					'username' => $row->user->username,
+					'acl' => $row->acl,
+				];
+			});
+		}
+
+		return $this->data($result);
+	}
+
+	public function operator(Request $request) {
+		$this->validate($request, [
+			'user_id' => 'required|integer',
+			'document_id' => 'required|integer',
+		], [
+			'user_id.required' => '请指定用户',
+			'document_id.required' => '请指定文档',
+		]);
+
+		$user = $request->getAttribute('user');
+		if (!$user->isManager && !$user->isFounder) {
+			throw new ErrorHttpException('您没有权限管理该文档');
+		}
+
+		$uid = intval($request->post('user_id'));
+		$permission = intval($request->post('permission'));
+		$documentId = intval($request->post('document_id'));
+
+		if ($uid == $user->id) {
+			throw new ErrorHttpException('不能添加自己为管理员');
+		}
+
+		/**
+		 * permission 值不存在时，意味着删除权限
+		 * 只要权限合适，减少判断直接删除
+		 */
+		if (empty($permission)) {
+			$hasPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($documentId, $uid);
+			if (!empty($hasPermission)) {
+				$hasPermission->delete();
+			}
+			return $this->data('success');
+		}
+
+		if (!in_array($permission, [
+			DocumentPermission::MANAGER_PERMISSION,
+			DocumentPermission::OPERATOR_PERMISSION,
+			DocumentPermission::OPERATOR_PERMISSION,
+		])) {
+			throw new ErrorHttpException('您操作了不存在的权限');
+		}
+
+		if ($permission == DocumentPermission::MANAGER_PERMISSION && !$user->isFounder) {
+			throw new ErrorHttpException('您没有权限添加管理员');
+		}
+
+		$document = DocumentLogic::instance()->getById($documentId);
+		if (empty($document)) {
+			throw new ErrorHttpException('管理的文档的不存在或是已经被删除');
+		}
+
+		$operator = UserLogic::instance()->getByUid($uid);
+		if (empty($operator)) {
+			throw new ErrorHttpException('您操作的用户不存在');
+		}
+
+		$hasPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($documentId, $uid);
+		if (empty($hasPermission)) {
+			$hasPermission = new DocumentPermission();
+			$hasPermission->user_id = $uid;
+			$hasPermission->document_id = $documentId;
+		}
+		$hasPermission->permission = $permission;
+		$hasPermission->save();
+
+		return $this->data('success');
 	}
 
 	public function create(Request $request)

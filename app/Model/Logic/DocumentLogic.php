@@ -34,50 +34,9 @@ class DocumentLogic extends BaseLogic
 		return Document::query()->find($id);
 	}
 
-
-
-	public function getlist($page, $name)
-	{
-		$request = App::getApp()->getContext()->getRequest();
-		$documents = $request->document_user_auth;
-		$userId = $request->document_user_id;
-		if ($documents == 'all') {
-			$res = Document::query()->where('name', 'like', '%'.$name.'%')->with('user')->orderBy('updated_at', 'desc')->get()->toArray();
-		} else {
-			$res = Document::query()->where('name', 'like', '%'.$name.'%')->with('user')->orderBy('updated_at', 'desc')->find($documents)->toArray();
-		}
-		return $this->paging($this->handleDocumentRes($res, $userId), 15, $page);
-	}
-
-	public function getDocUserList($id)
-	{
-		$request = App::getApp()->getContext()->getRequest();
-		$userId = $request->document_user_id;
-		$res = '';
-		$document = Document::find($id);
-
-		if (!$document) {
-			return $res;
-		}
-		$documentUsers = PermissionDocument::where('document_id', $id)->pluck('user_id')->toArray();
-		if (!$documentUsers) {
-			return $res;
-		}
-		$res = User::select('id', 'username', 'has_privilege')->find($documentUsers);
-		if ($res) {
-			$res = $this->handleDocumentRes($res, $userId);
-			foreach ($res as $k => &$v) {
-				if ($v['has_privilege'] || $v['has_privilege'] == 0) {
-					unset($v['has_privilege']);
-				}
-				if ($v['is_show_name']) {
-					unset($v['is_show_name']);
-				}
-			}
-		}
-		return $res;
-	}
-
+	/**
+	 * @deprecated
+	 */
 	public function getdetails($id)
 	{
 		$request = App::getApp()->getContext()->getRequest();
@@ -90,6 +49,9 @@ class DocumentLogic extends BaseLogic
 		return $res;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function details($id)
 	{
 		return Document::find($id);
@@ -206,6 +168,13 @@ class DocumentLogic extends BaseLogic
 		return $this->paging($this->handleDocumentRes($res, ''), 15, $page);
 	}
 
+	/**
+	 * @param $data
+	 * @param $perPage
+	 * @param $page
+	 * @deprecated
+	 * @return array
+	 */
 	public function paging($data, $perPage, $page)
 	{
 		$perPage = $perPage <= 0 ? 15 : $perPage;

@@ -17,10 +17,23 @@ use Illuminate\Support\Str;
 class Document extends BaseModel
 {
 	protected $table = 'document';
+	protected $perPage = '10';
 
+	/**
+	 * 关联作者
+	 * @return \Illuminate\Database\Eloquent\Relations\HasOne
+	 */
 	public function user()
 	{
 		return $this->hasOne(User::class, 'id', 'creator_id');
+	}
+
+	/**
+	 * 关联权限表中的操作人员
+	 * @return \Illuminate\Database\Eloquent\Relations\HasMany
+	 */
+	public function operator() {
+		return $this->hasMany(DocumentPermission::class, 'document_id', 'id');
 	}
 
 	public function getDescriptionShortAttribute() {
