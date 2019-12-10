@@ -25,7 +25,7 @@ class CheckAuthMiddleware extends MiddlewareAbstract
 	{
 		$user = $request->session->get('user');
 		if (empty($user)) {
-			throw new ErrorHttpException('请先登录');
+			throw new ErrorHttpException('请先登录', [], 444);
 		}
 		$request = $request->withAttribute('user', UserLogic::instance()->getByUid($user['uid']));
 		return parent::process($request, $handler);
