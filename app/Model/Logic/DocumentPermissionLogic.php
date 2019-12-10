@@ -1,15 +1,27 @@
 <?php
 
+/**
+ * WeEngine Document System
+ *
+ * (c) We7Team 2019 <https://www.w7.cc>
+ *
+ * This is not a free software
+ * Using it under the license terms
+ * visited https://www.w7.cc for more details
+ */
+
 namespace W7\App\Model\Logic;
 
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\DocumentPermission;
 use W7\Core\Helper\Traiter\InstanceTraiter;
 
-class DocumentPermissionLogic extends BaseLogic {
+class DocumentPermissionLogic extends BaseLogic
+{
 	use InstanceTraiter;
 
-	public function add($documentId, $userId, $permission) {
+	public function add($documentId, $userId, $permission)
+	{
 		if (!Document::query()->find($documentId)) {
 			throw new \RuntimeException('该文档不存在');
 		}
@@ -34,7 +46,8 @@ class DocumentPermissionLogic extends BaseLogic {
 		return true;
 	}
 
-	public function getByDocIdAndUid($documentId, $userId) {
+	public function getByDocIdAndUid($documentId, $userId)
+	{
 		return DocumentPermission::query()->where('document_id', '=', $documentId)->where('user_id', '=', $userId)->first();
 	}
 
@@ -43,7 +56,8 @@ class DocumentPermissionLogic extends BaseLogic {
 	 * @param $documentId
 	 * @return array
 	 */
-	public function getListByDocId($documentId) {
+	public function getListByDocId($documentId)
+	{
 		$documentPermissions = DocumentPermission::query()->where('document_id', '=', $documentId)->get();
 		/**
 		 * @var DocumentPermission $documentPermission
@@ -65,7 +79,8 @@ class DocumentPermissionLogic extends BaseLogic {
 		return $result;
 	}
 
-	public function updatePermissionById($id, $permission) {
+	public function updatePermissionById($id, $permission)
+	{
 		/**
 		 * @var DocumentPermission $documentPermission
 		 */
@@ -82,7 +97,8 @@ class DocumentPermissionLogic extends BaseLogic {
 		return true;
 	}
 
-	public function deleteById($id) {
+	public function deleteById($id)
+	{
 		$deleted = DocumentPermission::query()->where('id', '=', $id)->delete();
 		if (!$deleted) {
 			throw new \RuntimeException('文档权限删除失败');
@@ -96,12 +112,24 @@ class DocumentPermissionLogic extends BaseLogic {
 	 * @param $documentId
 	 * @return bool
 	 */
-	public function clearByDocId($documentId) {
+	public function clearByDocId($documentId)
+	{
 		$deleted = DocumentPermission::query()->where('document_id', '=', $documentId)->delete();
 		if (!$deleted) {
 			throw new \RuntimeException('文档权限清除失败');
 		}
 
 		return true;
+	}
+
+	public function getFounderACL()
+	{
+		return [
+			'name' => '创始人',
+			'has_manage' => true,
+			'has_edit' => true,
+			'has_delete' => true,
+			'has_read' => true,
+		];
 	}
 }
