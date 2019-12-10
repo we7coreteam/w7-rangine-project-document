@@ -14,23 +14,16 @@ namespace W7\App\Model\Entity;
 
 class User extends BaseModel
 {
-	protected $table = 'user';
-	//属性类型转换
-	//    protected $casts = [
-	//        'is_ban' => 'boolean',
-	//    ];
-	public function getCreatedAtAttribute($value)
-	{
-		return date('Y-m-d H:i:s', $value);
-	}
+	const GROUP_ADMIN = 1;
 
-	public function getUpdatedAtAttribute($value)
-	{
-		return date('Y-m-d H:i:s', $value);
-	}
+	protected $table = 'user';
 
 	public function document()
 	{
 		return $this->belongsTo(Document::class);
+	}
+
+	public function getIsAdminAttribute() {
+		return $this->group_id == self::GROUP_ADMIN;
 	}
 }
