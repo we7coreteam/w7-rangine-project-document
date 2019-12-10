@@ -9,18 +9,6 @@ class DocumentPermission extends BaseModel {
 
 	protected $table = 'document_permission';
 
-	public function isManager() : bool {
-		return $this->permission == self::MANAGER_PERMISSION;
-	}
-
-	public function isOperator() : bool {
-		return $this->permission == self::OPERATOR_PERMISSION;
-	}
-
-	public function isReader() : bool {
-		return $this->permission == self::READER_PERMISSION;
-	}
-
 	public function save(array $options = []) {
 		if ($this->isManager() || $this->isOperator() || $this->isReader()) {
 			return parent::save($options);
@@ -35,5 +23,21 @@ class DocumentPermission extends BaseModel {
 
 	public function document() {
 		return $this->hasOne(Document::class, 'id', 'document_id');
+	}
+
+	public function hasRead() {
+		return $this->permission == self::READER_PERMISSION || $this->permission == self::OPERATOR_PERMISSION || $this->permission == self::MANAGER_PERMISSION;
+	}
+
+	public function hasDelete() {
+		return $this->permission == self::MANAGER_PERMISSION;
+	}
+
+	public function hasEdit() {
+		return $this->permission == self::MANAGER_PERMISSION || $this->permission == self::OPERATOR_PERMISSION;
+	}
+
+	public function hasManager() {
+		return $this->permission == self::MANAGER_PERMISSION;
 	}
 }

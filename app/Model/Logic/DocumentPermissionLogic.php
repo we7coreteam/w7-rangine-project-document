@@ -32,6 +32,10 @@ class DocumentPermissionLogic extends LogicAbstract {
 		return true;
 	}
 
+	public function get($documentId, $userId) {
+		return DocumentPermission::where('document_id', '=', $documentId)->where('user_id', '=', $userId)->first();
+	}
+
 	public function list($documentId) {
 		$documentPermissions = (new DocumentPermission())->where('document_id', '=', $documentId)->where('document_id', '=', $documentId)->get();
 		if (!$documentPermissions) {
