@@ -17,7 +17,7 @@ namespace W7\App\Model\Entity;
  * @package W7\App\Model\Entity
  *
  * @property $isFounder
- * @property $isManage
+ * @property $isManager
  * @property $isOperator
  * @property $isReader
  */
