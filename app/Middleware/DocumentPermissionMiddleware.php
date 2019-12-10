@@ -29,7 +29,7 @@ class DocumentPermissionMiddleware extends MiddlewareAbstract
 			 * @var DocumentPermission $documentPermission
 			 */
 			$documentPermission = (new DocumentPermissionLogic())->getByDocIdAndUid($documentId, $user->id);
-			$user->isManage = $documentPermission->isManage();
+			$user->isManage = $documentPermission->isManager();
 			$user->isOperator = $documentPermission->isOperator();
 			$user->isReader = $documentPermission->isReader();
 		} else {
