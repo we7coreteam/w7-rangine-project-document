@@ -12,37 +12,42 @@
 
 namespace W7\App\Controller\Admin;
 
+use W7\App\Controller\BaseController;
+use W7\App\Model\Entity\User;
 use W7\Http\Message\Server\Request;
 use W7\App\Model\Logic\UserLogic;
 
-class UserController extends Controller
+class UserController extends BaseController
 {
 	public function __construct()
 	{
 		$this->logic = new UserLogic();
 	}
 
-	public function getUserList(Request $request)
+	public function search(Request $request)
 	{
-		try {
-			$username = trim($request->input('username'));
-			$res = $this->logic->getUserList($request->input('page'), $username);
-			return $this->success($res);
-		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
-		}
-	}
+		$username = trim($request->post('username'));
+		$page = intval($request->post('page'));
 
-	public function getUser(Request $request)
-	{
-		try {
-			$userId = $request->session->get('user_id');
-			$res = $this->logic->getUser(['id' => $userId]);
-			$res = $this->logic->handleUser([$res]);
-			return $this->success($res[0]);
-		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
+		$user = User::query()->where('username', 'LIKE', "%$username%")->paginate(null, '*', 'page', $page);
+
+		$result = [];
+		$list = $user->items();
+		if (!empty($list)) {
+			foreach ($list as $i => $row) {
+				$result['data'][] = [
+					'id' => $row->id,
+					'username' => $row->username,
+					'created_at' => $row->created_at->toDateTimeString(),
+				];
+			}
 		}
+
+		$result['page_count'] = $user->lastPage();
+		$result['total'] = $user->total();
+		$result['page_current'] = $user->currentPage();
+
+		return $this->data($result);
 	}
 
 	public function addUser(Request $request)
@@ -121,7 +126,7 @@ class UserController extends Controller
 
 			$this->logic->checkUserpass($userpass, $confirm_userpass);
 
-			$userinfos = $this->logic->getUser(['username'=>$username]);
+			$userinfos = $this->logic->getUser(['username' => $username]);
 
 			if ($userinfos) {
 				$this->logic->checkUsername($userinfos['id'], intval($request->input('id')));

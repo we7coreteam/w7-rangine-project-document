@@ -54,17 +54,6 @@ class UserLogic extends BaseLogic
 	}
 
 
-
-	public function getUserlist($page, $username)
-	{
-		$res = User::where('username', 'like', '%'.$username.'%')->orderBy('id', 'desc')->get()->toArray();
-		if ($res) {
-			$doclogic = new DocumentLogic();
-			return $doclogic->paging($this->handleUser($res), 15, $page);
-		}
-		return $res;
-	}
-
 	public function getUser($data)
 	{
 		if (isset($data['id']) && $data['id']) {

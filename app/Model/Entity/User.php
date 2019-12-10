@@ -26,6 +26,7 @@ class User extends BaseModel
 	const GROUP_ADMIN = 1;
 
 	protected $table = 'user';
+	protected $perPage = '10';
 
 	public function document()
 	{
