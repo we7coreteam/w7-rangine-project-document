@@ -10,7 +10,7 @@ class DocumentPermission extends BaseModel {
 	protected $table = 'document_permission';
 
 	public function save(array $options = []) {
-		if ($this->isManager() || $this->isOperator() || $this->isReader()) {
+		if (in_array($this->permission, [self::MANAGER_PERMISSION, self::OPERATOR_PERMISSION, self::READER_PERMISSION])) {
 			return parent::save($options);
 		}
 
