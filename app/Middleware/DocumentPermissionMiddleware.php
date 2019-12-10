@@ -19,6 +19,8 @@ class DocumentPermissionMiddleware extends MiddlewareAbstract {
 		$documentPermission = (new DocumentPermissionLogic())->get($documentId, $user->id);
 		if ($documentPermission) {
 			$request = $request->withAttribute('permission', $documentPermission);
+		} else {
+			throw new \RuntimeException('无操作权限');
 		}
 
 		return parent::process($request, $handler);
