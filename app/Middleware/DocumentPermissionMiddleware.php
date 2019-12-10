@@ -16,7 +16,7 @@ class DocumentPermissionMiddleware extends MiddlewareAbstract {
 		}
 
 		$user = $request->getAttribute('user');
-		$documentPermission = (new DocumentPermissionLogic())->get($documentId, $user->id);
+		$documentPermission = (new DocumentPermissionLogic())->getByDocIdAndUid($documentId, $user->id);
 		if ($documentPermission) {
 			$request = $request->withAttribute('permission', $documentPermission);
 		} else {
