@@ -12,29 +12,91 @@
 
 namespace W7\App\Controller\Admin;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use W7\App\Controller\BaseController;
+use W7\App\Model\Entity\Document;
+use W7\App\Model\Entity\DocumentPermission;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\Http\Message\Server\Request;
 
-class DocumentController extends Controller
+class DocumentController extends BaseController
 {
+	const PAGE_SIZE = 10;
+
 	public function __construct()
 	{
 		$this->logic = new DocumentLogic();
 	}
 
-	public function getList(Request $request)
+	public function all(Request $request)
 	{
-		try {
-			$this->validate($request, [
-				'name' => '',
-			]);
-			$name = trim($request->input('name'));
-			$res = $this->logic->getlist($request->input('page'), $name);
+		$keyword = trim($request->input('keyword'));
+		$page = intval($request->post('page'));
 
-			return $this->success($res);
-		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
+		$user = $request->getAttribute('user');
+
+		if ($user->isFounder) {
+			$query = Document::query()->with('user')->orderByDesc('id');
+			if (!empty($keyword)) {
+				$query->where('name', 'LIKE', "%{$keyword}%");
+			}
+			/**
+			 * @var LengthAwarePaginator $result
+			 */
+			$list = $query->paginate(self::PAGE_SIZE, '*', 'page', $page);
+
+			$document = $list->items();
+			if (!empty($document)) {
+				foreach ($document as $i => $row) {
+					$result['data'][] = [
+						'id' => $row->id,
+						'name' => $row->name,
+						'description' => $row->descriptionShort,
+						'is_show' => $row->is_show,
+						'permission' => [
+							'has_delete' => true,
+							'has_edit' => true,
+							'has_manage' => true,
+						]
+					];
+				}
+			}
+
+		} else {
+			$query = DocumentPermission::query()->where('user_id', '=', $user->id)
+					->whereIn('permission', [DocumentPermission::MANAGER_PERMISSION, DocumentPermission::OPERATOR_PERMISSION, DocumentPermission::READER_PERMISSION])
+					->orderByDesc('id')->with('document');
+			if (!empty($keyword)) {
+				$query->whereHas('document', function ($query) use ($keyword) {
+					return $query->where('name', 'LIKE', "%{$keyword}%");
+				});
+			}
+
+			$list = $query->paginate(self::PAGE_SIZE, '*', 'page', $page);
+
+			$document = $list->items();
+			if (!empty($document)) {
+				foreach ($document as $i => $row) {
+					$result['data'][] = [
+						'id' => $row->document->id,
+						'name' => $row->document->name,
+						'description' => $row->document->descriptionShort,
+						'is_show' => $row->document->is_show,
+						'permission' => [
+							'has_delete' => $row->permission == DocumentPermission::MANAGER_PERMISSION,
+							'has_edit' => $row->permission == DocumentPermission::MANAGER_PERMISSION || $row->permission == DocumentPermission::OPERATOR_PERMISSION,
+							'has_manage' => $row->permission == DocumentPermission::MANAGER_PERMISSION,
+						],
+					];
+				}
+			}
 		}
+
+		$result['page_count'] = $list->lastPage();
+		$result['total'] = $list->total();
+		$result['page_current'] = $list->currentPage();
+
+		return $this->data($result);
 	}
 
 	public function getDocUserList(Request $request)
@@ -57,7 +119,7 @@ class DocumentController extends Controller
 		}
 	}
 
-	public function getDetails(Request $request)
+	public function detail(Request $request)
 	{
 		try {
 			$this->validate($request, [
@@ -65,6 +127,7 @@ class DocumentController extends Controller
 			], [
 				'id.required' => '文档ID不能为空',
 			]);
+
 			$res = $this->logic->getdetails($request->input('id'));
 			if ($res) {
 				return $this->success($res);

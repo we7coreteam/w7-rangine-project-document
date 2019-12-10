@@ -12,22 +12,18 @@
 
 namespace W7\App\Model\Entity;
 
+use Illuminate\Support\Str;
+
 class Document extends BaseModel
 {
 	protected $table = 'document';
 
-	public function getCreatedAtAttribute($value)
-	{
-		return date('Y-m-d H:i:s', $value);
-	}
-
-	public function getUpdatedAtAttribute($value)
-	{
-		return date('Y-m-d H:i:s', $value);
-	}
-
 	public function user()
 	{
 		return $this->hasOne(User::class, 'id', 'creator_id');
+	}
+
+	public function getDescriptionShortAttribute() {
+		return Str::limit(html_entity_decode($this->description), 20);
 	}
 }

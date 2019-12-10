@@ -16,6 +16,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use W7\App\Exception\ErrorHttpException;
+use W7\App\Model\Logic\UserLogic;
 use W7\Core\Middleware\MiddlewareAbstract;
 
 class CheckAuthMiddleware extends MiddlewareAbstract
@@ -26,6 +27,7 @@ class CheckAuthMiddleware extends MiddlewareAbstract
 		if (empty($user)) {
 			throw new ErrorHttpException('请先登录');
 		}
+		$request = $request->withAttribute('user', UserLogic::instance()->getByUid($user['uid']));
 		return parent::process($request, $handler);
 	}
 }
