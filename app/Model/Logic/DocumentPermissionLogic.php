@@ -35,11 +35,31 @@ class DocumentPermissionLogic extends BaseLogic {
 		return DocumentPermission::query()->where('document_id', '=', $documentId)->where('user_id', '=', $userId)->first();
 	}
 
+	/**
+	 * 获取文档的所有权限用户
+	 * @param $documentId
+	 * @return array
+	 */
 	public function getListByDocId($documentId) {
-		$documentPermissions = (new DocumentPermission())->where('document_id', '=', $documentId)->where('document_id', '=', $documentId)->get();
-		if (!$documentPermissions) {
-
+		$documentPermissions = DocumentPermission::query()->where('document_id', '=', $documentId)->get();
+		/**
+		 * @var DocumentPermission $documentPermission
+		 */
+		$result = [];
+		foreach ($documentPermissions as $documentPermission) {
+			$result[] = [
+				'id' => $documentPermission->id,
+				'user_name' => $documentPermission->user->username,
+				'user_role' => $documentPermission->permission,
+				'permission' => [
+					'has_delete' => $documentPermission->hasManage(),
+					'has_edit' => $documentPermission->hasManage(),
+					'has_manage' => $documentPermission->hasManage()
+				]
+			];
 		}
+
+		return $result;
 	}
 
 	public function updatePermissionById($id, $permission) {
@@ -68,6 +88,11 @@ class DocumentPermissionLogic extends BaseLogic {
 		return true;
 	}
 
+	/**
+	 * 删除文档后，删除对应的权限
+	 * @param $documentId
+	 * @return bool
+	 */
 	public function clearByDocId($documentId) {
 		$deleted = DocumentPermission::query()->where('document_id', '=', $documentId)->delete();
 		if (!$deleted) {

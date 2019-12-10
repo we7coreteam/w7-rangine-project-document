@@ -21,19 +21,35 @@ class DocumentPermission extends BaseModel {
 		return $this->hasOne(Document::class, 'id', 'document_id');
 	}
 
+	/**
+	 * 判断用户是否有读该文档权限
+	 * @return bool
+	 */
 	public function hasRead() {
 		return $this->permission == self::READER_PERMISSION || $this->permission == self::OPERATOR_PERMISSION || $this->permission == self::MANAGER_PERMISSION;
 	}
 
+	/**
+	 * 判断用户是否有删除该文档权限
+	 * @return bool
+	 */
 	public function hasDelete() {
 		return $this->permission == self::MANAGER_PERMISSION;
 	}
 
+	/**
+	 * 判断用户是否有编辑该文档权限
+	 * @return bool
+	 */
 	public function hasEdit() {
 		return $this->permission == self::MANAGER_PERMISSION || $this->permission == self::OPERATOR_PERMISSION;
 	}
 
-	public function hasManager() {
+	/**
+	 * 判断用户是否有管理该文档权限
+	 * @return bool
+	 */
+	public function hasManage() {
 		return $this->permission == self::MANAGER_PERMISSION;
 	}
 
