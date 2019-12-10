@@ -26,10 +26,6 @@ class AdminMiddleware extends MiddlewareAbstract
 		if (!$user_id) {
 			return App::getApp()->getContext()->getResponse()->json(['message' => '用户未登录', 'data' => null, 'status' => false, 'code' => 444]);
 		}
-		$request->document_user_id = $user_id;
-		$logic = new App\Model\Logic\UserAuthorizationLogic();
-		$request->document_user_auth = $logic->getUserAuthorizations($user_id);
-		App::getApp()->getContext()->setRequest($request);
 		return $handler->handle($request);
 	}
 }
