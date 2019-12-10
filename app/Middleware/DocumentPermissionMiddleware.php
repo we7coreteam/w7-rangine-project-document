@@ -36,6 +36,10 @@ class DocumentPermissionMiddleware extends MiddlewareAbstract
 				$user->isManager = $documentPermission->isManager();
 				$user->isOperator = $documentPermission->isOperator();
 				$user->isReader = $documentPermission->isReader();
+			} else {
+				$user->isManager = false;
+				$user->isOperator = false;
+				$user->isReader = false;
 			}
 		}
 		$request = $request->withAttribute('user', $user);
