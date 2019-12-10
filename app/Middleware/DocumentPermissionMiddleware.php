@@ -5,7 +5,6 @@ namespace W7\App\Middleware;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\DocumentPermission;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Logic\DocumentPermissionLogic;
@@ -17,27 +16,28 @@ class DocumentPermissionMiddleware extends MiddlewareAbstract
 	{
 		$documentId = $request->post('document_id');
 		if (!$documentId) {
-			throw new ErrorHttpException('Invalid document_id');
+			return parent::process($request, $handler);
 		}
 
 		/**
 		 * @var User $user
 		 */
 		$user = $request->getAttribute('user');
-		if (!$user->isFounder) {
-			/**
-			 * @var DocumentPermission $documentPermission
-			 */
-			$documentPermission = (new DocumentPermissionLogic())->getByDocIdAndUid($documentId, $user->id);
-			$user->isManager = $documentPermission->isManager();
-			$user->isOperator = $documentPermission->isOperator();
-			$user->isReader = $documentPermission->isReader();
-		} else {
+		if ($user->isFounder) {
 			$user->isManager = true;
 			$user->isOperator = true;
 			$user->isReader = true;
+		} else {
+			/**
+			 * @var DocumentPermission $documentPermission
+			 */
+			$documentPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($documentId, $user->id);
+			if ($documentPermission) {
+				$user->isManager = $documentPermission->isManager();
+				$user->isOperator = $documentPermission->isOperator();
+				$user->isReader = $documentPermission->isReader();
+			}
 		}
-
 		$request = $request->withAttribute('user', $user);
 
 		return parent::process($request, $handler);
