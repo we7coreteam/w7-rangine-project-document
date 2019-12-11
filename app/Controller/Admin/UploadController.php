@@ -43,7 +43,7 @@ class UploadController extends BaseController
 			$baseName = md5(time().irandom(1000, 9999).uniqid());
 			$fileName = $baseName.'.'.explode('/', $file['type'])[1];
 
-			$url = CdnLogic::instance()->channel('we7cloud')->uploadFile($fileName, $file['tmp_name']);
+			$url = CdnLogic::instance()->channel('document')->uploadFile($fileName, $file['tmp_name']);
 
 			return ['state' => 'SUCCESS' ,'success' => 1,'message' => '上传成功','url'=>$url];
 		} catch (\Exception $e) {
