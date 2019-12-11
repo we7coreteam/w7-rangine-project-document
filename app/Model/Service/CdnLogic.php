@@ -13,154 +13,218 @@
 namespace W7\App\Model\Service;
 
 use Qcloud\Cos\Client;
-use W7\App\Model\Entity\Setting;
-use W7\App\Model\Logic\SettingLogic;
 use W7\Core\Database\LogicAbstract;
 use W7\Core\Helper\Traiter\InstanceTraiter;
 
+/**
+ * Class CdnLogic
+ * @package W7\App\Model\Service
+ */
 class CdnLogic extends LogicAbstract
 {
 	use InstanceTraiter;
 
-	private $allowAttachService = [
-		'cos' => qCloudCos::class,
-	];
+	private $bucketSpace = [];
+	private $client = [];
+	/**
+	 * 当前指定的通道
+	 * @var string
+	 */
+	private $channel = '';
 
-	public function get()
+	public function __construct()
 	{
-		$this->connection('cos');
+		$this->bucketSpace = [
+			'document' => [
+				'secretId' => ienv('CDN_QCLOUD_COSV5_SECRET_ID'),
+				'secretKey' => ienv('CDN_QCLOUD_COSV5_SECRET_KEY'),
+				'bucket' => sprintf('%s', ienv('CDN_QCLOUD_COSV5_BUCKET')),
+				'rootUrl' => ienv('CDN_QCLOUD_COSV5_CDN'),
+				'region' => 'ap-shanghai',
+			]
+		];
+	}
+
+	/**
+	 * @param string $channel
+	 * @return mixed
+	 * @throws \Throwable
+	 */
+	public function connection($channel = '')
+	{
+		if (empty($channel)) {
+			$channel = $this->channel;
+		}
+
+		if (empty($channel)) {
+			throw new \RuntimeException('Please set bucket');
+		}
+
+		if (empty($this->client[$channel])) {
+			try {
+				$this->client[$channel] = new Client([
+					'region' => $this->bucketSpace[$channel]['region'],
+					'schema' => 'https',
+					'credentials'=> [
+						'secretId'  => $this->bucketSpace[$channel]['secretId'],
+						'secretKey' => $this->bucketSpace[$channel]['secretKey'],
+					]
+				]);
+			} catch (\Throwable $e) {
+				throw $e;
+			}
+		}
+		return $this->client[$channel];
+	}
+
+	/**
+	 * 设置当前存储的通道
+	 * @param $channel
+	 * @param bool $runTest
+	 * @return $this
+	 */
+	public function channel($channel, $runTestBucket = false)
+	{
+		if (empty($channel) || empty($this->bucketSpace[$channel])) {
+			throw new \RuntimeException('Invalid bucket name');
+		}
+
+		if (!empty($this->bucketSpace[$channel]['rootUrl'])) {
+			$rootUrls = parse_url($this->bucketSpace[$channel]['rootUrl']);
+			if (empty($rootUrls['host'])) {
+				throw new \RuntimeException('Invalid root url');
+			}
+		}
+
+		if ($runTestBucket) {
+			try {
+				$isExistsBucket = $this->connection($channel)->headBucket([
+					'Bucket' => $this->bucketSpace[$channel]['bucket'],
+				]);
+			} catch (\Throwable $e) {
+				throw new \RuntimeException($e->getMessage(), $e->getCode());
+			}
+		}
+
+		$this->channel = $channel;
+
+		return $this;
 	}
 
 	/**
 	 * 上传一个文件
-	 * @param $uploadPath 上传到CDN的路径
-	 * @param $realPath 文件的本地真实路径
+	 * @param $uploadPath 上传到COS的路径，以/开头
+	 * @param $realPath 文件在本地的物理绝对路径
+	 * @return string 文件在COS上的URL
 	 */
 	public function uploadFile($uploadPath, $realPath)
 	{
-		if (!file_exists($realPath)) {
-			throw new \RuntimeException('File not found');
-		}
-
-		return $this->connection('cos')->uploadFile($uploadPath, $realPath);
-	}
-
-	public function convertUrl($uploadPath)
-	{
-		return $this->connection('cos')->convertUrl($uploadPath);
-	}
-
-	private function connection($name)
-	{
-		if (empty($this->allowAttachService[$name])) {
-			throw new \RuntimeException('Invalid connection name');
-		}
-
-		return iloader()->singleton($this->allowAttachService[$name]);
-	}
-}
-
-/**
- * 腾讯云COS
- * Class qCloudCos
- * @package W7\App\Model\Service
- */
-class qCloudCos
-{
-	private $secretId;
-	private $secretKey;
-	private $bucket;
-	private $rootUrl;
-	private $region = 'ap-shanghai';
-	private $path = '/';
-
-	public function __construct()
-	{
-		$settingLogic = new SettingLogic();
-		$settingValue = $settingLogic->show('cloud_cosv5');
-
-		if (empty($settingValue) && !isset($settingValue['value'])) {
-			throw new \RuntimeException('cloud_cosv5 is empty');
-		}
-		$settingValue = $settingValue['value'];
-
-		$this->secretId = $settingValue['secret_id'];
-		$this->secretKey = $settingValue['secret_key'];
-		$this->bucket = sprintf('%s-%s', $settingValue['bucket'], $settingValue['app_id']);
-		$this->rootUrl = str_replace(array('http://', 'https://'), '', $settingValue['url']);
-		$this->region = $settingValue['region'];
-		$this->path = rtrim($settingValue['path'], '/');
-
-		if (empty($this->secretKey) || empty($this->secretId)) {
-			throw new \RuntimeException('Invalid cloud_cosv5 config');
-		}
-
-		if (!empty($this->bucket)) {
-			try {
-				$isExistsBucket = $this->connection()->headBucket(
-					[
-						'Bucket' => $this->bucket,
-					]
-				);
-			} catch (\Throwable $e) {
-				throw new \RuntimeException('附件上传Bucket不存在或是无法访问。', $e->getStatusCode());
-			}
-		}
-	}
-
-	/**
-	 * @return Client
-	 * @throws \Throwable
-	 */
-	public function connection()
-	{
 		try {
-			$client = new Client(
-				[
-					'region' => $this->region,
-					'schema' => 'https',
-					'credentials' => [
-						'secretId' => $this->secretId,
-						'secretKey' => $this->secretKey,
-					],
-				]
-			);
+			$result = $this->connection()->putObject([
+				'Key' => $uploadPath,
+				'Bucket' => $this->bucketSpace[$this->channel]['bucket'],
+				'Body' => fopen($realPath, 'rb'),
+			]);
 		} catch (\Throwable $e) {
-			throw $e;
+			throw new \RuntimeException($e->getMessage(), $e->getCode());
 		}
-
-		return $client;
-	}
-
-	public function uploadFile($uploadPath, $realPath)
-	{
-		try {
-			$uploadPath = $this->path . '/' . $uploadPath;
-
-			$result = $this->connection()->putObject(
-				[
-					'Key' => $uploadPath,
-					'Bucket' => $this->bucket,
-					'Body' => fopen($realPath, 'rb'),
-				]
-			);
-		} catch (\Throwable $e) {
-			throw new \Exception($e->getMessage());
-			throw new \RuntimeException($e->getMessage(), $e->getStatusCode());
-		}
-
 		return $this->replacePublicRootUrl($result['ObjectURL']);
 	}
 
-	public function convertUrl($uploadPath)
+	/**
+	 * 获取目录下的所有文件
+	 * @param $dir
+	 * @return array
+	 */
+	public function getDirFiles($dir = '') : array
 	{
-		return sprintf('https://%s/%s', $this->rootUrl, $uploadPath);
+		try {
+			$dir = ltrim($dir, '/');
+			$result = $this->connection()->listObjects([
+				'Prefix' => $dir,
+				'Bucket' => $this->bucketSpace[$this->channel]['bucket']
+			]);
+		} catch (\Throwable $e) {
+			throw new \RuntimeException($e->getMessage(), $e->getCode());
+		}
+		return (array)$result['Contents'];
 	}
 
+	/**
+	 * 获取已上传文件的URL
+	 * @param $uploadFile 文件存在cos上的路径
+	 * @param $timeout 设置获取此地址的有效时间
+	 * @return string cos的url
+	 */
+	public function getFileUrl($uploadFile, $timeout = null)
+	{
+		if (!is_null($timeout)) {
+			$timeout = "+{$timeout} seconds";
+		}
+
+		try {
+			$result = $this->connection()->getObjectUrl($this->bucketSpace[$this->channel]['bucket'], $uploadFile, $timeout);
+		} catch (\Throwable $e) {
+			throw new \RuntimeException($e->getMessage(), $e->getCode());
+		}
+
+		return $result;
+	}
+
+	public function deleteFile($uploadFile)
+	{
+		if (empty($uploadFile)) {
+			throw new \RuntimeException('Invalid file path');
+		}
+
+		if (!is_array($uploadFile)) {
+			$uploadFile = [$uploadFile];
+		}
+		$objects = [];
+
+		foreach ($uploadFile as $row) {
+			$row = ltrim($row, '/');
+			$objects[] = [
+				'Key' => $row,
+			];
+		}
+
+		try {
+			$result = $this->connection()->deleteObjects([
+				'Bucket' => $this->bucketSpace[$this->channel]['bucket'],
+				'Objects' => $objects,
+			]);
+		} catch (\Throwable $e) {
+			throw new \RuntimeException($e->getMessage(), $e->getCode());
+		}
+
+		return true;
+	}
+
+	public function convertUrl($uploadPath, $returnOld = false)
+	{
+		$uploadPath = ltrim($uploadPath, '/');
+
+		if (!empty($this->bucketSpace[$this->channel]['rootUrl']) && empty($returnOld)) {
+			return sprintf('%s/%s', $this->bucketSpace[$this->channel]['rootUrl'], $uploadPath);
+		}
+		return sprintf('https://%s.cos.%s.myqcloud.com/%s', $this->bucketSpace[$this->channel]['bucket'], $this->bucketSpace[$this->channel]['region'], $uploadPath);
+	}
+
+	/**
+	 * 替换COS的默认地址为用户设置过的根域名
+	 * @param $url
+	 * @return string
+	 */
 	private function replacePublicRootUrl($url)
 	{
-		$oldUrl = sprintf('%s.cos.%s.myqcloud.com', $this->bucket, $this->region);
+		if (empty($this->bucketSpace[$this->channel]['rootUrl'])) {
+			return $url;
+		}
+		$oldUrl = $this->convertUrl('', true);
+		$oldHost = parse_url($oldUrl, PHP_URL_HOST);
+		$rootUrlHost = parse_url($this->bucketSpace[$this->channel]['rootUrl'], PHP_URL_HOST);
 
-		return str_replace($oldUrl, $this->rootUrl, $url);
+		return str_replace($oldHost, $rootUrlHost, $url);
 	}
 }
