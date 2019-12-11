@@ -166,8 +166,8 @@ class UserController extends BaseController
 
 		$ids = array_filter(explode(',', trim($request->input('ids'))));
 		if ($ids) {
-			$res = UserLogic::instance()->deleteUsers($ids);
-			return $this->data($res);
+			$delNum = UserLogic::instance()->deleteUsers($ids);
+			return $this->data('成功删除' . $delNum . '用户，如果用户有文档不能直接删除');
 		}
 		throw new ErrorHttpException('参数有误');
 	}

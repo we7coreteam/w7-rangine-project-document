@@ -113,22 +113,22 @@ class UserLogic extends BaseLogic
 
 	public function deleteUsers($ids)
 	{
-		$doclogic = new DocumentLogic();
+		$docLogic = new DocumentLogic();
 
-		$i = 0;
+		$delNum = 0;
 		foreach ($ids as $k => $val) {
-			$res = $doclogic->getUserCreateDoc($val);
+			$res = $docLogic->getUserCreateDoc($val);
 			if (!$res) {
-				$user = User::find($val);
+				$user = User::query()->find($val);
 				if ($user && $user['has_privilege'] != 1) {
 					if ($this->delUser($val)) {
-						$i++;
+						$delNum++;
 					}
 				}
 			}
 		}
 
-		return ['msg'=> '成功删除' . $i . '用户，如果用户有文档不能直接删除'];
+		return $delNum;
 	}
 
 	public function handleUser($res)
