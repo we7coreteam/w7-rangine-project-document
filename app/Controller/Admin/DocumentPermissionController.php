@@ -4,6 +4,7 @@ namespace W7\App\Controller\Admin;
 
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
+use W7\App\Model\Entity\User;
 use W7\App\Model\Logic\DocumentPermissionLogic;
 use W7\Http\Message\Server\Request;
 
@@ -17,6 +18,14 @@ class DocumentPermissionController extends BaseController
 
 	public function add(Request $request)
 	{
+		/**
+		 * @var User $user
+		 */
+		$user = $request->getAttribute('user');
+		if (!$user->isManager) {
+			throw new ErrorHttpException('您没有权限管理该文档');
+		}
+
 		$params = $this->validate($request, [
 			'document_id' => 'required',
 			'user_id' => 'required',
@@ -31,15 +40,23 @@ class DocumentPermissionController extends BaseController
 		}
 	}
 
-	public function getListByDocIdAndUid(Request $request)
+	public function batchAdd(Request $request)
 	{
+		/**
+		 * @var User $user
+		 */
+		$user = $request->getAttribute('user');
+		if (!$user->isFounder) {
+			throw new ErrorHttpException('您没有权限管理该文档');
+		}
+
 		$params = $this->validate($request, [
-			'document_id' => 'required'
+			'document_permission' => 'required'
 		]);
 
 		try {
-			$list = DocumentPermissionLogic::instance()->getListByDocId($params['document_id']);
-			return $this->data($list);
+			DocumentPermissionLogic::instance()->batchAdd($params['document_permission']);
+			return $this->data('success');
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());
 		}
@@ -47,6 +64,14 @@ class DocumentPermissionController extends BaseController
 
 	public function editPermissionById(Request $request)
 	{
+		/**
+		 * @var User $user
+		 */
+		$user = $request->getAttribute('user');
+		if (!$user->isManager) {
+			throw new ErrorHttpException('您没有权限管理该文档');
+		}
+
 		$params = $this->validate($request, [
 			'id' => 'required',
 			'permission' => 'required'
@@ -54,20 +79,6 @@ class DocumentPermissionController extends BaseController
 
 		try {
 			DocumentPermissionLogic::instance()->updatePermissionById($params['id'], $params['permission']);
-			return $this->data('success');
-		} catch (\Throwable $e) {
-			throw new ErrorHttpException($e->getMessage());
-		}
-	}
-
-	public function deletePermissionById(Request $request)
-	{
-		$params = $this->validate($request, [
-			'id' => 'required'
-		]);
-
-		try {
-			DocumentPermissionLogic::instance()->deleteById($params['id']);
 			return $this->data('success');
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());
