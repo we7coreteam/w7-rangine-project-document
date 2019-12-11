@@ -56,28 +56,25 @@ class UserController extends BaseController
 			throw new ErrorHttpException('没有操作用户的权限');
 		}
 
-		$this->validate($request, [
+		$data = $this->validate($request, [
 			'username' => 'required',
 			'userpass' => 'required',
 		], [
 			'username.required' => '请输入用户姓名',
 			'userpass.required' => '请输入用户密码',
 		]);
-		$username = trim($request->input('username'));
-		$userpass = trim($request->input('userpass'));
-
 		$data = [
-			'username' => $username,
-			'userpass' => $userpass,
+			'username' => trim($data['username']),
+			'userpass' => trim($data['userpass']),
 		];
 		$data['remark'] = $request->input('remark', '');
 
-		$res = UserLogic::instance()->createUser($data);
-		if ($res) {
+		try {
+			$res = UserLogic::instance()->createUser($data);
 			return $this->data($res);
+		} catch (\Throwable $e) {
+			throw new ErrorHttpException($e->getMessage());
 		}
-
-		throw new ErrorHttpException('用户名重复，获取数据有误');
 	}
 
 	public function detailById(Request $request)
@@ -90,17 +87,18 @@ class UserController extends BaseController
 			throw new ErrorHttpException('没有操作用户的权限');
 		}
 
-		$this->validate($request, [
+		$params = $this->validate($request, [
 			'id' => 'required'
 		], [
 			'id.required' => '用户ID不能为空',
 		]);
 
-		$res = UserLogic::instance()->detailById($request->input('id'));
-		if ($res) {
+		try {
+			$res = UserLogic::instance()->detailById($params['id']);
 			return $this->data($res);
+		} catch (\Throwable $e) {
+			throw new ErrorHttpException($e->getMessage());
 		}
-		throw new ErrorHttpException('用户不存在');
 	}
 
 	public function update(Request $request)
@@ -113,7 +111,7 @@ class UserController extends BaseController
 			throw new ErrorHttpException('没有操作用户的权限');
 		}
 
-		$this->validate($request, [
+		$user = $this->validate($request, [
 			'id' => 'required',
 			'username' => 'required',
 			'userpass' => 'required',
@@ -127,9 +125,9 @@ class UserController extends BaseController
 			'confirm_userpass.required' => '确认密码不能为空',
 		]);
 
-		$user['username'] = trim($request->input('username'));
-		$user['userpass'] = trim($request->input('userpass'));
-		$user['confirm_userpass'] = trim($request->input('confirm_userpass'));
+		$user['username'] = trim($user['username']);
+		$user['userpass'] = trim($user['userpass']);
+		$user['confirm_userpass'] = trim($user['confirm_userpass']);
 		if ($request->input('is_ban') !== null) {
 			$user['is_ban'] = $request->input('is_ban');
 		}
@@ -141,7 +139,7 @@ class UserController extends BaseController
 		}
 
 		try {
-			$res = UserLogic::instance()->updateUser(intval($request->input('id')), $data);
+			$res = UserLogic::instance()->updateUser($user);
 			return $this->data($res);
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());
@@ -158,13 +156,13 @@ class UserController extends BaseController
 			throw new ErrorHttpException('没有操作用户的权限');
 		}
 
-		$this->validate($request, [
+		$params = $this->validate($request, [
 			'ids' => 'required'
 		], [
 			'ids.required' => 'ID不能为空',
 		]);
 
-		$ids = array_filter(explode(',', trim($request->input('ids'))));
+		$ids = array_filter(explode(',', trim($params['ids'])));
 		if ($ids) {
 			$delNum = UserLogic::instance()->deleteUsers($ids);
 			return $this->data('成功删除' . $delNum . '用户，如果用户有文档不能直接删除');

@@ -74,21 +74,24 @@ class UserLogic extends BaseLogic
 
 		if (!$users) {
 			$data['userpass'] = $this->userpassEncryption($data['username'], $data['userpass']);
-			return User::query()->create($data);
+			if (!User::query()->create($data)) {
+				throw new \RuntimeException('用户添加失败');
+			}
 		}
-		return false;
+
+		throw new \RuntimeException('用户名重复，获取数据有误');
 	}
 
-	public function updateUser($id, $user)
+	public function updateUser($user)
 	{
 		$userInfo = $this->getUser(['username' => $user['username']]);
-		if ($userInfo && $id != $userInfo->id) {
+		if ($userInfo && $user['id'] != $userInfo->id) {
 			throw new \RuntimeException('用户名已经存在');
 		}
 
 		$user['userpass'] = $this->userpassEncryption($user['username'], $user['userpass']);
-		ChangeAuthEvent::instance()->attach('user_id', $id)->attach('document_id', 0)->dispatch();
-		$result = User::query()->where('id', $id)->update($user);
+		ChangeAuthEvent::instance()->attach('user_id', $user['id'])->attach('document_id', 0)->dispatch();
+		$result = User::query()->where('id', $user['id'])->update($user);
 		if (!$result) {
 			throw new \RuntimeException('修改用户信息失败');
 		}
@@ -103,7 +106,8 @@ class UserLogic extends BaseLogic
 			$res = $this->handleUser([$res]);
 			return $res[0];
 		}
-		return $res;
+
+		throw new \RuntimeException('用户不存在');
 	}
 
 	public function delUser($ids)
