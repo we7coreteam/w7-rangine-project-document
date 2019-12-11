@@ -16,24 +16,27 @@ irouter()->post('/js/php/controller.php', 'Admin\UploadController@image');
 irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], function (\W7\Core\Route\Route $route) {
 	//管理文档列表
 	$route->post('/document/all', 'Admin\DocumentController@all');
-	$route->middleware('DocumentPermissionMiddleware')->group([], function (\W7\Core\Route\Route $route){
+	$route->middleware('DocumentPermissionMiddleware')->group(['prefix'=>'/document'], function (\W7\Core\Route\Route $route){
 		//文档管理设置
-		$route->post('/document/detail', 'Admin\DocumentController@detail');
-		$route->post('/document/operator', 'Admin\DocumentController@operator');
+		$route->post('/detail', 'Admin\DocumentController@detail');
+		$route->post('/operator', 'Admin\DocumentController@operator');
 	});
 
 	//搜索用户
 	$route->post('/user/search', 'Admin\UserController@search');
+	$route->middleware('DocumentPermissionMiddleware')->group(['prefix'=>'/user'], function (\W7\Core\Route\Route $route){
+		//文档管理设置
+		$route->post('/add', 'Admin\UserController@add');
+		$route->post('/detail-by-id', 'Admin\UserController@detailById');
+		$route->post('/update', 'Admin\UserController@update');
+		$route->post('/delete-by-ids', 'Admin\UserController@deleteByIds');
+	});
 });
 
 irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'/admin'], function (\W7\Core\Route\Route $route) {
 	$route->post('/login/signout', 'Admin\LoginController@signOut'); // 退出登录
 
-	$route->post('/user/adduser', 'Admin\UserController@addUser');
-	$route->post('/user/updateuser', 'Admin\UserController@updateUser');
-	$route->post('/user/deleteuser', 'Admin\UserController@deleteUser');
 	$route->post('/user/searchuser', 'Admin\UserController@searchUser');
-	$route->post('/user/detailsuser', 'Admin\UserController@detailsUser');
 
 	$route->post('/chapter/index', 'Admin\ChapterController@index');
 	$route->post('/chapter/get_content', 'Admin\ChapterController@getContent');
