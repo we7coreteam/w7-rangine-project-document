@@ -12,7 +12,6 @@
 
 namespace W7\App\Model\Logic;
 
-use W7\App;
 use W7\App\Event\ChangeAuthEvent;
 use W7\App\Model\Entity\User;
 use W7\Core\Helper\Traiter\InstanceTraiter;
@@ -26,7 +25,8 @@ class UserLogic extends BaseLogic
 	 * @param $username
 	 * @return array|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|null|object
 	 */
-	public function getByUsername($username) {
+	public function getByUsername($username)
+	{
 		if (empty($username)) {
 			return [];
 		}
@@ -34,7 +34,8 @@ class UserLogic extends BaseLogic
 		return $user;
 	}
 
-	public function getByUid($uid) {
+	public function getByUid($uid)
+	{
 		$uid = intval($uid);
 		if (empty($uid)) {
 			return [];
@@ -49,19 +50,19 @@ class UserLogic extends BaseLogic
 	 * @param $postPassword
 	 * @return string
 	 */
-	public function getPasswordEncryption(User $user, $postPassword) {
+	public function getPasswordEncryption(User $user, $postPassword)
+	{
 		return md5(md5($user->username . $postPassword));
 	}
-
 
 	public function getUser($data)
 	{
 		if (isset($data['id']) && $data['id']) {
-			return User::find($data['id']);
+			return User::query()->find($data['id']);
 		}
 
 		if (isset($data['username']) && $data['username']) {
-			return User::where('username', $data['username'])->first();
+			return User::query()->where('username', $data['username'])->first();
 		}
 
 		return '';
@@ -69,25 +70,35 @@ class UserLogic extends BaseLogic
 
 	public function createUser($data)
 	{
-		$users = User::where('username', $data['username'])->count();
+		$users = User::query()->where('username', $data['username'])->count();
 
 		if (!$users) {
 			$data['userpass'] = $this->userpassEncryption($data['username'], $data['userpass']);
-			return User::create($data);
+			return User::query()->create($data);
 		}
 		return false;
 	}
 
-	public function updateUser($id, $data)
+	public function updateUser($id, $user)
 	{
-		$data['userpass'] = $this->userpassEncryption($data['username'], $data['userpass']);
+		$userInfo = $this->getUser(['username' => $user['username']]);
+		if ($userInfo && $id != $userInfo->id) {
+			throw new \RuntimeException('用户名已经存在');
+		}
+
+		$user['userpass'] = $this->userpassEncryption($user['username'], $user['userpass']);
 		ChangeAuthEvent::instance()->attach('user_id', $id)->attach('document_id', 0)->dispatch();
-		return User::where('id', $id)->update($data);
+		$result = User::query()->where('id', $id)->update($user);
+		if (!$result) {
+			throw new \RuntimeException('修改用户信息失败');
+		}
+
+		return $result;
 	}
 
-	public function detailsUser($id)
+	public function detailById($id)
 	{
-		$res = User::find($id);
+		$res = User::query()->find($id);
 		if ($res) {
 			$res = $this->handleUser([$res]);
 			return $res[0];
@@ -116,7 +127,8 @@ class UserLogic extends BaseLogic
 				}
 			}
 		}
-		return ['msg'=>'成功删除'.$i.'用户，如果用户有文档不能直接删除'];
+
+		return ['msg'=> '成功删除' . $i . '用户，如果用户有文档不能直接删除'];
 	}
 
 	public function handleUser($res)
@@ -142,26 +154,10 @@ class UserLogic extends BaseLogic
 		return md5(md5($username.$userpass));
 	}
 
-	public function checkUserpass($userpass, $confirm_userpass)
-	{
-		if ($userpass != $confirm_userpass) {
-			throw new \Exception('两次密码不一致');
-		}
-	}
-
 	public function checkUsername($id, $postId)
 	{
 		if ($id != $postId) {
 			throw new \Exception('用户名已经存在');
-		}
-	}
-
-	public function userAuth()
-	{
-		$request = App::getApp()->getContext()->getRequest();
-		$auth = $request->document_user_auth;
-		if ($auth != 'all') {
-			throw new \Exception('只有管理员才可以操作用户');
 		}
 	}
 }
