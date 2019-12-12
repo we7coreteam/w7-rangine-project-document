@@ -15,6 +15,7 @@ namespace W7\App\Controller\Admin;
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\User;
+use W7\App\Model\Logic\DocumentPermissionLogic;
 use W7\Http\Message\Server\Request;
 use W7\App\Model\Logic\UserLogic;
 
@@ -168,5 +169,49 @@ class UserController extends BaseController
 			return $this->data('成功删除' . $delNum . '用户，如果用户有文档不能直接删除');
 		}
 		throw new ErrorHttpException('参数有误');
+	}
+
+	public function addPermissionByDocIds(Request $request)
+	{
+		/**
+		 * @var User $user
+		 */
+		$user = $request->getAttribute('user');
+		if (!$user->isFounder) {
+			throw new ErrorHttpException('您没有权限管理该文档');
+		}
+
+		$params = $this->validate($request, [
+			'document_permission' => 'required'
+		]);
+
+		try {
+			DocumentPermissionLogic::instance()->addByDocIds($user->id, $params['document_permission']);
+			return $this->data('success');
+		} catch (\Throwable $e) {
+			throw new ErrorHttpException($e->getMessage());
+		}
+	}
+
+	public function addPermissionByDocType(Request $request)
+	{
+		/**
+		 * @var User $user
+		 */
+		$user = $request->getAttribute('user');
+		if (!$user->isFounder) {
+			throw new ErrorHttpException('您没有权限管理该文档');
+		}
+
+		$params = $this->validate($request, [
+			'document_type' => 'required'
+		]);
+
+		try {
+			DocumentPermissionLogic::instance()->addByDocType($user->id, $params['document_type']);
+			return $this->data('success');
+		} catch (\Throwable $e) {
+			throw new ErrorHttpException($e->getMessage());
+		}
 	}
 }

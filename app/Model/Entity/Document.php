@@ -16,6 +16,9 @@ use Illuminate\Support\Str;
 
 class Document extends BaseModel
 {
+	const PRIVATE_DOCUMENT = 2;
+	const PUBLIC_DOCUMENT = 1;
+
 	protected $table = 'document';
 	protected $perPage = '10';
 
@@ -32,11 +35,13 @@ class Document extends BaseModel
 	 * 关联权限表中的操作人员
 	 * @return \Illuminate\Database\Eloquent\Relations\HasMany
 	 */
-	public function operator() {
+	public function operator()
+	{
 		return $this->hasMany(DocumentPermission::class, 'document_id', 'id');
 	}
 
-	public function getDescriptionShortAttribute() {
+	public function getDescriptionShortAttribute()
+	{
 		return Str::limit(html_entity_decode($this->description), 20);
 	}
 }

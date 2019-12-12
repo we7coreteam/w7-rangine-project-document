@@ -14,11 +14,8 @@ namespace W7\App\Model\Logic;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
-use W7\App;
 use W7\App\Event\ChangeAuthEvent;
 use W7\App\Model\Entity\Document;
-use W7\App\Model\Entity\PermissionDocument;
-use W7\App\Model\Entity\User;
 use W7\Core\Helper\Traiter\InstanceTraiter;
 
 class DocumentLogic extends BaseLogic
@@ -34,79 +31,42 @@ class DocumentLogic extends BaseLogic
 		return Document::query()->find($id);
 	}
 
-	/**
-	 * @deprecated
-	 */
-	public function getdetails($id)
-	{
-		$request = App::getApp()->getContext()->getRequest();
-		$userId = $request->document_user_id;
-		$res = Document::find($id);
-		if ($res) {
-			$res = $this->handleDocumentRes([$res], $userId);
-			return $res[0];
-		}
-		return $res;
-	}
-
-	/**
-	 * @deprecated
-	 */
-	public function details($id)
-	{
-		return Document::find($id);
-	}
-
 	public function create($data)
 	{
-		$res = Document::create($data);
+		$res = Document::query()->create($data);
 		if ($res) {
-			PermissionDocument::create(['user_id' => $data['creator_id'],'document_id' => $res['id']]);
+			DocumentPermissionLogic::add($res['id'], $data['creator_id'], App\Model\Entity\DocumentPermission::MANAGER_PERMISSION);
 			ChangeAuthEvent::instance()->attach('user_id', $data['creator_id'])->attach('document_id', $res['id'])->dispatch();
 		}
-		return $res;
+
+		throw new \RuntimeException('新建文档失败');
 	}
 
-	public function update($id, $data)
+	public function updateById($id, $data)
 	{
-		return Document::where('id', $id)->update($data);
+		if (!Document::query()->where('id', $id)->update($data)) {
+			throw new \RuntimeException('文档编辑失败');
+		}
 	}
 
-	public function del($id)
+	public function deleteById($id)
 	{
 		idb()->beginTransaction();
-		$res = Document::destroy($id);
-		if ($res) {
-			$chapter = new ChapterLogic();
-			$chapter->deleteDocument($id);
-			ChangeAuthEvent::instance()->attach('user_id', 0)->attach('document_id', $res['id'])->dispatch();
-			idb()->commit();
-		} else {
-			idb()->rollBack();
-		}
-		return $res;
-	}
+		try {
+			$deleted = Document::query()->where('id', '=', $id)->delete();
+			if ($deleted) {
+				ChapterLogic::instance()->deleteDocument($id);
+				DocumentPermissionLogic::instance()->clearByDocId($id);
+				ChangeAuthEvent::instance()->attach('user_id', 0)->attach('document_id', $id)->dispatch();
+				idb()->commit();
+				return true;
+			}
 
-	public function relation($documentId)
-	{
-		$request = App::getApp()->getContext()->getRequest();
-		$userId = $request->document_user_id;
-		$user = new UserLogic();
-		$user = $user->getUser(['id' => $userId]);
-		if ($user['has_privilege'] == 1) {
-			return true;
+			throw new \RuntimeException('删除文档失败');
+		} catch (\Throwable $e) {
+			idb()->rollBack();
+			throw $e;
 		}
-		if (!$user) {
-			return '用户不存在';
-		}
-		$document = $this->getdetails($documentId);
-		if (!$document) {
-			return '文档不存在';
-		}
-		if ($user['id'] != $document['creator_id']) {
-			return '只有文档创建者才可以操作';
-		}
-		return true;
 	}
 
 	public function handleDocumentRes($res, $userId)

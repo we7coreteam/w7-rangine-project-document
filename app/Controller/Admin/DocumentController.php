@@ -17,6 +17,7 @@ use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\DocumentPermission;
+use W7\App\Model\Entity\User;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\App\Model\Logic\DocumentPermissionLogic;
 use W7\App\Model\Logic\UserLogic;
@@ -53,12 +54,11 @@ class DocumentController extends BaseController
 						'id' => $row->id,
 						'name' => $row->name,
 						'description' => $row->descriptionShort,
-						'is_show' => $row->is_show,
+						'type' => $row->type,
 						'acl' => DocumentPermissionLogic::instance()->getFounderACL(),
 					];
 				}
 			}
-
 		} else {
 			$query = DocumentPermission::query()->where('user_id', '=', $user->id)
 					->whereIn('permission', [DocumentPermission::MANAGER_PERMISSION, DocumentPermission::OPERATOR_PERMISSION, DocumentPermission::READER_PERMISSION])
@@ -78,7 +78,7 @@ class DocumentController extends BaseController
 						'id' => $row->document->id,
 						'name' => $row->document->name,
 						'description' => $row->document->descriptionShort,
-						'is_show' => $row->document->is_show,
+						'type' => $row->document->type,
 						'acl' => $row->acl,
 					];
 				}
@@ -104,12 +104,22 @@ class DocumentController extends BaseController
 			throw new ErrorHttpException('您没有权限管理该文档');
 		}
 
+		/**
+		 * @var User $user
+		 */
+		$user = $request->getAttribute('user');
 		$document = DocumentLogic::instance()->getById($request->post('document_id'));
 		$result = [
 			'id' => $document->id,
 			'name' => $document->name,
 			'description' => $document->description,
-			'is_show' => $document->is_show,
+			'type' => $document->type,
+			'acl' => [
+				'has_manage' => $user->isManager,
+				'has_edit' => $user->isOperator,
+				'has_delete' => $user->isManager,
+				'has_read' => $user->isReader
+			]
 		];
 
 		$operator = $document->operator()->with('user')->orderBy('permission')->get();
@@ -126,7 +136,8 @@ class DocumentController extends BaseController
 		return $this->data($result);
 	}
 
-	public function operator(Request $request) {
+	public function operator(Request $request)
+	{
 		$this->validate($request, [
 			'user_id' => 'required|integer',
 			'document_id' => 'required|integer',
@@ -196,88 +207,87 @@ class DocumentController extends BaseController
 
 	public function create(Request $request)
 	{
+		$data = $this->validate($request, [
+			'name' => 'required',
+			'type' => 'requires:in:' . Document::PUBLIC_DOCUMENT . ',' . Document::PRIVATE_DOCUMENT
+		], [
+			'name.required' => '文档名称不能为空',
+		]);
+
+		/**
+		 * @var User $user
+		 */
+		$user = $request->getAttribute('user');
+		$data['name'] = trim($data['name']);
+		$data['creator_id'] = $user->id;
+		$data['description'] = $request->input('description');
+
 		try {
-			$this->validate($request, [
-				'name' => 'required',
-			], [
-				'name.required' => '文档名称不能为空',
-			]);
-
-			$name = trim($request->input('name'));
-
-			$data = [];
-			$data['name'] = $name;
-			$data['creator_id'] = $request->document_user_id;
-			$data['description'] = $request->input('description');
-
-			$res = $this->logic->create($data);
-			if ($res) {
-				return $this->success($res);
-			} else {
-				return $this->error($res);
-			}
-		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
+			$res = DocumentLogic::instance()->create($data);
+			return $this->data($res);
+		} catch (\Throwable $e) {
+			throw new ErrorHttpException($e->getMessage());
 		}
 	}
 
-	public function update(Request $request)
+	public function updateById(Request $request)
 	{
-		try {
-			$this->validate($request, [
-				'id' => 'required|integer|min:1',
-			], [
-				'id.required' => '文档ID不能为空',
-			]);
-			$documentId = $request->input('id');
-
-			$relation = $this->logic->relation($documentId);
-			if ($relation !== true) {
-				return $this->error($relation);
-			}
-
-			$data = [];
-			if ($request->input('name') !== null) {
-				$data['name'] = $request->input('name');
-			}
-			if ($request->input('description') !== null) {
-				$data['description'] = $request->input('description');
-			}
-			if ($request->input('is_show') !== null) {
-				$data['is_show'] = (int)$request->input('is_show');
-			}
-			$res = $this->logic->update($documentId, $data);
-			if ($res) {
-				return $this->success($res);
-			} else {
-				return $this->error($res);
-			}
-		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
+		/**
+		 * @var User $user
+		 */
+		$user = $request->getAttribute('user');
+		if (!$user->isManager) {
+			throw new ErrorHttpException('无编辑文档的权限');
 		}
-	}
 
-	public function delete(Request $request)
-	{
 		$this->validate($request, [
 			'id' => 'required|integer|min:1',
 		], [
 			'id.required' => '文档ID不能为空',
 		]);
-		$relation = $this->logic->relation($request->input('id'));
-		if ($relation !== true) {
-			return $this->error($relation);
+		$documentId = $request->input('id');
+
+		$data = [];
+		if ($request->input('name') !== null) {
+			$data['name'] = $request->input('name');
+		}
+		if ($request->input('description') !== null) {
+			$data['description'] = $request->input('description');
+		}
+		if ($request->input('type') !== null) {
+			$data['type'] = (int)$request->input('type');
 		}
 
 		try {
-			$res = $this->logic->del($request->input('id'));
-			if ($res) {
-				return $this->success($res);
-			} else {
-				return $this->error($res);
-			}
-		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
+			$res = DocumentLogic::instance()->updateById($documentId, $data);
+			return $this->data($res);
+		} catch (\Throwable $e) {
+			throw new ErrorHttpException($e->getMessage());
+		}
+	}
+
+	public function deleteById(Request $request)
+	{
+		/**
+		 * @var User $user
+		 */
+		$user = $request->getAttribute('user');
+		if (!$user->isManager) {
+			throw new ErrorHttpException('无编辑文档的权限');
+		}
+
+		$this->validate($request, [
+			'id' => 'required|integer|min:1',
+		], [
+			'id.required' => '文档ID不能为空',
+		]);
+		$documentId = $request->input('id');
+
+		try {
+			$res = DocumentLogic::instance()->deleteById($documentId);
+			return $this->data($res);
+		} catch (\Throwable $e) {
+			throw new ErrorHttpException($e->getMessage());
 		}
 	}
 }

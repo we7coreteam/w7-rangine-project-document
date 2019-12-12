@@ -12,10 +12,12 @@
 
 namespace W7\App\Controller\Client;
 
+use W7\App\Controller\BaseController;
+use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\Http\Message\Server\Request;
 
-class DocumentController extends Controller
+class DocumentController extends BaseController
 {
 	public function __construct()
 	{
@@ -29,10 +31,10 @@ class DocumentController extends Controller
 			if (trim($request->input('name'))) {
 				$data['name'] = trim($request->input('name'));
 			}
-			$res = $this->logic->getShowList($data, $request->input('page'));
-			return $this->success($res);
-		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
+			$res = DocumentLogic::instance()->getShowList($data, $request->input('page'));
+			return $this->data($res);
+		} catch (\Throwable $e) {
+			throw new ErrorHttpException($e->getMessage());
 		}
 	}
 
@@ -45,10 +47,10 @@ class DocumentController extends Controller
 				'document_id.required' => '文档id必填',
 				'document_id.integer' => '文档id非法'
 			]);
-			$res = $this->logic->details($request->input('document_id'));
-			return $this->success($res);
-		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
+			$res = DocumentLogic::instance()->getById($request->input('document_id'));
+			return $this->data($res);
+		} catch (\Throwable $e) {
+			throw new ErrorHttpException($e->getMessage());
 		}
 	}
 }

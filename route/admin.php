@@ -20,6 +20,9 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 		//文档管理设置
 		$route->post('/detail', 'Admin\DocumentController@detail');
 		$route->post('/operator', 'Admin\DocumentController@operator');
+		$route->post('/create', 'Admin\DocumentController@create');
+		$route->post('/update', 'Admin\DocumentController@updateById');
+		$route->post('/delete', 'Admin\DocumentController@deleteById');
 	});
 
 	//搜索用户
@@ -53,10 +56,6 @@ irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'
 	$route->post('/auth/leave_document', 'Admin\UserAuthorizationController@leaveDocument');
 
 	$route->post('/document/getdocuserlist', 'Admin\DocumentController@getDocUserList');
-	$route->post('/document/create', 'Admin\DocumentController@create');
-	$route->post('/document/update', 'Admin\DocumentController@update');
-
-	$route->post('/document/delete', 'Admin\DocumentController@delete');
 	$route->post('/document/search', 'Admin\DocumentController@search');
 
 	$route->post('/setting/show', 'Admin\SettingController@show');

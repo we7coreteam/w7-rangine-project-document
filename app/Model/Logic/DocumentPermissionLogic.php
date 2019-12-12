@@ -51,65 +51,63 @@ class DocumentPermissionLogic extends BaseLogic
 		return true;
 	}
 
+	private function updateByDocIdAndUid($documentId, $userId, $permission)
+	{
+		if (!Document::query()->find($documentId)) {
+			throw new \RuntimeException('该文档不存在');
+		}
+
+		$documentPermission = new DocumentPermission();
+		$documentPermission->user_id = $userId;
+		$documentPermission->document_id = $documentId;
+		$documentPermission->permission = $permission;
+
+		if ($documentPermission->permission == DocumentPermission::MANAGER_PERMISSION) {
+			//只能添加一个
+			$exist = DocumentPermission::query()->where('document_id', '=', $documentId)->where('permission', '=', $permission)->first();
+			if ($exist) {
+				throw new \RuntimeException('该文档的管理员已存在');
+			}
+		}
+
+		if (!$documentPermission->save()) {
+			throw new \RuntimeException('文档权限添加失败');
+		}
+
+		return true;
+	}
+
+	public function addByDocIds($userId, array $documentPermissions)
+	{
+		idb()->beginTransaction();
+		try {
+			foreach ($documentPermissions as $documentPermission) {
+				$this->updateByDocIdAndUid($documentPermissions['document_id'], $userId, $documentPermission['permission']);
+			}
+			idb()->commit();
+		} catch (\Throwable $e) {
+			idb()->rollBack();
+			throw $e;
+		}
+	}
+
+	public function addByDocType($userId, $documentType)
+	{
+//		idb()->beginTransaction();
+//		try {
+//			foreach ($documentPermissions as $documentPermission) {
+//				$this->add($documentPermissions['document_id'], $documentPermission['user_id'], $documentPermission['permission']);
+//			}
+//			idb()->commit();
+//		} catch (\Throwable $e) {
+//			idb()->rollBack();
+//			throw $e;
+//		}
+	}
+
 	public function getByDocIdAndUid($documentId, $userId)
 	{
 		return DocumentPermission::query()->where('document_id', '=', $documentId)->where('user_id', '=', $userId)->first();
-	}
-
-	/**
-	 * 获取文档的所有权限用户
-	 * @param $documentId
-	 * @return array
-	 */
-	public function getListByDocId($documentId)
-	{
-		$documentPermissions = DocumentPermission::query()->where('document_id', '=', $documentId)->get();
-		/**
-		 * @var DocumentPermission $documentPermission
-		 */
-		$result = [];
-		foreach ($documentPermissions as $documentPermission) {
-			$result[] = [
-				'id' => $documentPermission->id,
-				'user_name' => $documentPermission->user->username,
-				'acl_name' => $documentPermission->ACLName,
-				'permission' => [
-					'has_manage' => $documentPermission->hasManage(),
-					'has_edit' => $documentPermission->hasManage(),
-					'has_delete' => $documentPermission->hasManage()
-				]
-			];
-		}
-
-		return $result;
-	}
-
-	public function updatePermissionById($id, $permission)
-	{
-		/**
-		 * @var DocumentPermission $documentPermission
-		 */
-		$documentPermission = DocumentPermission::query()->where('id', '=', $id)->first();
-		if (!$documentPermission) {
-			throw new \RuntimeException('该文档权限不存在');
-		}
-
-		$documentPermission->permission = $permission;
-		if (!$documentPermission->save()) {
-			throw new \RuntimeException('权限更新失败');
-		}
-
-		return true;
-	}
-
-	public function deleteById($id)
-	{
-		$deleted = DocumentPermission::query()->where('id', '=', $id)->delete();
-		if (!$deleted) {
-			throw new \RuntimeException('文档权限删除失败');
-		}
-
-		return true;
 	}
 
 	/**
