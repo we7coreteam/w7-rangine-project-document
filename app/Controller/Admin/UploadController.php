@@ -13,6 +13,7 @@
 namespace W7\App\Controller\Admin;
 
 use W7\App\Controller\BaseController;
+use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Service\CdnLogic;
 use W7\Http\Message\Server\Request;
 
@@ -25,7 +26,7 @@ class UploadController extends BaseController
 			if ($file) {
 				$file = $file->toArray();
 			} else {
-				return $this->error('file必传');
+				throw new ErrorHttpException('file必传');
 			}
 
 			$allowed_mime = ['image/png', 'image/jpg', 'image/gif', 'image/jpeg'];
@@ -63,6 +64,6 @@ class UploadController extends BaseController
 			$CONFIG = json_decode(preg_replace("/\/\*[\s\S]+?\*\//", '', file_get_contents(BASE_PATH.'/config/ueditor.json')), true);
 			return $CONFIG;
 		}
-		return $this->error('action值有误');
+		throw new ErrorHttpException('action值有误');
 	}
 }
