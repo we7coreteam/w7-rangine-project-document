@@ -38,7 +38,7 @@ class DocumentLogic extends BaseLogic
 			idb()->beginTransaction();
 			$res = Document::query()->create($data);
 			if ($res) {
-				DocumentPermissionLogic::add($res['id'], $data['creator_id'], DocumentPermission::MANAGER_PERMISSION);
+				DocumentPermissionLogic::instance()->add($res['id'], $data['creator_id'], DocumentPermission::MANAGER_PERMISSION);
 				ChangeAuthEvent::instance()->attach('user_id', $data['creator_id'])->attach('document_id', $res['id'])->dispatch();
 				idb()->commit();
 				return true;
@@ -59,8 +59,8 @@ class DocumentLogic extends BaseLogic
 
 	public function deleteById($id)
 	{
-		idb()->beginTransaction();
 		try {
+			idb()->beginTransaction();
 			$deleted = Document::query()->where('id', '=', $id)->delete();
 			if ($deleted) {
 				ChapterLogic::instance()->deleteDocument($id);
@@ -84,12 +84,6 @@ class DocumentLogic extends BaseLogic
 		}
 
 		foreach ($res as $key => &$val) {
-			if (isset($val['is_show']) && $val['is_show'] == 1) {
-				$val['is_show_name'] = '发布';
-			} elseif ($res) {
-				$val['is_show_name'] = '隐藏';
-			}
-
 			if (isset($val['user']) && $val['user'] && is_array($val['user'])) {
 				$val['username'] = $val['user']['username'];
 			}
@@ -125,11 +119,11 @@ class DocumentLogic extends BaseLogic
 	{
 		if ($keyword) {
 			$res = Document::where('name', 'like', '%'.$keyword['name'].'%')
-						->where('is_show', 1)
+						->where('type', 1)
 						->orderBy('updated_at', 'desc')
 						->get()->toArray();
 		} else {
-			$res = Document::where('is_show', 1)
+			$res = Document::where('type', 1)
 						->orderBy('updated_at', 'desc')
 						->get()->toArray();
 		}

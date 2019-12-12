@@ -209,7 +209,7 @@ class DocumentController extends BaseController
 	{
 		$data = $this->validate($request, [
 			'name' => 'required',
-			'type' => 'requires:in:' . Document::PUBLIC_DOCUMENT . ',' . Document::PRIVATE_DOCUMENT
+			'type' => 'required|in:' . Document::PUBLIC_DOCUMENT . ',' . Document::PRIVATE_DOCUMENT
 		], [
 			'name.required' => '文档名称不能为空',
 		]);
