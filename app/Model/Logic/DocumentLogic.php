@@ -16,6 +16,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use W7\App\Event\ChangeAuthEvent;
 use W7\App\Model\Entity\Document;
+use W7\App\Model\Entity\DocumentPermission;
 use W7\Core\Helper\Traiter\InstanceTraiter;
 
 class DocumentLogic extends BaseLogic
@@ -33,13 +34,20 @@ class DocumentLogic extends BaseLogic
 
 	public function create($data)
 	{
-		$res = Document::query()->create($data);
-		if ($res) {
-			DocumentPermissionLogic::add($res['id'], $data['creator_id'], App\Model\Entity\DocumentPermission::MANAGER_PERMISSION);
-			ChangeAuthEvent::instance()->attach('user_id', $data['creator_id'])->attach('document_id', $res['id'])->dispatch();
+		try {
+			idb()->beginTransaction();
+			$res = Document::query()->create($data);
+			if ($res) {
+				DocumentPermissionLogic::add($res['id'], $data['creator_id'], DocumentPermission::MANAGER_PERMISSION);
+				ChangeAuthEvent::instance()->attach('user_id', $data['creator_id'])->attach('document_id', $res['id'])->dispatch();
+				idb()->commit();
+				return true;
+			}
+			throw new \RuntimeException('新建文档失败');
+		} catch (\Throwable $e) {
+			idb()->rollBack();
+			throw $e;
 		}
-
-		throw new \RuntimeException('新建文档失败');
 	}
 
 	public function updateById($id, $data)
