@@ -13,33 +13,32 @@
 namespace W7\App\Model\Logic;
 
 use W7\App\Model\Entity\Setting;
+use W7\Core\Helper\Traiter\InstanceTraiter;
 
 class SettingLogic extends BaseLogic
 {
-	public function show($key)
+	use InstanceTraiter;
+
+	public function getByKey($key)
 	{
-		$res = Setting::query()->where('key', $key)->first();
-		return $this->handleData($key,$res);
+		$row = Setting::query()->where('key', $key)->first();
+		return $row;
 	}
 
-	public function save($key,$data)
+	public function save($key, $data)
 	{
 		$data = json_encode($data);
-		$res = Setting::query()->where('key', $key)->first();
-		if ($res) {
-			Setting::query()->where('key',$key)->update(['value' => $data]);
-			$res = ['value' => $data];
-		} else {
-			$res = Setting::query()->create(['key' => $key,'value' => $data]);
-		}
-		return $this->handleData($key,$res);
-	}
 
-	private function handleData($key,$data)
-	{
-		if ($data && isset($data['value'])) {
-			return ['key'=>$key,'value'=>json_decode($data['value'], true)];
+		$setting = $this->getByKey($key);
+		if (empty($setting)) {
+			Setting::query()->create([
+				'key' => $key,
+				'value' => $data
+			]);
+		} else {
+			$setting->value = $data;
+			$setting->save();
 		}
-		return $data;
+		return true;
 	}
 }
