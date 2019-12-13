@@ -122,7 +122,6 @@ class UserController extends BaseController
 			'username' => 'required',
 			'userpass' => 'required',
 			'confirm_userpass' => 'required',
-			'has_privilege' => '',
 			'remark' => '',
 		], [
 			'id.required' => '用户ID不能为空',
@@ -140,9 +139,6 @@ class UserController extends BaseController
 		unset($user['confirm_userpass']);
 		if ($request->input('is_ban') !== null) {
 			$user['is_ban'] = $request->input('is_ban');
-		}
-		if ($request->input('has_privilege') !== null) {
-			$user['has_privilege'] = $request->input('has_privilege');
 		}
 		if ($request->input('remark') !== null) {
 			$user['remark'] = $request->input('remark');
