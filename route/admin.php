@@ -44,6 +44,7 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 		$route->post('/detail-by-id', 'Admin\UserController@detailById');
 		$route->post('/update', 'Admin\UserController@update');
 		$route->post('/delete-by-ids', 'Admin\UserController@deleteByIds');
+		$route->post('/batch-update-permission', 'Admin\UserController@batchUpdateDocPermissionByUid');
 	});
 });
 
