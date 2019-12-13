@@ -54,7 +54,7 @@ class DocumentController extends BaseController
 						'id' => $row->id,
 						'name' => $row->name,
 						'description' => $row->descriptionShort,
-						'type' => $row->type,
+						'is_public' => $row->is_public,
 						'acl' => DocumentPermissionLogic::instance()->getFounderACL(),
 					];
 				}
@@ -78,7 +78,7 @@ class DocumentController extends BaseController
 						'id' => $row->document->id,
 						'name' => $row->document->name,
 						'description' => $row->document->descriptionShort,
-						'type' => $row->document->type,
+						'is_public' => $row->document->is_public,
 						'acl' => $row->acl,
 					];
 				}
@@ -113,7 +113,7 @@ class DocumentController extends BaseController
 			'id' => $document->id,
 			'name' => $document->name,
 			'description' => $document->description,
-			'type' => $document->type,
+			'is_public' => $document->is_public,
 			'acl' => [
 				'has_manage' => $user->isManager,
 				'has_edit' => $user->isOperator,
@@ -209,7 +209,7 @@ class DocumentController extends BaseController
 	{
 		$data = $this->validate($request, [
 			'name' => 'required',
-			'type' => 'required|in:' . Document::PUBLIC_DOCUMENT . ',' . Document::PRIVATE_DOCUMENT
+			'is_public' => 'required|in:' . Document::PUBLIC_DOCUMENT . ',' . Document::PRIVATE_DOCUMENT
 		], [
 			'name.required' => '文档名称不能为空',
 		]);
@@ -254,8 +254,8 @@ class DocumentController extends BaseController
 		if ($request->input('description') !== null) {
 			$data['description'] = $request->input('description');
 		}
-		if ($request->input('type') !== null) {
-			$data['type'] = (int)$request->input('type');
+		if ($request->input('is_public') !== null) {
+			$data['is_public'] = (int)$request->input('is_public');
 		}
 
 		try {

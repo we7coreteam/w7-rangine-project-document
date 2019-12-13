@@ -14,6 +14,7 @@ namespace W7\App\Controller\Admin;
 
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
+use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Logic\DocumentPermissionLogic;
 use W7\Http\Message\Server\Request;
@@ -193,7 +194,7 @@ class UserController extends BaseController
 		}
 	}
 
-	public function addPermissionByDocType(Request $request)
+	public function addPermissionByDocIsPublic(Request $request)
 	{
 		/**
 		 * @var User $user
@@ -204,12 +205,12 @@ class UserController extends BaseController
 		}
 
 		$params = $this->validate($request, [
-			'document_type' => 'required',
+			'is_public' => 'required|in:' . Document::PUBLIC_DOCUMENT . ',' . Document::PRIVATE_DOCUMENT,
 			'permission' => 'required'
 		]);
 
 		try {
-			DocumentPermissionLogic::instance()->addByDocType($user->id, $params['document_type'], $params['permission']);
+			DocumentPermissionLogic::instance()->addByDocIsPublic($user->id, $params['is_public'], $params['permission']);
 			return $this->data('success');
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());

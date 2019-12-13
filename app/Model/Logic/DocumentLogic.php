@@ -119,11 +119,11 @@ class DocumentLogic extends BaseLogic
 	{
 		if ($keyword) {
 			$res = Document::where('name', 'like', '%'.$keyword['name'].'%')
-						->where('type', 1)
+						->where('is_public', 1)
 						->orderBy('updated_at', 'desc')
 						->get()->toArray();
 		} else {
-			$res = Document::where('type', 1)
+			$res = Document::where('is_public', 1)
 						->orderBy('updated_at', 'desc')
 						->get()->toArray();
 		}
