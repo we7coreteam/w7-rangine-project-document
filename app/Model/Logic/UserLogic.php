@@ -43,9 +43,12 @@ class UserLogic extends BaseLogic
 		}
 
 		$data['userpass'] = $this->userPwdEncryption($data['username'], $data['userpass']);
-		if (!User::query()->create($data)) {
+		$user = User::query()->create($data);
+		if (!$user) {
 			throw new \RuntimeException('用户添加失败');
 		}
+
+		return $user->id;
 	}
 
 	public function updateUser($userInfo)
