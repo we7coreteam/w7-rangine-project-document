@@ -25,10 +25,6 @@ class DocumentLogic extends BaseLogic
 
 	public function getById($id)
 	{
-		$id = intval($id);
-		if (empty($id)) {
-			return [];
-		}
 		return Document::query()->find($id);
 	}
 
@@ -110,9 +106,9 @@ class DocumentLogic extends BaseLogic
 		return $res;
 	}
 
-	public function getUserCreateDoc($id)
+	public function getDocByCreatorId($id)
 	{
-		return Document::where('creator_id', $id)->first();
+		return Document::query()->where('creator_id', $id)->first();
 	}
 
 	public function getShowList($keyword, $page)

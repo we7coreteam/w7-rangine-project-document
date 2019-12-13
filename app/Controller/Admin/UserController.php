@@ -130,6 +130,10 @@ class UserController extends BaseController
 		$user['username'] = trim($user['username']);
 		$user['userpass'] = trim($user['userpass']);
 		$user['confirm_userpass'] = trim($user['confirm_userpass']);
+		if ($user['userpass'] != $user['confirm_userpass']) {
+			throw new ErrorHttpException('密码和确认密码不一致');
+		}
+		unset($user['confirm_userpass']);
 		if ($request->input('is_ban') !== null) {
 			$user['is_ban'] = $request->input('is_ban');
 		}
@@ -166,7 +170,7 @@ class UserController extends BaseController
 
 		$ids = array_filter(explode(',', trim($params['ids'])));
 		if ($ids) {
-			$delNum = UserLogic::instance()->deleteUsers($ids);
+			$delNum = UserLogic::instance()->deleteByIds($ids);
 			return $this->data('成功删除' . $delNum . '用户，如果用户有文档不能直接删除');
 		}
 		throw new ErrorHttpException('参数有误');

@@ -21,7 +21,7 @@ class AuthController extends BaseController
 {
 	public function login(Request $request)
 	{
-		$this->validate($request, [
+		$data = $this->validate($request, [
 			'username' => 'required',
 			'userpass' => 'required',
 			'code' => 'required',
@@ -31,16 +31,16 @@ class AuthController extends BaseController
 			'code.required' => '验证码不能为空',
 		]);
 		$code = $request->session->get('img_code');
-		if (strtolower($request->post('code')) != strtolower($code)) {
+		if (strtolower($data['code']) != strtolower($code)) {
 			throw new ErrorHttpException('请输入正确的验证码');
 		}
 
-		$user = UserLogic::instance()->getByUsername($request->post('username'));
+		$user = UserLogic::instance()->getByUserName($data['username']);
 		if (empty($user)) {
 			throw new ErrorHttpException('用户名或密码错误，请检查');
 		}
 
-		if ($user->userpass != UserLogic::instance()->getPasswordEncryption($user, $request->post('userpass'))) {
+		if ($user->userpass != UserLogic::instance()->userPwdEncryption($user->username, $data['userpass'])) {
 			throw new ErrorHttpException('用户名或密码错误，请检查');
 		}
 
@@ -64,7 +64,8 @@ class AuthController extends BaseController
 		return $this->data('success');
 	}
 
-	public function user(Request $request) {
+	public function user(Request $request)
+	{
 		$userSession = $request->session->get('user');
 		$user = UserLogic::instance()->getByUid($userSession['uid']);
 

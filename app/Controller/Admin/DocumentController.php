@@ -94,7 +94,7 @@ class DocumentController extends BaseController
 
 	public function detail(Request $request)
 	{
-		$this->validate($request, [
+		$params = $this->validate($request, [
 			'document_id' => 'required|integer|min:1',
 		], [
 			'document_id.required' => '文档ID不能为空',
@@ -108,7 +108,7 @@ class DocumentController extends BaseController
 		 * @var User $user
 		 */
 		$user = $request->getAttribute('user');
-		$document = DocumentLogic::instance()->getById($request->post('document_id'));
+		$document = DocumentLogic::instance()->getById($params['document_id']);
 		$result = [
 			'id' => $document->id,
 			'name' => $document->name,
@@ -128,7 +128,7 @@ class DocumentController extends BaseController
 				$result['operator'][] = [
 					'id' => $row->user->id,
 					'username' => $row->user->username,
-					'acl' => $row->acl,
+					'acl' => $row->acl
 				];
 			});
 		}
@@ -138,7 +138,15 @@ class DocumentController extends BaseController
 
 	public function operator(Request $request)
 	{
-		$this->validate($request, [
+		/**
+		 * @var User $user
+		 */
+		$user = $request->getAttribute('user');
+		if (!$user->isManager) {
+			throw new ErrorHttpException('无编辑文档的权限');
+		}
+
+		$params = $this->validate($request, [
 			'user_id' => 'required|integer',
 			'document_id' => 'required|integer',
 		], [
@@ -146,14 +154,9 @@ class DocumentController extends BaseController
 			'document_id.required' => '请指定文档',
 		]);
 
-		$user = $request->getAttribute('user');
-		if (!$user->isManager && !$user->isFounder) {
-			throw new ErrorHttpException('您没有权限管理该文档');
-		}
-
-		$uid = intval($request->post('user_id'));
+		$uid = intval($params['user_id']);
 		$permission = intval($request->post('permission'));
-		$documentId = intval($request->post('document_id'));
+		$documentId = intval($params['document_id']);
 
 		if ($uid == $user->id) {
 			throw new ErrorHttpException('不能添加自己为管理员');
@@ -174,7 +177,7 @@ class DocumentController extends BaseController
 		if (!in_array($permission, [
 			DocumentPermission::MANAGER_PERMISSION,
 			DocumentPermission::OPERATOR_PERMISSION,
-			DocumentPermission::OPERATOR_PERMISSION,
+			DocumentPermission::READER_PERMISSION,
 		])) {
 			throw new ErrorHttpException('您操作了不存在的权限');
 		}

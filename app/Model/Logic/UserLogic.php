@@ -25,73 +25,42 @@ class UserLogic extends BaseLogic
 	 * @param $username
 	 * @return array|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|null|object
 	 */
-	public function getByUsername($username)
+	public function getByUserName($username)
 	{
-		if (empty($username)) {
-			return [];
-		}
-		$user = User::query()->where('username', $username)->first();
-		return $user;
+		return User::query()->where('username', $username)->first();
 	}
 
 	public function getByUid($uid)
 	{
-		$uid = intval($uid);
-		if (empty($uid)) {
-			return [];
-		}
-		$user = User::query()->where('id', $uid)->first();
-		return $user;
-	}
-
-	/**
-	 * 将用户提交的密码转化为数据库存储密码
-	 * @param User $user
-	 * @param $postPassword
-	 * @return string
-	 */
-	public function getPasswordEncryption(User $user, $postPassword)
-	{
-		return md5(md5($user->username . $postPassword));
-	}
-
-	public function getUser($data)
-	{
-		if (isset($data['id']) && $data['id']) {
-			return User::query()->find($data['id']);
-		}
-
-		if (isset($data['username']) && $data['username']) {
-			return User::query()->where('username', $data['username'])->first();
-		}
-
-		return '';
+		return User::query()->where('id', $uid)->first();
 	}
 
 	public function createUser($data)
 	{
-		$users = User::query()->where('username', $data['username'])->count();
-
-		if (!$users) {
-			$data['userpass'] = $this->userpassEncryption($data['username'], $data['userpass']);
-			if (!User::query()->create($data)) {
-				throw new \RuntimeException('用户添加失败');
-			}
-		}
-
-		throw new \RuntimeException('用户名重复，获取数据有误');
-	}
-
-	public function updateUser($user)
-	{
-		$userInfo = $this->getUser(['username' => $user['username']]);
-		if ($userInfo && $user['id'] != $userInfo->id) {
+		$user = $this->getByUserName($data['username']);
+		if ($user) {
 			throw new \RuntimeException('用户名已经存在');
 		}
 
-		$user['userpass'] = $this->userpassEncryption($user['username'], $user['userpass']);
-		ChangeAuthEvent::instance()->attach('user_id', $user['id'])->attach('document_id', 0)->dispatch();
-		$result = User::query()->where('id', $user['id'])->update($user);
+		$data['userpass'] = $this->userPwdEncryption($data['username'], $data['userpass']);
+		if (!User::query()->create($data)) {
+			throw new \RuntimeException('用户添加失败');
+		}
+	}
+
+	public function updateUser($userInfo)
+	{
+		$user = $this->getByUserName($userInfo['username']);
+		if (!$user) {
+			throw new \RuntimeException('用户不存在');
+		}
+		if ($userInfo['id'] != $user->id) {
+			throw new \RuntimeException('用户名已经存在');
+		}
+
+		$userInfo['userpass'] = $this->userPwdEncryption($userInfo['username'], $userInfo['userpass']);
+		ChangeAuthEvent::instance()->attach('user_id', $userInfo['id'])->attach('document_id', 0)->dispatch();
+		$result = User::query()->where('id', $userInfo['id'])->update($userInfo);
 		if (!$result) {
 			throw new \RuntimeException('修改用户信息失败');
 		}
@@ -101,7 +70,7 @@ class UserLogic extends BaseLogic
 
 	public function detailById($id)
 	{
-		$res = User::query()->find($id);
+		$res = $this->getByUid($id);
 		if ($res) {
 			$res = $this->handleUser([$res]);
 			return $res[0];
@@ -110,22 +79,20 @@ class UserLogic extends BaseLogic
 		throw new \RuntimeException('用户不存在');
 	}
 
-	public function delUser($ids)
-	{
-		return User::destroy($ids);
-	}
-
-	public function deleteUsers($ids)
+	public function deleteByIds($ids)
 	{
 		$docLogic = new DocumentLogic();
 
 		$delNum = 0;
 		foreach ($ids as $k => $val) {
-			$res = $docLogic->getUserCreateDoc($val);
+			$res = $docLogic->getDocByCreatorId($val);
 			if (!$res) {
-				$user = User::query()->find($val);
-				if ($user && $user['has_privilege'] != 1) {
-					if ($this->delUser($val)) {
+				/**
+				 * @var User $user
+				 */
+				$user = $this->getByUid($val);
+				if ($user && !$user->isFounder) {
+					if (User::destroy($val)) {
 						$delNum++;
 					}
 				}
@@ -153,15 +120,8 @@ class UserLogic extends BaseLogic
 		return $res;
 	}
 
-	public function userpassEncryption($username, $userpass)
+	public function userPwdEncryption($username, $userpass)
 	{
 		return md5(md5($username.$userpass));
-	}
-
-	public function checkUsername($id, $postId)
-	{
-		if ($id != $postId) {
-			throw new \Exception('用户名已经存在');
-		}
 	}
 }
