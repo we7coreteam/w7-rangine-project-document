@@ -12,71 +12,92 @@
 
 namespace W7\App\Controller\Admin;
 
+use W7\App\Controller\BaseController;
+use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Logic\SettingLogic;
 use W7\Http\Message\Server\Request;
 
-class SettingController extends Controller
+class SettingController extends BaseController
 {
-	public function show(Request $request)
-	{
-		try {
-			$this->validate($request, [
-				'key' => 'required',
-			], [
-				'key.required' => 'key必填',
-			]);
-			$setting = new SettingLogic();
-			$res = $setting->show($request->input('key'));
-			return $this->success($res);
-		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
-		}
+	private $handler = [
+		'cloud_cosv5' => 'saveCos',
+	];
+
+	public function cos(Request $request) {
+		$this->check($request);
+
+		$setting = SettingLogic::instance()->getByKey('cloud_cosv5');
+		return $this->data([
+			'key' => 'cloud_cosv5',
+			'setting' => $setting->setting,
+		]);
 	}
 
 	public function save(Request $request)
 	{
-		try {
-			$this->validate($request, [
-				'key' => 'required',
-				'app_id' => 'required',
-				'secret_id' => 'required',
-				'secret_key' => 'required',
-				'bucket' => 'required',
-				'region' => 'required',
-				'url' => 'sometimes|url',
-				'path' => 'sometimes|regex:/^\/[a-zA-Z\-_0-9]+$/i'
-			], [
-				'key.required' => 'key必填',
-				'app_id.required' => 'app_id必填',
-				'secret_id.required' => 'secret_id必填',
-				'secret_key.required' => 'secret_key必填',
-				'bucket.required' => 'bucket必填',
-				'region.required' => '所属地址必填',
-				'url.url' => '附件访问域名格式错误',
-				'path.regex' => '保存目录填写错误，格式例如：/savepath '
-			]);
-			$data = [
-				'app_id' => $request->input('app_id'),
-				'secret_id' => $request->input('secret_id'),
-				'secret_key' => $request->input('secret_key'),
-				'bucket' => $request->input('bucket'),
-				'region' => $request->input('region'),
-				'url' => rtrim($request->input('url'), '/'),
-				'path' => rtrim($request->input('path'), '/'),
-			];
+		$this->validate($request, [
+			'key' => 'required',
+		], [
+			'key.required' => 'key必填',
+		]);
 
-			if (empty($data['url'])) {
-				$data['url'] = sprintf('%s-%s.cos.%s.myqcloud.com', $data['bucket'], $data['app_id'], $data['region']);
-			}
-
-			$setting = new SettingLogic();
-			$res = $setting->save($request->input('key'), $data);
-			if ($res) {
-				return $this->success($res);
-			}
-			return $this->error('保存失败');
-		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
+		$key = $request->post('key');
+		if (!isset($this->handler[$key])) {
+			throw new ErrorHttpException('错误的配置key');
 		}
+
+		if (!empty($this->handler[$key])) {
+			$value = call_user_func_array([$this, $this->handler[$key]], [$request]);
+		} else {
+			$value = $request->post('setting');
+		}
+
+		SettingLogic::instance()->save($key, $value);
+		return $this->data('success');
+	}
+
+	private function saveCos(Request $request) {
+		$this->validate($request, [
+			'setting.app_id' => 'required',
+			'setting.secret_id' => 'required',
+			'setting.secret_key' => 'required',
+			'setting.bucket' => 'required',
+			'setting.region' => 'required',
+			'setting.url' => 'sometimes|url',
+			'setting.path' => 'sometimes|regex:/^\/[a-zA-Z\-_0-9]+$/i'
+		], [
+			'setting.app_id.required' => 'app_id必填',
+			'setting.secret_id.required' => 'secret_id必填',
+			'setting.secret_key.required' => 'secret_key必填',
+			'setting.bucket.required' => 'bucket必填',
+			'setting.region.required' => '所属地址必填',
+			'setting.url.url' => '附件访问域名格式错误',
+			'setting.path.regex' => '保存目录填写错误，格式例如：/savepath '
+		]);
+
+		$setting = $request->post('setting');
+
+		$data = [
+			'app_id' => $setting['app_id'],
+			'secret_id' => $setting['secret_id'],
+			'secret_key' => $setting['secret_key'],
+			'bucket' => $setting['bucket'],
+			'region' => $setting['region'],
+			'url' => rtrim($setting['url'], '/'),
+			'path' => rtrim($setting['path'], '/'),
+		];
+
+		if (empty($data['url'])) {
+			$data['url'] = sprintf('%s-%s.cos.%s.myqcloud.com', $data['bucket'], $data['app_id'], $data['region']);
+		}
+		return $data;
+	}
+
+	private function check(Request $request) {
+		$user = $request->getAttribute('user');
+		if (!$user->isFounder) {
+			throw new ErrorHttpException('无权访问');
+		}
+		return true;
 	}
 }

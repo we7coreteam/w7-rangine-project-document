@@ -46,6 +46,9 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 		$route->post('/delete-by-ids', 'Admin\UserController@deleteByIds');
 		$route->post('/batch-update-permission', 'Admin\UserController@batchUpdateDocPermissionByUid');
 	});
+
+	$route->post('/setting/cos', 'Admin\SettingController@cos');
+	$route->post('/setting/save', 'Admin\SettingController@save');
 });
 
 irouter()->middleware(['AdminMiddleware'])->group(['prefix'=>'/admin'], function (\W7\Core\Route\Route $route) {
@@ -57,21 +60,13 @@ irouter()->middleware(['AdminMiddleware'])->group(['prefix'=>'/admin'], function
 	$route->post('/user/searchuser', 'Admin\UserController@searchUser');
 	$route->post('/user/detailsuser', 'Admin\UserController@detailsUser');
 
-	$route->post('/chapter/save_content', 'Admin\ChapterController@saveContent');
 	$route->post('/chapter/publish_or_cancel', 'Admin\ChapterController@publishOrCancel');
 
 
-	$route->post('/chapter/destroy', 'Admin\ChapterController@destroy');
 	$route->post('/chapter/search', 'Admin\ChapterController@searchChapter');
 
 	$route->post('/upload/image', 'Admin\UploadController@image'); //图片上传
 
-	$route->post('/auth/invite_user', 'Admin\UserAuthorizationController@inviteUser');
-	$route->post('/auth/leave_document', 'Admin\UserAuthorizationController@leaveDocument');
-
 	$route->post('/document/getdocuserlist', 'Admin\DocumentController@getDocUserList');
 	$route->post('/document/search', 'Admin\DocumentController@search');
-
-	$route->post('/setting/show', 'Admin\SettingController@show');
-	$route->post('/setting/save', 'Admin\SettingController@save');
 });

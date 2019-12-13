@@ -17,4 +17,11 @@ class Setting extends BaseModel
 	public $timestamps = false;
 	protected $table = 'setting';
 	protected $primaryKey = 'key';
+
+	public function getSettingAttribute() {
+		if (empty($this->value)) {
+			return [];
+		}
+		return json_decode($this->value, true);
+	}
 }
