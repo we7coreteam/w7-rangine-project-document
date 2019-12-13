@@ -75,7 +75,7 @@ class DocumentPermissionLogic extends BaseLogic
 		idb()->beginTransaction();
 		try {
 			foreach ($documentPermissions as $documentPermission) {
-				$this->updateByDocIdAndUid($documentPermissions['document_id'], $userId, $documentPermission['permission']);
+				$this->updateByDocIdAndUid($documentPermission['document_id'], $userId, $documentPermission['permission']);
 			}
 			idb()->commit();
 		} catch (\Throwable $e) {
