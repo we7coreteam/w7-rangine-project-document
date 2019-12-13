@@ -84,21 +84,6 @@ class DocumentPermissionLogic extends BaseLogic
 		}
 	}
 
-	public function addByDocIsPublic($userId, $isPublic, $permission)
-	{
-		idb()->beginTransaction();
-		try {
-			$documents = Document::query()->where('is_public', '=', $isPublic)->get()->toArray();
-			foreach ($documents as $document) {
-				$this->updateByDocIdAndUid($document['id'], $userId, $permission);
-			}
-			idb()->commit();
-		} catch (\Throwable $e) {
-			idb()->rollBack();
-			throw $e;
-		}
-	}
-
 	public function getByDocIdAndUid($documentId, $userId)
 	{
 		return DocumentPermission::query()->where('document_id', '=', $documentId)->where('user_id', '=', $userId)->first();

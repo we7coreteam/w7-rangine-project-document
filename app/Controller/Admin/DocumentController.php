@@ -49,7 +49,7 @@ class DocumentController extends BaseController
 						'id' => $row->id,
 						'name' => $row->name,
 						'description' => $row->descriptionShort,
-						'is_public' => $row->is_public,
+						'is_public' => $row->isPublicDoc,
 						'acl' => DocumentPermissionLogic::instance()->getFounderACL(),
 					];
 				}
@@ -73,11 +73,86 @@ class DocumentController extends BaseController
 						'id' => $row->document->id,
 						'name' => $row->document->name,
 						'description' => $row->document->descriptionShort,
-						'is_public' => $row->document->is_public,
+						'is_public' => $row->document->isPublicDoc,
 						'acl' => $row->acl,
 					];
 				}
 			}
+		}
+
+		$result['page_count'] = $list->lastPage();
+		$result['total'] = $list->total();
+		$result['page_current'] = $list->currentPage();
+
+		return $this->data($result);
+	}
+
+	public function getAllByUid(Request $request)
+	{
+		/**
+		 * @var User $user
+		 */
+		$user = $request->getAttribute('user');
+		if (!$user->isFounder) {
+			throw new ErrorHttpException('无操作用户权限');
+		}
+
+		$params = $this->validate($request, [
+			'user_id' => 'required|integer',
+		], [
+			'user_id.required' => '请指定用户',
+		]);
+
+		$name = trim($request->post('name'));
+		$isPublic = trim($request->post('is_public'));
+		if ($isPublic && !in_array($isPublic, [Document::PUBLIC_DOCUMENT, Document::PRIVATE_DOCUMENT])) {
+			throw new ErrorHttpException('参数错误');
+		}
+		$page = intval($request->post('page', 1));
+
+		$query = Document::query();
+		if ($isPublic) {
+			$query = $query->where('is_public', '=', $isPublic);
+		}
+		if ($name) {
+			$query = $query->where('name', 'like', '%' . $name . '%');
+		}
+
+		//获取私有文档和公有文档的用户身份列表
+		$roleList = DocumentPermissionLogic::instance()->getRoleList();
+		$readerRoleName = $roleList[DocumentPermission::READER_PERMISSION];
+		unset($roleList[DocumentPermission::READER_PERMISSION]);
+		$publicRoleList = [];
+		foreach ($roleList as $id => $name) {
+			$publicRoleList[] = [
+				'id' => $id,
+				'name' => $name
+			];
+		}
+		$privateRoleList = $publicRoleList;
+		$privateRoleList[] = [
+			'id' => DocumentPermission::READER_PERMISSION,
+			'name' => $readerRoleName
+		];
+
+		$list = $query->paginate(null, '*', 'page', $page);
+		foreach ($list->items() as $row) {
+			/**
+			 * @var DocumentPermission $documentPermission
+			 */
+			$documentPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($row->id, $params['user_id']);
+			$result['data'][] = [
+				'id' => $row->id,
+				'name' => $row->name,
+				'description' => $row->descriptionShort,
+				'is_public' => $row->isPublicDoc ,
+				'acl' => [
+					'has_manage' => $documentPermission ? $documentPermission->isManager() : false,
+					'has_operate' => $documentPermission ? $documentPermission->isOperator() : false,
+					'has_read' => $documentPermission ? $documentPermission->isReader() : false,
+				],
+				'role_list' => $row->isPublicDoc ? $publicRoleList : $privateRoleList
+			];
 		}
 
 		$result['page_count'] = $list->lastPage();
@@ -99,7 +174,7 @@ class DocumentController extends BaseController
 			'id' => $document->id,
 			'name' => $document->name,
 			'description' => $document->description,
-			'is_public' => $document->is_public,
+			'is_public' => $document->isPublicDoc,
 			'acl' => [
 				'has_manage' => $user->isManager,
 				'has_edit' => $user->isOperator,
@@ -109,7 +184,7 @@ class DocumentController extends BaseController
 		];
 
 		$roleList = DocumentPermissionLogic::instance()->getRoleList();
-		if ($document->is_public == Document::PUBLIC_DOCUMENT) {
+		if ($document->isPublicDoc) {
 			unset($roleList[DocumentPermission::READER_PERMISSION]);
 		}
 		foreach ($roleList as $id => $name) {
@@ -252,7 +327,6 @@ class DocumentController extends BaseController
 		$document->save();
 
 		return $this->data('success');
-
 	}
 
 	public function delete(Request $request)
@@ -266,7 +340,8 @@ class DocumentController extends BaseController
 		return $this->data('success');
 	}
 
-	private function checkPermissionAndGetDocument(Request $request) {
+	private function checkPermissionAndGetDocument(Request $request)
+	{
 		$this->validate($request, [
 			'document_id' => 'required|integer',
 		], [
