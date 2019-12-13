@@ -173,9 +173,6 @@ class UserController extends BaseController
 		]);
 
 		$ids = array_filter(explode(',', trim($params['ids'])));
-		if (in_array($user->id, $ids)) {
-			unset($ids[array_search($user->id, $ids)]);
-		}
 		if ($ids) {
 			$delNum = UserLogic::instance()->deleteByIds($ids);
 			return $this->data('成功删除' . $delNum . '用户，如果用户有文档不能直接删除');

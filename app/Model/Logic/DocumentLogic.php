@@ -14,7 +14,6 @@ namespace W7\App\Model\Logic;
 
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\DocumentPermission;
-use W7\App\Model\Entity\PermissionDocument;
 use W7\Core\Helper\Traiter\InstanceTraiter;
 
 class DocumentLogic extends BaseLogic
@@ -30,7 +29,8 @@ class DocumentLogic extends BaseLogic
 		return Document::query()->find($id);
 	}
 
-	public function deleteById($documentId) {
+	public function deleteById($documentId)
+	{
 		$documentId = intval($documentId);
 		if (empty($documentId)) {
 			return true;
@@ -42,7 +42,8 @@ class DocumentLogic extends BaseLogic
 		return $this->deleteByDocument($document);
 	}
 
-	public function deleteByDocument(Document $document) {
+	public function deleteByDocument(Document $document)
+	{
 		if (!$document->delete()) {
 			throw new \RuntimeException('文档删除失败，请重试');
 		}
@@ -55,7 +56,8 @@ class DocumentLogic extends BaseLogic
 		return true;
 	}
 
-	public function createCreatorPermission(Document $document) {
+	public function createCreatorPermission(Document $document)
+	{
 		DocumentPermission::query()->create([
 			'document_id' => $document->id,
 			'user_id' => $document->creator_id,
@@ -64,23 +66,23 @@ class DocumentLogic extends BaseLogic
 		return true;
 	}
 
-	public function getUserCreateDoc($id)
+	public function getDocByCreatorId($id)
 	{
-		return Document::where('creator_id', $id)->first();
+		return Document::query()->where('creator_id', $id)->first();
 	}
 
 	public function getShowList($keyword, $page)
 	{
-		if ($keyword) {
-			$res = Document::where('name', 'like', '%'.$keyword['name'].'%')
-						->where('is_show', 1)
-						->orderBy('updated_at', 'desc')
-						->get()->toArray();
-		} else {
-			$res = Document::where('is_show', 1)
-						->orderBy('updated_at', 'desc')
-						->get()->toArray();
+		$query = Document::query()->where('is_public', 1)->orderBy('updated_at', 'desc');
+		if (!empty($keyword['name'])) {
+			$query = $query->where('name', 'like', '%'.$keyword['name'].'%');
 		}
-		return $this->paging($this->handleDocumentRes($res, ''), 15, $page);
+		$list = $query->paginate(null, '*', 'page', $page);
+
+		return [
+			'total' => $list->total(),
+			'pageCount' => $list->lastPage(),
+			'data' => $list->items()
+		];
 	}
 }
