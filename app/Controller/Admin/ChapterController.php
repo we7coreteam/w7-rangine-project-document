@@ -89,14 +89,14 @@ class ChapterController extends BaseController
 		$this->validate($request, [
 			'name' => 'string|required|max:30',
 			'sort' => 'required|integer|min:0',
-			'id' => 'required|integer|min:1',
+			'chapter_id' => 'required|integer|min:1',
 		], [
 			'name.required' => '章节名称必填',
 			'name.max' => '章节名最大３０个字符',
 			'sort.min' => '排序最小值为０',
 			'sort.required' => '排序必填',
-			'id.required' => '文档id必填',
-			'id.min' => '文档id最小为0',
+			'chapter_id.required' => '文档id必填',
+			'chapter_id.min' => '文档id最小为0',
 		]);
 
 		$user = $request->getAttribute('user');
@@ -104,7 +104,7 @@ class ChapterController extends BaseController
 			throw new ErrorHttpException('您没有权限管理该文档');
 		}
 
-		$chapterId = intval($request->post('id'));
+		$chapterId = intval($request->post('chapter_id'));
 		$chapter = ChapterLogic::instance()->getById($chapterId);
 
 		if (empty($chapter)) {
@@ -122,9 +122,9 @@ class ChapterController extends BaseController
 	public function delete(Request $request)
 	{
 		$this->validate($request, [
-			'id' => 'required|integer',
+			'chapter_id' => 'required|integer',
 		], [
-			'id.required' => 'id is required',
+			'chapter_id.required' => '章节不存在',
 		]);
 
 		$user = $request->getAttribute('user');
@@ -132,7 +132,7 @@ class ChapterController extends BaseController
 			throw new ErrorHttpException('您没有权限管理该文档');
 		}
 
-		$chapterId = intval($request->post('id'));
+		$chapterId = intval($request->post('chapter_id'));
 
 		try {
 			ChapterLogic::instance()->deleteById($chapterId);
