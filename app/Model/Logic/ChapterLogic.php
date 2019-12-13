@@ -23,6 +23,8 @@ class ChapterLogic extends BaseLogic
 {
 	use InstanceTraiter;
 
+	private $tree;
+
 	/**
 	 * 获取章节目录
 	 * @param $id
@@ -46,13 +48,19 @@ class ChapterLogic extends BaseLogic
 			$result[$item['id']]['children'] = [];
 		}
 
-		foreach ($result as $id => $item) {
-			if ($item['parent_id'] != 0) {
-				$result[$item['parent_id']]['children'][] = &$result[$id];
+		return $this->getTree($result, 0);
+	}
+
+	private function getTree($data, $pid = 0){
+		$tree = [];
+		foreach($data as $k => $v) {
+			if($v['parent_id'] == $pid) {
+				$v['children'] = $this->getTree($data, $v['id']);
+				$tree[] = $v;
+				//unset($data[$k]);
 			}
 		}
-
-		return $result;
+		return $tree;
 	}
 
 	/**
@@ -87,7 +95,8 @@ class ChapterLogic extends BaseLogic
 		return true;
 	}
 
-	public function deleteById($chapterId) {
+	public function deleteById($chapterId)
+	{
 		$chapter = ChapterLogic::instance()->getById($chapterId);
 		if (empty($chapter)) {
 			throw new \RuntimeException('章节不存在');
