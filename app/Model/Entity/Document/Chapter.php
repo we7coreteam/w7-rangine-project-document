@@ -13,14 +13,18 @@
 namespace W7\App\Model\Entity\Document;
 
 use W7\App\Model\Entity\BaseModel;
+use W7\App\Model\Entity\Document;
 
 class Chapter extends BaseModel
 {
 	protected $table = 'document_chapter';
 
-	public function description()
-	{
+	public function content() {
 		return $this->hasOne(ChapterContent::class, 'chapter_id', 'id');
+	}
+
+	public function document() {
+		return $this->hasOne(Document::class, 'id', 'document_id');
 	}
 
 	public function getPrevItemAttribute() {
