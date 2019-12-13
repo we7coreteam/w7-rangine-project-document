@@ -17,6 +17,7 @@ use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\DocumentPermission;
+use W7\App\Model\Entity\User;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\App\Model\Logic\DocumentPermissionLogic;
 use W7\App\Model\Logic\UserLogic;
@@ -24,11 +25,6 @@ use W7\Http\Message\Server\Request;
 
 class DocumentController extends BaseController
 {
-	public function __construct()
-	{
-		$this->logic = new DocumentLogic();
-	}
-
 	public function all(Request $request)
 	{
 		$keyword = trim($request->input('keyword'));
@@ -58,7 +54,6 @@ class DocumentController extends BaseController
 					];
 				}
 			}
-
 		} else {
 			$query = DocumentPermission::query()->where('user_id', '=', $user->id)
 					->whereIn('permission', [DocumentPermission::MANAGER_PERMISSION, DocumentPermission::OPERATOR_PERMISSION, DocumentPermission::READER_PERMISSION])
@@ -96,12 +91,33 @@ class DocumentController extends BaseController
 	{
 		$document = $this->checkPermissionAndGetDocument($request);
 
+		/**
+		 * @var User $user
+		 */
+		$user = $request->getAttribute('user');
 		$result = [
 			'id' => $document->id,
 			'name' => $document->name,
 			'description' => $document->description,
 			'is_public' => $document->is_public,
+			'acl' => [
+				'has_manage' => $user->isManager,
+				'has_edit' => $user->isOperator,
+				'has_delete' => $user->isManager,
+				'has_read' => $user->isReader
+			]
 		];
+
+		$roleList = DocumentPermissionLogic::instance()->getRoleList();
+		if ($document->is_public == Document::PUBLIC_DOCUMENT) {
+			unset($roleList[DocumentPermission::READER_PERMISSION]);
+		}
+		foreach ($roleList as $id => $name) {
+			$result['role_list'][] = [
+				'id' => $id,
+				'name' => $name
+			];
+		}
 
 		$operator = $document->operator()->with('user')->orderBy('permission')->get();
 		if (!empty($operator)) {
@@ -117,7 +133,8 @@ class DocumentController extends BaseController
 		return $this->data($result);
 	}
 
-	public function operator(Request $request) {
+	public function operator(Request $request)
+	{
 		$this->validate($request, [
 			'user_id' => 'required|integer',
 			'document_id' => 'required|integer',
@@ -187,7 +204,6 @@ class DocumentController extends BaseController
 
 	public function create(Request $request)
 	{
-
 		$this->validate($request, [
 			'name' => 'required',
 		], [

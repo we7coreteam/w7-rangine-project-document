@@ -22,16 +22,7 @@ class DocumentPermissionLogic extends BaseLogic
 
 	public function getRoleList()
 	{
-		$roleList = (new DocumentPermission())->getRoleList();
-
-		$result = [];
-		foreach ($roleList as $id => $name) {
-			$result[] = [
-				'id' => $id,
-				'name' => $name
-			];
-		}
-		return $result;
+		return (new DocumentPermission())->getRoleList();
 	}
 
 	public function add($documentId, $userId, $permission)
@@ -125,11 +116,6 @@ class DocumentPermissionLogic extends BaseLogic
 	public function getByDocIdAndUid($documentId, $userId)
 	{
 		return DocumentPermission::query()->where('document_id', '=', $documentId)->where('user_id', '=', $userId)->first();
-	}
-
-	public function getByDocIdAndPermission($documentId, $permission)
-	{
-		return DocumentPermission::query()->where('document_id', '=', $documentId)->where('permission', '=', $permission)->first();
 	}
 
 	/**
