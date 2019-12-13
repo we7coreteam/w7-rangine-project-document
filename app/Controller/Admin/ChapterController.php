@@ -32,7 +32,15 @@ class ChapterController extends BaseController
 		$document = DocumentLogic::instance()->getById($documentId);
 
 		$chapter = ChapterLogic::instance()->getCatalog($documentId);
-		return $this->data($chapter);
+
+		$result = [
+			'document' => [
+				'id' => $document->id,
+				'name' => $document->name,
+			],
+			'catalog' => $chapter,
+		];
+		return $this->data($result);
 	}
 
 	public function create(Request $request)
