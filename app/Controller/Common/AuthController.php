@@ -14,6 +14,7 @@ namespace W7\App\Controller\Common;
 
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
+use W7\App\Model\Entity\User;
 use W7\App\Model\Logic\UserLogic;
 use W7\Http\Message\Server\Request;
 
@@ -67,6 +68,9 @@ class AuthController extends BaseController
 	public function user(Request $request)
 	{
 		$userSession = $request->session->get('user');
+		/**
+		 * @var User $user
+		 */
 		$user = UserLogic::instance()->getByUid($userSession['uid']);
 
 		$result = [
@@ -74,6 +78,9 @@ class AuthController extends BaseController
 			'username' => $user->username,
 			'created_at' => $user->created_at->toDateTimeString(),
 			'updated_at' => $user->updated_at->toDateTimeString(),
+			'acl' => [
+				'has_manage' => $user->isFounder
+			]
 		];
 
 		return $this->data($result);

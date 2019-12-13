@@ -15,6 +15,7 @@ namespace W7\App\Controller\Admin;
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document;
+use W7\App\Model\Entity\DocumentPermission;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Logic\DocumentPermissionLogic;
 use W7\Http\Message\Server\Request;
@@ -36,7 +37,11 @@ class UserController extends BaseController
 				$result['data'][] = [
 					'id' => $row->id,
 					'username' => $row->username,
+					'role' => $row->isFounder ? '创始人' : '普通用户',
 					'created_at' => $row->created_at->toDateTimeString(),
+					'manage_doc_count' => DocumentPermission::query()->where('user_id', '=', $row->id)->where('permission', '=', DocumentPermission::MANAGER_PERMISSION)->count(),
+					'operate_doc_count' => DocumentPermission::query()->where('user_id', '=', $row->id)->where('permission', '=', DocumentPermission::OPERATOR_PERMISSION)->count(),
+					'read_doc_count' => DocumentPermission::query()->where('user_id', '=', $row->id)->where('permission', '=', DocumentPermission::READER_PERMISSION)->count()
 				];
 			}
 		}
@@ -169,6 +174,9 @@ class UserController extends BaseController
 		]);
 
 		$ids = array_filter(explode(',', trim($params['ids'])));
+		if (in_array($user->id, $ids)) {
+			unset($ids[array_search($user->id, $ids)]);
+		}
 		if ($ids) {
 			$delNum = UserLogic::instance()->deleteByIds($ids);
 			return $this->data('成功删除' . $delNum . '用户，如果用户有文档不能直接删除');

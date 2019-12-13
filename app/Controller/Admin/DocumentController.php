@@ -136,19 +136,28 @@ class DocumentController extends BaseController
 	public function operator(Request $request)
 	{
 		$this->validate($request, [
-			'user_id' => 'required|integer',
 			'document_id' => 'required|integer',
 		], [
-			'user_id.required' => '请指定用户',
 			'document_id.required' => '请指定文档',
 		]);
+		$uid = intval($request->post('user_id'));
+		$userName = $request->post('user_name');
+		if (!$uid && !$userName) {
+			throw new ErrorHttpException('参数错误');
+		}
 
 		$user = $request->getAttribute('user');
 		if (!$user->isManager && !$user->isFounder) {
 			throw new ErrorHttpException('您没有权限管理该文档');
 		}
 
-		$uid = intval($request->post('user_id'));
+		if (!$uid && $userName) {
+			$findUser = UserLogic::instance()->getByUserName($userName);
+			if (!$findUser) {
+				throw new ErrorHttpException('用户不存在');
+			}
+			$uid = $findUser->id;
+		}
 		$permission = intval($request->post('permission'));
 		$documentId = intval($request->post('document_id'));
 
