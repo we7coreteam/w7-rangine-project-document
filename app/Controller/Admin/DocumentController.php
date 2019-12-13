@@ -53,7 +53,7 @@ class DocumentController extends BaseController
 						'id' => $row->id,
 						'name' => $row->name,
 						'description' => $row->descriptionShort,
-						'is_show' => $row->is_show,
+						'is_public' => $row->is_public,
 						'acl' => DocumentPermissionLogic::instance()->getFounderACL(),
 					];
 				}
@@ -78,7 +78,7 @@ class DocumentController extends BaseController
 						'id' => $row->document->id,
 						'name' => $row->document->name,
 						'description' => $row->document->descriptionShort,
-						'is_show' => $row->document->is_show,
+						'is_public' => $row->document->is_public,
 						'acl' => $row->acl,
 					];
 				}
@@ -100,7 +100,7 @@ class DocumentController extends BaseController
 			'id' => $document->id,
 			'name' => $document->name,
 			'description' => $document->description,
-			'is_show' => $document->is_show,
+			'is_public' => $document->is_public,
 		];
 
 		$operator = $document->operator()->with('user')->orderBy('permission')->get();
@@ -200,7 +200,7 @@ class DocumentController extends BaseController
 			'name' => trim($request->input('name')),
 			'description' => trim($request->input('description')),
 			'creator_id' => $user->id,
-			'is_show' => intval($request->post('is_show')) ?? 1,
+			'is_public' => intval($request->post('is_public')) ?? 1,
 		]);
 
 		DocumentLogic::instance()->createCreatorPermission($docuemnt);
@@ -220,8 +220,8 @@ class DocumentController extends BaseController
 			$document->description = $request->input('description');
 		}
 
-		if (!empty($request->input('is_show'))) {
-			$document->is_show = intval($request->input('is_show'));
+		if (!empty($request->input('is_public'))) {
+			$document->is_public = intval($request->input('is_public'));
 		}
 
 		$document->save();
