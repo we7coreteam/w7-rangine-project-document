@@ -241,11 +241,11 @@ class DocumentController extends BaseController
 		}
 
 		$this->validate($request, [
-			'id' => 'required|integer|min:1',
+			'document_id' => 'required|integer|min:1',
 		], [
-			'id.required' => '文档ID不能为空',
+			'document_id.required' => '文档ID不能为空',
 		]);
-		$documentId = $request->input('id');
+		$documentId = $request->input('document_id');
 
 		$data = [];
 		if ($request->input('name') !== null) {
@@ -256,6 +256,9 @@ class DocumentController extends BaseController
 		}
 		if ($request->input('is_public') !== null) {
 			$data['is_public'] = (int)$request->input('is_public');
+			if (!in_array($data['is_public'], [Document::PUBLIC_DOCUMENT, Document::PRIVATE_DOCUMENT])) {
+				throw new \RuntimeException('参数错误(is_public)');
+			}
 		}
 
 		try {
@@ -277,11 +280,11 @@ class DocumentController extends BaseController
 		}
 
 		$this->validate($request, [
-			'id' => 'required|integer|min:1',
+			'document_id' => 'required|integer|min:1',
 		], [
-			'id.required' => '文档ID不能为空',
+			'document_id.required' => '文档ID不能为空',
 		]);
-		$documentId = $request->input('id');
+		$documentId = $request->input('document_id');
 
 		try {
 			$res = DocumentLogic::instance()->deleteById($documentId);
