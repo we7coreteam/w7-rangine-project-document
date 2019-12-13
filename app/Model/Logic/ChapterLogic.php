@@ -57,7 +57,7 @@ class ChapterLogic extends BaseLogic
 			if($v['parent_id'] == $pid) {
 				$v['children'] = $this->getTree($data, $v['id']);
 				$tree[] = $v;
-				//unset($data[$k]);
+				unset($data[$k]);
 			}
 		}
 		return $tree;
