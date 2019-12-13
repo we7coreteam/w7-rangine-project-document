@@ -25,11 +25,6 @@ use W7\Http\Message\Server\Request;
 
 class DocumentController extends BaseController
 {
-	public function __construct()
-	{
-		$this->logic = new DocumentLogic();
-	}
-
 	public function all(Request $request)
 	{
 		$keyword = trim($request->input('keyword'));
@@ -69,7 +64,7 @@ class DocumentController extends BaseController
 				});
 			}
 
-			$list = $query->paginate(self::PAGE_SIZE, '*', 'page', $page);
+			$list = $query->paginate(null, '*', 'page', $page);
 
 			$document = $list->items();
 			if (!empty($document)) {
@@ -122,6 +117,12 @@ class DocumentController extends BaseController
 			]
 		];
 
+		$hasManager = DocumentPermissionLogic::instance()->getByDocIdAndPermission($params['document_id'], DocumentPermission::MANAGER_PERMISSION);
+		$roleList = DocumentPermissionLogic::instance()->getRoleList();
+		if ($hasManager) {
+			unset($roleList[0]);
+		}
+		$result['role_list'] = $roleList;
 		$operator = $document->operator()->with('user')->orderBy('permission')->get();
 		if (!empty($operator)) {
 			$operator->each(function ($row, $i) use (&$result) {

@@ -10,7 +10,7 @@ class DocumentPermissionController extends BaseController
 {
 	public function getAclList(Request $request)
 	{
-		$list = DocumentPermissionLogic::instance()->getAclList();
+		$list = DocumentPermissionLogic::instance()->getRoleList();
 		return $this->data($list);
 	}
 }

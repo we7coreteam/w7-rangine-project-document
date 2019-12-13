@@ -85,6 +85,7 @@ class DocumentPermission extends BaseModel
 	{
 		return [
 			'name' => $this->permissionName[$this->permission],
+			'role' => $this->permission,
 			'has_manage' => $this->hasManage(),
 			'has_edit' => $this->hasEdit(),
 			'has_delete' => $this->hasDelete(),
@@ -97,7 +98,7 @@ class DocumentPermission extends BaseModel
 		return $this->permissionName[$this->permission];
 	}
 
-	public function getPermissionList()
+	public function getRoleList()
 	{
 		return $this->permissionName;
 	}
