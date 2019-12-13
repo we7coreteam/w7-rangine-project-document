@@ -22,11 +22,14 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 		$route->post('/operator', 'Admin\DocumentController@operator');
 		$route->post('/update', 'Admin\DocumentController@update');
 		$route->post('/delete', 'Admin\DocumentController@delete');
-		$route->post('/detail', 'Admin\DocumentController@detail');
-		$route->post('/operator', 'Admin\DocumentController@operator');
 		$route->post('/create', 'Admin\DocumentController@create');
-		$route->post('/update', 'Admin\DocumentController@updateById');
-		$route->post('/delete', 'Admin\DocumentController@deleteById');
+	});
+
+	//文档内容管理
+	$route->middleware('DocumentPermissionMiddleware')->group(['prefix'=>'/chapter'], function (\W7\Core\Route\Route $route){
+		//文档管理设置
+		$route->post('/detail', 'Admin\ChapterController@detail');
+		$route->post('/create', 'Admin\ChapterController@create');
 	});
 
 	//搜索用户
@@ -49,11 +52,10 @@ irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'
 	$route->post('/user/searchuser', 'Admin\UserController@searchUser');
 	$route->post('/user/detailsuser', 'Admin\UserController@detailsUser');
 
-	$route->post('/chapter/index', 'Admin\ChapterController@index');
 	$route->post('/chapter/get_content', 'Admin\ChapterController@getContent');
 	$route->post('/chapter/save_content', 'Admin\ChapterController@saveContent');
 	$route->post('/chapter/publish_or_cancel', 'Admin\ChapterController@publishOrCancel');
-	$route->middleware(['CheckRepeatRequestMiddleware'])->post('/chapter/create', 'Admin\ChapterController@create');
+
 	$route->post('/chapter/update', 'Admin\ChapterController@update');
 	$route->post('/chapter/destroy', 'Admin\ChapterController@destroy');
 	$route->post('/chapter/search', 'Admin\ChapterController@searchChapter');

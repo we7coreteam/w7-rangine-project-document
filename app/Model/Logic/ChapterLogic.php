@@ -86,11 +86,11 @@ class ChapterLogic extends BaseLogic
 	 * @param $id
 	 * @return array
 	 */
-	public function getCatalog($id)
+	public function getCatalog($documentId)
 	{
 		$list = Chapter::query()
 			->select('id', 'name', 'sort', 'parent_id')
-			->where('document_id', $id)
+			->where('document_id', $documentId)
 			->orderBy('parent_id', 'asc')
 			->orderBy('sort', 'asc')->get()->toArray();
 

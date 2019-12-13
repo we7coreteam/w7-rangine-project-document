@@ -12,65 +12,67 @@
 
 namespace W7\App\Controller\Admin;
 
+use W7\App\Controller\BaseController;
+use W7\App\Exception\ErrorHttpException;
+use W7\App\Model\Entity\Document\Chapter;
 use W7\App\Model\Logic\ChapterLogic;
+use W7\App\Model\Logic\DocumentLogic;
 use W7\Http\Message\Server\Request;
 
-class ChapterController extends Controller
+class ChapterController extends BaseController
 {
-	public function __construct()
+	public function detail(Request $request)
 	{
-		$this->logic = new ChapterLogic();
-	}
+		$this->validate($request, [
+			'document_id' => 'required|integer',
+		], [
+			'document_id.required' => '文档ID必传',
+		]);
+		$documentId = intval($request->input('document_id'));
+		$document = DocumentLogic::instance()->getById($documentId);
 
-	public function index(Request $request)
-	{
-		try {
-			$this->validate($request, [
-				'document_id' => 'required|integer',
-			], [
-				'document_id.required' => '文档ID必传',
-			]);
-			$id = (int)$request->input('document_id');
-			$result = $this->logic->getChapters($id);
-
-			return $this->success($result);
-		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
-		}
+		$chapter = ChapterLogic::instance()->getCatalog($documentId);
+		return $this->data($chapter);
 	}
 
 	public function create(Request $request)
 	{
-		try {
-			$this->validate($request, [
-				'name' => 'string|required|max:30',
-				'sort' => 'required|integer|min:0',
-				'document_id' => 'required|integer|min:1',
-				'parent_id' => 'required|integer|min:0',
-			], [
-				'name.required' => '章节名称必填',
-				'name.max' => '章节名最大３０个字符',
-				'sort.min' => '排序最小值为０',
-				'sort.required' => '排序必填',
-				'document_id.required' => '文档id必填',
-				'document_id.min' => '文档id最小为0',
-				'parent_id.required' => '父id必填',
-			]);
+		$this->validate($request, [
+			'name' => 'string|required|max:30',
+			'sort' => 'required|integer|min:0',
+			'document_id' => 'required|integer|min:1',
+			'parent_id' => 'required|integer|min:0',
+		], [
+			'name.required' => '章节名称必填',
+			'name.max' => '章节名最大３０个字符',
+			'sort.min' => '排序最小值为０',
+			'sort.required' => '排序必填',
+			'document_id.required' => '文档id必填',
+			'document_id.min' => '文档id最小为0',
+			'parent_id.required' => '父id必填',
+		]);
 
-			$data['name'] = $request->input('name');
-			$data['sort'] = $request->input('sort', 0);
-			$data['document_id'] = $request->input('document_id');
-			$data['parent_id'] = $request->input('parent_id');
-
-			$result = $this->logic->createChapter($data);
-			if ($result) {
-				return $this->success($result);
-			}
-
-			return $this->error($result);
-		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
+		$user = $request->getAttribute('user');
+		if (!$user->isManager && !$user->isFounder && !$user->isOperator) {
+			throw new ErrorHttpException('您没有权限管理该文档');
 		}
+
+		$parentId = intval($request->post('parent_id'));
+		if (!empty($parentId)) {
+			$parentChapter = ChapterLogic::instance()->getById($parentId);
+			if (empty($parentChapter)) {
+				throw new ErrorHttpException('父章节不存在');
+			}
+		}
+
+		Chapter::query()->create([
+			'name' => $request->post('name'),
+			'sort' => intval($request->post('sort')),
+			'document_id' => intval($request->post('document_id')),
+			'parent_id' => $parentId,
+		]);
+
+		return $this->data('success');
 	}
 
 	public function update(Request $request)
