@@ -20,6 +20,10 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 		//文档管理设置
 		$route->post('/detail', 'Admin\DocumentController@detail');
 		$route->post('/operator', 'Admin\DocumentController@operator');
+		$route->post('/update', 'Admin\DocumentController@update');
+		$route->post('/delete', 'Admin\DocumentController@delete');
+		$route->post('/detail', 'Admin\DocumentController@detail');
+		$route->post('/operator', 'Admin\DocumentController@operator');
 		$route->post('/create', 'Admin\DocumentController@create');
 		$route->post('/update', 'Admin\DocumentController@updateById');
 		$route->post('/delete', 'Admin\DocumentController@deleteById');
@@ -39,7 +43,11 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'/admin'], function (\W7\Core\Route\Route $route) {
 	$route->post('/login/signout', 'Admin\LoginController@signOut'); // 退出登录
 
+	$route->post('/user/adduser', 'Admin\UserController@addUser');
+	$route->post('/user/updateuser', 'Admin\UserController@updateUser');
+	$route->post('/user/deleteuser', 'Admin\UserController@deleteUser');
 	$route->post('/user/searchuser', 'Admin\UserController@searchUser');
+	$route->post('/user/detailsuser', 'Admin\UserController@detailsUser');
 
 	$route->post('/chapter/index', 'Admin\ChapterController@index');
 	$route->post('/chapter/get_content', 'Admin\ChapterController@getContent');

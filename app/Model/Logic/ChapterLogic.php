@@ -113,14 +113,14 @@ class ChapterLogic extends BaseLogic
 		return $result;
 	}
 
-
 	/**
 	 * 获取章节数据
 	 * @param $id
 	 * @param int $documentId
 	 * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|null|object
 	 */
-	public function getById($id, $documentId = 0) {
+	public function getById($id, $documentId = 0)
+	{
 		$id = intval($id);
 		$documentId = intval($documentId);
 
@@ -130,6 +130,19 @@ class ChapterLogic extends BaseLogic
 		}
 
 		return $query->first();
+	}
+
+	public function deleteByDocumentId($documentId)
+	{
+		$chapterQuery = Chapter::query()->where('document_id', $documentId);
+
+		$chapter = $chapterQuery->get();
+		$chapterIds = $chapter->pluck('id')->toArray();
+
+		if ($chapterQuery->delete()) {
+			ChapterContent::query()->whereIn('chapter_id', $chapterIds)->delete();
+		}
+		return true;
 	}
 
 	public function searchDocument($id, $keyword)
@@ -265,19 +278,6 @@ class ChapterLogic extends BaseLogic
 			return $chapter;
 		}
 		throw new \Exception('没有匹配到任何章节');
-	}
-
-	public function deleteDocument($document_id)
-	{
-		$chapters = Chapter::where('document_id', $document_id)->get();
-		foreach ($chapters as $chapter) {
-			ChapterContent::where('chapter_id', $chapter->id)->delete();
-			$chapter->delete();
-		}
-		if ($chapters && icache()->has(DOCUMENT_INFO.$document_id)) {
-			icache()->delete(DOCUMENT_INFO.$document_id);
-		}
-		return true;
 	}
 
 	public function documentAuth($documentId)

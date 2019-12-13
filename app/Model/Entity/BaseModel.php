@@ -17,9 +17,7 @@ use W7\Core\Database\ModelAbstract;
 class BaseModel extends ModelAbstract
 {
 	public $timestamps = true;
-	//protected $table = 'home';
-	//protected $primaryKey = 'id';
-	//protected $fillable = [];
 	protected $guarded = [];
 	public $dateFormat = 'U';
+	protected $perPage = '10';
 }
