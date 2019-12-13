@@ -43,4 +43,9 @@ class Document extends BaseModel
 	{
 		return Str::limit(html_entity_decode($this->description), 20);
 	}
+
+	public function getIsPublicDocAttribute()
+	{
+		return $this->is_public == self::PUBLIC_DOCUMENT;
+	}
 }

@@ -12,7 +12,6 @@
 
 namespace W7\App\Model\Logic;
 
-use W7\App\Event\ChangeAuthEvent;
 use W7\App\Model\Entity\User;
 use W7\Core\Helper\Traiter\InstanceTraiter;
 
@@ -43,9 +42,12 @@ class UserLogic extends BaseLogic
 		}
 
 		$data['userpass'] = $this->userPwdEncryption($data['username'], $data['userpass']);
-		if (!User::query()->create($data)) {
+		$user = User::query()->create($data);
+		if (!$user) {
 			throw new \RuntimeException('用户添加失败');
 		}
+
+		return $user->id;
 	}
 
 	public function updateUser($userInfo)
@@ -59,7 +61,6 @@ class UserLogic extends BaseLogic
 		}
 
 		$userInfo['userpass'] = $this->userPwdEncryption($userInfo['username'], $userInfo['userpass']);
-		ChangeAuthEvent::instance()->attach('user_id', $userInfo['id'])->attach('document_id', 0)->dispatch();
 		$result = User::query()->where('id', $userInfo['id'])->update($userInfo);
 		if (!$result) {
 			throw new \RuntimeException('修改用户信息失败');
