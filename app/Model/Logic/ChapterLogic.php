@@ -13,8 +13,6 @@
 namespace W7\App\Model\Logic;
 
 use W7\App;
-use W7\App\Event\ChangeChapterEvent;
-use W7\App\Event\ChangeDocumentEvent;
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\Document\Chapter;
 use W7\App\Model\Entity\Document\ChapterContent;
@@ -24,62 +22,6 @@ use W7\Core\Helper\Traiter\InstanceTraiter;
 class ChapterLogic extends BaseLogic
 {
 	use InstanceTraiter;
-
-	public function createChapter($data)
-	{
-		if ($data['parent_id'] == 0) {
-			$data['levels'] = 1;
-		} else {
-			$parent = Chapter::find($data['parent_id']);
-			if (!$parent) {
-				throw new \Exception('父章节不存在');
-			}
-			$this->documentAuth($parent['document_id']);
-
-			$data['levels'] = $parent->levels + 1;
-			if ($data['levels'] > 3) {
-				throw new \Exception('章节最大层级为３层！');
-			}
-		}
-		$res = $chapter = Chapter::create($data);
-		if ($res && icache()->has(DOCUMENT_INFO.$data['document_id'])) {
-			icache()->delete(DOCUMENT_INFO.$data['document_id']);
-		}
-		ChangeChapterEvent::instance()->attach('chapter', $chapter)->dispatch();
-		return $chapter;
-	}
-
-	public function updateChapter($id, $data)
-	{
-		$chapter = Chapter::find($id);
-		if ($chapter) {
-			$this->documentAuth($chapter['document_id']);
-
-			$chapter->name = $data['name'];
-			$chapter->sort = $data['sort'];
-			$res = $chapter->save();
-			if ($res && icache()->has(DOCUMENT_INFO.$chapter['document_id'])) {
-				icache()->delete(DOCUMENT_INFO.$chapter['document_id']);
-			}
-			ChangeChapterEvent::instance()->attach('chapter', $chapter)->dispatch();
-			return $chapter;
-		}
-		throw new \Exception('this chapter is not exist,please refresh the web page!');
-	}
-
-	public function publishOrCancel($id, $is_show)
-	{
-		$document = Chapter::find($id);
-		if ($document) {
-			$document->is_show = $is_show;
-			$document->save();
-			ChangeDocumentEvent::instance()->attach('id', $id)->dispatch();
-
-			return true;
-		}
-
-		throw new \Exception('该文档不存在');
-	}
 
 	/**
 	 * 获取章节目录
@@ -145,6 +87,19 @@ class ChapterLogic extends BaseLogic
 		return true;
 	}
 
+	public function deleteById($chapterId) {
+		$chapter = ChapterLogic::instance()->getById($chapterId);
+		if (empty($chapter)) {
+			throw new \RuntimeException('章节不存在');
+		}
+
+		if ($chapter->delete()) {
+			ChapterContent::query()->whereIn('chapter_id', $chapterId)->delete();
+		}
+
+		return true;
+	}
+
 	public function searchDocument($id, $keyword)
 	{
 		$content_ids = ChapterContent::where('content', 'like', '%'.$keyword.'%')->pluck('chapter_id')->toArray();
@@ -187,86 +142,6 @@ class ChapterLogic extends BaseLogic
 			}
 		}
 		return $path;
-	}
-
-	public function deleteChapter($id)
-	{
-		if (Chapter::where('parent_id', $id)->count() > 0) {
-			throw new \Exception('该章节下有子章节，不可删除！');
-		}
-		$chapter = Chapter::find($id);
-		if ($chapter) {
-			$this->documentAuth($chapter['document_id']);
-			idb()->beginTransaction();
-			$resChapter = $chapter->delete();
-			ChapterContent::destroy($id);
-			ChangeChapterEvent::instance()->attach('chapter', $chapter)->dispatch();
-			if ($resChapter) {
-				if ($resChapter && icache()->has(DOCUMENT_INFO.$chapter['document_id'])) {
-					icache()->delete(DOCUMENT_INFO.$chapter['document_id']);
-				}
-				idb()->commit();
-				return $chapter;
-			} else {
-				idb()->rollBack();
-				return false;
-			}
-		}
-		throw new \Exception('该章节不存在，请刷新页面');
-	}
-
-	public function saveContent($id, $content, $layout)
-	{
-		$documentInfo = Chapter::find($id);
-		if (!$documentInfo['document_id']) {
-			throw new \Exception('该章节不存在，请刷新页面');
-		}
-		$this->documentAuth($documentInfo['document_id']);
-		$chapterContent = ChapterContent::find($id);
-		if ($chapterContent) {
-			$chapterContent->content = $content;
-			$chapterContent->layout = $layout;
-			$res = $chapterContent->save();
-			if ($res) {
-				$documentInfo->updated_at = time();
-				$documentInfo->save();
-			}
-		} else {
-			$chapterContent = ChapterContent::create(['chapter_id' => $id,'content' => $content,'layout' => $layout]);
-			if (!$chapterContent) {
-				return false;
-			}
-		}
-		$documents = Document::find($documentInfo['document_id']);
-		$username = User::where('id', $documents['creator_id'])->value('username');
-		$chapterContent['created_at'] = $documentInfo['created_at'];
-		$chapterContent['updated_at'] = $documentInfo['updated_at'];
-		$chapterContent['username'] = $username;
-		return $chapterContent;
-	}
-
-	public function getContent($id)
-	{
-		$documentinfo = Chapter::where('id', $id)->first();
-		if (!$documentinfo || !$documentinfo['document_id']) {
-			throw new \Exception('该章节不存在，请刷新页面');
-		}
-		$this->documentAuth($documentinfo['document_id']);
-		$chapter = ChapterContent::find($id);
-		if (!$chapter) {
-			return $chapter;
-		}
-		$document = Document::where('id', $documentinfo['document_id'])->first();
-		if ($document && $document['creator_id']) {
-			$userinfo = User::where('id', $document['creator_id'])->first();
-			if ($userinfo) {
-				$chapter['creator_id'] = $userinfo['id'];
-				$chapter['username'] = $userinfo['username'];
-			}
-		}
-		$chapter['created_at'] = $documentinfo['created_at'];
-		$chapter['updated_at'] = $documentinfo['updated_at'];
-		return $chapter;
 	}
 
 	public function searchChapter($id, $keywords)

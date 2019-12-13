@@ -30,6 +30,9 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 		//文档管理设置
 		$route->post('/detail', 'Admin\ChapterController@detail');
 		$route->post('/create', 'Admin\ChapterController@create');
+		$route->post('/update', 'Admin\ChapterController@update');
+		$route->post('/content', 'Admin\ChapterController@content');
+		$route->post('/save', 'Admin\ChapterController@save');
 	});
 
 	//搜索用户
@@ -52,11 +55,10 @@ irouter()->middleware(['AdminMiddleware','EventMiddleware'])->group(['prefix'=>'
 	$route->post('/user/searchuser', 'Admin\UserController@searchUser');
 	$route->post('/user/detailsuser', 'Admin\UserController@detailsUser');
 
-	$route->post('/chapter/get_content', 'Admin\ChapterController@getContent');
 	$route->post('/chapter/save_content', 'Admin\ChapterController@saveContent');
 	$route->post('/chapter/publish_or_cancel', 'Admin\ChapterController@publishOrCancel');
 
-	$route->post('/chapter/update', 'Admin\ChapterController@update');
+
 	$route->post('/chapter/destroy', 'Admin\ChapterController@destroy');
 	$route->post('/chapter/search', 'Admin\ChapterController@searchChapter');
 

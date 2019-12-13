@@ -15,6 +15,7 @@ namespace W7\App\Controller\Admin;
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document\Chapter;
+use W7\App\Model\Entity\Document\ChapterContent;
 use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\Http\Message\Server\Request;
@@ -85,96 +86,133 @@ class ChapterController extends BaseController
 
 	public function update(Request $request)
 	{
-		try {
-			$this->validate($request, [
-				'name' => 'string|required|max:30',
-				'sort' => 'required|integer|min:0',
-				'id' => 'required|integer|min:1',
-			], [
-				'name.required' => '章节名称必填',
-				'name.max' => '章节名最大３０个字符',
-				'sort.min' => '排序最小值为０',
-				'sort.required' => '排序必填',
-				'id.required' => '文档id必填',
-				'id.min' => '文档id最小为0',
-			]);
+		$this->validate($request, [
+			'name' => 'string|required|max:30',
+			'sort' => 'required|integer|min:0',
+			'id' => 'required|integer|min:1',
+		], [
+			'name.required' => '章节名称必填',
+			'name.max' => '章节名最大３０个字符',
+			'sort.min' => '排序最小值为０',
+			'sort.required' => '排序必填',
+			'id.required' => '文档id必填',
+			'id.min' => '文档id最小为0',
+		]);
 
-			$data['name'] = $request->input('name');
-			$data['sort'] = $request->input('sort');
-			$id = $request->input('id');
-
-			$result = $this->logic->updateChapter($id, $data);
-			if ($result) {
-				return $this->success($result);
-			}
-
-			return $this->error($result);
-		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
+		$user = $request->getAttribute('user');
+		if (!$user->isManager && !$user->isFounder && !$user->isOperator) {
+			throw new ErrorHttpException('您没有权限管理该文档');
 		}
+
+		$chapterId = intval($request->post('id'));
+		$chapter = ChapterLogic::instance()->getById($chapterId);
+
+		if (empty($chapter)) {
+			throw new ErrorHttpException('章节不存在');
+		}
+
+		$chapter->name = $request->post('name');
+		$chapter->sort = intval($request->post('sort'));
+
+		$chapter->save();
+
+		return $this->data('success');
 	}
 
-	public function destroy(Request $request)
+	public function delete(Request $request)
 	{
 		$this->validate($request, [
 			'id' => 'required|integer',
 		], [
 			'id.required' => 'id is required',
 		]);
-		$id = $request->input('id');
+
+		$user = $request->getAttribute('user');
+		if (!$user->isManager && !$user->isFounder && !$user->isOperator) {
+			throw new ErrorHttpException('您没有权限管理该文档');
+		}
+
+		$chapterId = intval($request->post('id'));
 
 		try {
-			$res = $this->logic->deleteChapter($id);
-			if ($res) {
-				return $this->success();
-			} else {
-				return $this->error();
-			}
-		} catch (\Exception $e) {
-			idb()->rollBack();
-			return $this->error($e->getMessage());
+			ChapterLogic::instance()->deleteById($chapterId);
+		} catch (\Throwable $e) {
+			throw new ErrorHttpException($e->getMessage());
 		}
+
+		return $this->data('success');
 	}
 
-	public function saveContent(Request $request)
+	public function save(Request $request)
 	{
-		try {
-			$this->validate($request, [
-				'chapter_id' => 'required|integer|min:1',
-				'layout' => 'required|integer|min:1',
-			], [
-				'chapter_id.required' => '文档id必填',
-				'layout' => '文档布局必填',
-			]);
-			$id = $request->input('chapter_id');
-			$content = $request->input('content');
-			$layout = $request->input('layout');
-			$res = $this->logic->saveContent($id, $content, $layout);
-			if ($res) {
-				$res['layout'] = $layout;
-				return $this->success($res);
-			}
-			return $this->error('保存失败');
-		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
+		$this->validate($request, [
+			'chapter_id' => 'required|integer|min:1',
+			'layout' => 'required|integer|min:1',
+		], [
+			'chapter_id.required' => '文档id必填',
+			'layout' => '文档布局必填',
+		]);
+
+		$user = $request->getAttribute('user');
+		if (!$user->isManager && !$user->isFounder && !$user->isOperator) {
+			throw new ErrorHttpException('您没有权限管理该文档');
 		}
+
+		$chapterId = intval($request->post('chapter_id'));
+		$chapter = ChapterLogic::instance()->getById($chapterId);
+		if (empty($chapter)) {
+			throw new ErrorHttpException('章节不存在');
+		}
+
+		if (!empty($chapter->content)) {
+			$chapter->content->content =  $request->post('content');
+			$chapter->content->layout =  intval($request->post('layout'));
+			$chapter->content->save();
+		} else {
+			ChapterContent::query()->create([
+				'chapter_id' => $chapterId,
+				'content' => $request->post('content'),
+				'layout' => intval($request->post('layout')),
+			]);
+		}
+
+		$chapter->updated_at = time();
+		$chapter->save();
+
+		return $this->data('success');
 	}
 
-	public function getContent(Request $request)
+	public function content(Request $request)
 	{
-		try {
-			$this->validate($request, [
-				'chapter_id' => 'required|integer|min:1',
-			], [
-				'chapter_id.required' => '文档id必填',
-				'chapter_id.min' => '文档id最小为0',
-			]);
-			$id = $request->input('chapter_id');
-			$content = $this->logic->getContent($id);
-			return $this->success($content);
-		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
+		$this->validate($request, [
+			'chapter_id' => 'required|integer|min:1',
+		], [
+			'chapter_id.required' => '文档id必填',
+			'chapter_id.min' => '文档id最小为0',
+		]);
+		$user = $request->getAttribute('user');
+		if (!$user->isManager && !$user->isFounder && !$user->isOperator) {
+			throw new ErrorHttpException('您没有权限管理该文档');
 		}
+
+		$chapterId = intval($request->post('chapter_id'));
+		$chapter = ChapterLogic::instance()->getById($chapterId);
+
+		if (empty($chapter)) {
+			throw new ErrorHttpException('章节不存在');
+		}
+
+		$result = [
+			'chapter_id' => $chapterId,
+			'content' => $chapter->content->content,
+			'layout' => $chapter->content->layout,
+			'author' => [
+				'uid' => $chapter->document->user->id,
+				'username' => $chapter->document->user->username,
+			]
+		];
+
+		return $this->data($result);
 	}
 
 	public function searchChapter(Request $request)
