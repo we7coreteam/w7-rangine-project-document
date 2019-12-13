@@ -20,7 +20,6 @@ class Document extends BaseModel
 	const PUBLIC_DOCUMENT = 1;
 
 	protected $table = 'document';
-	protected $perPage = '10';
 
 	/**
 	 * 关联作者
