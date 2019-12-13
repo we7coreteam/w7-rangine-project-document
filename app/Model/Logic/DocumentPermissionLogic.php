@@ -57,21 +57,28 @@ class DocumentPermissionLogic extends BaseLogic
 			throw new \RuntimeException('该文档不存在');
 		}
 
-		$documentPermission = new DocumentPermission();
+		//如果当前权限是管理员，删除已存在的管理员
+		if ($permission == DocumentPermission::MANAGER_PERMISSION) {
+			$documentManager = DocumentPermission::query()->where('document_id', '=', $documentId)->where('permission', '', $permission)->first();
+			if ($documentManager) {
+				$documentManager->delete();
+			}
+		}
+
+		$documentPermission = $this->getByDocIdAndUid($documentId, $userId);
+		if ($documentPermission && !$permission) {
+			$documentPermission->delete();
+		}
+		if (!$documentPermission) {
+			$documentPermission = new DocumentPermission();
+		}
+
 		$documentPermission->user_id = $userId;
 		$documentPermission->document_id = $documentId;
 		$documentPermission->permission = $permission;
 
-		if ($documentPermission->permission == DocumentPermission::MANAGER_PERMISSION) {
-			//只能添加一个
-			$exist = DocumentPermission::query()->where('document_id', '=', $documentId)->where('permission', '=', $permission)->first();
-			if ($exist) {
-				throw new \RuntimeException('该文档的管理员已存在');
-			}
-		}
-
 		if (!$documentPermission->save()) {
-			throw new \RuntimeException('文档权限添加失败');
+			throw new \RuntimeException('文档权限变更失败');
 		}
 
 		return true;
@@ -91,18 +98,19 @@ class DocumentPermissionLogic extends BaseLogic
 		}
 	}
 
-	public function addByDocType($userId, $documentType)
+	public function addByDocType($userId, $documentType, $permission)
 	{
-//		idb()->beginTransaction();
-//		try {
-//			foreach ($documentPermissions as $documentPermission) {
-//				$this->add($documentPermissions['document_id'], $documentPermission['user_id'], $documentPermission['permission']);
-//			}
-//			idb()->commit();
-//		} catch (\Throwable $e) {
-//			idb()->rollBack();
-//			throw $e;
-//		}
+		idb()->beginTransaction();
+		try {
+			$documents = Document::query()->where('type', '=', $documentType)->get()->toArray();
+			foreach ($documents as $document) {
+				$this->updateByDocIdAndUid($document['id'], $userId, $permission);
+			}
+			idb()->commit();
+		} catch (\Throwable $e) {
+			idb()->rollBack();
+			throw $e;
+		}
 	}
 
 	public function getByDocIdAndUid($documentId, $userId)
@@ -117,12 +125,7 @@ class DocumentPermissionLogic extends BaseLogic
 	 */
 	public function clearByDocId($documentId)
 	{
-		$deleted = DocumentPermission::query()->where('document_id', '=', $documentId)->delete();
-		if (!$deleted) {
-			throw new \RuntimeException('文档权限清除失败');
-		}
-
-		return true;
+		return DocumentPermission::query()->where('document_id', '=', $documentId)->delete();
 	}
 
 	public function getFounderACL()
