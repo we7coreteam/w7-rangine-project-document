@@ -194,11 +194,12 @@ class UserController extends BaseController
 		}
 
 		$params = $this->validate($request, [
-			'document_permission' => 'required'
+			'document_permission' => 'required',
+			'user_id' => 'required'
 		]);
 
 		try {
-			DocumentPermissionLogic::instance()->addByDocIds($user->id, $params['document_permission']);
+			DocumentPermissionLogic::instance()->addByDocIds($params['user_id'], $params['document_permission']);
 			return $this->data('success');
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());
