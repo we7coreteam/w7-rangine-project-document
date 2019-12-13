@@ -146,11 +146,7 @@ class DocumentController extends BaseController
 				'name' => $row->name,
 				'description' => $row->descriptionShort,
 				'is_public' => $row->isPublicDoc ,
-				'acl' => [
-					'has_manage' => $documentPermission ? $documentPermission->isManager() : false,
-					'has_operate' => $documentPermission ? $documentPermission->isOperator() : false,
-					'has_read' => $documentPermission ? $documentPermission->isReader() : false,
-				],
+				'cur_role' => $documentPermission ? $documentPermission->permission : 0,
 				'role_list' => $row->isPublicDoc ? $publicRoleList : $privateRoleList
 			];
 		}
