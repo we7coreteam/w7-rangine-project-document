@@ -21,35 +21,16 @@ class UploadController extends BaseController
 {
 	public function image(Request $request)
 	{
-		try {
-			$file = $request->file('file');
-			if ($file) {
-				$file = $file->toArray();
-			} else {
-				throw new ErrorHttpException('file必传');
-			}
+		$this->validate($request, [
+			'file' => 'required|file|mimes:bmp,png,jpeg,jpg|max:2048'
+		]);
 
-			$allowed_mime = ['image/png', 'image/jpg', 'image/gif', 'image/jpeg'];
-			if (0 !== $file['error']) {
-				return ['success' => 0,'message' => '['.$file['error'].']上传失败！网络错误或文件过大'];
-			}
-			if (isset($file['type']) && !in_array($file['type'], $allowed_mime, true)) {
-				return ['success' => 0,'message' => 'only jpg,jpeg,png,gif allowed'];
-			}
+		$file = $request->file('file');
 
-			if ($file['size'] > 2 * 1024 * 1204) {
-				return ['success' => 0,'message' => '图片尺寸不得超过2M'];
-			}
+		$fileName = irandom(32) . '.' . pathinfo($file->getClientFilename(), PATHINFO_EXTENSION);
 
-			$baseName = md5(time().irandom(1000, 9999).uniqid());
-			$fileName = $baseName.'.'.explode('/', $file['type'])[1];
-
-			$url = CdnLogic::instance()->channel('document')->uploadFile($fileName, $file['tmp_name']);
-
-			return ['state' => 'SUCCESS' ,'success' => 1,'message' => '上传成功','url'=>$url];
-		} catch (\Exception $e) {
-			return ['success' => 0,'message' => $e->getMessage()];
-		}
+		$url = CdnLogic::instance()->channel('document')->uploadFile($fileName, $file->getTmpFile());
+		echo $url;exit;
 	}
 
 	public function index(Request $request)

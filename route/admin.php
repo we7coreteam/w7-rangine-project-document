@@ -49,6 +49,9 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 
 	$route->post('/setting/cos', 'Admin\SettingController@cos');
 	$route->post('/setting/save', 'Admin\SettingController@save');
+
+	//图片上传
+	$route->post('/upload/image', 'Admin\UploadController@image');
 });
 
 irouter()->middleware(['AdminMiddleware'])->group(['prefix'=>'/admin'], function (\W7\Core\Route\Route $route) {
@@ -64,8 +67,6 @@ irouter()->middleware(['AdminMiddleware'])->group(['prefix'=>'/admin'], function
 
 
 	$route->post('/chapter/search', 'Admin\ChapterController@searchChapter');
-
-	$route->post('/upload/image', 'Admin\UploadController@image'); //图片上传
 
 	$route->post('/document/getdocuserlist', 'Admin\DocumentController@getDocUserList');
 	$route->post('/document/search', 'Admin\DocumentController@search');

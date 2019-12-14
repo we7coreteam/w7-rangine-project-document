@@ -87,9 +87,6 @@ class SettingController extends BaseController
 			'path' => rtrim($setting['path'], '/'),
 		];
 
-		if (empty($data['url'])) {
-			$data['url'] = sprintf('%s-%s.cos.%s.myqcloud.com', $data['bucket'], $data['app_id'], $data['region']);
-		}
 		return $data;
 	}
 
