@@ -83,7 +83,7 @@ class UserController extends BaseController
 		}
 	}
 
-	public function detailById(Request $request)
+	public function getById(Request $request)
 	{
 		/**
 		 * @var User $user
@@ -100,8 +100,12 @@ class UserController extends BaseController
 		]);
 
 		try {
-			$res = UserLogic::instance()->detailById($params['id']);
-			return $this->data($res);
+			$res = UserLogic::instance()->getByUid($params['id']);
+			if (!$res) {
+				throw new \RuntimeException('用户不存在');
+			}
+			unset($res->userpass);
+			return $this->data($res->toArray());
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());
 		}

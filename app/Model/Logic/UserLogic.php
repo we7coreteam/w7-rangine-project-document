@@ -66,17 +66,6 @@ class UserLogic extends BaseLogic
 		return $result;
 	}
 
-	public function detailById($id)
-	{
-		$res = $this->getByUid($id);
-		if ($res) {
-			$res = $this->handleUser([$res]);
-			return $res[0];
-		}
-
-		throw new \RuntimeException('用户不存在');
-	}
-
 	public function deleteByIds($ids)
 	{
 		$docLogic = new DocumentLogic();
@@ -98,24 +87,6 @@ class UserLogic extends BaseLogic
 		}
 
 		return $delNum;
-	}
-
-	public function handleUser($res)
-	{
-		if (!$res) {
-			return $res;
-		}
-		foreach ($res as $key => &$val) {
-			if (isset($val['has_privilege']) && $val['has_privilege'] == 1) {
-				$val['has_privilege_name'] = '有';
-			} else {
-				$val['has_privilege_name'] = '无';
-			}
-			if (isset($val['userpass']) && $val['userpass']) {
-				unset($val['userpass']);
-			}
-		}
-		return $res;
 	}
 
 	public function userPwdEncryption($username, $userpass)
