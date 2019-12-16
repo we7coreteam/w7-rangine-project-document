@@ -10,7 +10,7 @@
  * visited https://www.w7.cc for more details
  */
 
-namespace W7\App\Controller\Client;
+namespace W7\App\Controller\Document;
 
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
@@ -19,11 +19,6 @@ use W7\Http\Message\Server\Request;
 
 class DocumentController extends BaseController
 {
-	public function __construct()
-	{
-		$this->logic = new DocumentLogic();
-	}
-
 	public function getShowList(Request $request)
 	{
 		try {
@@ -38,7 +33,7 @@ class DocumentController extends BaseController
 		}
 	}
 
-	public function getDetails(Request $request)
+	public function detail(Request $request)
 	{
 		try {
 			$this->validate($request, [

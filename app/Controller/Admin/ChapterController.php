@@ -16,8 +16,10 @@ use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document\Chapter;
 use W7\App\Model\Entity\Document\ChapterContent;
+use W7\App\Model\Entity\DocumentPermission;
 use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Logic\DocumentLogic;
+use W7\App\Model\Logic\DocumentPermissionLogic;
 use W7\Http\Message\Server\Request;
 
 class ChapterController extends BaseController
@@ -103,22 +105,74 @@ class ChapterController extends BaseController
 			throw new ErrorHttpException('您没有权限管理该文档');
 		}
 
-		$parentId = intval($request->post('parent_id'));
+		$parentId = $request->post('parent_id', null);
 		$chapterId = intval($request->post('chapter_id'));
 		$chapter = ChapterLogic::instance()->getById($chapterId);
 		if (empty($chapter)) {
 			throw new ErrorHttpException('章节不存在');
 		}
-		if ($parentId) {
-			$parentChapter = ChapterLogic::instance()->getById($parentId);
-			if (!$parentChapter || $parentChapter->is_dir != Chapter::IS_DIR) {
-				throw new ErrorHttpException('上级章节不存在');
+		if (isset($parentId)) {
+			if ($parentId != 0) {
+				$parentChapter = ChapterLogic::instance()->getById($parentId);
+				if (!$parentChapter || $parentChapter->is_dir != Chapter::IS_DIR) {
+					throw new ErrorHttpException('上级章节不存在');
+				}
 			}
 			$chapter->parent_id = $parentId;
 		}
 
 		$chapter->name = $request->post('name');
 		$chapter->sort = intval($request->post('sort'));
+
+		$chapter->save();
+
+		return $this->data('success');
+	}
+
+	public function changeParentById(Request $request)
+	{
+		$this->validate($request, [
+			'chapter_id' => 'required|integer|min:1',
+			'document_id' => 'required|integer',
+		], [
+			'chapter_id.required' => '文档id必填',
+			'chapter_id.min' => '文档id最小为0',
+			'document_id.required' => '文档id必填',
+		]);
+
+		$user = $request->getAttribute('user');
+		if (!$user->isManager && !$user->isFounder && !$user->isOperator) {
+			throw new ErrorHttpException('您没有权限管理该文档');
+		}
+
+		$chapterId = intval($request->post('chapter_id'));
+		$chapter = ChapterLogic::instance()->getById($chapterId);
+		if (empty($chapter)) {
+			throw new ErrorHttpException('章节不存在');
+		}
+
+		$documentId = $request->post('target_document_id', null);
+		if ($documentId) {
+			/**
+			 * @var DocumentPermission $documentPermission
+			 */
+			$documentPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($documentId, $user->id);
+			if (!$documentPermission || $documentPermission->isReader()) {
+				throw new ErrorHttpException('您没有权限管理该文档');
+			}
+			$chapter->document_id = $documentId;
+		}
+
+		$parentId = $request->post('parent_id', null);
+		if (isset($parentId)) {
+			if ($parentId != 0) {
+				$parentChapter = ChapterLogic::instance()->getById($parentId);
+				if (!$parentChapter || $parentChapter->is_dir != Chapter::IS_DIR) {
+					throw new ErrorHttpException('上级章节不存在');
+				}
+			}
+			$chapter->parent_id = $parentId;
+		}
 
 		$chapter->save();
 
@@ -221,7 +275,8 @@ class ChapterController extends BaseController
 			'author' => [
 				'uid' => $chapter->document->user->id,
 				'username' => $chapter->document->user->username,
-			]
+			],
+			'updated_at' => date('Y-m-d H:i:s', $chapter->updated_at)
 		];
 
 		return $this->data($result);
