@@ -215,7 +215,7 @@ class ChapterController extends BaseController
 		return $this->data($result);
 	}
 
-	public function searchChapter(Request $request)
+	public function search(Request $request)
 	{
 		$this->validate($request, [
 			'keywords' => 'required',
