@@ -21,18 +21,22 @@ use W7\Http\Message\Server\Request;
 
 class UploadController extends BaseController
 {
+	private $path;
 	private $uploader;
 
 	public function __construct()
 	{
 		$setting = SettingLogic::instance()->getByKey(SettingLogic::KEY_COS);
+		$cosSetting = $setting->setting;
+
 		$this->uploader = new CdnLogic([
-			'secretId' => $setting->setting['secret_id'],
-			'secretKey' => $setting->setting['secret_key'],
-			'bucket' => $setting->setting['bucket'],
-			'rootUrl' => $setting->setting['rootUrl'],
-			'region' => $setting->setting['region'],
+			'secretId' => $cosSetting['secret_id'],
+			'secretKey' => $cosSetting['secret_key'],
+			'bucket' => $cosSetting['bucket'],
+			'rootUrl' => $cosSetting['url'],
+			'region' => $cosSetting['region'],
 		], 'cos');
+		$this->path = $cosSetting['path'];
 	}
 
 	public function image(Request $request)
@@ -43,7 +47,10 @@ class UploadController extends BaseController
 			'document_id' => 'required',
 		]);
 
-
+		$user = $request->getAttribute('user');
+		if (!$user->isManager && !$user->isFounder && !$user->isOperator) {
+			throw new ErrorHttpException('您没有权限管理该文档');
+		}
 
 		$chapterId = intval($request->post('chapter_id'));
 		$documentId = intval($request->post('document_id'));
@@ -55,16 +62,14 @@ class UploadController extends BaseController
 
 		$file = $request->file('file');
 
-		$fileName = sprintf('/%s/%s/%s.%s', $chapter->document_id, $chapterId, irandom(32), pathinfo($file->getClientFilename(), PATHINFO_EXTENSION));
-
-		echo $fileName;exit;
+		$fileName = sprintf('%s/%s/%s/%s.%s', $this->path, $chapter->document_id, $chapterId, irandom(32), pathinfo($file->getClientFilename(), PATHINFO_EXTENSION));
 		try {
 			$url = $this->uploader->channel('cos')->uploadFile($fileName, $file->getTmpFile());
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());
 		}
 
-		echo $url;exit;
+		return $this->data(['url' => $url]);
 	}
 
 	public function index(Request $request)

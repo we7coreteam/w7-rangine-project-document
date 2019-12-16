@@ -87,6 +87,10 @@ class SettingController extends BaseController
 			'path' => rtrim($setting['path'], '/'),
 		];
 
+		if (empty($data['path'])) {
+			$data['path'] = '';
+		}
+
 		return $data;
 	}
 
