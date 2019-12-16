@@ -33,11 +33,6 @@ return [
 			'path' => RUNTIME_PATH . DS. 'logs'. DS. 'w7.log',
 			'level' => ienv('LOG_CHANNEL_SINGLE_LEVEL', 'debug'),
 			'days' => '1',
-		],
-		'database' => [
-			'driver' => 'stream',
-			'path' => RUNTIME_PATH . DS. 'logs'. DS. 'db.log',
-			'level' => ienv('LOG_CHANNEL_DATABASE_LEVEL', 'debug'),
-		],
+		]
 	],
 ];
