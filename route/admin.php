@@ -58,20 +58,3 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 	//图片上传
 	$route->middleware('DocumentPermissionMiddleware')->post('/upload/image', 'Admin\UploadController@image');
 });
-
-irouter()->middleware(['AdminMiddleware'])->group(['prefix'=>'/admin'], function (\W7\Core\Route\Route $route) {
-	$route->post('/login/signout', 'Admin\LoginController@signOut'); // 退出登录
-
-	$route->post('/user/adduser', 'Admin\UserController@addUser');
-	$route->post('/user/updateuser', 'Admin\UserController@updateUser');
-	$route->post('/user/deleteuser', 'Admin\UserController@deleteUser');
-	$route->post('/user/searchuser', 'Admin\UserController@searchUser');
-	$route->post('/user/detailsuser', 'Admin\UserController@detailsUser');
-
-	$route->post('/chapter/publish_or_cancel', 'Admin\ChapterController@publishOrCancel');
-
-
-	$route->post('/chapter/search', 'Admin\ChapterController@searchChapter');
-
-	$route->post('/document/search', 'Admin\DocumentController@search');
-});
