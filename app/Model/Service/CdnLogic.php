@@ -13,6 +13,7 @@
 namespace W7\App\Model\Service;
 
 use Qcloud\Cos\Client;
+use W7\App\Model\Logic\SettingLogic;
 use W7\Core\Database\LogicAbstract;
 use W7\Core\Helper\Traiter\InstanceTraiter;
 
@@ -32,15 +33,8 @@ class CdnLogic extends LogicAbstract
 	 */
 	private $channel = '';
 
-	public function __construct($setting = [], $channel = 'default')
+	public function __construct()
 	{
-		$this->bucketSpace[$channel] = [
-			'secretId' => $setting['secretId'],
-			'secretKey' => $setting['secretKey'],
-			'bucket' => $setting['bucket'],
-			'rootUrl' => $setting['rootUrl'],
-			'region' => $setting['region'],
-		];
 	}
 
 	/**
@@ -83,6 +77,23 @@ class CdnLogic extends LogicAbstract
 	 */
 	public function channel($channel, $runTestBucket = false)
 	{
+		//从库里读取配置
+		$setting = SettingLogic::instance()->getByKey($channel);
+
+		if (empty($setting)) {
+			throw new \RuntimeException('请先配置上传参数');
+		}
+
+		$cosSetting = $setting->setting;
+		$this->bucketSpace[$channel] = [
+			'secretId' => $cosSetting['secret_id'],
+			'secretKey' => $cosSetting['secret_key'],
+			'bucket' => $cosSetting['bucket'],
+			'rootUrl' => $cosSetting['url'],
+			'region' => $cosSetting['region'],
+			'rootPath' => $cosSetting['path'],
+		];
+
 		if (empty($channel) || empty($this->bucketSpace[$channel])) {
 			throw new \RuntimeException('Invalid bucket name');
 		}
@@ -117,6 +128,7 @@ class CdnLogic extends LogicAbstract
 	 */
 	public function uploadFile($uploadPath, $realPath)
 	{
+		$uploadPath = $this->replacePublicRootPath($uploadPath);
 		try {
 			$result = $this->connection()->putObject([
 				'Key' => $uploadPath,
@@ -137,7 +149,8 @@ class CdnLogic extends LogicAbstract
 	public function getDirFiles($dir = '') : array
 	{
 		try {
-			$dir = ltrim($dir, '/');
+			$dir = $this->replacePublicRootPath($dir);
+			print_r($dir);exit;
 			$result = $this->connection()->listObjects([
 				'Prefix' => $dir,
 				'Bucket' => $this->bucketSpace[$this->channel]['bucket']
@@ -159,7 +172,7 @@ class CdnLogic extends LogicAbstract
 		if (!is_null($timeout)) {
 			$timeout = "+{$timeout} seconds";
 		}
-
+		$uploadFile = $this->replacePublicRootPath($uploadFile);
 		try {
 			$result = $this->connection()->getObjectUrl($this->bucketSpace[$this->channel]['bucket'], $uploadFile, $timeout);
 		} catch (\Throwable $e) {
@@ -183,7 +196,7 @@ class CdnLogic extends LogicAbstract
 		foreach ($uploadFile as $row) {
 			$row = ltrim($row, '/');
 			$objects[] = [
-				'Key' => $row,
+				'Key' => $this->replacePublicRootPath($uploadFile),
 			];
 		}
 
@@ -197,6 +210,20 @@ class CdnLogic extends LogicAbstract
 		}
 
 		return true;
+	}
+
+	public function deletePath($path) {
+		$pathList = $this->getDirFiles($this->replacePublicRootPath($path));
+		if (empty($pathList)) {
+			return true;
+		}
+
+		$files = [];
+		foreach ($pathList as $row) {
+			$files[] = $row['Key'];
+		}
+
+		return $this->deleteFile($files);
 	}
 
 	public function convertUrl($uploadPath, $returnOld = false)
@@ -224,5 +251,12 @@ class CdnLogic extends LogicAbstract
 		$rootUrlHost = parse_url($this->bucketSpace[$this->channel]['rootUrl'], PHP_URL_HOST);
 
 		return str_replace($oldHost, $rootUrlHost, $url);
+	}
+
+	/**
+	 * 替换COS设置的统一根目录
+	 */
+	private function replacePublicRootPath($path) {
+		return $this->bucketSpace[$this->channel]['rootPath'] . '/' . ltrim($path, '/');
 	}
 }

@@ -21,24 +21,6 @@ use W7\Http\Message\Server\Request;
 
 class UploadController extends BaseController
 {
-	private $path;
-	private $uploader;
-
-	public function __construct()
-	{
-		$setting = SettingLogic::instance()->getByKey(SettingLogic::KEY_COS);
-		$cosSetting = $setting->setting;
-
-		$this->uploader = new CdnLogic([
-			'secretId' => $cosSetting['secret_id'],
-			'secretKey' => $cosSetting['secret_key'],
-			'bucket' => $cosSetting['bucket'],
-			'rootUrl' => $cosSetting['url'],
-			'region' => $cosSetting['region'],
-		], 'cos');
-		$this->path = $cosSetting['path'];
-	}
-
 	public function image(Request $request)
 	{
 		$this->validate($request, [
@@ -62,9 +44,9 @@ class UploadController extends BaseController
 
 		$file = $request->file('file');
 
-		$fileName = sprintf('%s/%s/%s/%s.%s', $this->path, $chapter->document_id, $chapterId, irandom(32), pathinfo($file->getClientFilename(), PATHINFO_EXTENSION));
+		$fileName = sprintf('/%s/%s/%s.%s', $chapter->document_id, $chapterId, irandom(32), pathinfo($file->getClientFilename(), PATHINFO_EXTENSION));
 		try {
-			$url = $this->uploader->channel('cos')->uploadFile($fileName, $file->getTmpFile());
+			$url = CdnLogic::instance()->channel(SettingLogic::KEY_COS)->uploadFile($fileName, $file->getTmpFile());
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());
 		}
