@@ -13,7 +13,7 @@
 return [
 	'setting' => [
 		'env' => ienv('SETTING_DEVELOPMENT', RELEASE),
-		'error_reporting' => ienv('SETTING_ERROR_REPORTING', E_ALL),
+		'error_reporting' => ienv('SETTING_ERROR_REPORTING', E_ALL^E_NOTICE^E_WARNING^E_DEPRECATED^E_USER_DEPRECATED),
 		'server' => ienv('SETTING_SERVERS', 'http'),
 		'basedir' => [],
 		'lang' => 'zh-CN',
