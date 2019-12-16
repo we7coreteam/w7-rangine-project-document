@@ -17,6 +17,7 @@ use W7\App\Model\Entity\Document;
 
 class Chapter extends BaseModel
 {
+	const IS_DIR = 1;
 	protected $table = 'document_chapter';
 
 	public function content() {

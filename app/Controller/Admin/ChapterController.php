@@ -48,14 +48,12 @@ class ChapterController extends BaseController
 	{
 		$this->validate($request, [
 			'name' => 'string|required|max:30',
-			'sort' => 'required|integer|min:0',
 			'document_id' => 'required|integer|min:1',
 			'parent_id' => 'required|integer|min:0',
+			'is_dir' => 'required|boolean',
 		], [
 			'name.required' => '章节名称必填',
 			'name.max' => '章节名最大３０个字符',
-			'sort.min' => '排序最小值为０',
-			'sort.required' => '排序必填',
 			'document_id.required' => '文档id必填',
 			'document_id.min' => '文档id最小为0',
 			'parent_id.required' => '父id必填',
@@ -67,6 +65,7 @@ class ChapterController extends BaseController
 		}
 
 		$parentId = intval($request->post('parent_id'));
+		$isDir = $request->post('is_dir');
 		if (!empty($parentId)) {
 			$parentChapter = ChapterLogic::instance()->getById($parentId);
 			if (empty($parentChapter)) {
@@ -74,29 +73,29 @@ class ChapterController extends BaseController
 			}
 		}
 
-		Chapter::query()->create([
+		$chapter = Chapter::query()->create([
 			'name' => $request->post('name'),
 			'sort' => intval($request->post('sort')),
+			'is_dir' => $isDir ? 1 : 0,
 			'document_id' => intval($request->post('document_id')),
 			'parent_id' => $parentId,
 		]);
 
-		return $this->data('success');
+		return $this->data($chapter->toArray());
 	}
 
 	public function update(Request $request)
 	{
 		$this->validate($request, [
 			'name' => 'string|required|max:30',
-			'sort' => 'required|integer|min:0',
 			'chapter_id' => 'required|integer|min:1',
+			'document_id' => 'required|integer',
 		], [
 			'name.required' => '章节名称必填',
 			'name.max' => '章节名最大３０个字符',
-			'sort.min' => '排序最小值为０',
-			'sort.required' => '排序必填',
 			'chapter_id.required' => '文档id必填',
 			'chapter_id.min' => '文档id最小为0',
+			'document_id.required' => '文档id必填',
 		]);
 
 		$user = $request->getAttribute('user');
@@ -104,11 +103,18 @@ class ChapterController extends BaseController
 			throw new ErrorHttpException('您没有权限管理该文档');
 		}
 
+		$parentId = intval($request->post('parent_id'));
 		$chapterId = intval($request->post('chapter_id'));
 		$chapter = ChapterLogic::instance()->getById($chapterId);
-
 		if (empty($chapter)) {
 			throw new ErrorHttpException('章节不存在');
+		}
+		if ($parentId) {
+			$parentChapter = ChapterLogic::instance()->getById($parentId);
+			if (!$parentChapter || $parentChapter->is_dir != Chapter::IS_DIR) {
+				throw new ErrorHttpException('上级章节不存在');
+			}
+			$chapter->parent_id = $parentId;
 		}
 
 		$chapter->name = $request->post('name');
@@ -123,8 +129,10 @@ class ChapterController extends BaseController
 	{
 		$this->validate($request, [
 			'chapter_id' => 'required|integer',
+			'document_id' => 'required|integer',
 		], [
 			'chapter_id.required' => '章节不存在',
+			'document_id.required' => '文档id必填',
 		]);
 
 		$user = $request->getAttribute('user');
@@ -148,9 +156,11 @@ class ChapterController extends BaseController
 		$this->validate($request, [
 			'chapter_id' => 'required|integer|min:1',
 			'layout' => 'required|integer|min:1',
+			'document_id' => 'required|integer',
 		], [
 			'chapter_id.required' => '文档id必填',
 			'layout' => '文档布局必填',
+			'document_id.required' => '文档id必填',
 		]);
 
 		$user = $request->getAttribute('user');
@@ -186,9 +196,11 @@ class ChapterController extends BaseController
 	{
 		$this->validate($request, [
 			'chapter_id' => 'required|integer|min:1',
+			'document_id' => 'required|integer',
 		], [
 			'chapter_id.required' => '文档id必填',
 			'chapter_id.min' => '文档id最小为0',
+			'document_id.required' => '文档id必填',
 		]);
 		$user = $request->getAttribute('user');
 		if (!$user->isManager && !$user->isFounder && !$user->isOperator) {
