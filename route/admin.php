@@ -38,6 +38,7 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 
 	//搜索用户
 	$route->post('/user/search', 'Admin\UserController@search');
+
 	$route->middleware('DocumentPermissionMiddleware')->group(['prefix'=>'/user'], function (\W7\Core\Route\Route $route){
 		//文档管理设置
 		$route->post('/add', 'Admin\UserController@add');
@@ -47,11 +48,13 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 		$route->post('/batch-update-permission', 'Admin\UserController@batchUpdateDocPermissionByUid');
 	});
 
-	$route->post('/setting/cos', 'Admin\SettingController@cos');
-	$route->post('/setting/save', 'Admin\SettingController@save');
+	$route->middleware('CheckFounderMiddleware')->group([], function (\W7\Core\Route\Route $route){
+		$route->post('/setting/cos', 'Admin\SettingController@cos');
+		$route->post('/setting/save', 'Admin\SettingController@save');
+	});
 
 	//图片上传
-	$route->post('/upload/image', 'Admin\UploadController@image');
+	$route->middleware('DocumentPermissionMiddleware')->post('/upload/image', 'Admin\UploadController@image');
 });
 
 irouter()->middleware(['AdminMiddleware'])->group(['prefix'=>'/admin'], function (\W7\Core\Route\Route $route) {
@@ -68,6 +71,5 @@ irouter()->middleware(['AdminMiddleware'])->group(['prefix'=>'/admin'], function
 
 	$route->post('/chapter/search', 'Admin\ChapterController@searchChapter');
 
-	$route->post('/document/getdocuserlist', 'Admin\DocumentController@getDocUserList');
 	$route->post('/document/search', 'Admin\DocumentController@search');
 });

@@ -32,16 +32,14 @@ class CdnLogic extends LogicAbstract
 	 */
 	private $channel = '';
 
-	public function __construct()
+	public function __construct($setting = [], $channel = 'default')
 	{
-		$this->bucketSpace = [
-			'document' => [
-				'secretId' => ienv('CDN_QCLOUD_COSV5_SECRET_ID'),
-				'secretKey' => ienv('CDN_QCLOUD_COSV5_SECRET_KEY'),
-				'bucket' => sprintf('%s', ienv('CDN_QCLOUD_COSV5_BUCKET')),
-				'rootUrl' => ienv('CDN_QCLOUD_COSV5_CDN'),
-				'region' => 'ap-shanghai',
-			]
+		$this->bucketSpace[$channel] = [
+			'secretId' => $setting['secretId'],
+			'secretKey' => $setting['secretKey'],
+			'bucket' => $setting['bucket'],
+			'rootUrl' => $setting['rootUrl'],
+			'region' => $setting['region'],
 		];
 	}
 
@@ -113,8 +111,8 @@ class CdnLogic extends LogicAbstract
 
 	/**
 	 * 上传一个文件
-	 * @param $uploadPath 上传到COS的路径，以/开头
-	 * @param $realPath 文件在本地的物理绝对路径
+	 * @param 上传到COS的路径，以/开头 $uploadPath
+	 * @param  文件在本地的物理绝对路径 $realPath
 	 * @return string 文件在COS上的URL
 	 */
 	public function uploadFile($uploadPath, $realPath)
