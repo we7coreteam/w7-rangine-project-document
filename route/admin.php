@@ -34,6 +34,7 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 		$route->post('/update', 'Admin\ChapterController@update');
 		$route->post('/content', 'Admin\ChapterController@content');
 		$route->post('/save', 'Admin\ChapterController@save');
+		$route->post('/delete', 'Admin\ChapterController@delete');
 		$route->post('/search', 'Admin\ChapterController@search');
 	});
 
@@ -43,7 +44,7 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 	$route->middleware('DocumentPermissionMiddleware')->group(['prefix'=>'/user'], function (\W7\Core\Route\Route $route){
 		//文档管理设置
 		$route->post('/add', 'Admin\UserController@add');
-		$route->post('/detail-by-id', 'Admin\UserController@getById');
+		$route->post('/detail-by-id', 'Admin\UserController@detailById');
 		$route->post('/update', 'Admin\UserController@update');
 		$route->post('/delete-by-ids', 'Admin\UserController@deleteByIds');
 		$route->post('/batch-update-permission', 'Admin\UserController@batchUpdateDocPermissionByUid');
@@ -56,4 +57,21 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 
 	//图片上传
 	$route->middleware('DocumentPermissionMiddleware')->post('/upload/image', 'Admin\UploadController@image');
+});
+
+irouter()->middleware(['AdminMiddleware'])->group(['prefix'=>'/admin'], function (\W7\Core\Route\Route $route) {
+	$route->post('/login/signout', 'Admin\LoginController@signOut'); // 退出登录
+
+	$route->post('/user/adduser', 'Admin\UserController@addUser');
+	$route->post('/user/updateuser', 'Admin\UserController@updateUser');
+	$route->post('/user/deleteuser', 'Admin\UserController@deleteUser');
+	$route->post('/user/searchuser', 'Admin\UserController@searchUser');
+	$route->post('/user/detailsuser', 'Admin\UserController@detailsUser');
+
+	$route->post('/chapter/publish_or_cancel', 'Admin\ChapterController@publishOrCancel');
+
+
+	$route->post('/chapter/search', 'Admin\ChapterController@searchChapter');
+
+	$route->post('/document/search', 'Admin\DocumentController@search');
 });

@@ -150,7 +150,6 @@ class CdnLogic extends LogicAbstract
 	{
 		try {
 			$dir = $this->replacePublicRootPath($dir);
-			print_r($dir);exit;
 			$result = $this->connection()->listObjects([
 				'Prefix' => $dir,
 				'Bucket' => $this->bucketSpace[$this->channel]['bucket']
@@ -213,7 +212,7 @@ class CdnLogic extends LogicAbstract
 	}
 
 	public function deletePath($path) {
-		$pathList = $this->getDirFiles($this->replacePublicRootPath($path));
+		$pathList = $this->getDirFiles($path);
 		if (empty($pathList)) {
 			return true;
 		}

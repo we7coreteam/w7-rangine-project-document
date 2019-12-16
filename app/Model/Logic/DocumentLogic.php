@@ -58,6 +58,12 @@ class DocumentLogic extends BaseLogic
 		return Document::query()->where('creator_id', $id)->first();
 	}
 
+	/**
+	 * @deprecated
+	 * @param $keyword
+	 * @param $page
+	 * @return array
+	 */
 	public function getShowList($keyword, $page)
 	{
 		$query = Document::query()->where('is_public', 1)->orderBy('updated_at', 'desc');
