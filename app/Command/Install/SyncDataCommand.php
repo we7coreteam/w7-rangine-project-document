@@ -23,18 +23,18 @@ class SyncDataCommand extends CommandAbstract
 	{
 		try {
 			$get = [
-				'host' => ienv('DATABASE_ADDONS_HOST'),
-				'username' => ienv('DATABASE_ADDONS_USERNAME'),
-				'password' => ienv('DATABASE_ADDONS_PASSWORD'),
-				'database' => ienv('DATABASE_ADDONS_DATABASE'),
+				'host' => ienv('DATABASE_ORIGINAL_HOST'),
+				'username' => ienv('DATABASE_ORIGINAL_USERNAME'),
+				'password' => ienv('DATABASE_ORIGINAL_PASSWORD'),
+				'database' => ienv('DATABASE_ORIGINAL_DATABASE'),
 			];
 
 //			获取用户 (商城数据库配置)
 			$userDataBase = [
-				'host' => ienv('DATABASE_ADDONS_HOST'),
-				'username' => ienv('DATABASE_ADDONS_USERNAME'),
-				'password' => ienv('DATABASE_ADDONS_PASSWORD'),
-				'database' => ienv('DATABASE_ADDONS_DATABASE'),
+				'host' => ienv('DATABASE_MEMBER_HOST'),
+				'username' => ienv('DATABASE_MEMBER_USERNAME'),
+				'password' => ienv('DATABASE_MEMBER_PASSWORD'),
+				'database' => ienv('DATABASE_MEMBER_DATABASE'),
 			];
 
 //			要获取数据的所有表名称
@@ -47,6 +47,9 @@ class SyncDataCommand extends CommandAbstract
 
 //			定义生成的sql文件
 			$file = RUNTIME_PATH . '/document.sql';
+			if (file_exists($file)) {
+				unlink($file);
+			}
 
 //			拓展检查
 			$this->checkExtension();
@@ -97,6 +100,8 @@ class SyncDataCommand extends CommandAbstract
 
 		$sql = '';
 
+		$dirChapters = [];
+		$maxChapterId = 0;
 		$handle = fopen($file, 'a');
 		foreach ($tables as $key => $table) {
 			$data = $this->getdata($table, $get, $userDataBase);
@@ -104,14 +109,13 @@ class SyncDataCommand extends CommandAbstract
 				if ($table == 'ims_wiki') {
 					$i = 0;
 					foreach ($data as $k => $v) {
-
 						$this->userIds[$k] = $v['creator_id'];
 
-						$sql .= 'INSERT INTO ims_document (id, name, description,creator_id,created_at,updated_at,is_show) VALUES( ';
+						$sql .= 'INSERT INTO ims_document (id, name, description,creator_id,created_at,updated_at,is_public) VALUES( ';
 						$sql .= " '".$v['id']."', '".$v['name']."', '".$v['description']."', '".$v['creator_id']."', '".$v['created_at']."','".$v['updated_at']."', '".$v['is_show']."' );".PHP_EOL;
 
-						$sql .= 'INSERT INTO ims_permission_document (id, user_id, document_id,created_at,updated_at) VALUES( ';
-						$sql .= " '".$v['id']."', '".$v['creator_id']."', '".$v['id']."', '".$v['created_at']."', '".$v['updated_at']."' );".PHP_EOL;
+						$sql .= 'INSERT INTO ims_document_permission (id, user_id, document_id, permission, created_at,updated_at) VALUES( ';
+						$sql .= " '".$v['id']."', '".$v['creator_id']."', '".$v['id']."', 1,'".$v['created_at']."', '".$v['updated_at']."' );".PHP_EOL;
 
 						$res = $this->setContent($i, count($data), $sql, $handle);
 						if ($res) {
@@ -121,9 +125,16 @@ class SyncDataCommand extends CommandAbstract
 					}
 				} elseif ($table == 'ims_wiki_list') {
 					$i = 0;
+					$parentIds = array_column($data, 'parent_id');
 					foreach ($data as $k => $v) {
-						$sql .= 'INSERT INTO ims_document_chapter (id, parent_id, name,document_id,sort,levels,created_at,updated_at) VALUES( ';
-						$sql .= " '".$v['id']."', '".$v['parent_id']."', '".$v['name']."', '".$v['document_id']."', '".$v['sort']."', '".$v['levels']."', '".$v['created_at']."', '".$v['updated_at']."' ); ".PHP_EOL;
+						$isDir = 0;
+						$maxChapterId = $v['id'] > $maxChapterId ? $v['id'] : $maxChapterId;
+						if (in_array($v['id'], $parentIds)) {
+							$isDir = 1;
+							$dirChapters[$v['id']] = $v;
+						}
+						$sql .= 'INSERT INTO ims_document_chapter (id, parent_id, name,document_id,sort,levels,is_dir, created_at,updated_at) VALUES( ';
+						$sql .= " '".$v['id']."', '".$v['parent_id']."', '".$v['name']."', '".$v['document_id']."', '".$v['sort']."', '".$v['levels']."', '". $isDir ."', '".$v['created_at']."', '".$v['updated_at']."' ); ".PHP_EOL;
 
 						$res = $this->setContent($i, count($data), $sql, $handle);
 						if ($res) {
@@ -133,16 +144,32 @@ class SyncDataCommand extends CommandAbstract
 					}
 				} elseif ($table == 'ims_wiki_view') {
 					$i = 0;
+					$chapterNum = count($data);
 					foreach ($data as $k => $v) {
+						//表示该章节是目录并且有内容，创建新的章节
+						if (!empty($dirChapters[$v['chapter_id']])) {
+							++$maxChapterId;
+							++$chapterNum;
+							$sql .= 'INSERT INTO ims_document_chapter (id, parent_id, name,document_id,sort,levels,is_dir, created_at,updated_at) VALUES( ';
+							$sql .= " '".$maxChapterId."', '".$v['chapter_id']."', '".$dirChapters[$v['chapter_id']]['name']."', '".$dirChapters[$v['chapter_id']]['document_id']."', '".$dirChapters[$v['chapter_id']]['sort']."', '".$dirChapters[$v['chapter_id']]['levels']."', '". 0 ."', '".$dirChapters[$v['chapter_id']]['created_at']."', '".$dirChapters[$v['chapter_id']]['updated_at']."' ); ".PHP_EOL;
+							$v['chapter_id'] = $maxChapterId;
+							$i++;
+							$res = $this->setContent($i, $chapterNum, $sql, $handle);
+							if ($res) {
+								$sql = '';
+							}
+						}
+
 						$sql .= 'INSERT INTO ims_document_chapter_content (id, chapter_id, content,layout) VALUES( ';
 						$content = htmlspecialchars_decode(html_entity_decode($v['content']));
 						$content = str_replace('&#039;', "'", $content);
 						$content = addslashes($content);
 						$sql .= " '".$v['id']."', '".$v['chapter_id']."', '".$content."', '".$v['layout']."' ); ".PHP_EOL;
-						$res = $this->setContent($i, count($data), $sql, $handle);
+						$res = $this->setContent($i, $chapterNum, $sql, $handle);
 						if ($res) {
 							$sql = '';
 						}
+
 						$i++;
 					}
 				} elseif ($table == 'ims_members') {
