@@ -29,19 +29,6 @@ class DocumentLogic extends BaseLogic
 		return Document::query()->find($id);
 	}
 
-	public function deleteById($documentId)
-	{
-		$documentId = intval($documentId);
-		if (empty($documentId)) {
-			return true;
-		}
-		$document = $this->getById($documentId);
-		if (empty($document)) {
-			return true;
-		}
-		return $this->deleteByDocument($document);
-	}
-
 	public function deleteByDocument(Document $document)
 	{
 		if (!$document->delete()) {

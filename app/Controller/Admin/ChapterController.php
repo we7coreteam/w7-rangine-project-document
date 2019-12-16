@@ -217,21 +217,22 @@ class ChapterController extends BaseController
 
 	public function searchChapter(Request $request)
 	{
+		$this->validate($request, [
+			'keywords' => 'required',
+			'document_id' => 'required|integer|min:1',
+		], [
+			'document_id.required' => '文档id必填',
+			'document_id.min' => '文档id最小为0',
+			'keywords.required' => '关键字必填',
+		]);
+		$id = $request->input('document_id');
+		$keywords = $request->input('keywords');
+
 		try {
-			$this->validate($request, [
-				'keywords' => 'required',
-				'document_id' => 'required|integer|min:1',
-			], [
-				'document_id.required' => '文档id必填',
-				'document_id.min' => '文档id最小为0',
-				'keywords.required' => '关键字必填',
-			]);
-			$id = $request->input('document_id');
-			$keywords = $request->input('keywords');
-			$result = $this->logic->searchChapter($id, $keywords);
-			return $this->success($result);
-		} catch (\Exception $e) {
-			return $this->error($e->getMessage());
+			$result = ChapterLogic::instance()->searchChapter($id, $keywords);
+			return $this->data($result);
+		} catch (\Throwable $e) {
+			throw new ErrorHttpException($e->getMessage());
 		}
 	}
 }

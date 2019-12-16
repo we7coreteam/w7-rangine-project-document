@@ -12,7 +12,6 @@
 
 namespace W7\App\Model\Logic;
 
-use W7\App;
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\Document\Chapter;
 use W7\App\Model\Entity\Document\ChapterContent;
@@ -51,10 +50,11 @@ class ChapterLogic extends BaseLogic
 		return $this->getTree($result, 0);
 	}
 
-	private function getTree($data, $pid = 0){
+	private function getTree($data, $pid = 0)
+	{
 		$tree = [];
-		foreach($data as $k => $v) {
-			if($v['parent_id'] == $pid) {
+		foreach ($data as $k => $v) {
+			if ($v['parent_id'] == $pid) {
 				$v['children'] = $this->getTree($data, $v['id']);
 				$tree[] = $v;
 				unset($data[$k]);
@@ -142,7 +142,7 @@ class ChapterLogic extends BaseLogic
 	{
 		$path = $parent_id;
 		while ($parent_id != 0) {
-			$temporary = Chapter::find($parent_id)->first();
+			$temporary = Chapter::query()->find($parent_id)->first();
 			if ($temporary) {
 				$parent_id = $temporary->parent_id;
 				$path = $parent_id.'/'.$path;
@@ -155,21 +155,12 @@ class ChapterLogic extends BaseLogic
 
 	public function searchChapter($id, $keywords)
 	{
-		$chapter = Chapter::select('id', 'parent_id', 'name')->where('document_id', $id)->where('name', 'like', '%'.$keywords.'%')->first();
+		$chapter = Chapter::query()->select('id', 'parent_id', 'name')->where('document_id', $id)->where('name', 'like', '%'.$keywords.'%')->first();
 		if ($chapter) {
-			$chapter['content'] = ChapterContent::find($chapter['id'])->content ?? '';
+			$chapter['content'] = ChapterContent::query()->find($chapter['id'])->content ?? '';
 			$chapter['path'] = $this->getPath($chapter['parent_id']);
 			return $chapter;
 		}
 		throw new \Exception('没有匹配到任何章节');
-	}
-
-	public function documentAuth($documentId)
-	{
-		$request = App::getApp()->getContext()->getRequest();
-		$auth = $request->document_user_auth;
-		if ($auth != null && is_array($auth) && APP_AUTH_ALL !== $auth && !in_array($documentId, $auth)) {
-			throw new \Exception('无权操作');
-		}
 	}
 }
