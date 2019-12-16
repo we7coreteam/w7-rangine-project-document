@@ -65,7 +65,7 @@ return [
 			],
 		],
 		'cache' => [
-			'redis' => [
+			'default' => [
 				'enable' => true,
 				'max' => 1000,
 			],
