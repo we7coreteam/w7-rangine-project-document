@@ -20,15 +20,15 @@ use W7\Http\Message\Server\Request;
 class SettingController extends BaseController
 {
 	private $handler = [
-		'cloud_cosv5' => 'saveCos',
+		SettingLogic::KEY_COS => 'saveCos',
 	];
 
 	public function cos(Request $request) {
 		$this->check($request);
 
-		$setting = SettingLogic::instance()->getByKey('cloud_cosv5');
+		$setting = SettingLogic::instance()->getByKey(SettingLogic::KEY_COS);
 		return $this->data([
-			'key' => 'cloud_cosv5',
+			'key' => SettingLogic::KEY_COS,
 			'setting' => $setting->setting,
 		]);
 	}

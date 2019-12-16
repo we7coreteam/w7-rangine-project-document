@@ -19,6 +19,8 @@ class SettingLogic extends BaseLogic
 {
 	use InstanceTraiter;
 
+	const KEY_COS = 'cloud_cosv5';
+
 	public function getByKey($key)
 	{
 		$row = Setting::query()->where('key', $key)->first();
