@@ -18,6 +18,7 @@ use W7\App\Model\Entity\Document\Chapter;
 use W7\App\Model\Entity\Document\ChapterContent;
 use W7\App\Model\Entity\User;
 use W7\Core\Helper\Traiter\InstanceTraiter;
+use W7\App\Model\Service\CdnLogic;
 
 class ChapterLogic extends BaseLogic
 {
@@ -90,6 +91,7 @@ class ChapterLogic extends BaseLogic
 
 		if ($chapterQuery->delete()) {
 			ChapterContent::query()->whereIn('chapter_id', $chapterIds)->delete();
+			CdnLogic::instance()->channel(SettingLogic::KEY_COS)->deletePath(sprintf('/%s', $documentId));
 		}
 		return true;
 	}
@@ -103,6 +105,8 @@ class ChapterLogic extends BaseLogic
 
 		if ($chapter->delete()) {
 			ChapterContent::query()->whereIn('chapter_id', $chapterId)->delete();
+
+			CdnLogic::instance()->channel(SettingLogic::KEY_COS)->deletePath(sprintf('/%s/%s', $chapter->document_id, $chapterId));
 		}
 
 		return true;

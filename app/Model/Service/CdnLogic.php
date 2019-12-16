@@ -57,8 +57,8 @@ class CdnLogic extends LogicAbstract
 				$this->client[$channel] = new Client([
 					'region' => $this->bucketSpace[$channel]['region'],
 					'schema' => 'https',
-					'credentials'=> [
-						'secretId'  => $this->bucketSpace[$channel]['secretId'],
+					'credentials' => [
+						'secretId' => $this->bucketSpace[$channel]['secretId'],
 						'secretKey' => $this->bucketSpace[$channel]['secretKey'],
 					]
 				]);
@@ -150,6 +150,8 @@ class CdnLogic extends LogicAbstract
 	{
 		try {
 			$dir = $this->replacePublicRootPath($dir);
+			$dir = ltrim($dir, '/');
+
 			$result = $this->connection()->listObjects([
 				'Prefix' => $dir,
 				'Bucket' => $this->bucketSpace[$this->channel]['bucket']
@@ -211,18 +213,22 @@ class CdnLogic extends LogicAbstract
 		return true;
 	}
 
-	public function deletePath($path) {
+	public function deletePath($path)
+	{
 		$pathList = $this->getDirFiles($path);
 		if (empty($pathList)) {
 			return true;
 		}
-
-		$files = [];
-		foreach ($pathList as $row) {
-			$files[] = $row['Key'];
+		try {
+			$result = $this->connection()->deleteObjects([
+				'Bucket' => $this->bucketSpace[$this->channel]['bucket'],
+				'Objects' => $pathList,
+			]);
+		} catch (\Throwable $e) {
+			throw new \RuntimeException($e->getMessage(), $e->getCode());
 		}
 
-		return $this->deleteFile($files);
+		return true;
 	}
 
 	public function convertUrl($uploadPath, $returnOld = false)
@@ -255,7 +261,8 @@ class CdnLogic extends LogicAbstract
 	/**
 	 * 替换COS设置的统一根目录
 	 */
-	private function replacePublicRootPath($path) {
+	private function replacePublicRootPath($path)
+	{
 		return $this->bucketSpace[$this->channel]['rootPath'] . '/' . ltrim($path, '/');
 	}
 }
