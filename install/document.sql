@@ -64,6 +64,7 @@ CREATE TABLE `ims_document_chapter` (
   `document_id` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '壳id',
   `sort` int(11) NOT NULL DEFAULT '0' COMMENT '排序，越大越靠前',
   `levels` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
+  `is_dir` tinyint(1) DEFAULT '0' COMMENT '当前章节是否是目录(1：是，0：否)',
   `created_at` int(11) NOT NULL DEFAULT '0',
   `updated_at` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -87,10 +88,11 @@ CREATE TABLE `ims_document_chapter_content` (
 -- 表的结构 `ims_permission_document`
 --
 
-CREATE TABLE `ims_permission_document` (
+CREATE TABLE `ims_document_permission` (
   `id` int(10) UNSIGNED NOT NULL,
   `user_id` int(10) UNSIGNED NOT NULL DEFAULT '0',
   `document_id` int(10) NOT NULL DEFAULT '0' COMMENT '文档壳id',
+  `permission` tinyint(4) NOT NULL COMMENT '用户在文档中的权限(1: 管理员,2:操作员,3:阅读者)',
   `created_at` int(11) NOT NULL DEFAULT '0',
   `updated_at` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
