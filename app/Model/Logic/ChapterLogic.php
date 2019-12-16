@@ -104,7 +104,7 @@ class ChapterLogic extends BaseLogic
 		}
 
 		if ($chapter->delete()) {
-			ChapterContent::query()->whereIn('chapter_id', $chapterId)->delete();
+			ChapterContent::query()->where('chapter_id', '=', $chapterId)->delete();
 
 			CdnLogic::instance()->channel(SettingLogic::KEY_COS)->deletePath(sprintf('/%s/%s', $chapter->document_id, $chapterId));
 		}
