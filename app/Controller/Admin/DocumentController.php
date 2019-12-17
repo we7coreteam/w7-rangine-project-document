@@ -179,26 +179,33 @@ class DocumentController extends BaseController
 			]
 		];
 
+		$hasManager = false;
+		$operator = $document->operator()->with('user')->orderBy('permission')->get();
+		if (!empty($operator)) {
+			$operator->each(function ($row, $i) use (&$result, &$hasManager) {
+				$result['operator'][] = [
+					'id' => $row->user->id,
+					'username' => $row->user->username,
+					'acl' => $row->acl,
+				];
+				if ($row->acl['has_manage']) {
+					$hasManager = true;
+				}
+			});
+		}
+
 		$roleList = DocumentPermissionLogic::instance()->getRoleList();
 		if ($document->isPublicDoc) {
 			unset($roleList[DocumentPermission::READER_PERMISSION]);
+		}
+		if ($hasManager) {
+			unset($roleList[DocumentPermission::MANAGER_PERMISSION]);
 		}
 		foreach ($roleList as $id => $name) {
 			$result['role_list'][] = [
 				'id' => $id,
 				'name' => $name
 			];
-		}
-
-		$operator = $document->operator()->with('user')->orderBy('permission')->get();
-		if (!empty($operator)) {
-			$operator->each(function ($row, $i) use (&$result) {
-				$result['operator'][] = [
-					'id' => $row->user->id,
-					'username' => $row->user->username,
-					'acl' => $row->acl,
-				];
-			});
 		}
 
 		return $this->data($result);

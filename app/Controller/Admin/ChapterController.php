@@ -16,6 +16,7 @@ use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document\Chapter;
 use W7\App\Model\Entity\Document\ChapterContent;
+use W7\App\Model\Entity\User;
 use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\Http\Message\Server\Request;
@@ -29,6 +30,11 @@ class ChapterController extends BaseController
 		], [
 			'document_id.required' => '文档ID必传',
 		]);
+
+		/**
+		 * @var User $user
+		 */
+		$user = $request->getAttribute('user');
 		$documentId = intval($request->input('document_id'));
 		$document = DocumentLogic::instance()->getById($documentId);
 
@@ -40,6 +46,9 @@ class ChapterController extends BaseController
 				'name' => $document->name,
 			],
 			'catalog' => $chapter,
+			'acl' => [
+				'has_manage' => $user->isManager
+			]
 		];
 		return $this->data($result);
 	}
