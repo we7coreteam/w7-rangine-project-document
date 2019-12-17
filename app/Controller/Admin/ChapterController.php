@@ -16,10 +16,8 @@ use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document\Chapter;
 use W7\App\Model\Entity\Document\ChapterContent;
-use W7\App\Model\Entity\DocumentPermission;
 use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Logic\DocumentLogic;
-use W7\App\Model\Logic\DocumentPermissionLogic;
 use W7\Http\Message\Server\Request;
 
 class ChapterController extends BaseController
@@ -129,53 +127,66 @@ class ChapterController extends BaseController
 		return $this->data('success');
 	}
 
-	public function changeParentById(Request $request)
-	{
+	public function sort(Request $request) {
 		$this->validate($request, [
-			'chapter_id' => 'required|integer|min:1',
+			'target.chapter_id' => 'sometimes|integer',
+			'target.position' => 'required|in:inner,before,after',
+			'target.parent_id' => 'sometimes|integer',
+			'chapter_id' => 'required|integer',
 			'document_id' => 'required|integer',
-		], [
-			'chapter_id.required' => '文档id必填',
-			'chapter_id.min' => '文档id最小为0',
-			'document_id.required' => '文档id必填',
 		]);
 
-		$user = $request->getAttribute('user');
-		if (!$user->isManager && !$user->isFounder && !$user->isOperator) {
-			throw new ErrorHttpException('您没有权限管理该文档');
-		}
+		$targetChapter = ChapterLogic::instance()->getById($request->post('target')['chapter_id']);
+		$chapter = ChapterLogic::instance()->getById($request->post('chapter_id'));
 
-		$chapterId = intval($request->post('chapter_id'));
-		$chapter = ChapterLogic::instance()->getById($chapterId);
+		$position = $request->post('target')['position'];
+
 		if (empty($chapter)) {
-			throw new ErrorHttpException('章节不存在');
+			throw new ErrorHttpException('要移动的章节不存在');
 		}
 
-		$documentId = $request->post('target_document_id', null);
-		if ($documentId) {
-			/**
-			 * @var DocumentPermission $documentPermission
-			 */
-			$documentPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($documentId, $user->id);
-			if (!$documentPermission || $documentPermission->isReader()) {
-				throw new ErrorHttpException('您没有权限管理该文档');
+		//放入到目录节点中，但不存在排序
+		if ($position == 'inner') {
+			$targetParentId = $request->post('target')['parent_id'];
+			$targetParent = ChapterLogic::instance()->getById($targetParentId);
+
+			if (empty($targetParentId) || empty($targetParent)) {
+				throw new ErrorHttpException('移到的目录不存在');
 			}
-			$chapter->document_id = $documentId;
-		}
 
-		$parentId = $request->post('parent_id', null);
-		if (isset($parentId)) {
-			if ($parentId != 0) {
-				$parentChapter = ChapterLogic::instance()->getById($parentId);
-				if (!$parentChapter || $parentChapter->is_dir != Chapter::IS_DIR) {
-					throw new ErrorHttpException('上级章节不存在');
+			if ($targetParent->document_id != $request->post('document_id')) {
+				throw new ErrorHttpException('只能移动到当前文档中的其它目录');
+			}
+
+			if (!$targetParent->is_dir) {
+				throw new ErrorHttpException('移动的目标不是目录，不能移动');
+			}
+
+			$chapter->parent_id = $targetParentId;
+			$chapter->sort = ChapterLogic::instance()->getMaxSort($targetParentId);
+			$chapter->save();
+
+			return $this->data('success');
+		} else {
+			if (empty($targetChapter)) {
+				throw new ErrorHttpException('要移到的章节不存在');
+			}
+
+			$targetParentId = $request->post('target')['parent_id'];
+			if (!empty($targetParentId)) {
+				$targetParent = ChapterLogic::instance()->getById($targetParentId);
+				if (!empty($targetParent)) {
+					$chapter->parent_id = $targetParentId;
+					$chapter->save();
 				}
 			}
-			$chapter->parent_id = $parentId;
+
+			try {
+				ChapterLogic::instance()->sortByChapter($chapter, $targetChapter, $position);
+			} catch (\Throwable $e) {
+				throw new ErrorHttpException($e->getMessage());
+			}
 		}
-
-		$chapter->save();
-
 		return $this->data('success');
 	}
 

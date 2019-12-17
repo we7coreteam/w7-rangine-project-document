@@ -82,6 +82,10 @@ class ChapterLogic extends BaseLogic
 		return $query->first();
 	}
 
+	public function getMaxSort($parentId) {
+		return Chapter::query()->where('parent_id', '=', $parentId)->max('sort');
+	}
+
 	public function deleteByDocumentId($documentId)
 	{
 		$chapterQuery = Chapter::query()->where('document_id', $documentId);
@@ -107,6 +111,36 @@ class ChapterLogic extends BaseLogic
 			ChapterContent::query()->where('chapter_id', '=', $chapterId)->delete();
 
 			CdnLogic::instance()->channel(SettingLogic::KEY_COS)->deletePath(sprintf('/%s/%s', $chapter->document_id, $chapterId));
+		}
+
+		return true;
+	}
+
+	public function sortByChapter(Chapter $source, Chapter $target, $position = 'before') {
+		if ($source->parent_id != $target->parent_id) {
+			throw new \RuntimeException('文档不在一个目录内');
+		}
+
+		if ($source->document_id != $target->document_id) {
+			throw new \RuntimeException('要移到的章节不在一个文档内');
+		}
+
+		if ($position == 'before') {
+			//把大于target sort先全部后移一位，然后把当前插入到target后面
+			Chapter::query()->where('parent_id', '=', $target->parent_id)
+							->where('id', '!=', $source->id)
+							->where('sort', '>=', $target->sort)->increment('sort');
+
+			$source->sort = $target->sort;
+			$source->save();
+		} else {
+			//把大于target sort先全部后移一位，然后把当前插入到target后面
+			Chapter::query()->where('parent_id', '=', $target->parent_id)
+				->where('id', '!=', $source->id)
+				->where('sort', '>', $target->sort)->increment('sort');
+
+			$source->sort = $target->sort+1;
+			$source->save();
 		}
 
 		return true;
