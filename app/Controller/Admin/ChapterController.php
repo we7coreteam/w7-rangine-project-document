@@ -131,10 +131,14 @@ class ChapterController extends BaseController
 		$this->validate($request, [
 			'target.chapter_id' => 'sometimes|integer',
 			'target.position' => 'required|in:inner,before,after',
-			'target.parent_id' => 'sometimes|integer',
 			'chapter_id' => 'required|integer',
 			'document_id' => 'required|integer',
 		]);
+
+		$user = $request->getAttribute('user');
+		if (!$user->isManager && !$user->isFounder && !$user->isOperator) {
+			throw new ErrorHttpException('您没有权限管理该文档');
+		}
 
 		$targetChapter = ChapterLogic::instance()->getById($request->post('target')['chapter_id']);
 		$chapter = ChapterLogic::instance()->getById($request->post('chapter_id'));
@@ -145,26 +149,17 @@ class ChapterController extends BaseController
 			throw new ErrorHttpException('要移动的章节不存在');
 		}
 
+		if ($targetChapter->document_id != $request->post('document_id')) {
+			throw new ErrorHttpException('只能移动到当前文档中的其它目录');
+		}
+
 		//放入到目录节点中，但不存在排序
 		if ($position == 'inner') {
-			$targetParentId = $request->post('target')['parent_id'];
-			$targetParent = ChapterLogic::instance()->getById($targetParentId);
-
-			if (empty($targetParentId) || empty($targetParent)) {
-				throw new ErrorHttpException('移到的目录不存在');
+			try {
+				ChapterLogic::instance()->moveByChapter($chapter, $targetChapter);
+			} catch (\Throwable $e) {
+				throw new ErrorHttpException($e->getMessage());
 			}
-
-			if ($targetParent->document_id != $request->post('document_id')) {
-				throw new ErrorHttpException('只能移动到当前文档中的其它目录');
-			}
-
-			if (!$targetParent->is_dir) {
-				throw new ErrorHttpException('移动的目标不是目录，不能移动');
-			}
-
-			$chapter->parent_id = $targetParentId;
-			$chapter->sort = ChapterLogic::instance()->getMaxSort($targetParentId);
-			$chapter->save();
 
 			return $this->data('success');
 		} else {
@@ -172,14 +167,8 @@ class ChapterController extends BaseController
 				throw new ErrorHttpException('要移到的章节不存在');
 			}
 
-			$targetParentId = $request->post('target')['parent_id'];
-			if (!empty($targetParentId)) {
-				$targetParent = ChapterLogic::instance()->getById($targetParentId);
-				if (!empty($targetParent)) {
-					$chapter->parent_id = $targetParentId;
-					$chapter->save();
-				}
-			}
+			$chapter->parent_id = $targetChapter->parent_id;
+			$chapter->save();
 
 			try {
 				ChapterLogic::instance()->sortByChapter($chapter, $targetChapter, $position);

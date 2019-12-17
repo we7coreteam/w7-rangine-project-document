@@ -138,10 +138,21 @@ class ChapterLogic extends BaseLogic
 			Chapter::query()->where('parent_id', '=', $target->parent_id)
 				->where('id', '!=', $source->id)
 				->where('sort', '>', $target->sort)->increment('sort');
-
 			$source->sort = $target->sort+1;
 			$source->save();
 		}
+
+		return true;
+	}
+
+	public function moveByChapter(Chapter $source, Chapter $target) {
+		if (!$target->is_dir) {
+			throw new ErrorHttpException('移动的目标不是目录，不能移动');
+		}
+
+		$source->parent_id = $target->id;
+		$source->sort = ChapterLogic::instance()->getMaxSort($target->parent_id);
+		$source->save();
 
 		return true;
 	}
