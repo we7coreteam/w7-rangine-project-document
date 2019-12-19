@@ -22,7 +22,7 @@ class DocumentPermissionLogic extends BaseLogic
 
 	public function getRoleList()
 	{
-		return (new DocumentPermission())->getRoleList();
+		return (new DocumentPermission())->roleList;
 	}
 
 	public function add($documentId, $userId, $permission)

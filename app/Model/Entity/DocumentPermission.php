@@ -40,55 +40,24 @@ class DocumentPermission extends BaseModel
 		return $this->hasOne(Document::class, 'id', 'document_id');
 	}
 
-	public function isManager()
+	public function user()
+	{
+		return $this->hasOne(User::class, 'id', 'user_id');
+	}
+
+	public function getIsManagerAttribute()
 	{
 		return $this->permission == self::MANAGER_PERMISSION;
 	}
 
-	public function isOperator()
+	public function getIsOperatorAttribute()
 	{
 		return $this->permission == self::MANAGER_PERMISSION || $this->permission == self::OPERATOR_PERMISSION;
 	}
 
-	public function isReader()
+	public function getIsReaderAttribute()
 	{
 		return $this->permission == self::MANAGER_PERMISSION || $this->permission == self::OPERATOR_PERMISSION || $this->permission == self::READER_PERMISSION;
-	}
-
-	/**
-	 * 判断用户是否有读该文档权限
-	 * @return bool
-	 */
-	public function hasRead()
-	{
-		return $this->permission == self::READER_PERMISSION || $this->permission == self::OPERATOR_PERMISSION || $this->permission == self::MANAGER_PERMISSION;
-	}
-
-	/**
-	 * 判断用户是否有删除该文档权限
-	 * @return bool
-	 */
-	public function hasDelete()
-	{
-		return $this->permission == self::MANAGER_PERMISSION;
-	}
-
-	/**
-	 * 判断用户是否有编辑该文档权限
-	 * @return bool
-	 */
-	public function hasEdit()
-	{
-		return $this->permission == self::MANAGER_PERMISSION || $this->permission == self::OPERATOR_PERMISSION;
-	}
-
-	/**
-	 * 判断用户是否有管理该文档权限
-	 * @return bool
-	 */
-	public function hasManage()
-	{
-		return $this->permission == self::MANAGER_PERMISSION;
 	}
 
 	public function getACLAttribute()
@@ -96,10 +65,10 @@ class DocumentPermission extends BaseModel
 		return [
 			'name' => $this->permissionName[$this->permission],
 			'role' => $this->permission,
-			'has_manage' => $this->hasManage(),
-			'has_edit' => $this->hasEdit(),
-			'has_delete' => $this->hasDelete(),
-			'has_read' => $this->hasRead(),
+			'has_manage' => $this->isManager,
+			'has_edit' => $this->isOperator,
+			'has_delete' => $this->isManager,
+			'has_read' => $this->isReader,
 		];
 	}
 
@@ -108,13 +77,8 @@ class DocumentPermission extends BaseModel
 		return $this->permissionName[$this->permission];
 	}
 
-	public function getRoleList()
+	public function getRoleListAttribute()
 	{
 		return $this->permissionName;
-	}
-
-	public function user()
-	{
-		return $this->hasOne(User::class, 'id', 'user_id');
 	}
 }

@@ -70,7 +70,6 @@ class ChapterController extends BaseController
 			'created_at' => $chapter->created_at->toDateTimeString(),
 			'updated_at' => $chapter->updated_at->toDateTimeString(),
 			'content' => $chapter->content->content,
-			'layout' => $chapter->content->layout,
 			'prev_item' => [
 				'id' => $chapter->prevItem->id ?? '',
 				'name' => $chapter->prevItem->name ?? '',
