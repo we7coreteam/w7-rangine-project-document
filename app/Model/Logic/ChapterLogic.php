@@ -152,7 +152,7 @@ class ChapterLogic extends BaseLogic
 
 	public function moveByChapter(Chapter $source, Chapter $target) {
 		if (!$target->is_dir) {
-			throw new ErrorHttpException('移动的目标不是目录，不能移动');
+			throw new \RuntimeException('移动的目标不是目录，不能移动');
 		}
 
 		$source->parent_id = $target->id;
