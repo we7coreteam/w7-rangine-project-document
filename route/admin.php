@@ -9,10 +9,6 @@
  * Using it under the license terms
  * visited https://www.w7.cc for more details
  */
-
-irouter()->get('/js/php/controller.php', 'Admin\UploadController@index');
-irouter()->post('/js/php/controller.php', 'Admin\UploadController@image');
-
 irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], function (\W7\Core\Route\Route $route) {
 	//管理文档列表
 	$route->post('/document/all', 'Admin\DocumentController@all');
