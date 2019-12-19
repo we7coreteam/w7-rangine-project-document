@@ -21,6 +21,7 @@ use W7\App\Model\Entity\User;
 use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Logic\ChapterOperateLogic;
 use W7\App\Model\Logic\DocumentLogic;
+use W7\App\Model\Logic\DocumentPermissionLogic;
 use W7\Http\Message\Server\Request;
 
 /**
@@ -182,7 +183,7 @@ class ChapterController extends BaseController
 		if ($position == 'move') {
 			$targetDocumentId = $request->post('target')['document_id'];
 			$documentPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($targetDocumentId, $user->id);
-			if (!$documentPermission->isManager() && !$documentPermission->isFounder() && !$documentPermission->isOperator()) {
+			if (!$user->isFounder && !$documentPermission->isManager && !$documentPermission->isOperator) {
 				throw new ErrorHttpException('您没有权限管理该文档');
 			}
 
