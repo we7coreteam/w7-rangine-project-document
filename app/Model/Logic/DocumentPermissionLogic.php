@@ -70,7 +70,7 @@ class DocumentPermissionLogic extends BaseLogic
 		return true;
 	}
 
-	public function addByDocIds($userId, array $documentPermissions)
+	public function addByUidAndDocPermissions($userId, array $documentPermissions)
 	{
 		idb()->beginTransaction();
 		try {

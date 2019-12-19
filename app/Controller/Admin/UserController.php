@@ -196,7 +196,7 @@ class UserController extends BaseController
 		]);
 
 		try {
-			DocumentPermissionLogic::instance()->addByDocIds($params['user_id'], $params['document_permission']);
+			DocumentPermissionLogic::instance()->addByUidAndDocPermissions($params['user_id'], $params['document_permission']);
 			return $this->data('success');
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());
