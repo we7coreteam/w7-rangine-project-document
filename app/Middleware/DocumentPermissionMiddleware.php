@@ -33,9 +33,9 @@ class DocumentPermissionMiddleware extends MiddlewareAbstract
 			 */
 			$documentPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($documentId, $user->id);
 			if ($documentPermission) {
-				$user->isManager = $documentPermission->isManager();
-				$user->isOperator = $documentPermission->isOperator();
-				$user->isReader = $documentPermission->isReader();
+				$user->isManager = $documentPermission->isManager;
+				$user->isOperator = $documentPermission->isOperator;
+				$user->isReader = $documentPermission->isReader;
 			} else {
 				$user->isManager = false;
 				$user->isOperator = false;

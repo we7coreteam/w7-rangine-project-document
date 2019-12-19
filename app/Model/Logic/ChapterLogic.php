@@ -111,9 +111,11 @@ class ChapterLogic extends BaseLogic
 			ChapterContent::query()->where('chapter_id', '=', $chapterId)->delete();
 
 			CdnLogic::instance()->channel(SettingLogic::KEY_COS)->deletePath(sprintf('/%s/%s', $chapter->document_id, $chapterId));
+
+			return true;
 		}
 
-		return true;
+		throw new \RuntimeException('章节删除失败');
 	}
 
 	public function sortByChapter(Chapter $source, Chapter $target, $position = 'before') {
@@ -168,7 +170,6 @@ class ChapterLogic extends BaseLogic
 			if ($document['content']) {
 				$document['content'] = mb_substr($document['content'], 0, 264, 'utf-8');
 			}
-			$document['layout'] = ChapterContent::find($document['id'])->layout ?? '';
 			$document['path'] = $this->getPath($document['parent_id']);
 		}
 

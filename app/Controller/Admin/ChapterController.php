@@ -16,11 +16,17 @@ use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document\Chapter;
 use W7\App\Model\Entity\Document\ChapterContent;
+use W7\App\Model\Entity\Document\ChapterOperateLog;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Logic\ChapterLogic;
+use W7\App\Model\Logic\ChapterOperateLogic;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\Http\Message\Server\Request;
 
+/**
+ * Class ChapterController
+ * @package W7\App\Controller\Admin
+ */
 class ChapterController extends BaseController
 {
 	public function detail(Request $request)
@@ -89,6 +95,14 @@ class ChapterController extends BaseController
 			'document_id' => intval($request->post('document_id')),
 			'parent_id' => $parentId,
 		]);
+		if (!$chapter) {
+			throw new ErrorHttpException('章节添加失败');
+		}
+		ChapterOperateLog::query()->create([
+			'user_id' => $user->id,
+			'chapter_id' => $chapter->id,
+			'operate' => ChapterOperateLog::CREATE
+		]);
 
 		return $this->data($chapter->toArray());
 	}
@@ -133,10 +147,17 @@ class ChapterController extends BaseController
 
 		$chapter->save();
 
+		ChapterOperateLog::query()->create([
+			'user_id' => $user->id,
+			'chapter_id' => $chapter->id,
+			'operate' => ChapterOperateLog::EDIT
+		]);
+
 		return $this->data('success');
 	}
 
-	public function sort(Request $request) {
+	public function sort(Request $request)
+	{
 		$this->validate($request, [
 			'target.chapter_id' => 'sometimes|integer',
 			'target.position' => 'required|in:inner,before,after',
@@ -169,8 +190,6 @@ class ChapterController extends BaseController
 			} catch (\Throwable $e) {
 				throw new ErrorHttpException($e->getMessage());
 			}
-
-			return $this->data('success');
 		} else {
 			if (empty($targetChapter)) {
 				throw new ErrorHttpException('要移到的章节不存在');
@@ -185,6 +204,13 @@ class ChapterController extends BaseController
 				throw new ErrorHttpException($e->getMessage());
 			}
 		}
+
+		ChapterOperateLog::query()->create([
+			'user_id' => $user->id,
+			'chapter_id' => $chapter->id,
+			'operate' => ChapterOperateLog::EDIT
+		]);
+
 		return $this->data('success');
 	}
 
@@ -207,6 +233,11 @@ class ChapterController extends BaseController
 
 		try {
 			ChapterLogic::instance()->deleteById($chapterId);
+			ChapterOperateLog::query()->create([
+				'user_id' => $user->id,
+				'chapter_id' => $chapterId,
+				'operate' => ChapterOperateLog::DELETE
+			]);
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());
 		}
@@ -218,11 +249,9 @@ class ChapterController extends BaseController
 	{
 		$this->validate($request, [
 			'chapter_id' => 'required|integer|min:1',
-			'layout' => 'required|integer|min:1',
 			'document_id' => 'required|integer',
 		], [
 			'chapter_id.required' => '文档id必填',
-			'layout' => '文档布局必填',
 			'document_id.required' => '文档id必填',
 		]);
 
@@ -239,18 +268,22 @@ class ChapterController extends BaseController
 
 		if (!empty($chapter->content)) {
 			$chapter->content->content =  $request->post('content');
-			$chapter->content->layout =  intval($request->post('layout'));
 			$chapter->content->save();
 		} else {
 			ChapterContent::query()->create([
 				'chapter_id' => $chapterId,
-				'content' => $request->post('content'),
-				'layout' => intval($request->post('layout')),
+				'content' => $request->post('content')
 			]);
 		}
 
 		$chapter->updated_at = time();
 		$chapter->save();
+
+		ChapterOperateLog::query()->create([
+			'user_id' => $user->id,
+			'chapter_id' => $chapter->id,
+			'operate' => ChapterOperateLog::EDIT
+		]);
 
 		return $this->data('success');
 	}
@@ -277,13 +310,18 @@ class ChapterController extends BaseController
 			throw new ErrorHttpException('章节不存在');
 		}
 
+		$creator = ChapterOperateLogic::instance()->getByChapterAndOperate($chapterId, ChapterOperateLog::CREATE);
+		if ($creator) {
+			$author = $creator->user;
+		} else {
+			$author = $chapter->document->user;
+		}
 		$result = [
 			'chapter_id' => $chapterId,
 			'content' => $chapter->content->content,
-			'layout' => $chapter->content->layout,
 			'author' => [
-				'uid' => $chapter->document->user->id,
-				'username' => $chapter->document->user->username,
+				'uid' => $author->id,
+				'username' => $author->username,
 			],
 			'updated_at' => $chapter->updated_at->toDateTimeString()
 		];
