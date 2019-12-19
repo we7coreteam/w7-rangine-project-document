@@ -285,7 +285,7 @@ class ChapterController extends BaseController
 				'uid' => $chapter->document->user->id,
 				'username' => $chapter->document->user->username,
 			],
-			'updated_at' => date('Y-m-d H:i:s', $chapter->updated_at)
+			'updated_at' => $chapter->updated_at->toDateTimeString()
 		];
 
 		return $this->data($result);
