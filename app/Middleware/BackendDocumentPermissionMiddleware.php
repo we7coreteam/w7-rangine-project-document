@@ -10,7 +10,7 @@ use W7\App\Model\Entity\User;
 use W7\App\Model\Logic\DocumentPermissionLogic;
 use W7\Core\Middleware\MiddlewareAbstract;
 
-class DocumentPermissionMiddleware extends MiddlewareAbstract
+class BackendDocumentPermissionMiddleware extends MiddlewareAbstract
 {
 	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
 	{

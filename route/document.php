@@ -10,11 +10,9 @@
  * visited https://www.w7.cc for more details
  */
 
-irouter()->group(['prefix' => '/document'], function (\W7\Core\Route\Route $route) {
+irouter()->middleware('FrontendDocumentPermissionMiddleware')->group(['prefix' => '/document'], function (\W7\Core\Route\Route $route) {
+	$route->post('/detail', 'Document\DocumentController@detail');
 	$route->post('/chapter/list', 'Document\ChapterController@catalog');
 	$route->post('/chapter/detail', 'Document\ChapterController@detail');
 	$route->post('/chapter/search', 'Document\ChapterController@search');
-
-	$route->post('/document/getshowlist', 'Document\DocumentController@getShowList');
-	$route->post('/detail', 'Document\DocumentController@detail');
 });
