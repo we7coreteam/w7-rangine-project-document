@@ -72,6 +72,10 @@ class AuthController extends BaseController
 		 * @var User $user
 		 */
 		$user = UserLogic::instance()->getByUid($userSession['uid']);
+		if (!$user) {
+			$request->session->destroy();
+			throw new ErrorHttpException('请先登录', [], 444);
+		}
 
 		$result = [
 			'id' => $user->id,
