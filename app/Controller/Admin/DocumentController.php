@@ -56,7 +56,7 @@ class DocumentController extends BaseController
 			}
 		} else {
 			$query = DocumentPermission::query()->where('user_id', '=', $user->id)
-					->whereIn('permission', [DocumentPermission::MANAGER_PERMISSION, DocumentPermission::OPERATOR_PERMISSION, DocumentPermission::READER_PERMISSION])
+					->whereIn('permission', [DocumentPermission::MANAGER_PERMISSION, DocumentPermission::OPERATOR_PERMISSION])
 					->orderByDesc('id')->with('document');
 			if (!empty($keyword)) {
 				$query->whereHas('document', function ($query) use ($keyword) {
