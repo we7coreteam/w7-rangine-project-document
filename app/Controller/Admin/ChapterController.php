@@ -179,8 +179,19 @@ class ChapterController extends BaseController
 			throw new ErrorHttpException('要移动的章节不存在');
 		}
 
-		if ($targetChapter->document_id != $request->post('document_id')) {
-			throw new ErrorHttpException('只能移动到当前文档中的其它目录');
+		if ($position == 'move') {
+			$targetDocumentId = $request->post('target')['document_id'];
+			$documentPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($targetDocumentId, $user->id);
+			if (!$documentPermission->isManager() && !$documentPermission->isFounder() && !$documentPermission->isOperator()) {
+				throw new ErrorHttpException('您没有权限管理该文档');
+			}
+
+			$chapter->document_id = $targetDocumentId;
+			$chapter->save();
+		} else {
+			if ($targetChapter->document_id != $request->post('document_id')) {
+				throw new ErrorHttpException('只能移动到当前文档中的其它目录');
+			}
 		}
 
 		//放入到目录节点中，但不存在排序
@@ -327,6 +338,44 @@ class ChapterController extends BaseController
 		];
 
 		return $this->data($result);
+	}
+
+	/**
+	 * 设置章节目录默认显示文章内容
+	 */
+	public function defaultShow(Request $request) {
+		$this->validate($request, [
+			'chapter_id' => 'required',
+			'show_chapter_id' => 'required',
+		]);
+
+		$user = $request->getAttribute('user');
+		if (!$user->isManager && !$user->isFounder && !$user->isOperator) {
+			throw new ErrorHttpException('您没有权限管理该文档');
+		}
+
+		$chapterId = intval($request->post('chapter_id'));
+		$chapter = ChapterLogic::instance()->getById($chapterId);
+
+		$showChapterId = intval($request->post('show_chapter_id'));
+		$showChapter = ChapterLogic::instance()->getById($showChapterId);
+
+		if (empty($chapter) || empty($showChapter)) {
+			throw new ErrorHttpException('您要操作的章节或是目录不存在');
+		}
+
+		if (empty($chapter->is_dir)) {
+			throw new ErrorHttpException('此操作只能设置目录的默认显示');
+		}
+
+		if (!empty($showChapter->is_dir)) {
+			throw new ErrorHttpException('设置显示的章节不能为目录');
+		}
+
+		$chapter->default_show_chapter_id = $showChapterId;
+		$chapter->save();
+
+		return $this->data('success');
 	}
 
 	public function search(Request $request)

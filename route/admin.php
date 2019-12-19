@@ -33,6 +33,7 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 		$route->post('/delete', 'Admin\ChapterController@delete');
 		$route->post('/search', 'Admin\ChapterController@search');
 		$route->post('/sort', 'Admin\ChapterController@sort');
+		$route->post('/default-show', 'Admin\ChapterController@defaultShow');
 	});
 
 	//搜索用户
