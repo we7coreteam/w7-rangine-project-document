@@ -329,6 +329,10 @@ class DocumentController extends BaseController
 
 		$document->save();
 
+		if ($document->is_public == Document::PUBLIC_DOCUMENT) {
+			DocumentPermission::query()->where('document_id', '=', $document->id)->where('permission', '=', DocumentPermission::READER_PERMISSION)->delete();
+		}
+
 		return $this->data('success');
 	}
 
