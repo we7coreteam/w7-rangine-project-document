@@ -160,7 +160,7 @@ class ChapterController extends BaseController
 	{
 		$this->validate($request, [
 			'target.chapter_id' => 'sometimes|integer',
-			'target.position' => 'required|in:inner,before,after',
+			'target.position' => 'required|in:inner,before,after,move',
 			'chapter_id' => 'required|integer',
 			'document_id' => 'required|integer',
 		]);
