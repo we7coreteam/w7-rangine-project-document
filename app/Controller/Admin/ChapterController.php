@@ -375,6 +375,12 @@ class ChapterController extends BaseController
 		$chapter->default_show_chapter_id = $showChapterId;
 		$chapter->save();
 
+		ChapterOperateLog::query()->create([
+			'user_id' => $user->id,
+			'chapter_id' => $chapter->id,
+			'operate' => ChapterOperateLog::EDIT
+		]);
+
 		return $this->data('success');
 	}
 
