@@ -228,7 +228,7 @@ class ChapterController extends BaseController
 	public function delete(Request $request)
 	{
 		$this->validate($request, [
-			'chapter_id' => 'required|integer',
+			'chapter_id' => 'required',
 			'document_id' => 'required|integer',
 		], [
 			'chapter_id.required' => '章节不存在',
@@ -240,10 +240,15 @@ class ChapterController extends BaseController
 			throw new ErrorHttpException('您没有权限管理该文档');
 		}
 
-		$chapterId = intval($request->post('chapter_id'));
+		if (!is_array($request->post('chapter_id'))) {
+			$chapterId = intval($request->post('chapter_id'));
+			$chapterId = [$chapterId];
+		}
 
 		try {
-			ChapterLogic::instance()->deleteById($chapterId);
+			foreach ($chapterId as $id) {
+				ChapterLogic::instance()->deleteById($id);
+			}
 			ChapterOperateLog::query()->create([
 				'user_id' => $user->id,
 				'chapter_id' => $chapterId,
