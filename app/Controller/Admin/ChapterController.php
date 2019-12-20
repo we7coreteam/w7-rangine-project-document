@@ -196,7 +196,7 @@ class ChapterController extends BaseController
 		}
 
 		//放入到目录节点中，但不存在排序
-		if ($position == 'inner') {
+		if ($position == 'inner' || $position == 'move') {
 			try {
 				ChapterLogic::instance()->moveByChapter($chapter, $targetChapter);
 			} catch (\Throwable $e) {
