@@ -9,15 +9,11 @@
  * Using it under the license terms
  * visited https://www.w7.cc for more details
  */
-
-irouter()->get('/js/php/controller.php', 'Admin\UploadController@index');
-irouter()->post('/js/php/controller.php', 'Admin\UploadController@image');
-
 irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], function (\W7\Core\Route\Route $route) {
 	//管理文档列表
 	$route->post('/document/all', 'Admin\DocumentController@all');
 	$route->post('/document/all-by-uid', 'Admin\DocumentController@getAllByUid');
-	$route->middleware('DocumentPermissionMiddleware')->group(['prefix'=>'/document'], function (\W7\Core\Route\Route $route){
+	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix'=>'/document'], function (\W7\Core\Route\Route $route){
 		//文档管理设置
 		$route->post('/detail', 'Admin\DocumentController@detail');
 		$route->post('/operator', 'Admin\DocumentController@operator');
@@ -27,7 +23,7 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 	});
 
 	//文档内容管理
-	$route->middleware('DocumentPermissionMiddleware')->group(['prefix'=>'/chapter'], function (\W7\Core\Route\Route $route){
+	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix'=>'/chapter'], function (\W7\Core\Route\Route $route){
 		//文档管理设置
 		$route->post('/detail', 'Admin\ChapterController@detail');
 		$route->post('/create', 'Admin\ChapterController@create');
@@ -37,12 +33,13 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 		$route->post('/delete', 'Admin\ChapterController@delete');
 		$route->post('/search', 'Admin\ChapterController@search');
 		$route->post('/sort', 'Admin\ChapterController@sort');
+		$route->post('/default-show', 'Admin\ChapterController@defaultShow');
 	});
 
 	//搜索用户
 	$route->post('/user/search', 'Admin\UserController@search');
 
-	$route->middleware('DocumentPermissionMiddleware')->group(['prefix'=>'/user'], function (\W7\Core\Route\Route $route){
+	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix'=>'/user'], function (\W7\Core\Route\Route $route){
 		//文档管理设置
 		$route->post('/add', 'Admin\UserController@add');
 		$route->post('/detail-by-id', 'Admin\UserController@detailById');
@@ -57,5 +54,5 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 	});
 
 	//图片上传
-	$route->middleware('DocumentPermissionMiddleware')->post('/upload/image', 'Admin\UploadController@image');
+	$route->middleware('BackendDocumentPermissionMiddleware')->post('/upload/image', 'Admin\UploadController@image');
 });

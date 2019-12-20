@@ -22,7 +22,7 @@ class DocumentPermissionLogic extends BaseLogic
 
 	public function getRoleList()
 	{
-		return (new DocumentPermission())->getRoleList();
+		return (new DocumentPermission())->roleList;
 	}
 
 	public function add($documentId, $userId, $permission)
@@ -70,7 +70,7 @@ class DocumentPermissionLogic extends BaseLogic
 		return true;
 	}
 
-	public function addByDocIds($userId, array $documentPermissions)
+	public function addByUidAndDocPermissions($userId, array $documentPermissions)
 	{
 		idb()->beginTransaction();
 		try {

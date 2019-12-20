@@ -10,7 +10,7 @@ use W7\App\Model\Entity\User;
 use W7\App\Model\Logic\DocumentPermissionLogic;
 use W7\Core\Middleware\MiddlewareAbstract;
 
-class DocumentPermissionMiddleware extends MiddlewareAbstract
+class BackendDocumentPermissionMiddleware extends MiddlewareAbstract
 {
 	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
 	{
@@ -33,9 +33,9 @@ class DocumentPermissionMiddleware extends MiddlewareAbstract
 			 */
 			$documentPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($documentId, $user->id);
 			if ($documentPermission) {
-				$user->isManager = $documentPermission->isManager();
-				$user->isOperator = $documentPermission->isOperator();
-				$user->isReader = $documentPermission->isReader();
+				$user->isManager = $documentPermission->isManager;
+				$user->isOperator = $documentPermission->isOperator;
+				$user->isReader = $documentPermission->isReader;
 			} else {
 				$user->isManager = false;
 				$user->isOperator = false;

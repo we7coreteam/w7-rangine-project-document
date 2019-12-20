@@ -53,19 +53,4 @@ class UploadController extends BaseController
 
 		return $this->data(['url' => $url]);
 	}
-
-	public function index(Request $request)
-	{
-		$this->validate($request, [
-			'action' => 'required',
-		], [
-			'action.required' => 'action必填',
-		]);
-		$action = $request->input('action');
-		if ($action == 'config') {
-			$CONFIG = json_decode(preg_replace("/\/\*[\s\S]+?\*\//", '', file_get_contents(BASE_PATH.'/config/ueditor.json')), true);
-			return $CONFIG;
-		}
-		throw new ErrorHttpException('action值有误');
-	}
 }
