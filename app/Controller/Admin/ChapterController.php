@@ -21,6 +21,7 @@ use W7\App\Model\Entity\User;
 use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Logic\ChapterOperateLogic;
 use W7\App\Model\Logic\DocumentLogic;
+use W7\App\Model\Logic\DocumentPermissionLogic;
 use W7\Http\Message\Server\Request;
 
 /**
@@ -182,7 +183,7 @@ class ChapterController extends BaseController
 		if ($position == 'move') {
 			$targetDocumentId = $request->post('target')['document_id'];
 			$documentPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($targetDocumentId, $user->id);
-			if (!$documentPermission->isManager() && !$documentPermission->isFounder() && !$documentPermission->isOperator()) {
+			if (!$user->isFounder && !$documentPermission->isManager && !$documentPermission->isOperator) {
 				throw new ErrorHttpException('您没有权限管理该文档');
 			}
 
@@ -195,7 +196,7 @@ class ChapterController extends BaseController
 		}
 
 		//放入到目录节点中，但不存在排序
-		if ($position == 'inner') {
+		if ($position == 'inner' || $position == 'move') {
 			try {
 				ChapterLogic::instance()->moveByChapter($chapter, $targetChapter);
 			} catch (\Throwable $e) {
@@ -365,12 +366,16 @@ class ChapterController extends BaseController
 		$showChapterId = intval($request->post('show_chapter_id'));
 		$showChapter = ChapterLogic::instance()->getById($showChapterId);
 
-		if (empty($chapter) || empty($showChapter)) {
+		if (($chapterId && empty($chapter))|| empty($showChapter)) {
 			throw new ErrorHttpException('您要操作的章节或是目录不存在');
 		}
 
-		if (empty($chapter->is_dir)) {
+		if ($chapter && empty($chapter->is_dir)) {
 			throw new ErrorHttpException('此操作只能设置目录的默认显示');
+		}
+
+		if ($chapterId == 0) {
+			$chapter = $showChapter;
 		}
 
 		if (!empty($showChapter->is_dir)) {

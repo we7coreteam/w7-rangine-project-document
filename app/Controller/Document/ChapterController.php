@@ -27,14 +27,15 @@ class ChapterController extends BaseController
 	 */
 	public function catalog(Request $request)
 	{
-		$id = intval($request->input('document_id'));
-
-		if (!$id) {
-			throw new ErrorHttpException('文档不存在或是已经被删除');
-		}
+		$this->validate($request, [
+			'document_id' => 'required|integer|min:1',
+		], [
+			'document_id.required' => '文档id必填',
+			'document_id.integer' => '文档id非法'
+		]);
 
 		try {
-			$result = ChapterLogic::instance()->getCatalog($id);
+			$result = ChapterLogic::instance()->getCatalog($request->input('document_id'));
 			return $this->data($result);
 		} catch (\Exception $e) {
 			throw new ErrorHttpException($e->getMessage());
@@ -43,15 +44,18 @@ class ChapterController extends BaseController
 
 	public function detail(Request $request)
 	{
-		$id = intval($request->input('id'));
-		$documentId = intval($request->input('document_id'));
-
-		if (empty($id) || empty($documentId)) {
-			throw new ErrorHttpException('章节不存在或是已经被删除');
-		}
+		$params = $this->validate($request, [
+			'document_id' => 'required|integer|min:1',
+			'chapter_id' => 'required|integer|min:1'
+		], [
+			'document_id.required' => '文档id必填',
+			'document_id.integer' => '文档id非法',
+			'chapter_id.required' => '章节id必填',
+			'chapter_id.integer' => '章节id非法'
+		]);
 
 		try {
-			$chapter = ChapterLogic::instance()->getById($id, $documentId);
+			$chapter = ChapterLogic::instance()->getById($params['chapter_id'], $params['document_id']);
 		} catch (\Exception $e) {
 			throw new ErrorHttpException($e->getMessage());
 		}
@@ -60,7 +64,7 @@ class ChapterController extends BaseController
 			throw new ErrorHttpException('该章节不存在！');
 		}
 
-		$document = DocumentLogic::instance()->getById($documentId);
+		$document = DocumentLogic::instance()->getById($params['document_id']);
 
 		$result = [
 			'id' => $chapter->id,

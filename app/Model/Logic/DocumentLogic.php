@@ -57,25 +57,4 @@ class DocumentLogic extends BaseLogic
 	{
 		return Document::query()->where('creator_id', $id)->first();
 	}
-
-	/**
-	 * @deprecated
-	 * @param $keyword
-	 * @param $page
-	 * @return array
-	 */
-	public function getShowList($keyword, $page)
-	{
-		$query = Document::query()->where('is_public', 1)->orderBy('updated_at', 'desc');
-		if (!empty($keyword['name'])) {
-			$query = $query->where('name', 'like', '%'.$keyword['name'].'%');
-		}
-		$list = $query->paginate(null, '*', 'page', $page);
-
-		return [
-			'total' => $list->total(),
-			'pageCount' => $list->lastPage(),
-			'data' => $list->items()
-		];
-	}
 }

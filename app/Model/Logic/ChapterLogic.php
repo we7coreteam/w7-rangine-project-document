@@ -31,7 +31,7 @@ class ChapterLogic extends BaseLogic
 	public function getCatalog($documentId)
 	{
 		$list = Chapter::query()
-			->select('id', 'name', 'sort', 'parent_id', 'is_dir')
+			->select('id', 'name', 'sort', 'parent_id', 'is_dir', 'default_show_chapter_id')
 			->where('document_id', $documentId)
 			->orderBy('parent_id', 'asc')
 			->orderBy('sort', 'asc')->get()->toArray();
@@ -108,6 +108,9 @@ class ChapterLogic extends BaseLogic
 		}
 
 		if ($chapter->delete()) {
+			Chapter::query()->where('default_show_chapter_id', '=', $chapterId)->update([
+				'default_show_chapter_id' => 0
+			]);
 			ChapterContent::query()->where('chapter_id', '=', $chapterId)->delete();
 
 			CdnLogic::instance()->channel(SettingLogic::KEY_COS)->deletePath(sprintf('/%s/%s', $chapter->document_id, $chapterId));
@@ -149,7 +152,7 @@ class ChapterLogic extends BaseLogic
 
 	public function moveByChapter(Chapter $source, Chapter $target) {
 		if (!$target->is_dir) {
-			throw new ErrorHttpException('移动的目标不是目录，不能移动');
+			throw new \RuntimeException('移动的目标不是目录，不能移动');
 		}
 
 		$source->parent_id = $target->id;
