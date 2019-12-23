@@ -244,15 +244,21 @@ class ChapterController extends BaseController
 		if (!is_array($request->post('chapter_id'))) {
 			$chapterId = intval($request->post('chapter_id'));
 			$chapterId = [$chapterId];
+		} else {
+			$chapterId = $request->post('chapter_id');
 		}
 
 		try {
 			foreach ($chapterId as $id) {
+				$id = intval($id);
+				if (empty($id)) {
+					continue;
+				}
 				ChapterLogic::instance()->deleteById($id);
 			}
 			ChapterOperateLog::query()->create([
 				'user_id' => $user->id,
-				'chapter_id' => $chapterId,
+				'chapter_id' => $id,
 				'operate' => ChapterOperateLog::DELETE
 			]);
 		} catch (\Throwable $e) {
