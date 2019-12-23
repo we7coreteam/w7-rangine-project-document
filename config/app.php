@@ -47,7 +47,8 @@ return [
 		]
 	],
 	'session' => [
-		'expires' => 86400
+		'expires' => 86400,
+		'handler' => 'db'
 	],
 	'cookie' => [
 		'path' => ienv('SESSION_PATH', '/'),
