@@ -24,7 +24,7 @@ class SessionLogic extends LogicAbstract
 		return Session::query()->where('session_id', '=', $sessionId)->first();
 	}
 
-	public function deleteAll() {
-		return Session::query()->delete();
+	public function deleteBySessionId($sessionId) {
+		return Session::query()->where('session_id', '=', $sessionId)->delete();
 	}
 }
