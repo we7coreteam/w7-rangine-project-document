@@ -29,6 +29,7 @@ class DocumentController extends BaseController
 	{
 		$keyword = trim($request->input('keyword'));
 		$page = intval($request->post('page'));
+		$showAll = $request->post('show_all');
 
 		$user = $request->getAttribute('user');
 
@@ -55,8 +56,12 @@ class DocumentController extends BaseController
 				}
 			}
 		} else {
+			$permissions = [DocumentPermission::MANAGER_PERMISSION, DocumentPermission::OPERATOR_PERMISSION];
+			if ($showAll) {
+				$permissions[] = DocumentPermission::READER_PERMISSION;
+			}
 			$query = DocumentPermission::query()->where('user_id', '=', $user->id)
-					->whereIn('permission', [DocumentPermission::MANAGER_PERMISSION, DocumentPermission::OPERATOR_PERMISSION])
+					->whereIn('permission', $permissions)
 					->orderByDesc('id')->with('document');
 			if (!empty($keyword)) {
 				$query->whereHas('document', function ($query) use ($keyword) {
@@ -69,9 +74,11 @@ class DocumentController extends BaseController
 			$document = $list->items();
 			if (!empty($document)) {
 				foreach ($document as $i => $row) {
+					$star = Document\Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->document_id)->first();
 					$result['data'][] = [
 						'id' => $row->document->id,
 						'name' => $row->document->name,
+						'has_star' => $star ? true : false,
 						'description' => $row->document->descriptionShort,
 						'is_public' => $row->document->isPublicDoc,
 						'acl' => $row->acl,
@@ -149,6 +156,48 @@ class DocumentController extends BaseController
 				'cur_role' => $documentPermission ? $documentPermission->permission : 0,
 				'role_list' => $row->isPublicDoc ? $publicRoleList : $privateRoleList
 			];
+		}
+
+		$result['page_count'] = $list->lastPage();
+		$result['total'] = $list->total();
+		$result['page_current'] = $list->currentPage();
+
+		return $this->data($result);
+	}
+
+	public function operateLog(Request $request)
+	{
+		$name = $request->post('name');
+		$page = intval($request->post('page'));
+		/**
+		 * @var User $user
+		 */
+		$user = $request->getAttribute('user');
+		$query = Document\ChapterOperateLog::query()->where('user_id', '=', $user->id)->where('operate', '!=', Document\ChapterOperateLog::DELETE)->distinct(['document_id'])->orderByDesc('created_at');
+		if ($name) {
+			$query->whereHas('document', function ($query) use ($name) {
+				return $query->where('name', 'LIKE', "%{$name}%");
+			});
+		}
+
+		$list = $query->paginate(null, ['user_id', 'document_id', 'operate', 'remark', 'created_at'], 'page', $page);
+
+		$document = $list->items();
+		if (!empty($document)) {
+			foreach ($document as $i => $row) {
+				$star = Document\Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->document_id)->first();
+				$result['data'][] = [
+					'id' => $row->document->id,
+					'name' => $row->document->name,
+					'has_star' => $star ? true : false,
+					'author' => [
+						'name' => $row->document->user->username
+					],
+					'description' => $row->document->descriptionShort,
+					'is_public' => $row->document->isPublicDoc,
+					'time' => $row->created_at->toDateTimeString()
+				];
+			}
 		}
 
 		$result['page_count'] = $list->lastPage();
@@ -259,6 +308,7 @@ class DocumentController extends BaseController
 			DocumentPermission::MANAGER_PERMISSION,
 			DocumentPermission::OPERATOR_PERMISSION,
 			DocumentPermission::READER_PERMISSION,
+			DocumentPermission::LOGIN_READER_PERMISSION
 		])) {
 			throw new ErrorHttpException('您操作了不存在的权限');
 		}

@@ -3,6 +3,7 @@
 namespace W7\App\Model\Entity\Document;
 
 use W7\App\Model\Entity\BaseModel;
+use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\User;
 
 class ChapterOperateLog extends BaseModel
@@ -23,5 +24,10 @@ class ChapterOperateLog extends BaseModel
 	public function user()
 	{
 		return $this->hasOne(User::class, 'id', 'user_id');
+	}
+
+	public function document()
+	{
+		return $this->hasOne(Document::class, 'id', 'document_id');
 	}
 }

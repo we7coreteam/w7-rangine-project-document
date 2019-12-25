@@ -20,6 +20,7 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 		$route->post('/update', 'Admin\DocumentController@update');
 		$route->post('/delete', 'Admin\DocumentController@delete');
 		$route->post('/create', 'Admin\DocumentController@create');
+		$route->post('/operate-log', 'Admin\DocumentController@operateLog');
 	});
 
 	//文档内容管理
@@ -46,6 +47,13 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 		$route->post('/update', 'Admin\UserController@update');
 		$route->post('/delete-by-ids', 'Admin\UserController@deleteByIds');
 		$route->post('/batch-update-permission', 'Admin\UserController@batchUpdateDocPermissionByUid');
+	});
+
+	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix'=>'/star'], function (\W7\Core\Route\Route $route){
+		//文档管理设置
+		$route->post('/all', 'Admin\StarController@all');
+		$route->post('/add', 'Admin\StarController@add');
+		$route->post('/delete', 'Admin\StarController@delete');
 	});
 
 	$route->middleware('CheckFounderMiddleware')->group([], function (\W7\Core\Route\Route $route){

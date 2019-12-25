@@ -37,6 +37,9 @@ class DocumentLogic extends BaseLogic
 		//删除权限
 		DocumentPermissionLogic::instance()->clearByDocId($document->id);
 
+		//删除星标
+		StarLogic::instance()->clearByDocumentId($document->id);
+
 		//删除章节及文章
 		ChapterLogic::instance()->deleteByDocumentId($document->id);
 

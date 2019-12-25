@@ -11,6 +11,41 @@ use W7\Http\Message\Server\Request;
 
 class StarController extends BaseController
 {
+	public function all(Request $request)
+	{
+		$name = $request->post('name');
+		$page = intval($request->post('page'));
+		/**
+		 * @var User $user
+		 */
+		$user = $request->getAttribute('user');
+		$query = Star::query()->where('user_id', '=', $user->id);
+		if ($name) {
+			$query->whereHas('document', function ($query) use ($name) {
+				return $query->where('name', 'LIKE', "%{$name}%");
+			});
+		}
+		$list = $query->paginate(null, '*', 'page', $page);
+		$data = [];
+		foreach ($list->items() as $row) {
+			$data[] = [
+				'id' => $row->id,
+				'name' => $row->document->name,
+				'author' => [
+					'name' => $row->document->user->username
+				],
+				'document_id' => $row->document->id
+			];
+		}
+
+		$result['data'] = $data;
+		$result['page_count'] = $list->lastPage();
+		$result['total'] = $list->total();
+		$result['page_current'] = $list->currentPage();
+
+		return $this->data($result);
+	}
+
 	public function add(Request $request)
 	{
 		$params = $this->validate($request, [
