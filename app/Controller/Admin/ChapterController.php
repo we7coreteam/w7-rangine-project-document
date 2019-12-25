@@ -89,11 +89,12 @@ class ChapterController extends BaseController
 			}
 		}
 
+		$documentId = intval($request->post('document_id'));
 		$chapter = Chapter::query()->create([
 			'name' => $request->post('name'),
 			'sort' => intval($request->post('sort')),
 			'is_dir' => $isDir ? 1 : 0,
-			'document_id' => intval($request->post('document_id')),
+			'document_id' => $documentId,
 			'parent_id' => $parentId,
 		]);
 		if (!$chapter) {
@@ -101,6 +102,7 @@ class ChapterController extends BaseController
 		}
 		ChapterOperateLog::query()->create([
 			'user_id' => $user->id,
+			'document_id' => $documentId,
 			'chapter_id' => $chapter->id,
 			'operate' => ChapterOperateLog::CREATE
 		]);
@@ -150,6 +152,7 @@ class ChapterController extends BaseController
 
 		ChapterOperateLog::query()->create([
 			'user_id' => $user->id,
+			'document_id' => $chapter->document_id,
 			'chapter_id' => $chapter->id,
 			'operate' => ChapterOperateLog::EDIT
 		]);
@@ -219,6 +222,7 @@ class ChapterController extends BaseController
 
 		ChapterOperateLog::query()->create([
 			'user_id' => $user->id,
+			'document_id' => $chapter->document_id,
 			'chapter_id' => $chapter->id,
 			'operate' => ChapterOperateLog::EDIT
 		]);
@@ -249,18 +253,20 @@ class ChapterController extends BaseController
 		}
 
 		try {
+			$documentId = intval($request->post('document_id'));
 			foreach ($chapterId as $id) {
 				$id = intval($id);
 				if (empty($id)) {
 					continue;
 				}
 				ChapterLogic::instance()->deleteById($id);
+				ChapterOperateLog::query()->create([
+					'user_id' => $user->id,
+					'document_id' => $documentId,
+					'chapter_id' => $id,
+					'operate' => ChapterOperateLog::DELETE
+				]);
 			}
-			ChapterOperateLog::query()->create([
-				'user_id' => $user->id,
-				'chapter_id' => $id,
-				'operate' => ChapterOperateLog::DELETE
-			]);
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());
 		}
@@ -304,6 +310,7 @@ class ChapterController extends BaseController
 
 		ChapterOperateLog::query()->create([
 			'user_id' => $user->id,
+			'document_id' => $chapter->document_id,
 			'chapter_id' => $chapter->id,
 			'operate' => ChapterOperateLog::EDIT
 		]);
@@ -393,6 +400,7 @@ class ChapterController extends BaseController
 
 		ChapterOperateLog::query()->create([
 			'user_id' => $user->id,
+			'document_id' => $chapter->document_id,
 			'chapter_id' => $chapter->id,
 			'operate' => ChapterOperateLog::EDIT
 		]);
