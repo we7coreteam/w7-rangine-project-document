@@ -27,12 +27,13 @@ class ExceptionHandler extends ExceptionHandlerAbstract {
 			//如果是访问预览的连接，判断该文档是否需要登录后预览
 			if (substr($route, 0, 8) === '/chapter') {
 				$session = new Session();
+				$session->start(icontext()->getRequest());
 				if (!$session->get('user')) {
 					$documentId = explode('/', $route)[2] ?? '';
 					$documentId = explode('?', $documentId)[0];
 					$document = App\Model\Logic\DocumentLogic::instance()->getById($documentId);
 					if ($document && $document->is_public == App\Model\Entity\Document::LOGIN_PREVIEW_DOCUMENT) {
-						return icontext()->getResponse()->redirect('/login?redirect=' . ienv('API_HOST') . $route);
+						return icontext()->getResponse()->redirect('/login?redirect=' . ienv('API_HOST') . ltrim($route, '/'));
 					}
 				}
 			}
