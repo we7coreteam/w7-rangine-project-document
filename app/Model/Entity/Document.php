@@ -18,6 +18,7 @@ class Document extends BaseModel
 {
 	const PRIVATE_DOCUMENT = 2;
 	const PUBLIC_DOCUMENT = 1;
+	const LOGIN_PREVIEW_DOCUMENT = 3;
 
 	protected $table = 'document';
 

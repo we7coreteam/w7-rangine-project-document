@@ -34,6 +34,7 @@ class StarController extends BaseController
 				'author' => [
 					'name' => $row->document->user->username
 				],
+				'is_public' => $row->document->isPublicDoc,
 				'document_id' => $row->document->id
 			];
 		}

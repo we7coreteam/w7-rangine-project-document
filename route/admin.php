@@ -21,6 +21,7 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 		$route->post('/delete', 'Admin\DocumentController@delete');
 		$route->post('/create', 'Admin\DocumentController@create');
 		$route->post('/operate-log', 'Admin\DocumentController@operateLog');
+		$route->post('/delete-operate-log', 'Admin\DocumentController@deleteOperateLog');
 	});
 
 	//文档内容管理

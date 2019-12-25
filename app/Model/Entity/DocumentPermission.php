@@ -17,20 +17,18 @@ class DocumentPermission extends BaseModel
 	const MANAGER_PERMISSION = 1;
 	const OPERATOR_PERMISSION = 2;
 	const READER_PERMISSION = 3;
-	const LOGIN_READER_PERMISSION = 4;
 
 	private $permissionName = [
 		self::MANAGER_PERMISSION => '管理员',
 		self::OPERATOR_PERMISSION => '操作员',
 		self::READER_PERMISSION => '阅读员',
-		self::LOGIN_READER_PERMISSION => '阅读员',
 	];
 
 	protected $table = 'document_permission';
 
 	public function save(array $options = [])
 	{
-		if (in_array($this->permission, [self::MANAGER_PERMISSION, self::OPERATOR_PERMISSION, self::READER_PERMISSION, self::LOGIN_READER_PERMISSION])) {
+		if (in_array($this->permission, [self::MANAGER_PERMISSION, self::OPERATOR_PERMISSION, self::READER_PERMISSION])) {
 			return parent::save($options);
 		}
 
@@ -59,7 +57,7 @@ class DocumentPermission extends BaseModel
 
 	public function getIsReaderAttribute()
 	{
-		return $this->permission == self::MANAGER_PERMISSION || $this->permission == self::OPERATOR_PERMISSION || $this->permission == self::READER_PERMISSION || $this->premission == self::LOGIN_READER_PERMISSION;
+		return $this->permission == self::MANAGER_PERMISSION || $this->permission == self::OPERATOR_PERMISSION || $this->permission == self::READER_PERMISSION;
 	}
 
 	public function getACLAttribute()

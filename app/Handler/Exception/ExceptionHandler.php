@@ -16,11 +16,24 @@ class ExceptionHandler extends ExceptionHandlerAbstract {
 	public function handle(ResponseExceptionAbstract $e) : ResponseInterface {
 		if ($e instanceof RouteNotFoundException || $e instanceof RouteNotAllowException) {
 			$route = icontext()->getRequest()->getUri()->getPath();
+			//如果访问的是admin下的路由，先检测是否登录
 			if (substr($route, 0, 6) == '/admin') {
 				$session = new Session();
 				$session->start(icontext()->getRequest());
 				if (!$session->get('user')) {
 					return icontext()->getResponse()->redirect('/login');
+				}
+			}
+			//如果是访问预览的连接，判断该文档是否需要登录后预览
+			if (substr($route, 0, 8) === '/chapter') {
+				$session = new Session();
+				if (!$session->get('user')) {
+					$documentId = explode('/', $route)[2] ?? '';
+					$documentId = explode('?', $documentId)[0];
+					$document = App\Model\Logic\DocumentLogic::instance()->getById($documentId);
+					if ($document && $document->is_public == App\Model\Entity\Document::LOGIN_PREVIEW_DOCUMENT) {
+						return icontext()->getResponse()->redirect('/login?redirect=' . ienv('API_HOST') . $route);
+					}
 				}
 			}
 			return App::getApp()->getContext()->getResponse()->html(iloader()->singleton(View::class)->render('@public/index'));

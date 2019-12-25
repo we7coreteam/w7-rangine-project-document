@@ -78,6 +78,9 @@ class DocumentController extends BaseController
 					$result['data'][] = [
 						'id' => $row->document->id,
 						'name' => $row->document->name,
+						'author' => [
+							'name' => $row->document->user->username
+						],
 						'has_star' => $star ? true : false,
 						'description' => $row->document->descriptionShort,
 						'is_public' => $row->document->isPublicDoc,
@@ -169,6 +172,8 @@ class DocumentController extends BaseController
 	{
 		$name = $request->post('name');
 		$page = intval($request->post('page'));
+		//时间按天为单位
+		$time = intval($request->post('time'));
 		/**
 		 * @var User $user
 		 */
@@ -178,6 +183,9 @@ class DocumentController extends BaseController
 			$query->whereHas('document', function ($query) use ($name) {
 				return $query->where('name', 'LIKE', "%{$name}%");
 			});
+		}
+		if ($time) {
+			$query = $query->where('created_at', '<', time() - 86400 * $time);
 		}
 
 		$list = $query->paginate(null, ['user_id', 'document_id', 'operate', 'remark', 'created_at'], 'page', $page);
@@ -205,6 +213,23 @@ class DocumentController extends BaseController
 		$result['page_current'] = $list->currentPage();
 
 		return $this->data($result);
+	}
+
+	public function deleteOperateLog(Request $request)
+	{
+		$params = $this->validate($request, [
+			'document_id' => 'required|integer',
+		], [
+			'document_id.required' => '文档ID必传',
+		]);
+
+		/**
+		 * @var User $user
+		 */
+		$user = $request->getAttribute('user');
+		Document\ChapterOperateLog::query()->where('document_id', '=', $params['document_id'])->where('user_id', '=', $user->id)->delete();
+
+		return $this->data('success');
 	}
 
 	public function detail(Request $request)
@@ -307,8 +332,7 @@ class DocumentController extends BaseController
 		if (!in_array($permission, [
 			DocumentPermission::MANAGER_PERMISSION,
 			DocumentPermission::OPERATOR_PERMISSION,
-			DocumentPermission::READER_PERMISSION,
-			DocumentPermission::LOGIN_READER_PERMISSION
+			DocumentPermission::READER_PERMISSION
 		])) {
 			throw new ErrorHttpException('您操作了不存在的权限');
 		}
@@ -375,6 +399,10 @@ class DocumentController extends BaseController
 
 		if (!empty($request->input('is_public'))) {
 			$document->is_public = intval($request->input('is_public'));
+		}
+
+		if (!empty($request->input('login_preview'))) {
+			$document->is_public =  Document::LOGIN_PREVIEW_DOCUMENT;
 		}
 
 		$document->save();
