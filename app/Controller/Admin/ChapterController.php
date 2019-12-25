@@ -57,6 +57,7 @@ class ChapterController extends BaseController
 				'has_manage' => $user->isManager
 			]
 		];
+
 		return $this->data($result);
 	}
 
@@ -154,7 +155,8 @@ class ChapterController extends BaseController
 			'user_id' => $user->id,
 			'document_id' => $chapter->document_id,
 			'chapter_id' => $chapter->id,
-			'operate' => ChapterOperateLog::EDIT
+			'operate' => ChapterOperateLog::EDIT,
+			'remark' => '编辑文档标题'
 		]);
 
 		return $this->data('success');
@@ -224,7 +226,8 @@ class ChapterController extends BaseController
 			'user_id' => $user->id,
 			'document_id' => $chapter->document_id,
 			'chapter_id' => $chapter->id,
-			'operate' => ChapterOperateLog::EDIT
+			'operate' => ChapterOperateLog::EDIT,
+			'remark' => '移动文档'
 		]);
 
 		return $this->data('success');
@@ -312,7 +315,8 @@ class ChapterController extends BaseController
 			'user_id' => $user->id,
 			'document_id' => $chapter->document_id,
 			'chapter_id' => $chapter->id,
-			'operate' => ChapterOperateLog::EDIT
+			'operate' => ChapterOperateLog::EDIT,
+			'remark' => '编辑文档内容'
 		]);
 
 		return $this->data('success');
@@ -355,6 +359,13 @@ class ChapterController extends BaseController
 			],
 			'updated_at' => $chapter->updated_at->toDateTimeString()
 		];
+
+		ChapterOperateLog::query()->create([
+			'user_id' => $user->id,
+			'document_id' => $chapter->document_id,
+			'chapter_id' => $chapter->id,
+			'operate' => ChapterOperateLog::PREVIEW
+		]);
 
 		return $this->data($result);
 	}
@@ -402,7 +413,8 @@ class ChapterController extends BaseController
 			'user_id' => $user->id,
 			'document_id' => $chapter->document_id,
 			'chapter_id' => $chapter->id,
-			'operate' => ChapterOperateLog::EDIT
+			'operate' => ChapterOperateLog::EDIT,
+			'remark' => '设置文档默认显示'
 		]);
 
 		return $this->data('success');
