@@ -46,9 +46,14 @@ class DocumentController extends BaseController
 			$document = $list->items();
 			if (!empty($document)) {
 				foreach ($document as $i => $row) {
+					$star = Document\Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->id)->first();
 					$result['data'][] = [
 						'id' => $row->id,
 						'name' => $row->name,
+						'author' => [
+							'name' => $row->user->username
+						],
+						'has_star' => $star ? true : false,
 						'description' => $row->descriptionShort,
 						'is_public' => $row->isPublicDoc,
 						'acl' => DocumentPermissionLogic::instance()->getFounderACL(),
