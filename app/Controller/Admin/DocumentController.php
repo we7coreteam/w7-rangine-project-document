@@ -402,7 +402,7 @@ class DocumentController extends BaseController
 		}
 
 		if (!empty($request->input('login_preview'))) {
-			$document->is_public =  Document::LOGIN_PREVIEW_DOCUMENT;
+			$document->is_public = $request->input('login_preview') == 1 ? Document::LOGIN_PREVIEW_DOCUMENT : Document::PRIVATE_DOCUMENT;
 		}
 
 		$document->save();
