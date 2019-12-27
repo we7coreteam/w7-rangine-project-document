@@ -360,13 +360,6 @@ class ChapterController extends BaseController
 			'updated_at' => $chapter->updated_at->toDateTimeString()
 		];
 
-		UserOperateLog::query()->create([
-			'user_id' => $user->id,
-			'document_id' => $chapter->document_id,
-			'chapter_id' => $chapter->id,
-			'operate' => UserOperateLog::PREVIEW
-		]);
-
 		return $this->data($result);
 	}
 

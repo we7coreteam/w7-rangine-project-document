@@ -14,6 +14,7 @@ namespace W7\App\Controller\Document;
 
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
+use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\Http\Message\Server\Request;
@@ -27,7 +28,7 @@ class ChapterController extends BaseController
 	 */
 	public function catalog(Request $request)
 	{
-		$this->validate($request, [
+		$params = $this->validate($request, [
 			'document_id' => 'required|integer|min:1',
 		], [
 			'document_id.required' => '文档id必填',
@@ -35,7 +36,16 @@ class ChapterController extends BaseController
 		]);
 
 		try {
-			$result = ChapterLogic::instance()->getCatalog($request->input('document_id'));
+			$result = ChapterLogic::instance()->getCatalog($params['document_id']);
+
+			if ($user = $request->getAttribute('user')) {
+				UserOperateLog::query()->create([
+					'user_id' => $user->id,
+					'document_id' => $params['document_id'],
+					'chapter_id' => 0,
+					'operate' => UserOperateLog::PREVIEW
+				]);
+			}
 			return $this->data($result);
 		} catch (\Exception $e) {
 			throw new ErrorHttpException($e->getMessage());
@@ -56,6 +66,14 @@ class ChapterController extends BaseController
 
 		try {
 			$chapter = ChapterLogic::instance()->getById($params['chapter_id'], $params['document_id']);
+			if ($user = $request->getAttribute('user')) {
+				UserOperateLog::query()->create([
+					'user_id' => $user->id,
+					'document_id' => $params['document_id'],
+					'chapter_id' => $params['chapter_id'],
+					'operate' => UserOperateLog::PREVIEW
+				]);
+			}
 		} catch (\Exception $e) {
 			throw new ErrorHttpException($e->getMessage());
 		}
