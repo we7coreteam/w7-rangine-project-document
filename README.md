@@ -6,7 +6,7 @@
 
 ### 环境要求
 
-  * PHP > 7.0.0
+  * PHP > 7.2.0
   * PHP Swoole 扩展 >= 4.3.0
   * PHP Mbstring 扩展
   * PHP Pdo MySql 扩展
