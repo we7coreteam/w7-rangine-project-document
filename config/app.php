@@ -39,6 +39,7 @@ return [
 			'collation' => 'utf8mb4_general_ci',
 			'prefix' => ienv('DATABASE_DEFAULT_PREFIX', 'ims_'),
 			'port' => ienv('DATABASE_DEFAULT_PORT', 3306),
+			'strict' => false
 		],
 	],
 	'view' => [
