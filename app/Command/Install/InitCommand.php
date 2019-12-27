@@ -74,6 +74,7 @@ class InitCommand extends CommandAbstract
 			throw new CommandException('配置文件写入失败！');
 		}
 		$this->output->success('配置文件已生成！');
+		echo 2;exit;
 		$this->segmentation();
 	}
 
@@ -145,8 +146,8 @@ class InitCommand extends CommandAbstract
 		$this->output->info('检查PHP扩展: ');
 		$this->output->writeln('');
 
-		if (version_compare(PHP_VERSION, '7.0.0', '<')) {
-			throw new CommandException('PHP 版本必须>= 7.0.0');
+		if (version_compare(PHP_VERSION, '7.2.0', '<')) {
+			throw new CommandException('PHP 版本必须>= 7.2.0');
 		}
 
 		$extension = ['pdo_mysql', 'mbstring', 'swoole'];
@@ -156,12 +157,8 @@ class InitCommand extends CommandAbstract
 			}
 		}
 
-		if (version_compare(swoole_version(), '4.2.3', '<')) {
-			throw new CommandException('swoole 版本必须>= 4.2.3');
-		}
-
-		if (is_writable(BASE_PATH) === false) {
-			throw new CommandException('请检查' . BASE_PATH . '目录权限！');
+		if (version_compare(swoole_version(), '4.3.0', '<')) {
+			throw new CommandException('swoole 版本必须>= 4.3.0');
 		}
 
 		if (is_writable(RUNTIME_PATH) === false) {

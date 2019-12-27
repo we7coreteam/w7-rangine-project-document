@@ -49,27 +49,27 @@ return [
 	],
 	'session' => [
 		'expires' => 86400,
-		'handler' => 'db'
+		'handler' => ienv('SESSION_HANDLER', 'file')
 	],
 	'cookie' => [
-		'path' => ienv('SESSION_PATH', '/'),
-		'http_only' => ienv('SESSION_HTTP_ONLY', false),
-		'domain' => ienv('SESSION_DOMAIN', ''),
-		'secure' => ienv('SESSION_SECURE', false),
-		'expires' => ienv('SESSION_EXPIRES', 0),//不设置，默认取session.gc_maxlifetime配置
+		'path' => ienv('COOKIE_PATH', '/'),
+		'http_only' => ienv('COOKIE_HTTP_ONLY', false),
+		'domain' => ienv('COOKIE_DOMAIN', ''),
+		'secure' => ienv('COOKIE_SECURE', false),
+		'expires' => ienv('COOKIE_EXPIRES', 0),//不设置，默认取session.gc_maxlifetime配置
 	],
 
 	'pool' => [
 		'database' => [
 			'default' => [
-				'enable' => true,
-				'max' => 1000,
+				'enable' => ienv('POOL_DATABASE_DEFAULT_ENABLE', true),
+				'max' => ienv('POOL_DATABASE_DEFAULT_MAX', '1000'),
 			],
 		],
 		'cache' => [
 			'default' => [
-				'enable' => true,
-				'max' => 1000,
+				'enable' => ienv('POOL_CACHE_DEFAULT_ENABLE', false),
+				'max' => ienv('POOL_CACHE_DEFAULT_MAX', '1000'),
 			],
 		]
 	],
