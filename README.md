@@ -15,7 +15,7 @@
 
 #### 下载安装包
 
-https://gitee.com/we7coreteam/document-apiserver/releases/ 下载最新版的文档系统源码
+https://github.com/we7coreteam/w7-rangine-project-document/releases/ 下载最新版的文档系统源码
 
 #### 解压文件
 
@@ -36,7 +36,7 @@ bin/gerent install:init
 > 如果您的80端口被其他应用占用，您需要手动修改.env文件中的 SERVER_HTTP_PORT 选项
 
 ```
-/bin/server start
+bin/server start
 ```
 
 
