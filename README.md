@@ -21,7 +21,7 @@ https://github.com/we7coreteam/w7-rangine-project-document/releases/ 下载最�
 
 下载源码后，解压到服务器目录（如：/home/wwwroot）
 
-进入文档系统源码目录，```cd /home/wwwroot/w7-document```
+进入文档系统源码目录，```cd /home/wwwroot/w7-rangine-project-document```
 
 #### 安装扩展包
 
