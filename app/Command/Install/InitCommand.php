@@ -217,7 +217,7 @@ class InitCommand extends CommandAbstract
 						'validate' => '/\w{4,24}/'
 					],
 					'password' => [
-						'type' => 'hidden',
+						//'type' => 'hidden',
 						'name' => '密码',
 						'default' => '',
 						'validate' => $validate['password']
@@ -253,13 +253,13 @@ class InitCommand extends CommandAbstract
 						'validate' => '/\w{4,24}/'
 					],
 					'password' => [
-						'type' => 'hidden',
+						//'type' => 'hidden',
 						'name' => '密码',
 						'default' => '',
 						'validate' => $validate['password']
 					],
 					'passwordConfirm' => [
-						'type' => 'hidden',
+						//'type' => 'hidden',
 						'name' => '确认密码',
 						'default' => '',
 						'validate' => 'reconfirm',
