@@ -1,13 +1,10 @@
 <?php
 
-namespace W7\App\Model\Entity\Document;
-
-use W7\App\Model\Entity\BaseModel;
-use W7\App\Model\Entity\Document;
+namespace W7\App\Model\Entity;
 
 class Star extends BaseModel
 {
-	protected $table = 'document_star';
+	protected $table = 'user_star';
 	protected $primaryKey = 'id';
 
 	public function setUpdatedAt($value)

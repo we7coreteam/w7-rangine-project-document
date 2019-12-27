@@ -2,7 +2,7 @@
 
 namespace W7\App\Model\Logic;
 
-use W7\App\Model\Entity\Document\Star;
+use W7\App\Model\Entity\Star;
 use W7\Core\Helper\Traiter\InstanceTraiter;
 
 class StarLogic extends BaseLogic

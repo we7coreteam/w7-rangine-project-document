@@ -17,7 +17,9 @@ use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\DocumentPermission;
+use W7\App\Model\Entity\Star;
 use W7\App\Model\Entity\User;
+use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\App\Model\Logic\DocumentPermissionLogic;
 use W7\App\Model\Logic\UserLogic;
@@ -29,11 +31,11 @@ class DocumentController extends BaseController
 	{
 		$keyword = trim($request->input('keyword'));
 		$page = intval($request->post('page'));
-		$showAll = $request->post('show_all');
+		$onlyRead = $request->post('only_read');
 
 		$user = $request->getAttribute('user');
 
-		if ($user->isFounder) {
+		if ($user->isFounder && !$onlyRead) {
 			$query = Document::query()->with('user')->orderByDesc('id');
 			if (!empty($keyword)) {
 				$query->where('name', 'LIKE', "%{$keyword}%");
@@ -46,7 +48,7 @@ class DocumentController extends BaseController
 			$document = $list->items();
 			if (!empty($document)) {
 				foreach ($document as $i => $row) {
-					$star = Document\Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->id)->first();
+					$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->id)->first();
 					$result['data'][] = [
 						'id' => $row->id,
 						'name' => $row->name,
@@ -62,8 +64,8 @@ class DocumentController extends BaseController
 			}
 		} else {
 			$permissions = [DocumentPermission::MANAGER_PERMISSION, DocumentPermission::OPERATOR_PERMISSION];
-			if ($showAll) {
-				$permissions[] = DocumentPermission::READER_PERMISSION;
+			if ($onlyRead) {
+				$permissions = [DocumentPermission::READER_PERMISSION];
 			}
 			$query = DocumentPermission::query()->where('user_id', '=', $user->id)
 					->whereIn('permission', $permissions)
@@ -79,7 +81,7 @@ class DocumentController extends BaseController
 			$document = $list->items();
 			if (!empty($document)) {
 				foreach ($document as $i => $row) {
-					$star = Document\Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->document_id)->first();
+					$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->document_id)->first();
 					$result['data'][] = [
 						'id' => $row->document->id,
 						'name' => $row->document->name,
@@ -183,7 +185,7 @@ class DocumentController extends BaseController
 		 * @var User $user
 		 */
 		$user = $request->getAttribute('user');
-		$query = Document\ChapterOperateLog::query()->where('user_id', '=', $user->id)->where('operate', '!=', Document\ChapterOperateLog::DELETE)->distinct(['document_id'])->orderByDesc('created_at');
+		$query = UserOperateLog::query()->where('user_id', '=', $user->id)->where('operate', '!=', UserOperateLog::DELETE)->distinct(['document_id'])->orderByDesc('created_at');
 		if ($name) {
 			$query->whereHas('document', function ($query) use ($name) {
 				return $query->where('name', 'LIKE', "%{$name}%");
@@ -198,7 +200,7 @@ class DocumentController extends BaseController
 		$document = $list->items();
 		if (!empty($document)) {
 			foreach ($document as $i => $row) {
-				$star = Document\Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->document_id)->first();
+				$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->document_id)->first();
 				$result['data'][] = [
 					'id' => $row->document->id,
 					'name' => $row->document->name,
@@ -232,7 +234,7 @@ class DocumentController extends BaseController
 		 * @var User $user
 		 */
 		$user = $request->getAttribute('user');
-		Document\ChapterOperateLog::query()->where('document_id', '=', $params['document_id'])->where('user_id', '=', $user->id)->delete();
+		UserOperateLog::query()->where('document_id', '=', $params['document_id'])->where('user_id', '=', $user->id)->delete();
 
 		return $this->data('success');
 	}

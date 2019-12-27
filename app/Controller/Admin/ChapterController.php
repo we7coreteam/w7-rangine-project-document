@@ -16,12 +16,12 @@ use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document\Chapter;
 use W7\App\Model\Entity\Document\ChapterContent;
-use W7\App\Model\Entity\Document\ChapterOperateLog;
 use W7\App\Model\Entity\User;
+use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\ChapterLogic;
-use W7\App\Model\Logic\ChapterOperateLogic;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\App\Model\Logic\DocumentPermissionLogic;
+use W7\App\Model\Logic\UserOperateLogic;
 use W7\Http\Message\Server\Request;
 
 /**
@@ -101,11 +101,11 @@ class ChapterController extends BaseController
 		if (!$chapter) {
 			throw new ErrorHttpException('章节添加失败');
 		}
-		ChapterOperateLog::query()->create([
+		UserOperateLog::query()->create([
 			'user_id' => $user->id,
 			'document_id' => $documentId,
 			'chapter_id' => $chapter->id,
-			'operate' => ChapterOperateLog::CREATE
+			'operate' => UserOperateLog::CREATE
 		]);
 
 		return $this->data($chapter->toArray());
@@ -151,11 +151,11 @@ class ChapterController extends BaseController
 
 		$chapter->save();
 
-		ChapterOperateLog::query()->create([
+		UserOperateLog::query()->create([
 			'user_id' => $user->id,
 			'document_id' => $chapter->document_id,
 			'chapter_id' => $chapter->id,
-			'operate' => ChapterOperateLog::EDIT,
+			'operate' => UserOperateLog::EDIT,
 			'remark' => '编辑文档标题'
 		]);
 
@@ -222,11 +222,11 @@ class ChapterController extends BaseController
 			}
 		}
 
-		ChapterOperateLog::query()->create([
+		UserOperateLog::query()->create([
 			'user_id' => $user->id,
 			'document_id' => $chapter->document_id,
 			'chapter_id' => $chapter->id,
-			'operate' => ChapterOperateLog::EDIT,
+			'operate' => UserOperateLog::EDIT,
 			'remark' => '移动文档'
 		]);
 
@@ -263,11 +263,11 @@ class ChapterController extends BaseController
 					continue;
 				}
 				ChapterLogic::instance()->deleteById($id);
-				ChapterOperateLog::query()->create([
+				UserOperateLog::query()->create([
 					'user_id' => $user->id,
 					'document_id' => $documentId,
 					'chapter_id' => $id,
-					'operate' => ChapterOperateLog::DELETE
+					'operate' => UserOperateLog::DELETE
 				]);
 			}
 		} catch (\Throwable $e) {
@@ -311,11 +311,11 @@ class ChapterController extends BaseController
 		$chapter->updated_at = time();
 		$chapter->save();
 
-		ChapterOperateLog::query()->create([
+		UserOperateLog::query()->create([
 			'user_id' => $user->id,
 			'document_id' => $chapter->document_id,
 			'chapter_id' => $chapter->id,
-			'operate' => ChapterOperateLog::EDIT,
+			'operate' => UserOperateLog::EDIT,
 			'remark' => '编辑文档内容'
 		]);
 
@@ -344,7 +344,7 @@ class ChapterController extends BaseController
 			throw new ErrorHttpException('章节不存在');
 		}
 
-		$creator = ChapterOperateLogic::instance()->getByChapterAndOperate($chapterId, ChapterOperateLog::CREATE);
+		$creator = UserOperateLogic::instance()->getByChapterAndOperate($chapterId, UserOperateLog::CREATE);
 		if ($creator) {
 			$author = $creator->user;
 		} else {
@@ -360,11 +360,11 @@ class ChapterController extends BaseController
 			'updated_at' => $chapter->updated_at->toDateTimeString()
 		];
 
-		ChapterOperateLog::query()->create([
+		UserOperateLog::query()->create([
 			'user_id' => $user->id,
 			'document_id' => $chapter->document_id,
 			'chapter_id' => $chapter->id,
-			'operate' => ChapterOperateLog::PREVIEW
+			'operate' => UserOperateLog::PREVIEW
 		]);
 
 		return $this->data($result);
@@ -409,11 +409,11 @@ class ChapterController extends BaseController
 		$chapter->default_show_chapter_id = $showChapterId;
 		$chapter->save();
 
-		ChapterOperateLog::query()->create([
+		UserOperateLog::query()->create([
 			'user_id' => $user->id,
 			'document_id' => $chapter->document_id,
 			'chapter_id' => $chapter->id,
-			'operate' => ChapterOperateLog::EDIT,
+			'operate' => UserOperateLog::EDIT,
 			'remark' => '设置文档默认显示'
 		]);
 

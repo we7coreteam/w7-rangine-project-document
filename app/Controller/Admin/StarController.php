@@ -4,7 +4,7 @@ namespace W7\App\Controller\Admin;
 
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
-use W7\App\Model\Entity\Document\Star;
+use W7\App\Model\Entity\Star;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\Http\Message\Server\Request;
