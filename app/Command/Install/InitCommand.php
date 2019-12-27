@@ -170,9 +170,18 @@ class InitCommand extends CommandAbstract
 			throw new CommandException('swoole 版本必须>= 4.3.0');
 		}
 
-		if (is_writable(RUNTIME_PATH) === false) {
-			throw new CommandException('请检查' . RUNTIME_PATH . '目录权限！');
+		if (is_writable(BASE_PATH) === false) {
+			throw new CommandException('请保证' . BASE_PATH . '目录有写权限！');
 		}
+
+		if (is_writable(RUNTIME_PATH) === false) {
+			throw new CommandException('请保证' . RUNTIME_PATH . '目录有写权限！');
+		}
+
+		if (!file_exists(BASE_PATH . '/composer.json')) {
+			throw new CommandException('请先执行 composer install --no-dev 安装扩展包');
+		}
+
 
 		$this->output->success('PHP扩展已检查完毕！');
 		$this->segmentation();

@@ -23,6 +23,12 @@ https://github.com/we7coreteam/w7-rangine-project-document/releases/ 下载最�
 
 进入文档系统源码目录，```cd /home/wwwroot/w7-document```
 
+#### 安装扩展包
+
+```php
+composer install --no-dev
+```
+
 #### 安装系统
 
 执行以下命令，根据提示完成文档安装
