@@ -36,7 +36,7 @@ bin/gerent install:init
 > 如果您的80端口被其他应用占用，您需要手动修改.env文件中的 SERVER_HTTP_PORT 选项
 
 ```
-./vendor/bin/rangine-server http start
+/bin/server start
 ```
 
 
