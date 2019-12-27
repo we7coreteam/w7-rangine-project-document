@@ -89,6 +89,11 @@ class DocumentPermissionLogic extends BaseLogic
 		return DocumentPermission::query()->where('document_id', '=', $documentId)->where('user_id', '=', $userId)->first();
 	}
 
+	public function getByDocIdAndPermission($documentId, $permission)
+	{
+		return DocumentPermission::query()->where('document_id', '=', $documentId)->where('permission', '=', $permission)->first();
+	}
+
 	/**
 	 * 删除文档后，删除对应的权限
 	 * @param $documentId

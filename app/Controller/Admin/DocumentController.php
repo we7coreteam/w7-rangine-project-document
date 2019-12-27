@@ -31,7 +31,7 @@ class DocumentController extends BaseController
 	{
 		$keyword = trim($request->input('keyword'));
 		$page = intval($request->post('page'));
-		$onlyRead = $request->post('only_read');
+		$onlyRead = $request->post('only_reader');
 
 		$user = $request->getAttribute('user');
 
@@ -137,19 +137,14 @@ class DocumentController extends BaseController
 
 		//获取私有文档和公有文档的用户身份列表
 		$roleList = DocumentPermissionLogic::instance()->getRoleList();
-		$readerRoleName = $roleList[DocumentPermission::READER_PERMISSION];
-		unset($roleList[DocumentPermission::READER_PERMISSION]);
-		$publicRoleList = [];
-		foreach ($roleList as $id => $name) {
-			$publicRoleList[] = [
-				'id' => $id,
-				'name' => $name
-			];
-		}
+		$publicRoleList[] = [
+			'id' => DocumentPermission::OPERATOR_PERMISSION,
+			'name' => $roleList[DocumentPermission::OPERATOR_PERMISSION]
+		];
 		$privateRoleList = $publicRoleList;
 		$privateRoleList[] = [
 			'id' => DocumentPermission::READER_PERMISSION,
-			'name' => $readerRoleName
+			'name' => $roleList[DocumentPermission::READER_PERMISSION]
 		];
 
 		$list = $query->paginate(null, '*', 'page', $page);
@@ -158,13 +153,21 @@ class DocumentController extends BaseController
 			 * @var DocumentPermission $documentPermission
 			 */
 			$documentPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($row->id, $params['user_id']);
+			$hasManager = DocumentPermissionLogic::instance()->getByDocIdAndPermission($row->id, DocumentPermission::MANAGER_PERMISSION);
+			$roleList = $row->isPublicDoc ? $publicRoleList : $privateRoleList;
+			if (!$hasManager) {
+				$roleList[] = [
+					'id' => DocumentPermission::MANAGER_PERMISSION,
+					'name' => $roleList[DocumentPermission::MANAGER_PERMISSION]
+				];
+			}
 			$result['data'][] = [
 				'id' => $row->id,
 				'name' => $row->name,
 				'description' => $row->descriptionShort,
 				'is_public' => $row->isPublicDoc ,
 				'cur_role' => $documentPermission ? $documentPermission->permission : 0,
-				'role_list' => $row->isPublicDoc ? $publicRoleList : $privateRoleList
+				'role_list' => $roleList
 			];
 		}
 
@@ -198,6 +201,7 @@ class DocumentController extends BaseController
 		$list = $query->paginate(null, ['user_id', 'document_id', 'operate', 'remark', 'created_at'], 'page', $page);
 
 		$document = $list->items();
+		var_dump($document);
 		if (!empty($document)) {
 			foreach ($document as $i => $row) {
 				$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->document_id)->first();
