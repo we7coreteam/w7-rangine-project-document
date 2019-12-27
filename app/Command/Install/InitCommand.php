@@ -65,9 +65,9 @@ class InitCommand extends CommandAbstract
 			$env = str_replace('{{CACHE_DEFAULT_PORT}}', $config['cache_port'], $env);
 			$env = str_replace('{{CACHE_DEFAULT_PASSWORD}}', '', $env);
 		} else {
-			$env = preg_replace('/CACHE_DEFAULT_HOST[\s\S]+?}}/', '', $env);
-			$env = preg_replace('/CACHE_DEFAULT_PORT[\s\S]+?}}/', '', $env);
-			$env = preg_replace('/CACHE_DEFAULT_PASSWORD[\s\S]+?}}/', '', $env);
+			$env = str_replace('{{CACHE_DEFAULT_HOST}}', '127.0.0.1', $env);
+			$env = str_replace('{{CACHE_DEFAULT_PORT}}', '6379', $env);
+			$env = str_replace('{{CACHE_DEFAULT_PASSWORD}}', '', $env);
 		}
 
 		if (file_put_contents(BASE_PATH . '/.env', $env) === false) {
@@ -85,9 +85,9 @@ class InitCommand extends CommandAbstract
 	{
 		// 创建数据库
 		try {
-			$connect = new \PDO("mysql:host={$config['db_host']};port={$config['db_port']};charset=utf8mb4", $config['db_username'], $config['db_password']);
+			$connect = new \PDO("mysql:host={$config['db_host']};port={$config['db_port']};charset=utf8", $config['db_username'], $config['db_password']);
 			$connect->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-			$sql = "CREATE DATABASE IF NOT EXISTS {$config['db_database']} DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;";
+			$sql = "CREATE DATABASE IF NOT EXISTS {$config['db_database']} DEFAULT CHARSET utf8 COLLATE utf8_general_ci;";
 			$connect->exec($sql);
 			$statement = $connect->query("SHOW DATABASES LIKE '{$config['db_database']}';");
 			if (empty($statement->fetch())) {
@@ -124,11 +124,21 @@ class InitCommand extends CommandAbstract
 	{
 		try {
 			$connect = new \PDO("mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_database']};charset=utf8mb4", $config['db_username'], $config['db_password']);
-			$userLogic = new UserLogic();
 			$username = $config['admin_username'];
-			$password = $userLogic->userpassEncryption($username, $config['admin_password']);
+			$password = UserLogic::instance()->userPwdEncryption($username, $config['admin_password']);
 			$userTable = $config['db_prefix'] . 'user';
-			$sql = "INSERT INTO `{$userTable}` (`username`, `is_ban`, `userpass`, `remark`, `has_privilege`, `created_at`, `updated_at`) VALUE ('{$username}', 0, '{$password}', '超管', 1, 0, 0)";
+
+			$adminInsert = [
+				'username' => $username,
+				'userpass' => $password,
+				'is_ban' => 0,
+				'remark' => '超管',
+				'group_id' => 1,
+				'created_at' => time(),
+				'updated_at' => time(),
+			];
+
+			$sql = "INSERT INTO `{$userTable}` (`" . implode('`,`', array_keys($adminInsert)) . "`) VALUE ('" . implode("','", $adminInsert) . "')";
 			$connect->exec($sql);
 			$statement = $connect->query("SELECT * FROM {$userTable} WHERE username = '{$username}'");
 			if (empty($statement->fetch())) {
@@ -145,8 +155,8 @@ class InitCommand extends CommandAbstract
 		$this->output->info('检查PHP扩展: ');
 		$this->output->writeln('');
 
-		if (version_compare(PHP_VERSION, '7.0.0', '<')) {
-			throw new CommandException('PHP 版本必须>= 7.0.0');
+		if (version_compare(PHP_VERSION, '7.2.0', '<')) {
+			throw new CommandException('PHP 版本必须>= 7.2.0');
 		}
 
 		$extension = ['pdo_mysql', 'mbstring', 'swoole'];
@@ -156,17 +166,22 @@ class InitCommand extends CommandAbstract
 			}
 		}
 
-		if (version_compare(swoole_version(), '4.2.3', '<')) {
-			throw new CommandException('swoole 版本必须>= 4.2.3');
+		if (version_compare(swoole_version(), '4.3.0', '<')) {
+			throw new CommandException('swoole 版本必须>= 4.3.0');
 		}
 
 		if (is_writable(BASE_PATH) === false) {
-			throw new CommandException('请检查' . BASE_PATH . '目录权限！');
+			throw new CommandException('请保证' . BASE_PATH . '目录有写权限！');
 		}
 
 		if (is_writable(RUNTIME_PATH) === false) {
-			throw new CommandException('请检查' . RUNTIME_PATH . '目录权限！');
+			throw new CommandException('请保证' . RUNTIME_PATH . '目录有写权限！');
 		}
+
+		if (!file_exists(BASE_PATH . '/composer.json')) {
+			throw new CommandException('请先执行 composer install --no-dev 安装扩展包');
+		}
+
 
 		$this->output->success('PHP扩展已检查完毕！');
 		$this->segmentation();
@@ -220,7 +235,7 @@ class InitCommand extends CommandAbstract
 						'validate' => '/\w{4,24}/'
 					],
 					'password' => [
-						'type' => 'hidden',
+						//'type' => 'hidden',
 						'name' => '密码',
 						'default' => '',
 						'validate' => $validate['password']
@@ -256,13 +271,13 @@ class InitCommand extends CommandAbstract
 						'validate' => '/\w{4,24}/'
 					],
 					'password' => [
-						'type' => 'hidden',
+						//'type' => 'hidden',
 						'name' => '密码',
 						'default' => '',
 						'validate' => $validate['password']
 					],
 					'passwordConfirm' => [
-						'type' => 'hidden',
+						//'type' => 'hidden',
 						'name' => '确认密码',
 						'default' => '',
 						'validate' => 'reconfirm',

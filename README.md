@@ -6,7 +6,7 @@
 
 ### 环境要求
 
-  * PHP > 7.0.0
+  * PHP > 7.2.0
   * PHP Swoole 扩展 >= 4.3.0
   * PHP Mbstring 扩展
   * PHP Pdo MySql 扩展
@@ -15,20 +15,26 @@
 
 #### 下载安装包
 
-https://gitee.com/we7coreteam/document-apiserver/releases/ 下载最新版的文档系统源码
+https://github.com/we7coreteam/w7-rangine-project-document/releases/ 下载最新版的文档系统源码
 
 #### 解压文件
 
 下载源码后，解压到服务器目录（如：/home/wwwroot）
 
-进入文档系统源码目录，```cd /home/wwwroot/w7-document```
+进入文档系统源码目录，```cd /home/wwwroot/w7-rangine-project-document```
+
+#### 安装扩展包
+
+```php
+composer install --no-dev
+```
 
 #### 安装系统
 
 执行以下命令，根据提示完成文档安装
 
 ```
-./vendor/bin/rangine-gerent install:init
+bin/gerent install:init
 ```
 
 #### 运行系统
@@ -36,7 +42,7 @@ https://gitee.com/we7coreteam/document-apiserver/releases/ 下载最新版的文
 > 如果您的80端口被其他应用占用，您需要手动修改.env文件中的 SERVER_HTTP_PORT 选项
 
 ```
-./vendor/bin/rangine-server http start
+bin/server start
 ```
 
 
