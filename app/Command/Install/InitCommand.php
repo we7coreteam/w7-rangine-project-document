@@ -65,16 +65,15 @@ class InitCommand extends CommandAbstract
 			$env = str_replace('{{CACHE_DEFAULT_PORT}}', $config['cache_port'], $env);
 			$env = str_replace('{{CACHE_DEFAULT_PASSWORD}}', '', $env);
 		} else {
-			$env = preg_replace('/CACHE_DEFAULT_HOST[\s\S]+?}}/', '', $env);
-			$env = preg_replace('/CACHE_DEFAULT_PORT[\s\S]+?}}/', '', $env);
-			$env = preg_replace('/CACHE_DEFAULT_PASSWORD[\s\S]+?}}/', '', $env);
+			$env = str_replace('{{CACHE_DEFAULT_HOST}}', '127.0.0.1', $env);
+			$env = str_replace('{{CACHE_DEFAULT_PORT}}', '6379', $env);
+			$env = str_replace('{{CACHE_DEFAULT_PASSWORD}}', '', $env);
 		}
 
 		if (file_put_contents(BASE_PATH . '/.env', $env) === false) {
 			throw new CommandException('配置文件写入失败！');
 		}
 		$this->output->success('配置文件已生成！');
-		echo 2;exit;
 		$this->segmentation();
 	}
 
@@ -86,9 +85,9 @@ class InitCommand extends CommandAbstract
 	{
 		// 创建数据库
 		try {
-			$connect = new \PDO("mysql:host={$config['db_host']};port={$config['db_port']};charset=utf8mb4", $config['db_username'], $config['db_password']);
+			$connect = new \PDO("mysql:host={$config['db_host']};port={$config['db_port']};charset=utf8", $config['db_username'], $config['db_password']);
 			$connect->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-			$sql = "CREATE DATABASE IF NOT EXISTS {$config['db_database']} DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;";
+			$sql = "CREATE DATABASE IF NOT EXISTS {$config['db_database']} DEFAULT CHARSET utf8 COLLATE utf8_general_ci;";
 			$connect->exec($sql);
 			$statement = $connect->query("SHOW DATABASES LIKE '{$config['db_database']}';");
 			if (empty($statement->fetch())) {
@@ -125,11 +124,21 @@ class InitCommand extends CommandAbstract
 	{
 		try {
 			$connect = new \PDO("mysql:host={$config['db_host']};port={$config['db_port']};dbname={$config['db_database']};charset=utf8mb4", $config['db_username'], $config['db_password']);
-			$userLogic = new UserLogic();
 			$username = $config['admin_username'];
-			$password = $userLogic->userpassEncryption($username, $config['admin_password']);
+			$password = UserLogic::instance()->userPwdEncryption($username, $config['admin_password']);
 			$userTable = $config['db_prefix'] . 'user';
-			$sql = "INSERT INTO `{$userTable}` (`username`, `is_ban`, `userpass`, `remark`, `has_privilege`, `created_at`, `updated_at`) VALUE ('{$username}', 0, '{$password}', '超管', 1, 0, 0)";
+
+			$adminInsert = [
+				'username' => $username,
+				'userpass' => $password,
+				'is_ban' => 0,
+				'remark' => '超管',
+				'group_id' => 1,
+				'created_at' => time(),
+				'updated_at' => time(),
+			];
+
+			$sql = "INSERT INTO `{$userTable}` (`" . implode('`,`', array_keys($adminInsert)) . "`) VALUE ('" . implode("','", $adminInsert) . "')";
 			$connect->exec($sql);
 			$statement = $connect->query("SELECT * FROM {$userTable} WHERE username = '{$username}'");
 			if (empty($statement->fetch())) {
