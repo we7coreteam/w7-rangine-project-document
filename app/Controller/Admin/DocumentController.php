@@ -153,14 +153,17 @@ class DocumentController extends BaseController
 			 * @var DocumentPermission $documentPermission
 			 */
 			$documentPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($row->id, $params['user_id']);
-			$hasManager = DocumentPermissionLogic::instance()->getByDocIdAndPermission($row->id, DocumentPermission::MANAGER_PERMISSION);
+			$manager = DocumentPermissionLogic::instance()->getByDocIdAndPermission($row->id, DocumentPermission::MANAGER_PERMISSION);
 			$roleList = $row->isPublicDoc ? $publicRoleList : $privateRoleList;
-			if (!$hasManager) {
+			if (!$manager) {
 				$roleList[] = [
 					'id' => DocumentPermission::MANAGER_PERMISSION,
 					'name' => $roleList[DocumentPermission::MANAGER_PERMISSION]
 				];
+			} elseif ($manager->user_id == $params['user_id']) {
+				continue;
 			}
+
 			$result['data'][] = [
 				'id' => $row->id,
 				'name' => $row->name,
