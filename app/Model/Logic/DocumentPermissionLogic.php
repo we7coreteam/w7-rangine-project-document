@@ -104,6 +104,16 @@ class DocumentPermissionLogic extends BaseLogic
 		return DocumentPermission::query()->where('document_id', '=', $documentId)->delete();
 	}
 
+	/**
+	 * 删除用户后，删除对应的权限
+	 * @param $userId
+	 * @return bool
+	 */
+	public function clearByUid($userId)
+	{
+		return DocumentPermission::query()->where('user_id', '=', $userId)->delete();
+	}
+
 	public function getFounderACL()
 	{
 		return [

@@ -80,6 +80,9 @@ class UserLogic extends BaseLogic
 				$user = $this->getByUid($val);
 				if ($user && !$user->isFounder) {
 					if (User::destroy($val)) {
+						DocumentPermissionLogic::instance()->clearByUid($val);
+						StarLogic::instance()->clearByUid($val);
+						UserOperateLogic::instance()->clearByUid($val);
 						$delNum++;
 					}
 				}

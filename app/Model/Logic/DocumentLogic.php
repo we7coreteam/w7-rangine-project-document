@@ -43,6 +43,9 @@ class DocumentLogic extends BaseLogic
 		//删除章节及文章
 		ChapterLogic::instance()->deleteByDocumentId($document->id);
 
+		//删除操作记录
+		UserOperateLogic::instance()->clearByDocId($document->id);
+
 		return true;
 	}
 

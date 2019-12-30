@@ -13,4 +13,9 @@ class StarLogic extends BaseLogic
 	{
 		Star::query()->where('document_id', '=', $documentId)->delete();
 	}
+
+	public function clearByUid($userId)
+	{
+		Star::query()->where('user_id', '=', $userId)->delete();
+	}
 }
