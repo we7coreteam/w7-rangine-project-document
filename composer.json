@@ -23,6 +23,10 @@
 		"files": [
 			"config/define.php",
 			"app/Helper/Functions.php"
+		],
+		"classmap": [
+			"database/seeds",
+			"database/migrations"
 		]
 	},
 	"require": {
