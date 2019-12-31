@@ -17,6 +17,7 @@ use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Logic\DocumentLogic;
+use W7\App\Model\Logic\UserOperateLogic;
 use W7\Http\Message\Server\Request;
 
 class ChapterController extends BaseController
@@ -92,7 +93,12 @@ class ChapterController extends BaseController
 		}
 
 		$document = DocumentLogic::instance()->getById($params['document_id']);
-
+		$creator = UserOperateLogic::instance()->getByChapterAndOperate($chapter->id, UserOperateLog::CREATE);
+		if ($creator) {
+			$author = $creator->user;
+		} else {
+			$author = $document->user;
+		}
 		$result = [
 			'id' => $chapter->id,
 			'parent_id' => $chapter->parent_id,
@@ -110,8 +116,8 @@ class ChapterController extends BaseController
 				'name' => $chapter->nextItem->name ?? '',
 			],
 			'author' => [
-				'uid' => $document->user->id,
-				'username' => $document->user->username,
+				'uid' => $author->id,
+				'username' => $author->username,
 			]
 		];
 
