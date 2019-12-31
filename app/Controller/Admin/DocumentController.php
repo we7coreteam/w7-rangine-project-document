@@ -396,7 +396,7 @@ class DocumentController extends BaseController
 
 		DocumentLogic::instance()->createCreatorPermission($docuemnt);
 
-		return $this->data('success');
+		return $this->data($docuemnt->id);
 	}
 
 	public function update(Request $request)
