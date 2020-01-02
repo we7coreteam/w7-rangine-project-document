@@ -15,7 +15,11 @@ irouter()->post('/common/verifycode/image', 'Common\VerifyCodeController@image')
 
 //登录退出
 irouter()->post('/common/auth/login', 'Common\AuthController@login');
+irouter()->post('/common/auth/method', 'Common\AuthController@method');
+
 irouter()->middleware('CheckAuthMiddleware')
 	->post('/common/auth/logout', 'Common\AuthController@logout');
 irouter()->middleware('CheckAuthMiddleware')
 	->post('/common/auth/user', 'Common\AuthController@user');
+
+irouter()->get('/common/auth/third-party-login', 'Common\AuthController@thirdPartyLogin');

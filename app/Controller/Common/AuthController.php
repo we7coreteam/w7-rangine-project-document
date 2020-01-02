@@ -15,6 +15,7 @@ namespace W7\App\Controller\Common;
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\User;
+use W7\App\Model\Logic\OauthLogic;
 use W7\App\Model\Logic\UserLogic;
 use W7\Http\Message\Server\Request;
 
@@ -65,6 +66,20 @@ class AuthController extends BaseController
 		return $this->data('success');
 	}
 
+	public function method(Request $request) {
+		try {
+			$url = OauthLogic::instance()->getLoginUrl();
+		} catch (\Throwable $e) {
+
+		}
+		$data = [];
+		if (!empty($url)) {
+			$data['third-party-login']['url'] = $url;
+		}
+
+		return $this->data($data);
+	}
+
 	public function user(Request $request)
 	{
 		$userSession = $request->session->get('user');
@@ -88,5 +103,24 @@ class AuthController extends BaseController
 		];
 
 		return $this->data($result);
+	}
+
+	public function thirdPartyLogin(Request $request) {
+		$code = $request->post('code');
+		if (empty($code)) {
+			throw new ErrorHttpException('Code码错误');
+		}
+
+		try {
+			$accessToken = OauthLogic::instance()->getAccessToken($code);
+			$userInfo = OauthLogic::instance()->getUserInfo($accessToken);
+		} catch (\Throwable $e) {
+			throw new ErrorHttpException($e->getMessage());
+		}
+
+		if (empty($userInfo['username']) || empty($userInfo['uid'])) {
+			throw new ErrorHttpException('登录用户数据错误，请重试');
+		}
+
 	}
 }
