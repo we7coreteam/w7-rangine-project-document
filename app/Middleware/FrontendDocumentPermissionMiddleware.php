@@ -36,7 +36,7 @@ class FrontendDocumentPermissionMiddleware extends MiddlewareAbstract
 			return parent::process($request, $handler);
 		}
 
-		$user->isReader = false;
+		$user->isReader = $user->isFounder;
 		if ($document->isPublicDoc) {
 			$user->isReader = true;
 		} elseif ($document->is_public == Document::PRIVATE_DOCUMENT && !empty($user->id)) {
