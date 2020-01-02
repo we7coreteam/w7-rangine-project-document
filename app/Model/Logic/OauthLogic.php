@@ -13,6 +13,7 @@
 namespace W7\App\Model\Logic;
 
 use GuzzleHttp\Client;
+use W7\App\Model\Entity\UserThirdParty;
 use W7\Core\Helper\Traiter\InstanceTraiter;
 
 class OauthLogic extends BaseLogic
@@ -38,6 +39,13 @@ class OauthLogic extends BaseLogic
 			'verify' => false,
 			'http_errors' => false
 		]);
+	}
+
+	public function getThirdPartyUserByUsernameUid($uid, $username) {
+		return UserThirdParty::query()->where([
+			'openid' => $uid,
+			'username' => $username,
+		])->first();
 	}
 
 	public function getLoginUrl() {

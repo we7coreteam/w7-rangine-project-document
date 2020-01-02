@@ -22,4 +22,4 @@ irouter()->middleware('CheckAuthMiddleware')
 irouter()->middleware('CheckAuthMiddleware')
 	->post('/common/auth/user', 'Common\AuthController@user');
 
-irouter()->get('/common/auth/third-party-login', 'Common\AuthController@thirdPartyLogin');
+irouter()->post('/common/auth/third-party-login', 'Common\AuthController@thirdPartyLogin');

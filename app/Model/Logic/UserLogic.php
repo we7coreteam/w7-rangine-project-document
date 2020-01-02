@@ -50,6 +50,28 @@ class UserLogic extends BaseLogic
 		return $user->id;
 	}
 
+
+	public function createBucket($username) {
+		$user = $this->getByUserName($username);
+		if ($user) {
+			return $user->id;
+		}
+
+		$user = User::query()->create([
+			'username' => $username,
+			'userpass' => '',
+			'remark' => '',
+			'is_ban' => 0,
+			'group_id' => 0,
+		]);
+
+		if (!$user) {
+			throw new \RuntimeException('用户添加失败');
+		}
+
+		return $user->id;
+	}
+
 	public function updateUser($userInfo)
 	{
 		$user = $this->getByUserName($userInfo['username']);

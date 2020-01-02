@@ -15,6 +15,7 @@ namespace W7\App\Controller\Common;
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\User;
+use W7\App\Model\Entity\UserThirdParty;
 use W7\App\Model\Logic\OauthLogic;
 use W7\App\Model\Logic\UserLogic;
 use W7\Http\Message\Server\Request;
@@ -122,5 +123,32 @@ class AuthController extends BaseController
 			throw new ErrorHttpException('登录用户数据错误，请重试');
 		}
 
+		$user = OauthLogic::instance()->getThirdPartyUserByUsernameUid($userInfo['uid'], $userInfo['username']);
+		if (empty($user)) {
+			$localUsername = 'tpl_' . $userInfo['username'] . $userInfo['uid'];
+
+			$uid = UserLogic::instance()->createBucket($localUsername);
+			UserThirdParty::query()->create([
+				'openid' => $userInfo['uid'],
+				'username' => $userInfo['username'],
+				'uid' => $uid,
+				'source' => 1,
+			]);
+
+			$localUser = [
+				'uid' => $uid,
+				'username' => $localUsername,
+			];
+		} else {
+			$localUser = [
+				'uid' => $user->bindUser->id,
+				'username' => $user->bindUser->username,
+			];
+		}
+
+		$request->session->destroy();
+		$request->session->set('user', $localUser);
+
+		return $this->data('success');
 	}
 }
