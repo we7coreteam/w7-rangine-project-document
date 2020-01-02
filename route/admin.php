@@ -59,6 +59,7 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 
 	$route->middleware('CheckFounderMiddleware')->group([], function (\W7\Core\Route\Route $route){
 		$route->post('/setting/cos', 'Admin\SettingController@cos');
+		$route->post('/setting/third-party-login', 'Admin\SettingController@thirdPartyLogin');
 		$route->post('/setting/save', 'Admin\SettingController@save');
 	});
 

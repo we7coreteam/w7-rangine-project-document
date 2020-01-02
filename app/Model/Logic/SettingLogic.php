@@ -20,6 +20,7 @@ class SettingLogic extends BaseLogic
 	use InstanceTraiter;
 
 	const KEY_COS = 'cloud_cosv5';
+	const KEY_THIRD_PARTY_LOGIN = 'third_party_login';
 
 	public function getByKey($key)
 	{

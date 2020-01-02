@@ -21,6 +21,7 @@ class SettingController extends BaseController
 {
 	private $handler = [
 		SettingLogic::KEY_COS => 'saveCos',
+		SettingLogic::KEY_THIRD_PARTY_LOGIN => 'saveThirdPartyLogin',
 	];
 
 	public function cos(Request $request) {
@@ -29,6 +30,16 @@ class SettingController extends BaseController
 		$setting = SettingLogic::instance()->getByKey(SettingLogic::KEY_COS);
 		return $this->data([
 			'key' => SettingLogic::KEY_COS,
+			'setting' => $setting->setting,
+		]);
+	}
+
+	public function thirdPartyLogin(Request $request) {
+		$this->check($request);
+
+		$setting = SettingLogic::instance()->getByKey(SettingLogic::KEY_THIRD_PARTY_LOGIN);
+		return $this->data([
+			'key' => SettingLogic::KEY_THIRD_PARTY_LOGIN,
 			'setting' => $setting->setting,
 		]);
 	}
@@ -90,6 +101,36 @@ class SettingController extends BaseController
 		if (empty($data['path'])) {
 			$data['path'] = '';
 		}
+
+		return $data;
+	}
+
+	private function saveThirdPartyLogin(Request $request) {
+		$this->validate($request, [
+			'setting.app_id' => 'required',
+			'setting.secret_key' => 'required',
+			'setting.access_token_url' => 'required|url',
+			'setting.user_info_url' => 'required|url',
+			'setting.login_url_url' => 'required|url',
+		], [
+			'setting.app_id.required' => 'app_id必填',
+			'setting.secret_key.required' => 'secret_key必填',
+			'setting.access_token_url.url' => '获取access_token接口地址错误',
+			'setting.user_info_url.url' => '获取用户信息接口地址错误',
+			'setting.login_url_url.url' => '获取登录地址接口地址错误',
+		]);
+
+		$setting = $request->post('setting');
+
+		$data = [
+			'app_id' => $setting['app_id'],
+			'secret_key' => $setting['secret_key'],
+			'user_info_url' => rtrim($setting['user_info_url'], '/'),
+			'access_token_url' => rtrim($setting['access_token_url'], '/'),
+			'login_url_url' => rtrim($setting['login_url_url'], '/'),
+			'enable' => !empty($setting['enable']) ? true : false,
+		];
+
 
 		return $data;
 	}
