@@ -150,8 +150,6 @@ class ChapterController extends BaseController
 		}
 
 		$chapter->name = $request->post('name');
-		$chapter->sort = intval($request->post('sort'));
-
 		$chapter->save();
 
 		UserOperateLog::query()->create([
