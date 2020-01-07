@@ -33,7 +33,7 @@ class ExceptionHandler extends ExceptionHandlerAbstract {
 					$documentId = explode('?', $documentId)[0];
 					$document = App\Model\Logic\DocumentLogic::instance()->getById($documentId);
 					if ($document && $document->is_public == App\Model\Entity\Document::LOGIN_PREVIEW_DOCUMENT) {
-						return icontext()->getResponse()->redirect('/login?redirect=' . ienv('API_HOST') . ltrim($route, '/'));
+						return icontext()->getResponse()->redirect('/login?redirect_url=' . ienv('API_HOST') . ltrim($route, '/'));
 					}
 				}
 			}
