@@ -19,5 +19,5 @@ class BaseModel extends ModelAbstract
 	public $timestamps = true;
 	protected $guarded = [];
 	public $dateFormat = 'U';
-	protected $perPage = '10';
+	protected $perPage = '15';
 }
