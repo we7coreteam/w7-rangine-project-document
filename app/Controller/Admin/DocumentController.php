@@ -31,6 +31,7 @@ class DocumentController extends BaseController
 	{
 		$keyword = trim($request->input('keyword'));
 		$page = intval($request->post('page'));
+		$pageSize = intval($request->post('page_size'));
 		$onlyRead = $request->post('only_reader');
 
 		$user = $request->getAttribute('user');
@@ -43,7 +44,7 @@ class DocumentController extends BaseController
 			/**
 			 * @var LengthAwarePaginator $result
 			 */
-			$list = $query->paginate(null, '*', 'page', $page);
+			$list = $query->paginate($pageSize, '*', 'page', $page);
 
 			$document = $list->items();
 			if (!empty($document)) {
@@ -76,7 +77,7 @@ class DocumentController extends BaseController
 				});
 			}
 
-			$list = $query->paginate(null, '*', 'page', $page);
+			$list = $query->paginate($pageSize, '*', 'page', $page);
 
 			$document = $list->items();
 			if (!empty($document)) {
