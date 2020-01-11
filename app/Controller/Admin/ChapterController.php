@@ -353,6 +353,7 @@ class ChapterController extends BaseController
 		}
 		$result = [
 			'chapter_id' => $chapterId,
+			'name' => $chapter->name,
 			'content' => $chapter->content->content,
 			'author' => [
 				'uid' => $author->id,
