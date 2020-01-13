@@ -27,6 +27,7 @@ class DbHandler extends HandlerAbstract
 		if (empty($session) || $session->expired_at < time()) {
 			return '';
 		}
+		$this->write($session_id, $session->data);
 		return $session->data;
 	}
 
