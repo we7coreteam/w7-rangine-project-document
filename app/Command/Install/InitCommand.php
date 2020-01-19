@@ -191,7 +191,7 @@ class InitCommand extends CommandAbstract
 	{
 		// 验证规则
 		$validate = [
-			'host' => '/[\w-\.]{5,64}/',
+			'host' => '/[\w\-\.]{5,64}/',
 			'port' => '/[1-9]\d{0,4}/',
 			'password' => '/\w{6,32}/'
 		];
