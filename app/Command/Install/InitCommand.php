@@ -191,7 +191,7 @@ class InitCommand extends CommandAbstract
 	{
 		// 验证规则
 		$validate = [
-			'host' => '/[\w-\.]{5,64}/',
+			'host' => '/[\w\-\.]{5,64}/',
 			'port' => '/[1-9]\d{0,4}/',
 			'password' => '/\w{6,32}/'
 		];
@@ -246,7 +246,7 @@ class InitCommand extends CommandAbstract
 				'option' => '缓存',
 				'value' => [
 					'driver' => [
-						'name' => '驱动, 只支持[db,redis]',
+						'name' => '驱动, 只支持[db,redis]，系统已集成db缓存',
 						'default' => 'db', // db, redis
 						'validate' => '/(db|redis)/'
 					],
