@@ -246,7 +246,7 @@ class InitCommand extends CommandAbstract
 				'option' => '缓存',
 				'value' => [
 					'driver' => [
-						'name' => '驱动, 只支持[db,redis]',
+						'name' => '驱动, 只支持[db,redis]，系统已集成db缓存',
 						'default' => 'db', // db, redis
 						'validate' => '/(db|redis)/'
 					],
