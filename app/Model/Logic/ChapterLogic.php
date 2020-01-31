@@ -132,7 +132,8 @@ class ChapterLogic extends BaseLogic
 
 		if ($position == 'before') {
 			//把大于target sort先全部后移一位，然后把当前插入到target后面
-			Chapter::query()->where('parent_id', '=', $target->parent_id)
+			Chapter::query()->where('document_id', '=', $source->document_id)
+							->where('parent_id', '=', $target->parent_id)
 							->where('id', '!=', $source->id)
 							->where('sort', '>=', $target->sort)->increment('sort');
 
@@ -140,7 +141,8 @@ class ChapterLogic extends BaseLogic
 			$source->save();
 		} else {
 			//把大于target sort先全部后移一位，然后把当前插入到target后面
-			Chapter::query()->where('parent_id', '=', $target->parent_id)
+			Chapter::query()->where('document_id', '=', $source->document_id)
+				->where('parent_id', '=', $target->parent_id)
 				->where('id', '!=', $source->id)
 				->where('sort', '>', $target->sort)->increment('sort');
 			$source->sort = $target->sort+1;

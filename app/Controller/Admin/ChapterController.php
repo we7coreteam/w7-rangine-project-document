@@ -91,9 +91,11 @@ class ChapterController extends BaseController
 		}
 
 		$documentId = intval($request->post('document_id'));
+		$maxSort = Chapter::query()->where('document_id', '=', $documentId)->where('parent_id', '=', $parentId)->max('sort');
+		$sort = intval($request->post('sort', ++$maxSort));
 		$chapter = Chapter::query()->create([
 			'name' => $request->post('name'),
-			'sort' => intval($request->post('sort')),
+			'sort' => $sort,
 			'is_dir' => $isDir ? 1 : 0,
 			'document_id' => $documentId,
 			'parent_id' => $parentId,
@@ -101,6 +103,7 @@ class ChapterController extends BaseController
 		if (!$chapter) {
 			throw new ErrorHttpException('章节添加失败');
 		}
+
 		UserOperateLog::query()->create([
 			'user_id' => $user->id,
 			'document_id' => $documentId,
