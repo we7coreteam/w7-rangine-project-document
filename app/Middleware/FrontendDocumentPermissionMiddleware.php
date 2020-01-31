@@ -36,6 +36,7 @@ class FrontendDocumentPermissionMiddleware extends MiddlewareAbstract
 			return parent::process($request, $handler);
 		}
 
+		$user->isReader = false;
 		if ($document->isPublicDoc) {
 			$user->isReader = true;
 		} elseif ($document->is_public == Document::PRIVATE_DOCUMENT && !empty($user->id)) {
@@ -45,8 +46,6 @@ class FrontendDocumentPermissionMiddleware extends MiddlewareAbstract
 			}
 		} elseif ($document->is_public == Document::LOGIN_PREVIEW_DOCUMENT) {
 			$user->isReader = empty($user->id) ? false : true;
-		} else {
-			$user->isReader = false;
 		}
 
 		$request = $request->withAttribute('user', $user);
