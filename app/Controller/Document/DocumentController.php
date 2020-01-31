@@ -13,6 +13,7 @@
 namespace W7\App\Controller\Document;
 
 use W7\App\Controller\BaseController;
+use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\Http\Message\Server\Request;
@@ -28,7 +29,11 @@ class DocumentController extends BaseController
 			'document_id.integer' => '文档id非法'
 		]);
 
-		if ($user = $request->getAttribute('user')) {
+		$user = $request->getAttribute('user');
+		if (empty($user->isReader)) {
+			throw new ErrorHttpException('无权限阅读该文档');
+		}
+		if ($user && !empty($user->id)) {
 			UserOperateLog::query()->create([
 				'user_id' => $user->id,
 				'document_id' => $params['document_id'],

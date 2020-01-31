@@ -38,7 +38,11 @@ class ChapterController extends BaseController
 		try {
 			$result = ChapterLogic::instance()->getCatalog($params['document_id']);
 
-			if ($user = $request->getAttribute('user')) {
+			$user = $request->getAttribute('user');
+			if (empty($user->isReader)) {
+				throw new ErrorHttpException('无权限阅读该文档');
+			}
+			if ($user && !empty($user->id)) {
 				UserOperateLog::query()->create([
 					'user_id' => $user->id,
 					'document_id' => $params['document_id'],
@@ -66,7 +70,12 @@ class ChapterController extends BaseController
 
 		try {
 			$chapter = ChapterLogic::instance()->getById($params['chapter_id'], $params['document_id']);
-			if ($user = $request->getAttribute('user')) {
+
+			$user = $request->getAttribute('user');
+			if (empty($user->isReader)) {
+				throw new ErrorHttpException('无权限阅读该文档');
+			}
+			if ($user && !empty($user->id)) {
 				UserOperateLog::query()->create([
 					'user_id' => $user->id,
 					'document_id' => $params['document_id'],

@@ -201,7 +201,6 @@ class DocumentController extends BaseController
 		$list = $query->paginate(null, ['user_id', 'document_id', 'operate', 'remark', 'created_at'], 'page', $page);
 
 		$document = $list->items();
-		var_dump($document);
 		if (!empty($document)) {
 			foreach ($document as $i => $row) {
 				$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->document_id)->first();
@@ -256,6 +255,7 @@ class DocumentController extends BaseController
 			'name' => $document->name,
 			'description' => $document->description,
 			'is_public' => $document->isPublicDoc,
+			'login_preview' => $document->is_public == Document::LOGIN_PREVIEW_DOCUMENT,
 			'acl' => [
 				'has_manage' => $user->isManager,
 				'has_edit' => $user->isOperator,
@@ -413,7 +413,7 @@ class DocumentController extends BaseController
 		}
 
 		if (!empty($request->input('login_preview'))) {
-			$document->is_public = $request->input('login_preview') == 1 ? Document::LOGIN_PREVIEW_DOCUMENT : Document::PRIVATE_DOCUMENT;
+			$document->is_public = $request->input('login_preview') == 2 ? Document::LOGIN_PREVIEW_DOCUMENT : Document::PRIVATE_DOCUMENT;
 		}
 
 		$document->save();
