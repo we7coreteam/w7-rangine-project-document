@@ -33,7 +33,9 @@
 		"w7/rangine": "*",
 		"ext-json": "*",
 		"gregwar/captcha": "^1.1",
-		"qcloud/cos-sdk-v5": "^1.3"
+		"qcloud/cos-sdk-v5": "^1.3",
+		"socialiteproviders/qq": "^3.0",
+		"socialiteproviders/weixin-web": "^3.0"
 	},
 	"require-dev": {
 		"eaglewu/swoole-ide-helper": "dev-master",
