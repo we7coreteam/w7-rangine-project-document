@@ -27,8 +27,27 @@ class ThirdPartyLoginController extends BaseController
 		}
 		return true;
     }
+
+    public function thirdPartyLoginChannel(Request $request) 
+    {
+		$this->check($request);
+		return $this->data(ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannel());
+    }
     
-    public function saveThirdPartyLogin(Request $request) 
+    public function getThirdPartyLoginChannelById(Request $request)
+    {
+        $this->check($request);
+        $params = $this->validate($request, [
+			'id' => 'required'
+        ]);
+        try {
+            return $this->data(ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($params['id']));
+        } catch (\Throwable $e) {
+            throw new ErrorHttpException($e->getMessage());
+        }
+	}
+	
+	public function saveThirdPartyLogin(Request $request) 
     {
 		$this->check($request);
 		$params = $this->validate($request, [
@@ -59,19 +78,6 @@ class ThirdPartyLoginController extends BaseController
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());
 		}
-    }
-    
-    public function getThirdPartyLoginChannelById(Request $request)
-    {
-        $this->check($request);
-        $params = $this->validate($request, [
-			'id' => 'required'
-        ]);
-        try {
-            return $this->data(ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($params['id']));
-        } catch (\Throwable $e) {
-            throw new ErrorHttpException($e->getMessage());
-        }
     }
 
     public function updateThirdPartyLoginChannelById(Request $request)
@@ -104,12 +110,20 @@ class ThirdPartyLoginController extends BaseController
         } catch (\Throwable $e) {
             throw new ErrorHttpException($e->getMessage());
         }
-    }
+	}
 
-    public function thirdPartyLoginChannel(Request $request) 
+	public function deleteThirdPartyLoginChannelById(Request $request)
     {
-		$this->check($request);
-		return $this->data(ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannel());
+        $this->check($request);
+        $params = $this->validate($request, [
+			'id' => 'required',
+		]);
+        try {
+			ThirdPartyLoginLogic::instance()->deleteThirdPartyLoginChannelById($params['id']);
+            return $this->data('success');
+        } catch (\Throwable $e) {
+            throw new ErrorHttpException($e->getMessage());
+        }
     }
     
     public function setDefaultLoginChannel(Request $request) {

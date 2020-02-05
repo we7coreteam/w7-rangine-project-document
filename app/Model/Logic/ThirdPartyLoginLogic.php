@@ -25,9 +25,11 @@ class ThirdPartyLoginLogic extends BaseLogic
 		if (empty($setting['channel'])) {
 			$setting['channel'] = [
 				[
+					'app_union_key' => 'qq',
 					'name' => 'QQ'
 				],
 				[
+					'app_union_key' => 'wechat',
 					'name' => '微信'
 				]
 			];
@@ -69,6 +71,16 @@ class ThirdPartyLoginLogic extends BaseLogic
     {
 		$setting = $this->getThirdPartyLoginSetting();
 		return $setting['channel'][$id - 1] ?? [];
+	}
+
+	public function deleteThirdPartyLoginChannelById($id) {
+		$setting = $this->getThirdPartyLoginSetting();
+		if (!empty($setting['channel'][$id - 1])) {
+			unset($setting['channel'][$id - 1]);
+			SettingLogic::instance()->save(self::THIRD_PARTY_LOGIN_SETTING_KEY, $setting);
+		}
+
+		return true;
 	}
 	
     public function addThirdPartyLoginChannel(array $config)
