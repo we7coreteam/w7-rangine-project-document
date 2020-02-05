@@ -63,6 +63,7 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 		$route->post('/add', 'Admin\ThirdPartyLoginController@saveThirdPartyLogin');
 		$route->post('/detail', 'Admin\ThirdPartyLoginController@getThirdPartyLoginChannelById');
 		$route->post('/update', 'Admin\StarController@updateThirdPartyLoginChannelById');
+		$route->post('/delete', 'Admin\StarController@deleteThirdPartyLoginChannelById');
 		$route->post('/set-default-channel', 'Admin\StarController@setDefaultLoginChannel');
 		$route->post('/get-default-channel', 'Admin\StarController@getDefaultLoginChannel');
 	});
