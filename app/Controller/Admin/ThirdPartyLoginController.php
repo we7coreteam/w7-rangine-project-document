@@ -121,4 +121,10 @@ class ThirdPartyLoginController extends BaseController
 		ThirdPartyLoginLogic::instance()->setDefaultLoginChannel($params['default_login_channel']);
 		return $this->data('success');
     }
+    
+    public function getDefaultLoginChannel(Request $request) {
+		$this->check($request);
+		
+		return $this->data(ThirdPartyLoginLogic::instance()->getDefaultLoginChannel());
+    }
 }

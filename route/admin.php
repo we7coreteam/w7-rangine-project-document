@@ -57,6 +57,16 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 		$route->post('/delete', 'Admin\StarController@delete');
 	});
 
+	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix'=>'/third-party-login'], function (\W7\Core\Route\Route $route){
+		//文档管理设置
+		$route->post('/all', 'Admin\ThirdPartyLoginController@thirdPartyLoginChannel');
+		$route->post('/add', 'Admin\ThirdPartyLoginController@saveThirdPartyLogin');
+		$route->post('/detail', 'Admin\ThirdPartyLoginController@getThirdPartyLoginChannelById');
+		$route->post('/update', 'Admin\StarController@updateThirdPartyLoginChannelById');
+		$route->post('/set-default-channel', 'Admin\StarController@setDefaultLoginChannel');
+		$route->post('/get-default-channel', 'Admin\StarController@getDefaultLoginChannel');
+	});
+
 	$route->middleware('CheckFounderMiddleware')->group([], function (\W7\Core\Route\Route $route){
 		$route->post('/setting/cos', 'Admin\SettingController@cos');
 		$route->post('/setting/third-party-login', 'Admin\SettingController@thirdPartyLogin');

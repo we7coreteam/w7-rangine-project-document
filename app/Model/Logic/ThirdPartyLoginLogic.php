@@ -105,4 +105,10 @@ class ThirdPartyLoginLogic extends BaseLogic
 		$setting['default_login_channel'] = $channelName;
 		SettingLogic::instance()->save(self::THIRD_PARTY_LOGIN_SETTING_KEY, $setting);
 	}
+
+	public function getDefaultLoginChannel()
+	{
+		$setting = $this->getThirdPartyLoginSetting();
+		return $setting['default_login_channel'] ?? 'default';
+	}
 }
