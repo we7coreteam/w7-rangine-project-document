@@ -113,20 +113,20 @@ class ThirdPartyLoginLogic extends BaseLogic
 		if ($index !== false && $index != $id - 1) {
 			throw new \RuntimeException('该授权方式名称已存在');
 		}
-		$setting['channel'][$id] = $config;
+		$setting['channel'][$id - 1] = $config;
 		SettingLogic::instance()->save(self::THIRD_PARTY_LOGIN_SETTING_KEY, $setting);
 	}
 
-	public function setDefaultLoginChannel($channelName)
+	public function setDefaultLoginSetting(array $data)
 	{
 		$setting = $this->getThirdPartyLoginSetting();
-		$setting['default_login_channel'] = $channelName;
+		$setting['default_login_setting'] = $data;
 		SettingLogic::instance()->save(self::THIRD_PARTY_LOGIN_SETTING_KEY, $setting);
 	}
 
-	public function getDefaultLoginChannel()
+	public function getDefaultLoginSetting()
 	{
 		$setting = $this->getThirdPartyLoginSetting();
-		return $setting['default_login_channel'] ?? '';
+		return $setting['default_login_setting'] ?? [];
 	}
 }

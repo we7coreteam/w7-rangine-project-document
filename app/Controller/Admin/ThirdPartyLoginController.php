@@ -133,14 +133,21 @@ class ThirdPartyLoginController extends BaseController
     }
     
     public function setDefaultLoginChannel(Request $request) {
-        $this->check($request);
-		ThirdPartyLoginLogic::instance()->setDefaultLoginChannel($request->post('default_login_channel', ''));
+		$this->check($request);
+
+		$defaultLoginChannel = $request->post('default_login_channel', '');
+		$isNeedBind = $request->post('is_need_bind', '');
+		$isNeedBind = $isNeedBind == 1 ? true : false;
+		ThirdPartyLoginLogic::instance()->setDefaultLoginSetting([
+			'default_login_channel' => $defaultLoginChannel,
+			'is_need_bind' => $isNeedBind
+		]);
 		return $this->data('success');
     }
     
     public function getDefaultLoginChannel(Request $request) {
 		$this->check($request);
 		
-		return $this->data(ThirdPartyLoginLogic::instance()->getDefaultLoginChannel());
+		return $this->data(ThirdPartyLoginLogic::instance()->getDefaultLoginSetting());
     }
 }
