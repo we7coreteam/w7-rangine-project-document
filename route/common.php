@@ -14,6 +14,7 @@
 irouter()->post('/common/verifycode/image', 'Common\VerifyCodeController@image');
 
 //登录退出
+irouter()->get('/common/auth/test', 'Common\AuthController@test');
 irouter()->post('/common/auth/login', 'Common\AuthController@login');
 irouter()->post('/common/auth/method', 'Common\AuthController@method');
 

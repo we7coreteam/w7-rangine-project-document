@@ -12,6 +12,8 @@
 
 namespace W7\App\Controller\Common;
 
+use Overtrue\Socialite\Config;
+use Overtrue\Socialite\SocialiteManager;
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\User;
@@ -22,6 +24,18 @@ use W7\Http\Message\Server\Request;
 
 class AuthController extends BaseController
 {
+	public function test(Request $request)
+	{
+		/**
+		 * @var SocialiteManager $socialite
+		 */
+		$socialite = iloader()->get(SocialiteManager::class);
+		return $socialite->config(new Config([
+			'client_id' => 'wa84a4166e8e1f471a',
+			'client_secret' => ''
+		]))->driver('we7')->redirect()->getTargetUrl();
+	}
+
 	public function login(Request $request)
 	{
 		$data = $this->validate($request, [
