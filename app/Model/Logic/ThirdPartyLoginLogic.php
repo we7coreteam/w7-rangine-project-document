@@ -50,9 +50,7 @@ class ThirdPartyLoginLogic extends BaseLogic
     public function getThirdPartyLoginChannel()
     {
 		$setting = $this->getThirdPartyLoginSetting();
-		$channel = $setting['channel'] ?? [];
-
-		$channel = array_column($channel, 'name');
+		$channel = array_column(array_column($setting['channel'], 'setting'), 'name');
 		foreach($channel as $key => $item) {
 			$channel[$key]['id'] = $key + 1;
 		}
@@ -62,7 +60,7 @@ class ThirdPartyLoginLogic extends BaseLogic
     public function getThirdPartyLoginChannelByName($name)
     {
 		$setting = $this->getThirdPartyLoginSetting();
-		$nameArr = array_column($setting['channel'], 'name');
+		$nameArr = array_column(array_column($setting['channel'], 'setting'), 'name');
 		$index = array_search($name, $nameArr);
 		if ($index === false) {
 			return false;
@@ -90,8 +88,8 @@ class ThirdPartyLoginLogic extends BaseLogic
     public function addThirdPartyLoginChannel(array $config)
     {
 		$setting = $this->getThirdPartyLoginSetting();
-		$nameArr = array_column($setting['channel'], 'name');
-		$index = array_search($config['name'], $nameArr);
+		$nameArr = array_column(array_column($setting['channel'], 'setting'), 'name');
+		$index = array_search($config['setting']['name'], $nameArr);
 		if ($index !== false) {
 			throw new \RuntimeException('该授权方式名称已存在');
 		}
@@ -107,7 +105,7 @@ class ThirdPartyLoginLogic extends BaseLogic
 			throw new \RuntimeException('该授权方式不存在');
 		}
 		$nameArr = array_column($setting['channel'], 'name');
-		$index = array_search($config['name'], $nameArr);
+		$index = array_search($config['setting']['name'], $nameArr);
 		if ($index !== false && $index != $id - 1) {
 			throw new \RuntimeException('该授权方式名称已存在');
 		}
