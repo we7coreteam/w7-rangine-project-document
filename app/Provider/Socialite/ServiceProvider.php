@@ -40,7 +40,7 @@ class ServiceProvider extends ProviderAbstract
          */
         $socialite = iloader()->get(SocialiteManager::class);
 		foreach ($thirdPartyLogins as $name => $thirdPartyLogin) {
-            $obj = new $thirdPartyLogin();
+            $obj = new $thirdPartyLogin($socialite->getRequest(), '', '', '');
             // if (!($obj instanceof ThirdPartyLoginAbstract)) {
             //     throw new \RuntimeException('class ' . $thirdPartyLogin . ' must instanceof ' . ThirdPartyLoginAbstract::class);
             // }
