@@ -1,11 +1,16 @@
 <?php
 
 namespace W7\App\Provider\Socialite\ThirdPartyLogin;
+
+use Overtrue\Socialite\ProviderInterface;
+use Overtrue\Socialite\Providers\AbstractProvider;
 use Overtrue\Socialite\AccessTokenInterface;
 use Overtrue\Socialite\User;
 
-class We7OauthLogin extends ThirdPartyLoginAbstract
+class We7Oauth extends AbstractProvider implements ProviderInterface
 {
+    use OauthTrait;
+    
     public function getAppName()
     {
         return 'we7';

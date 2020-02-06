@@ -2,18 +2,17 @@
 
 namespace W7\App\Provider\Socialite\ThirdPartyLogin;
 
-use Overtrue\Socialite\ProviderInterface;
-use Overtrue\Socialite\Providers\AbstractProvider;
-use Symfony\Component\HttpFoundation\Request;
 use W7\App\Model\Logic\ThirdPartyLoginLogic;
 
-abstract class ThirdPartyLoginAbstract extends AbstractProvider implements ProviderInterface
+trait OauthTrait
 {
     protected $config;
 
-    public function __construct(Request $request = null, $clientId = null, $clientSecret = null, $redirectUrl = null)
-    {
-        parent::__construct($request, $clientId, $clientSecret, $redirectUrl);
+    private function initConfig() {
+        if ($this->config) {
+            return true;
+        }
+
         $config = iloader()->get(ThirdPartyLoginLogic::class)->getThirdPartyLoginChannelByName($this->getAppName());
         if (!$config) {
             throw new \RuntimeException('授权登陆方式 ' . $this->getAppName() . ' 不存在');
@@ -32,6 +31,7 @@ abstract class ThirdPartyLoginAbstract extends AbstractProvider implements Provi
      */
     protected function getAuthUrl($state)
     {
+        $this->initConfig();
         return $this->buildAuthUrlFromBase($this->config['login_url_url'], $state);
     }
 
@@ -42,10 +42,12 @@ abstract class ThirdPartyLoginAbstract extends AbstractProvider implements Provi
      */
     protected function getTokenUrl()
     {
+        $this->initConfig();
         return $this->config['access_token_url'];
     }
 
     protected function getUserInfoUrl() {
+        $this->initConfig();
         return $this->config['user_info_url'];
     }
 }

@@ -5,7 +5,6 @@ namespace W7\App\Provider\Socialite;
 use Overtrue\Socialite\SocialiteManager;
 use Symfony\Component\Finder\Finder;
 use W7\Core\Provider\ProviderAbstract;
-use W7\App\Provider\Socialite\ThirdPartyLogin\ThirdPartyLoginAbstract;
 
 class ServiceProvider extends ProviderAbstract
 {
@@ -30,7 +29,7 @@ class ServiceProvider extends ProviderAbstract
 				continue;
 			}
 
-			if (strrchr($file->getFilename(), 'Abstract') === false) {
+			if (strrchr($file->getFilename(), 'Trait') === false) {
 				$fileName = substr($file->getBasename(), 0, -4);
 				$thirdPartyLogins[] = "\\W7\\App\\Provider\\Socialite\\ThirdPartyLogin\\" . $fileName;
 			}
@@ -41,19 +40,17 @@ class ServiceProvider extends ProviderAbstract
          */
         $socialite = iloader()->get(SocialiteManager::class);
 		foreach ($thirdPartyLogins as $name => $thirdPartyLogin) {
-            /**
-             * @var ThirdPartyLoginAbstract $obj
-             */
             $obj = new $thirdPartyLogin();
-            if (!($obj instanceof ThirdPartyLoginAbstract)) {
-                throw new \RuntimeException('class ' . $thirdPartyLogin . ' must instanceof ' . ThirdPartyLoginAbstract::class);
-            }
-			$socialite->extend($obj->getAppName(), function ($config) use ($socialite, $thirdPartyLogin) {
+            // if (!($obj instanceof ThirdPartyLoginAbstract)) {
+            //     throw new \RuntimeException('class ' . $thirdPartyLogin . ' must instanceof ' . ThirdPartyLoginAbstract::class);
+            // }
+            $appName = $obj->getAppName();
+			$socialite->extend($obj->getAppName(), function ($config) use ($socialite, $thirdPartyLogin, $appName) {
                 return new $thirdPartyLogin(
                     $socialite->getRequest(), 
-                    $config['app_id'],
-                    $config['app_secret'],
-                    $config['redirect_url']
+                    $config['client_id'],
+                    $config['client_secret'],
+                    ienv('API_HOST') . '/common/auth/third-party-login/' . $appName
                 );
             });
 		}
