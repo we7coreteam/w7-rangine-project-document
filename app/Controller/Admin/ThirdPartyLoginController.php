@@ -56,20 +56,17 @@ class ThirdPartyLoginController extends BaseController
 			'setting.app_id' => 'required',
 			'setting.secret_key' => 'required',
 			'setting.access_token_url' => 'required|url',
-			'setting.user_info_url' => 'required|url',
-			'setting.login_url_url' => 'required|url',
+			'setting.user_info_url' => 'required|url'
 		], [
 			'setting.name.required' => 'name必填',
 			'setting.logo.required' => 'logo必传',
 			'setting.app_id.required' => 'app_id必填',
 			'setting.secret_key.required' => 'secret_key必填',
 			'setting.access_token_url.url' => '获取access_token接口地址错误',
-			'setting.user_info_url.url' => '获取用户信息接口地址错误',
-			'setting.login_url_url.url' => '获取登录地址接口地址错误',
+			'setting.user_info_url.url' => '获取用户信息接口地址错误'
 		]);
 		$params['setting']['user_info_url'] = rtrim($params['setting']['user_info_url'], '/');
 		$params['setting']['access_token_url'] = rtrim($params['setting']['access_token_url'], '/');
-		$params['setting']['login_url_url'] = rtrim($params['setting']['login_url_url'], '/');
 		$params['setting']['enable'] = !empty($params['setting']['enable']) ? true : false;
 		
 		try {
@@ -91,7 +88,6 @@ class ThirdPartyLoginController extends BaseController
 			'setting.secret_key' => 'required',
 			'setting.access_token_url' => 'required|url',
 			'setting.user_info_url' => 'required|url',
-			'setting.login_url_url' => 'required|url',
 		], [
 			'setting.name.required' => 'name必填',
 			'setting.logo.required' => 'logo必传',
@@ -99,11 +95,9 @@ class ThirdPartyLoginController extends BaseController
 			'setting.secret_key.required' => 'secret_key必填',
 			'setting.access_token_url.url' => '获取access_token接口地址错误',
 			'setting.user_info_url.url' => '获取用户信息接口地址错误',
-			'setting.login_url_url.url' => '获取登录地址接口地址错误',
 		]);
 		$params['setting']['user_info_url'] = rtrim($params['setting']['user_info_url'], '/');
 		$params['setting']['access_token_url'] = rtrim($params['setting']['access_token_url'], '/');
-		$params['setting']['login_url_url'] = rtrim($params['setting']['login_url_url'], '/');
 		$params['setting']['enable'] = !empty($params['setting']['enable']) ? true : false;
         try {
             return $this->data(ThirdPartyLoginLogic::instance()->updateThirdPartyLoginChannelById($params['id'], $params));

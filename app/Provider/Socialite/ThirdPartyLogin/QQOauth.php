@@ -13,11 +13,6 @@ class QQOauth extends QQProvider
         return 'qq';
     }
 
-    protected function getAuthUrl($state)
-    {
-        return parent::getAuthUrl($state);
-    }
-
     /**
      * Get the token URL for the provider.
      *

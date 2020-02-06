@@ -13,11 +13,6 @@ class WechatOauth extends QQProvider
         return 'wechat';
     }
 
-    protected function getAuthUrl($state)
-    {
-        return parent::getAuthUrl($state);
-    }
-
     /**
      * Get the token URL for the provider.
      *

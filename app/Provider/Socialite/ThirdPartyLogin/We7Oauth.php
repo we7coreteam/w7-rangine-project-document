@@ -2,6 +2,7 @@
 
 namespace W7\App\Provider\Socialite\ThirdPartyLogin;
 
+use GuzzleHttp\Client;
 use Overtrue\Socialite\ProviderInterface;
 use Overtrue\Socialite\Providers\AbstractProvider;
 use Overtrue\Socialite\AccessTokenInterface;
@@ -14,6 +15,30 @@ class We7Oauth extends AbstractProvider implements ProviderInterface
     public function getAppName()
     {
         return 'we7';
+    }
+
+    protected function getAuthUrl($state)
+    {
+		$data = [
+			'redirect' => $this->redirectUrl,
+			'appid' => $this->clientId
+        ];
+        
+        $response = (new Client())->post('http://api.w7.cc/oauth/login-url', [
+			'form_params' => $data,
+		]);
+
+		$result = $response->getBody()->getContents();
+		if (empty($result)) {
+			throw new \RuntimeException('获取授权地址错误');
+		}
+
+		$result = json_decode($result, true);
+		if (!empty($result['error'])) {
+			throw new \RuntimeException($result['error']);
+		}
+
+		return $result['url'];
     }
     
     /**

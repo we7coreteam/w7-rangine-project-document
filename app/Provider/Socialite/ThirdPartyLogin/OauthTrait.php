@@ -23,19 +23,6 @@ trait OauthTrait
     abstract public function getAppName();
 
     /**
-     * Get the authentication URL for the provider.
-     *
-     * @param string $state
-     *
-     * @return string
-     */
-    protected function getAuthUrl($state)
-    {
-        $this->initConfig();
-        return $this->buildAuthUrlFromBase($this->config['login_url_url'], $state);
-    }
-
-    /**
      * Get the token URL for the provider.
      *
      * @return string
