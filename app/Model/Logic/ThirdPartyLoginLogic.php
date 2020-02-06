@@ -21,16 +21,24 @@ class ThirdPartyLoginLogic extends BaseLogic
 
 	public function __construct()
 	{
-		$setting = SettingLogic::instance()->getByKey(self::THIRD_PARTY_LOGIN_SETTING_KEY);
+		$setting = $this->getThirdPartyLoginSetting();
 		if (empty($setting['channel'])) {
 			$setting['channel'] = [
 				[
-					'app_union_key' => 'qq',
-					'name' => 'QQ'
+					'is_default' => true,
+					'setting' => [
+						'app_union_key' => 'qq',
+						'name' => 'QQ',
+						'logo' => '//cdn.w7.cc/web/resource/images/wechat/qqlogin.png'
+					]
 				],
 				[
-					'app_union_key' => 'wechat',
-					'name' => '微信'
+					'is_default' => true,
+					'setting' => [
+						'app_union_key' => 'wechat',
+						'name' => '微信',
+						'logo' => '//cdn.w7.cc/web/resource/images/wechat/wxlogin.png'
+					]
 				]
 			];
 			SettingLogic::instance()->save(self::THIRD_PARTY_LOGIN_SETTING_KEY, $setting);
@@ -44,18 +52,9 @@ class ThirdPartyLoginLogic extends BaseLogic
 			return [];
 		}
 
-		return $setting;
+		return $setting->setting;
 	}
 
-    public function getThirdPartyLoginChannel()
-    {
-		$setting = $this->getThirdPartyLoginSetting();
-		$channel = array_column(array_column($setting['channel'], 'setting'), 'name');
-		foreach($channel as $key => $item) {
-			$channel[$key]['id'] = $key + 1;
-		}
-		return $channel;
-	}
 
     public function getThirdPartyLoginChannelByName($name)
     {
@@ -66,13 +65,18 @@ class ThirdPartyLoginLogic extends BaseLogic
 			return false;
 		}
 
+		//判断是不是默认支持的
+		$setting['channel'][$index]['is_default'] = $setting['channel'][$index]['is_default'] ?? false;
 		return $setting['channel'][$index];
 	}
 
     public function getThirdPartyLoginChannelById($id)
     {
 		$setting = $this->getThirdPartyLoginSetting();
-		return $setting['channel'][$id - 1] ?? [];
+		$setting = $setting['channel'][$id - 1] ?? [];
+		//判断是不是默认支持的
+		$setting['is_default'] = $setting['is_default'] ?? false;
+		return $setting;
 	}
 
 	public function deleteThirdPartyLoginChannelById($id) {
@@ -123,6 +127,6 @@ class ThirdPartyLoginLogic extends BaseLogic
 	public function getDefaultLoginChannel()
 	{
 		$setting = $this->getThirdPartyLoginSetting();
-		return $setting['default_login_channel'] ?? 'default';
+		return $setting['default_login_channel'] ?? '';
 	}
 }

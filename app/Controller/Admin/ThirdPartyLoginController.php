@@ -31,7 +31,16 @@ class ThirdPartyLoginController extends BaseController
     public function thirdPartyLoginChannel(Request $request) 
     {
 		$this->check($request);
-		return $this->data(ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannel());
+
+		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginSetting();
+		$channel = array_column(array_column($setting['channel'], 'setting'), 'name');
+		$data = [];
+		foreach($channel as $key => $item) {
+			$data[$key]['id'] = $key + 1;
+			$data[$key]['name'] = $item;
+			$data[$key]['enable'] = $setting['channel'][$key]['setting']['enable'] ?? false;
+		}
+		return $this->data($data);
     }
     
     public function getThirdPartyLoginChannelById(Request $request)
@@ -68,6 +77,7 @@ class ThirdPartyLoginController extends BaseController
 		$params['setting']['user_info_url'] = rtrim($params['setting']['user_info_url'], '/');
 		$params['setting']['access_token_url'] = rtrim($params['setting']['access_token_url'], '/');
 		$params['setting']['enable'] = !empty($params['setting']['enable']) ? true : false;
+		$params['convert'] = $request->post('convert');
 		
 		try {
 			ThirdPartyLoginLogic::instance()->addThirdPartyLoginChannel($params);
@@ -99,6 +109,8 @@ class ThirdPartyLoginController extends BaseController
 		$params['setting']['user_info_url'] = rtrim($params['setting']['user_info_url'], '/');
 		$params['setting']['access_token_url'] = rtrim($params['setting']['access_token_url'], '/');
 		$params['setting']['enable'] = !empty($params['setting']['enable']) ? true : false;
+		$params['convert'] = $request->post('convert');
+		
         try {
             return $this->data(ThirdPartyLoginLogic::instance()->updateThirdPartyLoginChannelById($params['id'], $params));
         } catch (\Throwable $e) {
@@ -122,11 +134,7 @@ class ThirdPartyLoginController extends BaseController
     
     public function setDefaultLoginChannel(Request $request) {
         $this->check($request);
-		$params = $this->validate($request, [
-			'default_login_channel' => 'required'
-		]);
-
-		ThirdPartyLoginLogic::instance()->setDefaultLoginChannel($params['default_login_channel']);
+		ThirdPartyLoginLogic::instance()->setDefaultLoginChannel($request->post('default_login_channel', ''));
 		return $this->data('success');
     }
     
