@@ -14,11 +14,13 @@ namespace W7\App\Controller\Common;
 
 use Overtrue\Socialite\Config;
 use Overtrue\Socialite\SocialiteManager;
+use Throwable;
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserThirdParty;
 use W7\App\Model\Logic\OauthLogic;
+use W7\App\Model\Logic\ThirdPartyLoginLogic;
 use W7\App\Model\Logic\UserLogic;
 use W7\Http\Message\Server\Request;
 
@@ -30,10 +32,10 @@ class AuthController extends BaseController
 		 * @var SocialiteManager $socialite
 		 */
 		$socialite = iloader()->get(SocialiteManager::class);
-		return $socialite->config(new Config([
+		return $this->response()->redirect($socialite->config(new Config([
 			'client_id' => 'wa84a4166e8e1f471a',
 			'client_secret' => ''
-		]))->driver('we7')->redirect()->getTargetUrl();
+		]))->driver('we7')->stateless()->redirect()->getTargetUrl());
 	}
 
 	public function login(Request $request)
@@ -82,16 +84,32 @@ class AuthController extends BaseController
 	}
 
 	public function method(Request $request) {
-		try {
-			$url = OauthLogic::instance()->getLoginUrl();
-		} catch (\Throwable $e) {
-
-		}
+		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginSetting();
+		$channel = array_column(array_column($setting['channel'], 'setting'), 'name');
 		$data = [];
-		if (!empty($url)) {
-			$data['third-party-login']['url'] = $url;
-		}
 
+		/**
+		 * @var SocialiteManager $socialite
+		 */
+		$socialite = iloader()->get(SocialiteManager::class);
+		//获取可用的第三方登录列表
+		foreach($channel as $key => $name) {
+			if (!empty($setting['channel'][$key]['setting']['enable'])) {
+				$data[$key]['id'] = $key + 1;
+				$data[$key]['name'] = $name;
+				$data[$key]['logo'] = $setting['channel'][$key]['setting']['logo'];
+				
+				try{
+					$driver = $socialite->config(new Config([
+						'client_id' =>  $setting['channel'][$key]['setting']['app_id'],
+						'client_secret' =>  $setting['channel'][$key]['setting']['app_secret']
+					]))->driver($name)->stateless();
+					$data[$key]['redirect_url'] = $driver->redirect()->getTargetUrl();
+				} catch(Throwable $e) {
+					$data[$key]['redirect_url'] = '';
+				}
+			}
+		}
 		return $this->data($data);
 	}
 
@@ -125,14 +143,27 @@ class AuthController extends BaseController
 		if (empty($code)) {
 			throw new ErrorHttpException('Code码错误');
 		}
-
-		try {
-			$accessToken = OauthLogic::instance()->getAccessToken($code);
-			$userInfo = OauthLogic::instance()->getUserInfo($accessToken);
-		} catch (\Throwable $e) {
-			throw new ErrorHttpException($e->getMessage());
+		$type = $request->input('type');
+		if (empty($code)) {
+			throw new ErrorHttpException('type错误');
 		}
 
+		$config = ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelByName($type);
+		if (!$config) {
+			throw new ErrorHttpException('不支持该授权方式');
+		}
+		/**
+		 * @var SocialiteManager $socialite
+		 */
+		$socialite = iloader()->get(SocialiteManager::class);
+		$driver = $socialite->config(new Config([
+			'client_id' => $config['app_id'],
+			'client_secret' => $config['app_secret']
+		]))->driver($type)->stateless();
+
+		$user = $driver->user($driver->getAccessToken($code));
+		//添加QQ用户数据
+		$userInfo = $user->getOriginal();
 		if (empty($userInfo['username']) || empty($userInfo['uid'])) {
 			throw new ErrorHttpException('登录用户数据错误，请重试');
 		}
