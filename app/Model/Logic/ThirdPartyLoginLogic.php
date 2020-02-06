@@ -52,7 +52,11 @@ class ThirdPartyLoginLogic extends BaseLogic
 		$setting = $this->getThirdPartyLoginSetting();
 		$channel = $setting['channel'] ?? [];
 
-		return array_column($channel, 'name');
+		$channel = array_column($channel, 'name');
+		foreach($channel as $key => $item) {
+			$channel[$key]['id'] = $key + 1;
+		}
+		return $channel;
 	}
 
     public function getThirdPartyLoginChannelByName($name)
