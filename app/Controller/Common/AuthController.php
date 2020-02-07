@@ -148,8 +148,8 @@ class AuthController extends BaseController
 			throw new ErrorHttpException('id错误');
 		}
 
-		$config = ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($id);
-		if (!$config) {
+		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($id);
+		if (!$setting) {
 			throw new ErrorHttpException('不支持该授权方式');
 		}
 		/**
@@ -157,8 +157,8 @@ class AuthController extends BaseController
 		 */
 		$socialite = iloader()->get(SocialiteManager::class);
 		$driver = $socialite->config(new Config([
-			'client_id' => $config['app_id'],
-			'client_secret' => $config['secret_key']
+			'client_id' => $setting['setting']['app_id'],
+			'client_secret' => $setting['setting']['secret_key']
 		]))->driver($id)->stateless();
 
 		$user = $driver->user($driver->getAccessToken($code));
