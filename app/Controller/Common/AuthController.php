@@ -93,18 +93,22 @@ class AuthController extends BaseController
 		//获取可用的第三方登录列表
 		foreach($setting['channel'] as $key => $item) {
 			if (!empty($item['setting']['enable'])) {
-				$data[$key]['name'] = $item['setting']['name'];
-				$data[$key]['logo'] = $item['setting']['logo'];
-				
+				$redirectUrl = '';
 				try{
 					$driver = $socialite->config(new Config([
 						'client_id' =>  $item['setting']['app_id'],
 						'client_secret' =>  $item['setting']['secret_key']
 					]))->driver($key)->stateless();
-					$data[$key]['redirect_url'] = $driver->redirect()->getTargetUrl();
+					$redirectUrl = $driver->redirect()->getTargetUrl();
 				} catch(Throwable $e) {
-					$data[$key]['redirect_url'] = '';
+					
 				}
+
+				$data[] = [
+					'name' => $item['setting']['name'],
+					'logo' => $item['setting']['logo'],
+					'redirect_url' => $redirectUrl
+				];
 			}
 		}
 		return $this->data($data);

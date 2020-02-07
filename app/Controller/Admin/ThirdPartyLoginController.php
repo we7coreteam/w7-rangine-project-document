@@ -35,8 +35,11 @@ class ThirdPartyLoginController extends BaseController
 		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginSetting();
 		$data = [];
 		foreach($setting['channel'] as $key => $item) {
-			$data[$key]['name'] = $item['setting']['name'];
-			$data[$key]['enable'] = $item['setting']['enable'] ?? false;
+			$data[] = [
+				'id' => $key,
+				'name' => $item['setting']['name'],
+				'enable' => $item['setting']['enable'] ?? false
+			];
 		}
 		return $this->data($data);
     }
