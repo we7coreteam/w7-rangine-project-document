@@ -77,7 +77,7 @@ class ThirdPartyLoginController extends BaseController
 		]);
 		$params['setting']['user_info_url'] = rtrim($params['setting']['user_info_url'], '/');
 		$params['setting']['access_token_url'] = rtrim($params['setting']['access_token_url'], '/');
-		$params['setting']['enable'] = !empty($request->post('setting')['enable']) ? true : false;
+		$params['setting']['enable'] = !empty($request->post('setting')['enable']) ? 1 : 0;
 		$params['convert'] = $request->post('convert');
 		
 		try {
@@ -109,7 +109,7 @@ class ThirdPartyLoginController extends BaseController
 		]);
 		$params['setting']['user_info_url'] = rtrim($params['setting']['user_info_url'], '/');
 		$params['setting']['access_token_url'] = rtrim($params['setting']['access_token_url'], '/');
-		$params['setting']['enable'] = !empty($request->post('setting')['enable']) ? true : false;
+		$params['setting']['enable'] = !empty($request->post('setting')['enable']) ? 1 : 0;
 		$params['convert'] = $request->post('convert');
 		
         try {
