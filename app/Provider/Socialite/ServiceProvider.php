@@ -47,10 +47,10 @@ class ServiceProvider extends ProviderAbstract
             $appId = $obj->getAppUnionId();
 			$socialite->extend($appId, function ($config) use ($socialite, $thirdPartyLogin, $appId) {
                 return new $thirdPartyLogin(
-                    $socialite->getRequest(), 
+                    $socialite->getRequest(),
                     $config['client_id'],
                     $config['client_secret'],
-                    ienv('API_HOST') . 'common/auth/third-party-login?id=' . $appId
+                    empty($config['redirect_url']) ? ienv('API_HOST') . 'common/auth/third-party-login?id=' . $appId : $config['redirect_url']
                 );
             });
 		}

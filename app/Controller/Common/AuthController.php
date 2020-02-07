@@ -95,11 +95,10 @@ class AuthController extends BaseController
 			if (!empty($item['setting']['enable'])) {
 				$redirectUrl = '';
 				try{
-					$driver = $socialite->config(new Config([
+					$redirectUrl = $socialite->config(new Config([
 						'client_id' =>  $item['setting']['app_id'],
 						'client_secret' =>  $item['setting']['secret_key']
-					]))->driver($key)->stateless();
-					$redirectUrl = $driver->redirect()->getTargetUrl();
+					]))->driver($key)->stateless()->redirect()->getTargetUrl();
 				} catch(Throwable $e) {
 					
 				}
@@ -159,7 +158,7 @@ class AuthController extends BaseController
 		$socialite = iloader()->get(SocialiteManager::class);
 		$driver = $socialite->config(new Config([
 			'client_id' => $config['app_id'],
-			'client_secret' => $config['app_secret']
+			'client_secret' => $config['secret_key']
 		]))->driver($id)->stateless();
 
 		$user = $driver->user($driver->getAccessToken($code));
