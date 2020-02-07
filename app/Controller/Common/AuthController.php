@@ -85,25 +85,22 @@ class AuthController extends BaseController
 
 	public function method(Request $request) {
 		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginSetting();
-		$channel = array_column(array_column($setting['channel'], 'setting'), 'name');
 		$data = [];
-
 		/**
 		 * @var SocialiteManager $socialite
 		 */
 		$socialite = iloader()->get(SocialiteManager::class);
 		//获取可用的第三方登录列表
-		foreach($channel as $key => $name) {
-			if (!empty($setting['channel'][$key]['setting']['enable'])) {
-				$data[$key]['id'] = $key + 1;
-				$data[$key]['name'] = $name;
-				$data[$key]['logo'] = $setting['channel'][$key]['setting']['logo'];
+		foreach($setting['channel'] as $key => $item) {
+			if (!empty($item['setting']['enable'])) {
+				$data[$key]['name'] = $item['setting']['name'];
+				$data[$key]['logo'] = $item['setting']['logo'];
 				
 				try{
 					$driver = $socialite->config(new Config([
-						'client_id' =>  $setting['channel'][$key]['setting']['app_id'],
-						'client_secret' =>  $setting['channel'][$key]['setting']['app_secret']
-					]))->driver($name)->stateless();
+						'client_id' =>  $item['setting']['app_id'],
+						'client_secret' =>  $item['setting']['secret_key']
+					]))->driver($key)->stateless();
 					$data[$key]['redirect_url'] = $driver->redirect()->getTargetUrl();
 				} catch(Throwable $e) {
 					$data[$key]['redirect_url'] = '';
@@ -143,12 +140,12 @@ class AuthController extends BaseController
 		if (empty($code)) {
 			throw new ErrorHttpException('Code码错误');
 		}
-		$type = $request->input('type');
-		if (empty($code)) {
-			throw new ErrorHttpException('type错误');
+		$id = $request->input('id');
+		if (empty($id)) {
+			throw new ErrorHttpException('id错误');
 		}
 
-		$config = ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelByName($type);
+		$config = ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($id);
 		if (!$config) {
 			throw new ErrorHttpException('不支持该授权方式');
 		}
@@ -159,7 +156,7 @@ class AuthController extends BaseController
 		$driver = $socialite->config(new Config([
 			'client_id' => $config['app_id'],
 			'client_secret' => $config['app_secret']
-		]))->driver($type)->stateless();
+		]))->driver($id)->stateless();
 
 		$user = $driver->user($driver->getAccessToken($code));
 		//添加QQ用户数据

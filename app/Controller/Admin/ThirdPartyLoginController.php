@@ -33,12 +33,10 @@ class ThirdPartyLoginController extends BaseController
 		$this->check($request);
 
 		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginSetting();
-		$channel = array_column(array_column($setting['channel'], 'setting'), 'name');
 		$data = [];
-		foreach($channel as $key => $item) {
-			$data[$key]['id'] = $key + 1;
-			$data[$key]['name'] = $item;
-			$data[$key]['enable'] = $setting['channel'][$key]['setting']['enable'] ?? false;
+		foreach($setting['channel'] as $key => $item) {
+			$data[$key]['name'] = $item['setting']['name'];
+			$data[$key]['enable'] = $item['setting']['enable'] ?? false;
 		}
 		return $this->data($data);
     }
@@ -76,7 +74,7 @@ class ThirdPartyLoginController extends BaseController
 		]);
 		$params['setting']['user_info_url'] = rtrim($params['setting']['user_info_url'], '/');
 		$params['setting']['access_token_url'] = rtrim($params['setting']['access_token_url'], '/');
-		$params['setting']['enable'] = !empty($params['setting']['enable']) ? true : false;
+		$params['setting']['enable'] = !empty($request->post('setting')['enable']) ? true : false;
 		$params['convert'] = $request->post('convert');
 		
 		try {
@@ -108,7 +106,7 @@ class ThirdPartyLoginController extends BaseController
 		]);
 		$params['setting']['user_info_url'] = rtrim($params['setting']['user_info_url'], '/');
 		$params['setting']['access_token_url'] = rtrim($params['setting']['access_token_url'], '/');
-		$params['setting']['enable'] = !empty($params['setting']['enable']) ? true : false;
+		$params['setting']['enable'] = !empty($request->post('setting')['enable']) ? true : false;
 		$params['convert'] = $request->post('convert');
 		
         try {

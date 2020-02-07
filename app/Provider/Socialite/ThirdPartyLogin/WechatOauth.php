@@ -8,7 +8,7 @@ class WechatOauth extends QQProvider
 {
     use OauthTrait;
 
-    public function getAppName()
+    public function getAppUnionId()
     {
         return 'wechat';
     }

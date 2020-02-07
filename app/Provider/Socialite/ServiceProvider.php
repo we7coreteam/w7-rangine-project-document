@@ -44,13 +44,13 @@ class ServiceProvider extends ProviderAbstract
             // if (!($obj instanceof ThirdPartyLoginAbstract)) {
             //     throw new \RuntimeException('class ' . $thirdPartyLogin . ' must instanceof ' . ThirdPartyLoginAbstract::class);
             // }
-            $appName = $obj->getAppName();
-			$socialite->extend($obj->getAppName(), function ($config) use ($socialite, $thirdPartyLogin, $appName) {
+            $appId = $obj->getAppUnionId();
+			$socialite->extend($appId, function ($config) use ($socialite, $thirdPartyLogin, $appId) {
                 return new $thirdPartyLogin(
                     $socialite->getRequest(), 
                     $config['client_id'],
                     $config['client_secret'],
-                    ienv('API_HOST') . '/common/auth/third-party-login/' . $appName
+                    ienv('API_HOST') . 'common/auth/third-party-login?id=' . $appId
                 );
             });
 		}

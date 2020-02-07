@@ -24,18 +24,16 @@ class ThirdPartyLoginLogic extends BaseLogic
 		$setting = $this->getThirdPartyLoginSetting();
 		if (empty($setting['channel'])) {
 			$setting['channel'] = [
-				[
+				'qq' => [
 					'is_default' => true,
 					'setting' => [
-						'app_union_key' => 'qq',
 						'name' => 'QQ',
 						'logo' => '//cdn.w7.cc/web/resource/images/wechat/qqlogin.png'
 					]
 				],
-				[
+				'wechat' => [
 					'is_default' => true,
 					'setting' => [
-						'app_union_key' => 'wechat',
 						'name' => '微信',
 						'logo' => '//cdn.w7.cc/web/resource/images/wechat/wxlogin.png'
 					]
@@ -43,6 +41,15 @@ class ThirdPartyLoginLogic extends BaseLogic
 			];
 			SettingLogic::instance()->save(self::THIRD_PARTY_LOGIN_SETTING_KEY, $setting);
 		}
+	}
+
+	public function makeUnionId() {
+		$unionId = irandom(12);
+		if ($this->getThirdPartyLoginChannelById($unionId)) {
+			return $this->makeUnionId();
+		}
+
+		return $unionId;
 	}
 
     public function getThirdPartyLoginSetting()
@@ -55,34 +62,22 @@ class ThirdPartyLoginLogic extends BaseLogic
 		return $setting->setting;
 	}
 
-
-    public function getThirdPartyLoginChannelByName($name)
-    {
-		$setting = $this->getThirdPartyLoginSetting();
-		$nameArr = array_column(array_column($setting['channel'], 'setting'), 'name');
-		$index = array_search($name, $nameArr);
-		if ($index === false) {
-			return false;
-		}
-
-		//判断是不是默认支持的
-		$setting['channel'][$index]['is_default'] = $setting['channel'][$index]['is_default'] ?? false;
-		return $setting['channel'][$index];
-	}
-
     public function getThirdPartyLoginChannelById($id)
     {
 		$setting = $this->getThirdPartyLoginSetting();
-		$setting = $setting['channel'][$id - 1] ?? [];
-		//判断是不是默认支持的
-		$setting['is_default'] = $setting['is_default'] ?? false;
+		$setting = $setting['channel'][$id] ?? [];
+		if ($setting) {
+			//判断是不是默认支持的
+			$setting['is_default'] = $setting['is_default'] ?? false;
+		}
+		
 		return $setting;
 	}
 
 	public function deleteThirdPartyLoginChannelById($id) {
 		$setting = $this->getThirdPartyLoginSetting();
-		if (!empty($setting['channel'][$id - 1])) {
-			unset($setting['channel'][$id - 1]);
+		if (!empty($setting['channel'][$id])) {
+			unset($setting['channel'][$id]);
 			SettingLogic::instance()->save(self::THIRD_PARTY_LOGIN_SETTING_KEY, $setting);
 		}
 
@@ -92,31 +87,20 @@ class ThirdPartyLoginLogic extends BaseLogic
     public function addThirdPartyLoginChannel(array $config)
     {
 		$setting = $this->getThirdPartyLoginSetting();
-		$nameArr = array_column(array_column($setting['channel'], 'setting'), 'name');
-		$index = array_search($config['setting']['name'], $nameArr);
-		if ($index !== false) {
-			throw new \RuntimeException('该授权方式名称已存在');
-		}
-
-		$setting['channel'][] = $config;
+		$setting['channel'][$this->makeUnionId()] = $config;
 		SettingLogic::instance()->save(self::THIRD_PARTY_LOGIN_SETTING_KEY, $setting);
 	}
 	
     public function updateThirdPartyLoginChannelById($id, array $config)
     {
 		$setting = $this->getThirdPartyLoginSetting();
-		if (empty($setting['channel'][$id - 1])) {
+		if (empty($setting['channel'][$id])) {
 			throw new \RuntimeException('该授权方式不存在');
 		}
-		$nameArr = array_column($setting['channel'], 'name');
-		$index = array_search($config['setting']['name'], $nameArr);
-		if ($index !== false && $index != $id - 1) {
-			throw new \RuntimeException('该授权方式名称已存在');
-		}
-		$setting['channel'][$id - 1] = $config;
+		$setting['channel'][$id] = $config;
 		SettingLogic::instance()->save(self::THIRD_PARTY_LOGIN_SETTING_KEY, $setting);
 	}
-
+	
 	public function setDefaultLoginSetting(array $data)
 	{
 		$setting = $this->getThirdPartyLoginSetting();

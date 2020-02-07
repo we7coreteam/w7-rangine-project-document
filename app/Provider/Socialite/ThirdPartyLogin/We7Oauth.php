@@ -12,7 +12,7 @@ class We7Oauth extends AbstractProvider implements ProviderInterface
 {
     use OauthTrait;
     
-    public function getAppName()
+    public function getAppUnionId()
     {
         return 'we7';
     }

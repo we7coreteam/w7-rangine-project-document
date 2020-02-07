@@ -13,14 +13,14 @@ trait OauthTrait
             return true;
         }
 
-        $config = iloader()->get(ThirdPartyLoginLogic::class)->getThirdPartyLoginChannelByName($this->getAppName());
+        $config = iloader()->get(ThirdPartyLoginLogic::class)->getThirdPartyLoginChannelById($this->getAppUnionId());
         if (!$config) {
             throw new \RuntimeException('授权登陆方式 ' . $this->getAppName() . ' 不存在');
         }
         $this->config = $config;
     }
 
-    abstract public function getAppName();
+    abstract public function getAppUnionId();
 
     /**
      * Get the token URL for the provider.

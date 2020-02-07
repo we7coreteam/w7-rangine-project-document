@@ -8,7 +8,7 @@ class QQOauth extends QQProvider
 {
     use OauthTrait;
 
-    public function getAppName()
+    public function getAppUnionId()
     {
         return 'qq';
     }
