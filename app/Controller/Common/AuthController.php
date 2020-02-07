@@ -139,7 +139,7 @@ class AuthController extends BaseController
 	}
 
 	public function thirdPartyLogin(Request $request) {
-		$code = $request->post('code');
+		$code = $request->input('code');
 		if (empty($code)) {
 			throw new ErrorHttpException('Code码错误');
 		}

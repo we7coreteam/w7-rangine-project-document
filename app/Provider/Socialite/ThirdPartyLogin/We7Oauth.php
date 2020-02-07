@@ -68,7 +68,9 @@ class We7Oauth extends AbstractProvider implements ProviderInterface
             'form_params' => $this->getTokenFields($code),
         ]);
 
-        return $this->parseAccessToken($response->getBody()->getContents());
+        $data = \json_decode($response->getBody()->getContents(), true);
+        $data['access_token'] = $data['accessToken'];
+        return $this->parseAccessToken(\json_encode($data));
     }
 
     /**
