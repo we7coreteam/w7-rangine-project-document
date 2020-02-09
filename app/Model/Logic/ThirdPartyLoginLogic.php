@@ -77,6 +77,12 @@ class ThirdPartyLoginLogic extends BaseLogic
 	public function deleteThirdPartyLoginChannelById($id) {
 		$setting = $this->getThirdPartyLoginSetting();
 		if (!empty($setting['channel'][$id])) {
+			$loginSetting = $this->getDefaultLoginSetting();
+			if (!empty($loginSetting['default_login_channel']) && $loginSetting['default_login_channel'] == $id) {
+				$loginSetting['default_login_channel'] = '';
+				$loginSetting['is_need_bind'] = '';
+				$this->setDefaultLoginSetting($loginSetting);
+			}
 			unset($setting['channel'][$id]);
 			SettingLogic::instance()->save(self::THIRD_PARTY_LOGIN_SETTING_KEY, $setting);
 		}

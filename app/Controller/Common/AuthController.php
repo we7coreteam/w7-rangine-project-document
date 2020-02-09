@@ -171,9 +171,8 @@ class AuthController extends BaseController
 		$user = OauthLogic::instance()->getThirdPartyUserByUsernameUid($userInfo['uid'], $userInfo['username']);
 		if (empty($user)) {
 			$localUsername = 'tpl_' . $userInfo['username'] . $userInfo['uid'];
-
 			$uid = UserLogic::instance()->createBucket($localUsername);
-			UserThirdParty::query()->create([
+			$thirdPartyUser = UserThirdParty::query()->create([
 				'openid' => $userInfo['uid'],
 				'username' => $userInfo['username'],
 				'uid' => $uid,
@@ -182,6 +181,7 @@ class AuthController extends BaseController
 
 			$localUser = [
 				'uid' => $uid,
+				'third-party-uid' => $thirdPartyUser->id,
 				'username' => $localUsername,
 			];
 		} else {
@@ -192,7 +192,55 @@ class AuthController extends BaseController
 		}
 
 		$request->session->destroy();
-		$request->session->set('user', $localUser);
+		$loginSetting = ThirdPartyLoginLogic::instance()->getDefaultLoginSetting();
+		if (!empty($loginSetting['is_need_bind']) && empty($user)) {
+			$request->session->set('third-party-user', $localUser);
+			return $this->data([
+				'is_need_bind' => true
+			]);
+		} else {
+			$request->session->set('user', $localUser);
+			return $this->data('success');
+		}
+	}
+	
+	public function thirdPartyLoginBind(Request $request)
+	{
+		$data = $this->validate($request, [
+			'username' => 'required',
+			'userpass' => 'required'
+		], [
+			'username.required' => '用户名不能为空',
+			'userpass.required' => '密码不能为空'
+		]);
+		$thirdPartyUser = $request->session->get('third-party-user');
+		if (!$thirdPartyUser) {
+			throw new ErrorHttpException('非法请求');
+		}
+
+		$user = UserLogic::instance()->getByUserName($data['username']);
+		if (empty($user)) {
+			throw new ErrorHttpException('用户名或密码错误，请检查');
+		}
+
+		if ($user->userpass != UserLogic::instance()->userPwdEncryption($user->username, $data['userpass'])) {
+			throw new ErrorHttpException('用户名或密码错误，请检查');
+		}
+
+		if (!empty($user->is_ban)) {
+			throw new ErrorHttpException('您使用的用户已经被禁用，请联系管理员');
+		}
+
+		UserThirdParty::query()->where('id', '=', $thirdPartyUser['third-party-uid'])->update([
+			'uid' => $user->id,
+		]);
+		UserLogic::instance()->deleteByIds([$thirdPartyUser['uid']]);
+
+		$request->session->destroy();
+		$request->session->set('user', [
+			'uid' => $user->id,
+			'username' => $user->username,
+		]);
 
 		return $this->data('success');
 	}

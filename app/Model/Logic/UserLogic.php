@@ -88,7 +88,7 @@ class UserLogic extends BaseLogic
 		return $result;
 	}
 
-	public function deleteByIds($ids)
+	public function deleteByIds(array $ids)
 	{
 		$docLogic = new DocumentLogic();
 
