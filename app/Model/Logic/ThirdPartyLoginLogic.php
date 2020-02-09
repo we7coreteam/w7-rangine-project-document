@@ -29,6 +29,10 @@ class ThirdPartyLoginLogic extends BaseLogic
 					'setting' => [
 						'name' => 'QQ',
 						'logo' => '//cdn.w7.cc/web/resource/images/wechat/qqlogin.png'
+					],
+					'convert' => [
+						'uid' => 'openid',
+						'username' => 'nickname'
 					]
 				],
 				'wechat' => [
@@ -36,6 +40,10 @@ class ThirdPartyLoginLogic extends BaseLogic
 					'setting' => [
 						'name' => '微信',
 						'logo' => '//cdn.w7.cc/web/resource/images/wechat/wxlogin.png'
+					],
+					'convert' => [
+						'uid' => 'openid',
+						'username' => 'nickname'
 					]
 				]
 			];
@@ -102,6 +110,9 @@ class ThirdPartyLoginLogic extends BaseLogic
 		$setting = $this->getThirdPartyLoginSetting();
 		if (empty($setting['channel'][$id])) {
 			throw new \RuntimeException('该授权方式不存在');
+		}
+		if (empty($config['convert'])) {
+			$config['convert'] = $setting['channel'][$id]['convert'];
 		}
 		$setting['channel'][$id] = $config;
 		SettingLogic::instance()->save(self::THIRD_PARTY_LOGIN_SETTING_KEY, $setting);

@@ -91,19 +91,4 @@ class We7Oauth extends AbstractProvider implements ProviderInterface
 
         return \json_decode($response->getBody()->getContents(), true);
     }
-
-    /**
-     * Map the raw user array to a Socialite User instance.
-     *
-     * @param array $user
-     *
-     * @return \Overtrue\Socialite\User
-     */
-    protected function mapUserToObject(array $user)
-    {
-        return new User([
-            'openid' => $this->arrayItem($user, 'uid'),
-            'username' => $this->arrayItem($user, 'username')
-        ]);
-    }
 }

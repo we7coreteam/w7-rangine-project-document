@@ -2,9 +2,9 @@
 
 namespace W7\App\Provider\Socialite\ThirdPartyLogin;
 
-use Overtrue\Socialite\Providers\QQProvider;
+use Overtrue\Socialite\Providers\WeChatProvider;
 
-class WechatOauth extends QQProvider
+class WechatOauth extends WeChatProvider
 {
     use OauthTrait;
 
