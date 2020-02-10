@@ -72,6 +72,7 @@ class AuthController extends BaseController
 	}
 
 	public function method(Request $request) {
+		$redirectUrl = $request->post('redirect_url');
 		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginSetting();
 		$data = [];
 		/**
@@ -85,7 +86,8 @@ class AuthController extends BaseController
 				try{
 					$redirectUrl = $socialite->config(new Config([
 						'client_id' =>  $item['setting']['app_id'],
-						'client_secret' =>  $item['setting']['secret_key']
+						'client_secret' =>  $item['setting']['secret_key'],
+						'redirect_url' => ienv('API_HOST') . 'login?id=' . $key . '&redirect_url=' . urlencode($redirectUrl)
 					]))->driver($key)->stateless()->redirect()->getTargetUrl();
 				} catch(Throwable $e) {
 					

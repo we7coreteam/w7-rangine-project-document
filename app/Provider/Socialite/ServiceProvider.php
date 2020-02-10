@@ -50,7 +50,7 @@ class ServiceProvider extends ProviderAbstract
                     $socialite->getRequest(),
                     $config['client_id'],
                     $config['client_secret'],
-                    empty($config['redirect_url']) ? ienv('API_HOST') . 'common/auth/third-party-login?id=' . $appId : $config['redirect_url']
+                    empty($config['redirect_url']) ? ienv('API_HOST') . 'login?id=' . $appId : $config['redirect_url']
                 );
             });
 		}
