@@ -113,8 +113,9 @@ class ThirdPartyLoginController extends BaseController
 		$params['convert'] = $request->post('convert');
 		
         try {
-            return $this->data(ThirdPartyLoginLogic::instance()->updateThirdPartyLoginChannelById($params['id'], $params));
-        } catch (\Throwable $e) {
+            ThirdPartyLoginLogic::instance()->updateThirdPartyLoginChannelById($params['id'], $params);
+			return $this->data('success');
+		} catch (\Throwable $e) {
             throw new ErrorHttpException($e->getMessage());
         }
 	}
