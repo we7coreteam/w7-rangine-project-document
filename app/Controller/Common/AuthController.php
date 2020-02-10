@@ -120,6 +120,7 @@ class AuthController extends BaseController
 			'username' => $user->username,
 			'created_at' => $user->created_at->toDateTimeString(),
 			'updated_at' => $user->updated_at->toDateTimeString(),
+			'no_password' => empty($user->userpass),
 			'acl' => [
 				'has_manage' => $user->isFounder
 			]
@@ -134,9 +135,6 @@ class AuthController extends BaseController
 		 * @var User $user
 		 */
 		$user = $request->getAttribute('user');
-		if (!$user) {
-			throw new ErrorHttpException('没有操作用户的权限');
-		}
 
 		$userName = trim($request->post('username'));
 		$userOldPass = trim($request->post('old_userpass'));
