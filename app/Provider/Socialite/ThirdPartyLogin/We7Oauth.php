@@ -24,7 +24,7 @@ class We7Oauth extends AbstractProvider implements ProviderInterface
 			'appid' => $this->clientId
         ];
         
-        $response = (new Client())->post('http://api-pay.i0358.cn/o:auth/login-url/index', [
+        $response = (new Client())->post('http://api-pay.i0358.cn/oauth/login-url/index', [
 			'form_params' => $data,
 		]);
 
