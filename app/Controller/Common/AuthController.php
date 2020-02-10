@@ -120,6 +120,7 @@ class AuthController extends BaseController
 			'username' => $user->username,
 			'created_at' => $user->created_at->toDateTimeString(),
 			'updated_at' => $user->updated_at->toDateTimeString(),
+			//判断当前用户是否有密码
 			'no_password' => empty($user->userpass),
 			'acl' => [
 				'has_manage' => $user->isFounder
