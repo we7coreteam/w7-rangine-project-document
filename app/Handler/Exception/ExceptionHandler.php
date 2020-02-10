@@ -66,7 +66,7 @@ class ExceptionHandler extends ExceptionHandlerAbstract {
 				return $socialite->config(new Config([
 					'client_id' => $setting['setting']['app_id'],
 					'client_secret' => $setting['setting']['secret_key'],
-					'redirect_url' => ienv('API_HOST') . 'login?id=' . $defaultLoginChannel['default_login_channel'] . '&redirect_url=' . urlencode($redirectUrl)
+					'redirect_url' => ienv('API_HOST') . 'login?id=' . $defaultLoginChannel['default_login_channel'] . '&redirect_url=' . $redirectUrl
 				]))->driver($defaultLoginChannel['default_login_channel'])->stateless()->redirect()->getTargetUrl();
 			}
 		}
