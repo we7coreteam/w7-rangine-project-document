@@ -156,10 +156,17 @@ class AuthController extends BaseController
 			throw new ErrorHttpException('登录用户数据错误，请重试');
 		}
 
+		$loginSetting = ThirdPartyLoginLogic::instance()->getDefaultLoginSetting();
 		$user = OauthLogic::instance()->getThirdPartyUserByUsernameUid($userInfo['uid'], $userInfo['username']);
 		if (empty($user)) {
-			$localUsername = 'tpl_' . $userInfo['username'] . $userInfo['uid'];
-			$uid = UserLogic::instance()->createBucket($localUsername);
+			if (empty($loginSetting['is_need_bind'])) {
+				$localUsername = 'tpl_' . $userInfo['username'] . $userInfo['uid'];
+				$uid = UserLogic::instance()->createBucket($localUsername);
+			} else {
+				$localUsername = $userInfo['username'];
+				$uid = 0;
+			}
+			
 			$thirdPartyUser = UserThirdParty::query()->create([
 				'openid' => $userInfo['uid'],
 				'username' => $userInfo['username'],
@@ -180,7 +187,6 @@ class AuthController extends BaseController
 		}
 
 		$request->session->destroy();
-		$loginSetting = ThirdPartyLoginLogic::instance()->getDefaultLoginSetting();
 		if (!empty($loginSetting['is_need_bind']) && empty($user)) {
 			$request->session->set('third-party-user', $localUser);
 			return $this->data([
@@ -222,7 +228,6 @@ class AuthController extends BaseController
 		UserThirdParty::query()->where('id', '=', $thirdPartyUser['third-party-uid'])->update([
 			'uid' => $user->id,
 		]);
-		UserLogic::instance()->deleteByIds([$thirdPartyUser['uid']]);
 
 		$request->session->destroy();
 		$request->session->set('user', [
