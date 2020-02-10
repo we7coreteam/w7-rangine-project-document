@@ -14,7 +14,7 @@ class We7Oauth extends AbstractProvider implements ProviderInterface
     
     public function getAppUnionId()
     {
-        return 'we7';
+        return 'Td0V0LK5Fk8f';
     }
 
     protected function getAuthUrl($state)
@@ -24,7 +24,7 @@ class We7Oauth extends AbstractProvider implements ProviderInterface
 			'appid' => $this->clientId
         ];
         
-        $response = (new Client())->post('http://api.w7.cc/oauth/login-url/index', [
+        $response = (new Client())->post('http://api-pay.i0358.cn/o:auth/login-url/index', [
 			'form_params' => $data,
 		]);
 
