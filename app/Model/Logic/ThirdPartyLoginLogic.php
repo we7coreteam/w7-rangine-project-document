@@ -24,7 +24,7 @@ class ThirdPartyLoginLogic extends BaseLogic
 		$setting = $this->getThirdPartyLoginSetting();
 		if (empty($setting['channel'])) {
 			$setting['channel'] = [
-				'qq' => [
+				'1' => [
 					'is_default' => true,
 					'setting' => [
 						'name' => 'QQ',
@@ -35,7 +35,7 @@ class ThirdPartyLoginLogic extends BaseLogic
 						'username' => 'nickname'
 					]
 				],
-				'wechat' => [
+				'2' => [
 					'is_default' => true,
 					'setting' => [
 						'name' => '微信',
@@ -49,15 +49,6 @@ class ThirdPartyLoginLogic extends BaseLogic
 			];
 			SettingLogic::instance()->save(self::THIRD_PARTY_LOGIN_SETTING_KEY, $setting);
 		}
-	}
-
-	public function makeUnionId() {
-		$unionId = irandom(12);
-		if ($this->getThirdPartyLoginChannelById($unionId)) {
-			return $this->makeUnionId();
-		}
-
-		return $unionId;
 	}
 
     public function getThirdPartyLoginSetting()
@@ -101,7 +92,8 @@ class ThirdPartyLoginLogic extends BaseLogic
     public function addThirdPartyLoginChannel(array $config)
     {
 		$setting = $this->getThirdPartyLoginSetting();
-		$setting['channel'][$this->makeUnionId()] = $config;
+		$maxId = max(array_keys($setting['channel'])) + 1;
+		$setting['channel'][$maxId] = $config;
 		SettingLogic::instance()->save(self::THIRD_PARTY_LOGIN_SETTING_KEY, $setting);
 	}
 	

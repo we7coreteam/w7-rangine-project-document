@@ -10,7 +10,7 @@ class QQOauth extends QQProvider
 
     public function getAppUnionId()
     {
-        return 'qq';
+        return '1';
     }
 
     /**

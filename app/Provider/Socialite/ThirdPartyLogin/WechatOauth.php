@@ -10,7 +10,7 @@ class WechatOauth extends WeChatProvider
 
     public function getAppUnionId()
     {
-        return 'wechat';
+        return '2';
     }
 
     /**

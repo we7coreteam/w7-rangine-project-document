@@ -14,7 +14,7 @@ class We7Oauth extends AbstractProvider implements ProviderInterface
     
     public function getAppUnionId()
     {
-        return 'Td0V0LK5Fk8f';
+        return '3';
     }
 
     protected function getAuthUrl($state)
