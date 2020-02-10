@@ -79,7 +79,10 @@ class UserLogic extends BaseLogic
 			throw new \RuntimeException('用户名已经存在');
 		}
 
-		$userInfo['userpass'] = $this->userPwdEncryption($userInfo['username'], $userInfo['userpass']);
+		if (!empty($userInfo['userpass'])) {
+			$userInfo['userpass'] = $this->userPwdEncryption($userInfo['username'], $userInfo['userpass']);
+		}
+		
 		$result = User::query()->where('id', $userInfo['id'])->update($userInfo);
 		if (!$result) {
 			throw new \RuntimeException('修改用户信息失败');

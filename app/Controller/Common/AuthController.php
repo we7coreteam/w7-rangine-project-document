@@ -87,7 +87,7 @@ class AuthController extends BaseController
 					$redirectUrl = $socialite->config(new Config([
 						'client_id' =>  $item['setting']['app_id'],
 						'client_secret' =>  $item['setting']['secret_key'],
-						'redirect_url' => ienv('API_HOST') . 'login?id=' . $key . '&redirect_url=' . $redirectUrl
+						'redirect_url' => ienv('API_HOST') . 'login?app_id=' . $key . '&redirect_url=' . $redirectUrl
 					]))->driver($key)->stateless()->redirect()->getTargetUrl();
 				} catch(Throwable $e) {
 					
@@ -128,14 +128,45 @@ class AuthController extends BaseController
 		return $this->data($result);
 	}
 
+	public function update(Request $request)
+	{
+		/**
+		 * @var User $user
+		 */
+		$user = $request->getAttribute('user');
+		if (!$user) {
+			throw new ErrorHttpException('没有操作用户的权限');
+		}
+
+		$userName = trim($request->post('username'));
+		$userOldPass = trim($request->post('old_userpass'));
+		$userPass = trim($request->post('userpass'));
+		if (empty($userName) || empty($userPass)) {
+			throw new ErrorHttpException('参数错误');
+		}
+		if ($userOldPass && $user->userpass != UserLogic::instance()->userPwdEncryption($user->username, $userOldPass)) {
+			throw new ErrorHttpException('旧密码错误');
+		}
+		
+		$user['id'] = $user->id;
+		$user['username'] = empty($userName) ? $user->username : $userName;
+		$userPass && $user['userpass'] = $userPass;
+		try {
+			$res = UserLogic::instance()->updateUser($user);
+			return $this->data($res);
+		} catch (\Throwable $e) {
+			throw new ErrorHttpException($e->getMessage());
+		}
+	}
+
 	public function thirdPartyLogin(Request $request) {
 		$code = $request->input('code');
 		if (empty($code)) {
 			throw new ErrorHttpException('Code码错误');
 		}
-		$id = $request->input('id');
-		if (empty($id)) {
-			throw new ErrorHttpException('id错误');
+		$appId = $request->input('app_id');
+		if (empty($appId)) {
+			throw new ErrorHttpException('app_id错误');
 		}
 
 		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($id);
@@ -149,7 +180,7 @@ class AuthController extends BaseController
 		$driver = $socialite->config(new Config([
 			'client_id' => $setting['setting']['app_id'],
 			'client_secret' => $setting['setting']['secret_key']
-		]))->driver($id)->stateless();
+		]))->driver($appId)->stateless();
 
 		$user = $driver->user($driver->getAccessToken($code));
 		//添加QQ用户数据
@@ -173,7 +204,7 @@ class AuthController extends BaseController
 				'openid' => $userInfo['uid'],
 				'username' => $userInfo['username'],
 				'uid' => $uid,
-				'source' => 1,
+				'source' => $appId,
 			]);
 
 			$localUser = [
