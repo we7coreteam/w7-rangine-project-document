@@ -158,11 +158,11 @@ class AuthController extends BaseController
 			throw new ErrorHttpException('旧密码错误');
 		}
 		
-		$user['id'] = $user->id;
-		$user['username'] = empty($userName) ? $user->username : $userName;
-		$userPass && $user['userpass'] = $userPass;
+		$updateUuser['id'] = $user->id;
+		$updateUuser['username'] = empty($userName) ? $user->username : $userName;
+		$userPass && $updateUuser['userpass'] = $userPass;
 		try {
-			$res = UserLogic::instance()->updateUser($user);
+			$res = UserLogic::instance()->updateUser($updateUuser);
 			return $this->data($res);
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());
