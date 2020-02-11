@@ -115,6 +115,16 @@ class AuthController extends BaseController
 			throw new ErrorHttpException('请先登录', [], 444);
 		}
 
+		$source = [];
+		$userSourceAppId = $request->session->get('user-source-app');
+		if ($userSourceAppId) {
+			$userSource = UserThirdParty::query()->where('source', '=', $userSourceAppId)->where('uid', '=', $user->id)->first();
+			$loginChannel = ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($userSourceAppId);
+			$source = [
+				'source_name' => $loginChannel['setting']['name'],
+				'username' => $userSource->username
+			];
+		}
 		$result = [
 			'id' => $user->id,
 			'username' => $user->username,
@@ -122,6 +132,7 @@ class AuthController extends BaseController
 			'updated_at' => $user->updated_at->toDateTimeString(),
 			//判断当前用户是否有密码
 			'no_password' => empty($user->userpass),
+			'user_source' => $source,
 			'acl' => [
 				'has_manage' => $user->isFounder
 			]
@@ -130,7 +141,7 @@ class AuthController extends BaseController
 		return $this->data($result);
 	}
 
-	public function update(Request $request)
+	public function updateUser(Request $request)
 	{
 		/**
 		 * @var User $user
@@ -207,6 +218,7 @@ class AuthController extends BaseController
 			]);
 
 			$localUser = [
+				'app_id' => $appId,
 				'uid' => $uid,
 				'third-party-uid' => $thirdPartyUser->id,
 				'username' => $localUsername,
@@ -225,6 +237,7 @@ class AuthController extends BaseController
 				'is_need_bind' => true
 			]);
 		} else {
+			$request->session->set('user-source-app', $appId);
 			$request->session->set('user', $localUser);
 			return $this->data('success');
 		}
@@ -262,6 +275,7 @@ class AuthController extends BaseController
 		]);
 
 		$request->session->destroy();
+		$request->session->set('user-source-app', $thirdPartyUser['app_id']);
 		$request->session->set('user', [
 			'uid' => $user->id,
 			'username' => $user->username,
