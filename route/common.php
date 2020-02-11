@@ -22,7 +22,7 @@ irouter()->middleware('CheckAuthMiddleware')
 irouter()->middleware('CheckAuthMiddleware')
 	->post('/common/auth/user', 'Common\AuthController@user');
 irouter()->middleware('CheckAuthMiddleware')
-	->post('/common/auth/update', 'Common\AuthController@update');
+	->post('/common/auth/user/update', 'Common\AuthController@updateUser');
 
 irouter()->post('/common/auth/third-party-login', 'Common\AuthController@thirdPartyLogin');
 irouter()->post('/common/auth/third-party-login-bind', 'Common\AuthController@thirdPartyLoginBind');
