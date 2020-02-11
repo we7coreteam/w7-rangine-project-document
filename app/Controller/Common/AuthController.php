@@ -115,7 +115,10 @@ class AuthController extends BaseController
 			throw new ErrorHttpException('请先登录', [], 444);
 		}
 
-		$source = [];
+		$source = [
+			'source_name' => '',
+			'username' => ''
+		];
 		$userSourceAppId = $request->session->get('user-source-app');
 		if ($userSourceAppId) {
 			$userSource = UserThirdParty::query()->where('source', '=', $userSourceAppId)->where('uid', '=', $user->id)->first();
