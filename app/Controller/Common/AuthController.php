@@ -151,7 +151,7 @@ class AuthController extends BaseController
 		$userName = trim($request->post('username'));
 		$userOldPass = trim($request->post('old_userpass'));
 		$userPass = trim($request->post('userpass'));
-		if (empty($userName) || empty($userPass)) {
+		if (empty($userName) && empty($userPass)) {
 			throw new ErrorHttpException('参数错误');
 		}
 		if ($userOldPass && $user->userpass != UserLogic::instance()->userPwdEncryption($user->username, $userOldPass)) {
