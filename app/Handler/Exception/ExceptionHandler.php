@@ -40,10 +40,10 @@ class ExceptionHandler extends ExceptionHandlerAbstract {
 					}
 				}
 			}
-			if (substr($route, 0, 6) === '/login') {
+			if (substr($route, 0, 6) === '/login' && !empty(icontext()->getRequest()->getQueryParams()['code']) && !empty(icontext()->getRequest()->getQueryParams()['app_id'])) {
 				$redirectUrl = icontext()->getRequest()->getQueryParams()['redirect_url'] ?? '';
 				$redirectUrl = $this->getLoginUrl($redirectUrl);
-				if (substr($route, 0, 6) !== '/login') {
+				if (substr($redirectUrl, 0, 6) !== '/login') {
 					return icontext()->getResponse()->redirect($redirectUrl);
 				}
 			}
