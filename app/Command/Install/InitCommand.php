@@ -193,7 +193,7 @@ class InitCommand extends CommandAbstract
 		$validate = [
 			'host' => '/[\w\-\.]{5,64}/',
 			'port' => '/[1-9]\d{0,4}/',
-			'password' => '/\w{6,32}/'
+			'password' => "/[0-9A-Za-z`~!@#$%^&*()\-_+<>?:\"{},.\/;'[\]|]{4,32}/"
 		];
 		$install = [
 			'server' => [
@@ -237,7 +237,7 @@ class InitCommand extends CommandAbstract
 					'password' => [
 						//'type' => 'hidden',
 						'name' => '密码',
-						'default' => '',
+						'default' => 'root',
 						'validate' => $validate['password']
 					]
 				]
