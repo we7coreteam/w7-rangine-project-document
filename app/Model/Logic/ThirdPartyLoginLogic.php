@@ -28,7 +28,7 @@ class ThirdPartyLoginLogic extends BaseLogic
 					'is_default' => true,
 					'setting' => [
 						'name' => 'QQ',
-						'logo' => '//cdn.w7.cc/web/resource/images/wechat/qqlogin.png'
+						'logo' => 'http://cdn.w7.cc/web/resource/images/wechat/qqlogin.png'
 					],
 					'convert' => [
 						'uid' => 'openid',
@@ -39,7 +39,7 @@ class ThirdPartyLoginLogic extends BaseLogic
 					'is_default' => true,
 					'setting' => [
 						'name' => '微信',
-						'logo' => '//cdn.w7.cc/web/resource/images/wechat/wxlogin.png'
+						'logo' => 'http://cdn.w7.cc/web/resource/images/wechat/wxlogin.png'
 					],
 					'convert' => [
 						'uid' => 'openid',
