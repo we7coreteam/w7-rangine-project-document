@@ -10,6 +10,16 @@
  * visited https://www.w7.cc for more details
  */
 
+use W7\App;
+use function GuzzleHttp\Psr7\build_query;
+
+irouter()->any('/oauth/login', function () {
+	$request = App::getApp()->getContext()->getRequest();
+	$query = $request->getQueryParams();
+
+	return App::getApp()->getContext()->getResponse()->redirect(ienv('API_HOST') . 'login?' . build_query($query));
+});
+
 //获取验证码
 irouter()->post('/common/verifycode/image', 'Common\VerifyCodeController@image');
 

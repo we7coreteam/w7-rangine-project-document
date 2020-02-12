@@ -65,9 +65,9 @@ class ExceptionHandler extends ExceptionHandlerAbstract {
 				//测试使用
 				$key = $defaultLoginChannel['default_login_channel'];
 				if ($key == 1) {
-					$redirect = 'http://s.w7.cc/v1/qq/userBack?is_passport=1&callback=' . ienv('API_HOST') . 'oauth/login?app_id=' . $key . '&redirect_url=' . $redirectUrl;
+					$redirect = 'https://s.w7.cc/v1/qq/userBack?is_passport=1&callback=' . ienv('API_HOST') . 'oauth/login?app_id=' . $key . '&redirect_url=' . $redirectUrl;
 				} else if ($key == 2) {
-					$redirect = 'http://s.w7.cc/v1/wechatweb/callback?is_passport=1&callback=' . ienv('API_HOST') . 'oauth/login?app_id=' . $key . '&redirect_url=' . $redirectUrl;
+					$redirect = 'https://s.w7.cc/v1/wechatweb/callback?is_passport=1&callback=' . ienv('API_HOST') . 'oauth/login?app_id=' . $key . '&redirect_url=' . $redirectUrl;
 				} else {
 					$redirect = ienv('API_HOST') . 'login?app_id=' . $key . '&redirect_url=' . $redirectUrl;
 				}
