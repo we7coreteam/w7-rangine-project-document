@@ -113,10 +113,37 @@ class AuthController extends BaseController
 		return $this->data($data);
 	}
 
-	public function defaultLoginChannel(Request $request)
+	public function defaultLoginUrl(Request $request)
 	{
+		$redirectUrl = $request->post('redirect_url');
 		$defaultSetting = ThirdPartyLoginLogic::instance()->getDefaultLoginSetting();
-		return $defaultSetting['default_login_channel'] ?? '';
+		if (!empty($defaultSetting['default_login_channel']) && $setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($defaultSetting['default_login_channel'])) {
+			/**
+			 * @var SocialiteManager $socialite
+			 */
+			$socialite = iloader()->get(SocialiteManager::class);
+			$key = $defaultSetting['default_login_channel'];
+			//测试用
+			if ($key == 1) {
+				$redirect = 'https://s.w7.cc/v1/qq/userBack?is_passport=1&callback=' . ienv('API_HOST') . 'oauth/login?app_id=' . $key . '&redirect_url=' . $redirectUrl;
+			} else if ($key == 2) {
+				$redirect = 'https://s.w7.cc/v1/wechatweb/callback?is_passport=1&callback=' . ienv('API_HOST') . 'oauth/login?app_id=' . $key . '&redirect_url=' . $redirectUrl;
+			} else {
+				$redirect = ienv('API_HOST') . 'login?app_id=' . $key . '&redirect_url=' . $redirectUrl;
+			}
+
+			try{
+				return $socialite->config(new Config([
+					'client_id' =>  $setting['setting']['app_id'],
+					'client_secret' =>  $setting['setting']['secret_key'],
+					'redirect_url' => $redirect
+				]))->driver($key)->stateless()->redirect()->getTargetUrl();
+			} catch(Throwable $e) {
+				throw new ErrorHttpException($e->getMessage());
+			}
+		}
+		
+		return '';
 	}
 
 	public function user(Request $request)
