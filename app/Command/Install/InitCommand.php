@@ -192,8 +192,7 @@ class InitCommand extends CommandAbstract
 		// 验证规则
 		$validate = [
 			'host' => '/[\w\-\.]{5,64}/',
-			'port' => '/[1-9]\d{0,4}/',
-			'password' => "/[0-9A-Za-z`~!@#$%^&*()\-_+<>?:\"{},.\/;'[\]|]{4,32}/"
+			'port' => '/[1-9]\d{0,4}/'
 		];
 		$install = [
 			'server' => [
@@ -237,8 +236,8 @@ class InitCommand extends CommandAbstract
 					'password' => [
 						//'type' => 'hidden',
 						'name' => '密码',
-						'default' => 'root',
-						'validate' => $validate['password']
+						'default' => '',
+						'validate' => "/[0-9A-Za-z`~!@#$%^&*()\-_+<>?:\"{},.\/;'[\]|]{4,32}/"
 					]
 				]
 			],
@@ -274,7 +273,7 @@ class InitCommand extends CommandAbstract
 						//'type' => 'hidden',
 						'name' => '密码',
 						'default' => '',
-						'validate' => $validate['password']
+						'validate' => '/\w{6,32}/'
 					],
 					'passwordConfirm' => [
 						//'type' => 'hidden',
