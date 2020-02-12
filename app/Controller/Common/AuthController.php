@@ -183,7 +183,7 @@ class AuthController extends BaseController
 			throw new ErrorHttpException('app_id错误');
 		}
 
-		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($id);
+		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($appId);
 		if (!$setting) {
 			throw new ErrorHttpException('不支持该授权方式');
 		}
@@ -198,7 +198,10 @@ class AuthController extends BaseController
 
 		$user = $driver->user($driver->getAccessToken($code));
 		//添加QQ用户数据
-		$userInfo = $user->getOriginal();
+		$userInfo = [
+			'uid' => $user->uid,
+			'username' => $user->username
+		];
 		if (empty($userInfo['username']) || empty($userInfo['uid'])) {
 			throw new ErrorHttpException('登录用户数据错误，请重试');
 		}
