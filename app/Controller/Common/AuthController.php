@@ -87,7 +87,7 @@ class AuthController extends BaseController
 					$redirectUrl = $socialite->config(new Config([
 						'client_id' =>  $item['setting']['app_id'],
 						'client_secret' =>  $item['setting']['secret_key'],
-						'redirect_url' => ienv('API_HOST') . 'login?app_id=' . $key . '&redirect_url=' . $redirectUrl
+						'redirect_url' => 'http://s.w7.cc/v1/wechatweb/passport?callback=' . ienv('API_HOST') . 'oauth/login?app_id=' . $key . '&redirect_url=' . $redirectUrl
 					]))->driver($key)->stateless()->redirect()->getTargetUrl();
 				} catch(Throwable $e) {
 					
