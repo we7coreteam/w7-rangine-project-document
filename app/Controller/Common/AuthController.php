@@ -82,12 +82,21 @@ class AuthController extends BaseController
 		//获取可用的第三方登录列表
 		foreach($setting['channel'] as $key => $item) {
 			if (!empty($item['setting']['enable'])) {
+				//测试使用
 				$redirectUrl = '';
+				if ($key == 1) {
+					$redirect = 'http://s.w7.cc/v1/qq/passport?callback=' . ienv('API_HOST') . 'oauth/login?app_id=' . $key . '&redirect_url=' . $redirectUrl;
+				} else if ($key == 2) {
+					$redirect = 'http://s.w7.cc/v1/wechatweb/passport?callback=' . ienv('API_HOST') . 'oauth/login?app_id=' . $key . '&redirect_url=' . $redirectUrl;
+				} else {
+					$redirect = ienv('API_HOST') . 'login?app_id=' . $key . '&redirect_url=' . $redirectUrl;
+				}
+
 				try{
 					$redirectUrl = $socialite->config(new Config([
 						'client_id' =>  $item['setting']['app_id'],
 						'client_secret' =>  $item['setting']['secret_key'],
-						'redirect_url' => 'http://s.w7.cc/v1/wechatweb/passport?callback=' . ienv('API_HOST') . 'oauth/login?app_id=' . $key . '&redirect_url=' . $redirectUrl
+						'redirect_url' => $redirect
 					]))->driver($key)->stateless()->redirect()->getTargetUrl();
 				} catch(Throwable $e) {
 					

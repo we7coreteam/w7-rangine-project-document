@@ -62,11 +62,20 @@ class ExceptionHandler extends ExceptionHandlerAbstract {
 				/**
 				 * @var SocialiteManager $socialite
 				 */
+				//测试使用
+				$key = $defaultLoginChannel['default_login_channel'];
+				if ($key == 1) {
+					$redirect = 'http://s.w7.cc/v1/qq/passport?callback=' . ienv('API_HOST') . 'oauth/login?app_id=' . $key . '&redirect_url=' . $redirectUrl;
+				} else if ($key == 2) {
+					$redirect = 'http://s.w7.cc/v1/wechatweb/passport?callback=' . ienv('API_HOST') . 'oauth/login?app_id=' . $key . '&redirect_url=' . $redirectUrl;
+				} else {
+					$redirect = ienv('API_HOST') . 'login?app_id=' . $key . '&redirect_url=' . $redirectUrl;
+				}
 				$socialite = iloader()->get(SocialiteManager::class);
 				return $socialite->config(new Config([
 					'client_id' => $setting['setting']['app_id'],
 					'client_secret' => $setting['setting']['secret_key'],
-					'redirect_url' => ienv('API_HOST') . 'login?app_id=' . $defaultLoginChannel['default_login_channel'] . '&redirect_url=' . $redirectUrl
+					'redirect_url' => $redirect
 				]))->driver($defaultLoginChannel['default_login_channel'])->stateless()->redirect()->getTargetUrl();
 			}
 		}
