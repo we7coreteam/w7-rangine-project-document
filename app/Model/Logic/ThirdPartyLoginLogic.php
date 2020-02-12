@@ -106,6 +106,7 @@ class ThirdPartyLoginLogic extends BaseLogic
 		if (empty($config['convert'])) {
 			$config['convert'] = $setting['channel'][$id]['convert'];
 		}
+		$config['is_default'] = $setting['channel'][$id]['is_default'] ?? false;
 		$setting['channel'][$id] = $config;
 		SettingLogic::instance()->save(self::THIRD_PARTY_LOGIN_SETTING_KEY, $setting);
 	}
