@@ -85,9 +85,9 @@ class AuthController extends BaseController
 				//测试使用
 				$redirectUrl = '';
 				if ($key == 1) {
-					$redirect = 'http://s.w7.cc/v1/qq/passport?callback=' . ienv('API_HOST') . 'oauth/login?app_id=' . $key . '&redirect_url=' . $redirectUrl;
+					$redirect = 'http://s.w7.cc/v1/qq/userBack?is_passport=1&callback=' . ienv('API_HOST') . 'oauth/login?app_id=' . $key . '&redirect_url=' . $redirectUrl;
 				} else if ($key == 2) {
-					$redirect = 'http://s.w7.cc/v1/wechatweb/passport?callback=' . ienv('API_HOST') . 'oauth/login?app_id=' . $key . '&redirect_url=' . $redirectUrl;
+					$redirect = 'http://s.w7.cc/v1/wechatweb/callback?is_passport=1&callback=' . ienv('API_HOST') . 'oauth/login?app_id=' . $key . '&redirect_url=' . $redirectUrl;
 				} else {
 					$redirect = ienv('API_HOST') . 'login?app_id=' . $key . '&redirect_url=' . $redirectUrl;
 				}
