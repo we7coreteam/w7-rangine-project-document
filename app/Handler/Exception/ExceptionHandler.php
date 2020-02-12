@@ -40,6 +40,13 @@ class ExceptionHandler extends ExceptionHandlerAbstract {
 					}
 				}
 			}
+			if (substr($route, 0, 6) === '/login') {
+				$redirectUrl = icontext()->getRequest()->getQueryParams()['redirect_url'] ?? '';
+				$redirectUrl = $this->getLoginUrl($redirectUrl);
+				if (substr($route, 0, 6) !== '/login') {
+					return icontext()->getResponse()->redirect($redirectUrl);
+				}
+			}
 			return App::getApp()->getContext()->getResponse()->html(iloader()->singleton(View::class)->render('@public/index'));
 		}
 
