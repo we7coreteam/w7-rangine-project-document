@@ -163,6 +163,7 @@ class AuthController extends BaseController
 		
 		$updateUser['id'] = $user->id;
 		$updateUser['username'] = empty($userName) ? $user->username : $userName;
+		!empty($updateUser['username']) && $updateUser['userpass'] = $userOldPass;
 		$userPass && $updateUser['userpass'] = $userPass;
 		try {
 			$res = UserLogic::instance()->updateUser($updateUser);
