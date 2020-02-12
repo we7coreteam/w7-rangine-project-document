@@ -36,3 +36,4 @@ irouter()->middleware('CheckAuthMiddleware')
 
 irouter()->post('/common/auth/third-party-login', 'Common\AuthController@thirdPartyLogin');
 irouter()->post('/common/auth/third-party-login-bind', 'Common\AuthController@thirdPartyLoginBind');
+irouter()->post('/common/auth/default-login-channel', 'Common\AuthController@defaultLoginChannel');

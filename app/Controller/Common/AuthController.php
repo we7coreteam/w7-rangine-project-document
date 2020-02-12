@@ -103,6 +103,7 @@ class AuthController extends BaseController
 				}
 
 				$data[] = [
+					'id' => $key,
 					'name' => $item['setting']['name'],
 					'logo' => $item['setting']['logo'],
 					'redirect_url' => $redirectUrl
@@ -110,6 +111,12 @@ class AuthController extends BaseController
 			}
 		}
 		return $this->data($data);
+	}
+
+	public function defaultLoginChannel(Request $request)
+	{
+		$defaultSetting = ThirdPartyLoginLogic::instance()->getDefaultLoginSetting();
+		return $defaultSetting['default_login_channel'] ?? '';
 	}
 
 	public function user(Request $request)
