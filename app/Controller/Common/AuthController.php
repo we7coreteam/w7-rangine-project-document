@@ -112,22 +112,12 @@ class AuthController extends BaseController
 			 * @var SocialiteManager $socialite
 			 */
 			$socialite = iloader()->get(SocialiteManager::class);
-			$key = $defaultSetting['default_login_channel'];
-			//测试用
-			if ($key == 1) {
-				$redirect = 'https://s.w7.cc/v1/qq/userBack?is_passport=1&callback=' . ienv('API_HOST') . 'oauth/login?app_id=' . $key . '&redirect_url=' . $redirectUrl;
-			} else if ($key == 2) {
-				$redirect = 'https://s.w7.cc/v1/wechatweb/callback?is_passport=1&callback=' . ienv('API_HOST') . 'oauth/login?app_id=' . $key . '&redirect_url=' . $redirectUrl;
-			} else {
-				$redirect = ienv('API_HOST') . 'login?app_id=' . $key . '&redirect_url=' . $redirectUrl;
-			}
-
 			try{
 				return $this->data($socialite->config(new Config([
 					'client_id' =>  $setting['setting']['app_id'],
 					'client_secret' =>  $setting['setting']['secret_key'],
-					'redirect_url' => $redirect
-				]))->driver($key)->stateless()->redirect()->getTargetUrl());
+					'redirect_url' => ienv('API_HOST') . 'login?app_id=' . $defaultSetting['default_login_channel'] . '&redirect_url=' . $redirectUrl
+				]))->driver($defaultSetting['default_login_channel'])->stateless()->redirect()->getTargetUrl());
 			} catch(Throwable $e) {
 				throw new ErrorHttpException($e->getMessage());
 			}
