@@ -133,17 +133,17 @@ class AuthController extends BaseController
 			}
 
 			try{
-				return $socialite->config(new Config([
+				return $this->data($socialite->config(new Config([
 					'client_id' =>  $setting['setting']['app_id'],
 					'client_secret' =>  $setting['setting']['secret_key'],
 					'redirect_url' => $redirect
-				]))->driver($key)->stateless()->redirect()->getTargetUrl();
+				]))->driver($key)->stateless()->redirect()->getTargetUrl());
 			} catch(Throwable $e) {
 				throw new ErrorHttpException($e->getMessage());
 			}
 		}
 		
-		return '';
+		return $this->data('');
 	}
 
 	public function user(Request $request)
