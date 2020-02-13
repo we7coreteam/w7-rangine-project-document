@@ -46,11 +46,24 @@ class ServiceProvider extends ProviderAbstract
             // }
             $appId = $obj->getAppUnionId();
 			$socialite->extend($appId, function ($config) use ($socialite, $thirdPartyLogin, $appId) {
+                //测试用
+                $redirectUrl = empty($config['redirect_url']) ? ienv('API_HOST') . 'login?app_id=' . $appId : $config['redirect_url'];
+                if (ienv('OAUTH_TEST')) {
+                    $redirectUrl = parse_url($redirectUrl, PHP_URL_QUERY)['redirect_url'] ?? '';
+                    if ($appId == 1) {
+                        $redirectUrl = 'https://s.w7.cc/v1/qq/userBack?is_passport=1&callback=' . ienv('API_HOST') . 'oauth/login?app_id=' . $appId . '&redirect_url=' . $redirectUrl;
+                    } else if ($appId == 2) {
+                        $redirectUrl = 'https://s.w7.cc/v1/wechatweb/callback?is_passport=1&callback=' . ienv('API_HOST') . 'oauth/login?app_id=' . $appId . '&redirect_url=' . $redirectUrl;
+                    } else {
+                        $redirectUrl = ienv('API_HOST') . 'login?app_id=' . $appId . '&redirect_url=' . $redirectUrl;
+                    }
+                }
+                
                 return new $thirdPartyLogin(
                     $socialite->getRequest(),
                     $config['client_id'],
                     $config['client_secret'],
-                    empty($config['redirect_url']) ? ienv('API_HOST') . 'login?app_id=' . $appId : $config['redirect_url']
+                    $redirectUrl
                 );
             });
 		}
