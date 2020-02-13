@@ -20,6 +20,9 @@ class ExceptionHandler extends ExceptionHandlerAbstract {
 		if ($e instanceof RouteNotFoundException || $e instanceof RouteNotAllowException) {
 			$route = icontext()->getRequest()->getUri()->getPath();
 			//如果访问的是admin下的路由，先检测是否登录
+			if (substr($route, 0, 12) == '/admin-login') {
+				return App::getApp()->getContext()->getResponse()->html(iloader()->singleton(View::class)->render('@public/index'));
+			}
 			if (substr($route, 0, 6) == '/admin') {
 				$session = new Session();
 				$session->start(icontext()->getRequest());
@@ -40,13 +43,6 @@ class ExceptionHandler extends ExceptionHandlerAbstract {
 					}
 				}
 			}
-			// if (substr($route, 0, 6) === '/login' && !empty(icontext()->getRequest()->getQueryParams()['code']) && !empty(icontext()->getRequest()->getQueryParams()['app_id'])) {
-			// 	$redirectUrl = icontext()->getRequest()->getQueryParams()['redirect_url'] ?? '';
-			// 	$redirectUrl = $this->getLoginUrl($redirectUrl);
-			// 	if (substr($redirectUrl, 0, 6) !== '/login') {
-			// 		return icontext()->getResponse()->redirect($redirectUrl);
-			// 	}
-			// }
 			return App::getApp()->getContext()->getResponse()->html(iloader()->singleton(View::class)->render('@public/index'));
 		}
 
