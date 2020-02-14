@@ -29,7 +29,7 @@ class VerifyCodeController extends BaseController
 			$code = $phrase->build(self::CODE_LENGTH);
 
 			$builder = new CaptchaBuilder($code, $phrase);
-			$builder->setBackgroundColor(220, 210, 230);
+			$builder->setBackgroundColor(255, 255, 255);
 			$builder->setMaxAngle(25);
 			$builder->setMaxBehindLines(0);
 			$builder->setMaxFrontLines(0);
