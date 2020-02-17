@@ -51,8 +51,8 @@ class ThirdPartyLoginLogic extends BaseLogic
 		}
 	}
 
-    public function getThirdPartyLoginSetting()
-    {
+	public function getThirdPartyLoginSetting()
+	{
 		$setting = SettingLogic::instance()->getByKey(self::THIRD_PARTY_LOGIN_SETTING_KEY);
 		if (!$setting) {
 			return [];
@@ -61,8 +61,8 @@ class ThirdPartyLoginLogic extends BaseLogic
 		return $setting->setting;
 	}
 
-    public function getThirdPartyLoginChannelById($id)
-    {
+	public function getThirdPartyLoginChannelById($id)
+	{
 		$setting = $this->getThirdPartyLoginSetting();
 		$setting = $setting['channel'][$id] ?? [];
 		if ($setting) {
@@ -73,7 +73,8 @@ class ThirdPartyLoginLogic extends BaseLogic
 		return $setting;
 	}
 
-	public function deleteThirdPartyLoginChannelById($id) {
+	public function deleteThirdPartyLoginChannelById($id)
+	{
 		$setting = $this->getThirdPartyLoginSetting();
 		if (!empty($setting['channel'][$id])) {
 			$loginSetting = $this->getDefaultLoginSetting();
@@ -89,16 +90,16 @@ class ThirdPartyLoginLogic extends BaseLogic
 		return true;
 	}
 	
-    public function addThirdPartyLoginChannel(array $config)
-    {
+	public function addThirdPartyLoginChannel(array $config)
+	{
 		$setting = $this->getThirdPartyLoginSetting();
 		$maxId = max(array_keys($setting['channel'])) + 1;
 		$setting['channel'][$maxId] = $config;
 		SettingLogic::instance()->save(self::THIRD_PARTY_LOGIN_SETTING_KEY, $setting);
 	}
 	
-    public function updateThirdPartyLoginChannelById($id, array $config)
-    {
+	public function updateThirdPartyLoginChannelById($id, array $config)
+	{
 		$setting = $this->getThirdPartyLoginSetting();
 		if (empty($setting['channel'][$id])) {
 			throw new \RuntimeException('该授权方式不存在');

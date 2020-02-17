@@ -10,21 +10,21 @@ use Overtrue\Socialite\User;
 
 class We7Oauth extends AbstractProvider implements ProviderInterface
 {
-    use OauthTrait;
-    
-    public function getAppUnionId()
-    {
-        return '3';
-    }
+	use OauthTrait;
 
-    protected function getAuthUrl($state)
-    {
+	public function getAppUnionId()
+	{
+		return '3';
+	}
+
+	protected function getAuthUrl($state)
+	{
 		$data = [
 			'redirect' => $this->redirectUrl,
 			'appid' => $this->clientId
-        ];
-        
-        $response = (new Client())->post('http://api-pay.i0358.cn/oauth/login-url/index', [
+		];
+
+		$response = (new Client())->post('http://api-pay.i0358.cn/oauth/login-url/index', [
 			'form_params' => $data,
 		]);
 
@@ -39,56 +39,54 @@ class We7Oauth extends AbstractProvider implements ProviderInterface
 		}
 
 		return $result['url'];
-    }
-    
-    /**
-     * Get the Post fields for the token request.
-     *
-     * @param string $code
-     *
-     * @return array
-     */
-    protected function getTokenFields($code)
-    {
-        return [
-            'code' => $code
-        ];
-    }
+	}
 
-    /**
-     * Get the access token for the given code.
-     *
-     * @param string $code
-     *
-     * @return \Overtrue\Socialite\AccessToken
-     */
-    public function getAccessToken($code)
-    {
-        $response = $this->getHttpClient()->post($this->getTokenUrl(), [
-            'form_params' => $this->getTokenFields($code),
-        ]);
+	/**
+	 * Get the Post fields for the token request.
+	 *
+	 * @param string $code
+	 *
+	 * @return array
+	 */
+	protected function getTokenFields($code)
+	{
+		return [
+			'code' => $code
+		];
+	}
 
-        $data = \json_decode($response->getBody()->getContents(), true);
-        $data['access_token'] = $data['accessToken'];
-        return $this->parseAccessToken(\json_encode($data));
-    }
+	/**
+	 * Get the access token for the given code.
+	 *
+	 * @param string $code
+	 *
+	 * @return \Overtrue\Socialite\AccessToken
+	 */
+	public function getAccessToken($code)
+	{
+		$response = $this->getHttpClient()->post($this->getTokenUrl(), [
+			'form_params' => $this->getTokenFields($code),
+		]);
 
-    /**
-     * Get the raw user for the given access token.
-     *
-     * @param \Overtrue\Socialite\AccessTokenInterface $token
-     *
-     * @return array
-     */
-    protected function getUserByToken(AccessTokenInterface $token)
-    {
+		$data = \json_decode($response->getBody()->getContents(), true);
+		$data['access_token'] = $data['accessToken'];
+		return $this->parseAccessToken(\json_encode($data));
+	}
+
+	/**
+	 * Get the raw user for the given access token.
+	 * @param AccessTokenInterface $token
+	 * @return mixed
+	 */
+	protected function getUserByToken(AccessTokenInterface $token)
+	{
 		$data = [
 			'access_token' => $token->getToken()
 		];
-        $response = $this->getHttpClient()->post($this->getUserInfoUrl(), [
-            'form_params' => $data
-        ]);
+		$response = $this->getHttpClient()->post($this->getUserInfoUrl(), [
+			'form_params' => $data
+		]);
 
-        return \json_decode($response->getBody()->getContents(), true);
-    }
+		return \json_decode($response->getBody()->getContents(), true);
+	}
 }

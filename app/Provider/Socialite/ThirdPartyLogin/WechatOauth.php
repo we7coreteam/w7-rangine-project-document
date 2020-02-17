@@ -6,20 +6,19 @@ use Overtrue\Socialite\Providers\WeChatProvider;
 
 class WechatOauth extends WeChatProvider
 {
-    use OauthTrait;
+	use OauthTrait;
 
-    public function getAppUnionId()
-    {
-        return '2';
-    }
+	public function getAppUnionId()
+	{
+		return '2';
+	}
 
-    /**
-     * Get the token URL for the provider.
-     *
-     * @return string
-     */
-    protected function getTokenUrl()
-    {
-        return parent::getTokenUrl();
-    }
+	/**
+	 * Get the token URL for the provider.
+	 * @return mixed
+	 */
+	protected function getTokenUrl()
+	{
+		return parent::getTokenUrl();
+	}
 }
