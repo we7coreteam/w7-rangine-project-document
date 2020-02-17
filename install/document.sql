@@ -121,7 +121,7 @@ DROP TABLE IF EXISTS `ims_setting`;
 CREATE TABLE `ims_setting` (
   `id` int(10) UNSIGNED NOT NULL,
   `key` varchar(60) NOT NULL,
-  `value` varchar(1000) NOT NULL
+  `value` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
