@@ -28,13 +28,13 @@ class ThirdPartyLoginController extends BaseController
 		return true;
 	}
 
-	public function thirdPartyLoginChannel(Request $request)
+	public function all(Request $request)
 	{
 		$this->check($request);
 
 		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginSetting();
 		$data = [];
-		foreach($setting['channel'] as $key => $item) {
+		foreach ($setting['channel'] as $key => $item) {
 			$data[] = [
 				'id' => $key,
 				'name' => $item['setting']['name'],
@@ -44,7 +44,7 @@ class ThirdPartyLoginController extends BaseController
 		return $this->data($data);
 	}
 
-	public function getThirdPartyLoginChannelById(Request $request)
+	public function getById(Request $request)
 	{
 		$this->check($request);
 		$params = $this->validate($request, [
@@ -53,11 +53,11 @@ class ThirdPartyLoginController extends BaseController
 		try {
 			return $this->data(ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($params['id']));
 		} catch (\Throwable $e) {
-		throw new ErrorHttpException($e->getMessage());
+			throw new ErrorHttpException($e->getMessage());
 		}
 	}
 	
-	public function saveThirdPartyLogin(Request $request) 
+	public function add(Request $request)
 	{
 		$this->check($request);
 		$params = $this->validate($request, [
@@ -88,7 +88,7 @@ class ThirdPartyLoginController extends BaseController
 		}
 	}
 
-	public function updateThirdPartyLoginChannelById(Request $request)
+	public function updateById(Request $request)
 	{
 		$this->check($request);
 		$params = $this->validate($request, [
@@ -120,7 +120,7 @@ class ThirdPartyLoginController extends BaseController
 		}
 	}
 
-	public function deleteThirdPartyLoginChannelById(Request $request)
+	public function deleteById(Request $request)
 	{
 		$this->check($request);
 		$params = $this->validate($request, [
@@ -134,7 +134,8 @@ class ThirdPartyLoginController extends BaseController
 		}
 	}
 
-	public function setDefaultLoginChannel(Request $request) {
+	public function setDefaultLoginChannel(Request $request)
+	{
 		$this->check($request);
 
 		$defaultLoginChannel = $request->post('default_login_channel', '');
@@ -147,7 +148,8 @@ class ThirdPartyLoginController extends BaseController
 		return $this->data('success');
 	}
 
-	public function getDefaultLoginChannel(Request $request) {
+	public function getDefaultLoginChannel(Request $request)
+	{
 		$this->check($request);
 		
 		return $this->data(ThirdPartyLoginLogic::instance()->getDefaultLoginSetting());

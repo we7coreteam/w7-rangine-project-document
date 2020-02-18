@@ -59,13 +59,22 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 
 	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix'=>'/third-party-login'], function (\W7\Core\Route\Route $route){
 		//文档管理设置
-		$route->post('/all', 'Admin\ThirdPartyLoginController@thirdPartyLoginChannel');
-		$route->post('/add', 'Admin\ThirdPartyLoginController@saveThirdPartyLogin');
-		$route->post('/detail', 'Admin\ThirdPartyLoginController@getThirdPartyLoginChannelById');
-		$route->post('/update', 'Admin\ThirdPartyLoginController@updateThirdPartyLoginChannelById');
-		$route->post('/delete', 'Admin\ThirdPartyLoginController@deleteThirdPartyLoginChannelById');
+		$route->post('/all', 'Admin\ThirdPartyLoginController@all');
+		$route->post('/add', 'Admin\ThirdPartyLoginController@add');
+		$route->post('/detail', 'Admin\ThirdPartyLoginController@getById');
+		$route->post('/update', 'Admin\ThirdPartyLoginController@updateById');
+		$route->post('/delete', 'Admin\ThirdPartyLoginController@deleteById');
 		$route->post('/set-default-channel', 'Admin\ThirdPartyLoginController@setDefaultLoginChannel');
 		$route->post('/get-default-channel', 'Admin\ThirdPartyLoginController@getDefaultLoginChannel');
+	});
+
+	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix'=>'/menu'], function (\W7\Core\Route\Route $route){
+		//文档管理设置
+		$route->post('/all', 'Admin\MenuSettingController@all');
+		$route->post('/add', 'Admin\MenuSettingController@add');
+		$route->post('/detail', 'Admin\MenuSettingController@getById');
+		$route->post('/update', 'Admin\MenuSettingController@updateById');
+		$route->post('/delete', 'Admin\MenuSettingController@deleteById');
 	});
 
 	$route->middleware('CheckFounderMiddleware')->group([], function (\W7\Core\Route\Route $route){
