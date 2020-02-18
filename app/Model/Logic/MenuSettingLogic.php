@@ -12,7 +12,12 @@ class MenuSettingLogic extends BaseLogic
 	public function all()
 	{
 		$setting = $this->getMenuSetting();
-		return $setting['list'] ?? [];
+		$data = $setting['list'] ?? [];
+		foreach ($data as $index => &$item) {
+			$item['id'] = $index;
+		}
+
+		return $data;
 	}
 
 	public function getMenuSetting()
