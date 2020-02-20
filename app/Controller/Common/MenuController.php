@@ -10,6 +10,12 @@ class MenuController extends BaseController
 {
 	public function setting(Request $request)
 	{
-		return $this->data(MenuSettingLogic::instance()->getMenuSetting());
+		$setting = MenuSettingLogic::instance()->getMenuSetting();
+		$list = $setting['list'] ?? [];
+		foreach ($list as $index => &$item) {
+			$item['id'] = $index;
+		}
+		$setting['list'] = array_values($list);
+		return $this->data($setting);
 	}
 }

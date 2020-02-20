@@ -17,7 +17,7 @@ class MenuSettingLogic extends BaseLogic
 			$item['id'] = $index;
 		}
 
-		return $data;
+		return array_values($data);
 	}
 
 	public function getMenuSetting()
