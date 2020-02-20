@@ -64,4 +64,17 @@ class MenuSettingLogic extends BaseLogic
 
 		return true;
 	}
+
+	public function setTheme($theme)
+	{
+		$setting = $this->getMenuSetting();
+		$setting['theme'] = $theme;
+		SettingLogic::instance()->save(self::MENU_SETTING_KEY, $setting);
+	}
+
+	public function getTheme()
+	{
+		$setting = $this->getMenuSetting();
+		return $setting['theme'] ?? '';
+	}
 }

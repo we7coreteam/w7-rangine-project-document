@@ -84,4 +84,22 @@ class MenuSettingController extends BaseController
 
 		return $this->data('success');
 	}
+
+	public function setTheme(Request $request)
+	{
+		$this->check($request);
+		$params = $this->validate($request, [
+			'theme' => 'required'
+		]);
+
+		MenuSettingLogic::instance()->setTheme($params['theme']);
+
+		return $this->data('success');
+	}
+
+	public function getTheme(Request $request)
+	{
+		$this->check($request);
+		return $this->data(MenuSettingLogic::instance()->getTheme());
+	}
 }
