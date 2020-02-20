@@ -466,7 +466,7 @@ class DocumentController extends BaseController
 	{
 		$params = $this->validate($request, [
 			'document_id' => 'required|integer',
-			'user_id' => 'required|integer',
+			'username' => 'required',
 		]);
 
 		$user = $request->getAttribute('user');
@@ -474,12 +474,15 @@ class DocumentController extends BaseController
 			throw new ErrorHttpException('您没有权限管理该文档');
 		}
 
-		Document::query()->where('id', $params['document_id'])->update(['creator_id' => $params['user_id']]);
+		if (!$user = UserLogic::instance()->getByUserName($params['username'])) {
+			throw new ErrorHttpException('该用户不存在');
+		}
+		Document::query()->where('id', $params['document_id'])->update(['creator_id' => $user->id]);
 		$managerPermission = DocumentPermissionLogic::instance()->getByDocIdAndPermission($params['document_id'], DocumentPermission::MANAGER_PERMISSION);
 		if ($managerPermission) {
 			$managerPermission->delete();
 		}
-		DocumentPermissionLogic::instance()->add($params['document_id'], $params['user_id'], DocumentPermission::MANAGER_PERMISSION);
+		DocumentPermissionLogic::instance()->add($params['document_id'], $user->id, DocumentPermission::MANAGER_PERMISSION);
 
 		return $this->data('success');
 	}
