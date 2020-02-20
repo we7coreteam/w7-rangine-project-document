@@ -470,7 +470,7 @@ class DocumentController extends BaseController
 		]);
 
 		$user = $request->getAttribute('user');
-		if (!$user->isManager && !$user->isManager) {
+		if (!$user->isManager) {
 			throw new ErrorHttpException('您没有权限管理该文档');
 		}
 
