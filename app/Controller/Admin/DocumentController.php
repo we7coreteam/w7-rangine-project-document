@@ -461,4 +461,26 @@ class DocumentController extends BaseController
 
 		return $document;
 	}
+
+	public function changeDocumentFounder(Request $request)
+	{
+		$params = $this->validate($request, [
+			'document_id' => 'required|integer',
+			'user_id' => 'required|integer',
+		]);
+
+		$user = $request->getAttribute('user');
+		if (!$user->isManager && !$user->isFounder) {
+			throw new ErrorHttpException('您没有权限管理该文档');
+		}
+
+		Document::query()->where('id', $params['document_id'])->update(['creator_id' => $params['user_id']]);
+		$managerPermission = DocumentPermissionLogic::instance()->getByDocIdAndPermission($params['document_id'], DocumentPermission::MANAGER_PERMISSION);
+		if ($managerPermission) {
+			$managerPermission->delete();
+		}
+		DocumentPermissionLogic::instance()->add($params['document_id'], $params['user_id'], DocumentPermission::MANAGER_PERMISSION);
+
+		return $this->data('success');
+	}
 }

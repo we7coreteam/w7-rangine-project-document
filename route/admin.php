@@ -22,6 +22,7 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 		$route->post('/create', 'Admin\DocumentController@create');
 		$route->post('/operate-log', 'Admin\DocumentController@operateLog');
 		$route->post('/delete-operate-log', 'Admin\DocumentController@deleteOperateLog');
+		$route->post('/change-founder', 'Admin\DocumentController@changeDocumentFounder');
 	});
 
 	//文档内容管理
@@ -75,6 +76,8 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 		$route->post('/detail', 'Admin\MenuSettingController@getById');
 		$route->post('/update', 'Admin\MenuSettingController@updateById');
 		$route->post('/delete', 'Admin\MenuSettingController@deleteById');
+		$route->post('/set-theme', 'Admin\MenuSettingController@setTheme');
+		$route->post('/get-theme', 'Admin\MenuSettingController@getTheme');
 	});
 
 	$route->middleware('CheckFounderMiddleware')->group([], function (\W7\Core\Route\Route $route){
