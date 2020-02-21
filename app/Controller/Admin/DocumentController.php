@@ -58,8 +58,8 @@ class DocumentController extends BaseController
 							'name' => $row->user->username
 						],
 						'operator' => [
-							'name' => $lastOperate->operateDesc,
-							'time' => $lastOperate->created_at
+							'name' => $lastOperate && $lastOperate->operateDesc,
+							'time' => $lastOperate && $lastOperate->created_at->toDateTimeString()
 						],
 						'has_star' => $star ? true : false,
 						'description' => $row->descriptionShort,
@@ -96,8 +96,8 @@ class DocumentController extends BaseController
 							'name' => $row->document->user->username
 						],
 						'operator' => [
-							'name' => $lastOperate->operateDesc,
-							'time' => $lastOperate->created_at
+							'name' => $lastOperate && $lastOperate->operateDesc,
+							'time' => $lastOperate && $lastOperate->created_at->toDateTimeString()
 						],
 						'has_star' => $star ? true : false,
 						'description' => $row->document->descriptionShort,
