@@ -59,7 +59,7 @@ class DocumentController extends BaseController
 						],
 						'operator' => [
 							'name' => $lastOperate->operateDesc,
-							'time' => $lastOperate->created_at->toDateTimeString()
+							'time' => $lastOperate->created_at
 						],
 						'has_star' => $star ? true : false,
 						'description' => $row->descriptionShort,
@@ -88,7 +88,7 @@ class DocumentController extends BaseController
 			if (!empty($document)) {
 				foreach ($document as $i => $row) {
 					$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->document_id)->first();
-					$lastOperate = UserOperateLog::query()->where('document_id', '=', $row->id)->whereIn('operate', [UserOperateLog::CREATE, UserOperateLog::DELETE, UserOperateLog::DELETE])->latest();
+					$lastOperate = UserOperateLog::query()->where('document_id', '=', $row->id)->whereIn('operate', [UserOperateLog::CREATE, UserOperateLog::DELETE, UserOperateLog::DELETE])->latest()->first();
 					$result['data'][] = [
 						'id' => $row->document->id,
 						'name' => $row->document->name,
@@ -97,7 +97,7 @@ class DocumentController extends BaseController
 						],
 						'operator' => [
 							'name' => $lastOperate->operateDesc,
-							'time' => $lastOperate->created_at->toDateTimeString()
+							'time' => $lastOperate->created_at
 						],
 						'has_star' => $star ? true : false,
 						'description' => $row->document->descriptionShort,
