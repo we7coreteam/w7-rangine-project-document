@@ -32,6 +32,8 @@ class DocumentController extends BaseController
 		$keyword = trim($request->input('keyword'));
 		$page = intval($request->post('page'));
 		$pageSize = intval($request->post('page_size'));
+		$isPublic = $request->post('is_public');
+		$role = $request->post('role');
 		$onlyRead = $request->post('only_reader');
 
 		$user = $request->getAttribute('user');
@@ -40,6 +42,9 @@ class DocumentController extends BaseController
 			$query = Document::query()->with('user')->orderByDesc('id');
 			if (!empty($keyword)) {
 				$query->where('name', 'LIKE', "%{$keyword}%");
+			}
+			if (!empty($isPublic)) {
+				$query->where('is_public', '=', $isPublic);
 			}
 			/**
 			 * @var LengthAwarePaginator $result
@@ -70,6 +75,14 @@ class DocumentController extends BaseController
 			}
 		} else {
 			$permissions = [DocumentPermission::MANAGER_PERMISSION, DocumentPermission::OPERATOR_PERMISSION];
+			//$role代表为创建者
+			if ($role == 1) {
+				$permissions = [DocumentPermission::MANAGER_PERMISSION];
+			}
+			//$role为2代表为参与者
+			if ($role == 2) {
+				$permissions = [DocumentPermission::OPERATOR_PERMISSION];
+			}
 			if ($onlyRead) {
 				$permissions = [DocumentPermission::READER_PERMISSION];
 			}
@@ -79,6 +92,11 @@ class DocumentController extends BaseController
 			if (!empty($keyword)) {
 				$query->whereHas('document', function ($query) use ($keyword) {
 					return $query->where('name', 'LIKE', "%{$keyword}%");
+				});
+			}
+			if (!empty($isPublic)) {
+				$query->whereHas('document', function ($query) use ($isPublic) {
+					return $query->where('is_public', '=', $isPublic);
 				});
 			}
 
