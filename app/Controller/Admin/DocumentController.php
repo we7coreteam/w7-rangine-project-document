@@ -51,6 +51,7 @@ class DocumentController extends BaseController
 				foreach ($document as $i => $row) {
 					$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->id)->first();
 					$lastOperate = UserOperateLog::query()->where('document_id', '=', $row->id)->whereIn('operate', [UserOperateLog::CREATE, UserOperateLog::DELETE, UserOperateLog::DELETE])->latest();
+					var_dump($lastOperate);
 					$result['data'][] = [
 						'id' => $row->id,
 						'name' => $row->name,
