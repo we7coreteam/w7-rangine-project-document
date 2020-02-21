@@ -26,4 +26,18 @@ class UserOperateLog extends BaseModel
 	{
 		return $this->hasOne(Document::class, 'id', 'document_id');
 	}
+
+	public function getOperateDescAttribute()
+	{
+		switch ($this->operate) {
+			case self::CREATE:
+				return '创建';
+			case self::PREVIEW:
+				return '预览';
+			case self::EDIT:
+				return '编辑';
+			case self::DELETE:
+				return '删除';
+		}
+	}
 }

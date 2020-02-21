@@ -50,11 +50,16 @@ class DocumentController extends BaseController
 			if (!empty($document)) {
 				foreach ($document as $i => $row) {
 					$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->id)->first();
+					$lastOperate = UserOperateLog::query()->where('document_id', '=', $row->id)->whereIn('operate', [UserOperateLog::CREATE, UserOperateLog::DELETE, UserOperateLog::DELETE])->latest();
 					$result['data'][] = [
 						'id' => $row->id,
 						'name' => $row->name,
 						'author' => [
 							'name' => $row->user->username
+						],
+						'operator' => [
+							'name' => $lastOperate->operateDesc,
+							'time' => $lastOperate->created_at->toDateTimeString()
 						],
 						'has_star' => $star ? true : false,
 						'description' => $row->descriptionShort,
@@ -83,11 +88,16 @@ class DocumentController extends BaseController
 			if (!empty($document)) {
 				foreach ($document as $i => $row) {
 					$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->document_id)->first();
+					$lastOperate = UserOperateLog::query()->where('document_id', '=', $row->id)->whereIn('operate', [UserOperateLog::CREATE, UserOperateLog::DELETE, UserOperateLog::DELETE])->latest();
 					$result['data'][] = [
 						'id' => $row->document->id,
 						'name' => $row->document->name,
 						'author' => [
 							'name' => $row->document->user->username
+						],
+						'operator' => [
+							'name' => $lastOperate->operateDesc,
+							'time' => $lastOperate->created_at->toDateTimeString()
 						],
 						'has_star' => $star ? true : false,
 						'description' => $row->document->descriptionShort,
