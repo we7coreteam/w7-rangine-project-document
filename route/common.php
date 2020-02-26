@@ -25,6 +25,8 @@ irouter()->post('/common/verifycode/image', 'Common\VerifyCodeController@image')
 
 //登录退出
 irouter()->post('/common/auth/login', 'Common\AuthController@login');
+irouter()->middleware('AppCheckMiddleware')
+	->post('/common/auth/login-by-app', 'Common\AuthController@loginByAppId');
 irouter()->post('/common/auth/method', 'Common\AuthController@method');
 
 irouter()->middleware('CheckAuthMiddleware')

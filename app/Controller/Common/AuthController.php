@@ -26,106 +26,6 @@ use W7\Http\Message\Server\Request;
 
 class AuthController extends BaseController
 {
-	public function login(Request $request)
-	{
-		$data = $this->validate($request, [
-			'username' => 'required',
-			'userpass' => 'required',
-			'code' => 'required',
-		], [
-			'username.required' => '用户名不能为空',
-			'userpass.required' => '密码不能为空',
-			'code.required' => '验证码不能为空',
-		]);
-		$code = $request->session->get('img_code');
-		if (strtolower($data['code']) != strtolower($code)) {
-			throw new ErrorHttpException('请输入正确的验证码');
-		}
-
-		$user = UserLogic::instance()->getByUserName($data['username']);
-		if (empty($user)) {
-			throw new ErrorHttpException('用户名或密码错误，请检查');
-		}
-
-		if ($user->userpass != UserLogic::instance()->userPwdEncryption($user->username, $data['userpass'])) {
-			throw new ErrorHttpException('用户名或密码错误，请检查');
-		}
-
-		if (!empty($user->is_ban)) {
-			throw new ErrorHttpException('您使用的用户已经被禁用，请联系管理员');
-		}
-
-		$request->session->destroy();
-
-		$request->session->set('user', [
-			'uid' => $user->id,
-			'username' => $user->username,
-		]);
-
-		return $this->data('success');
-	}
-
-	public function logout(Request $request)
-	{
-		$request->session->destroy();
-		return $this->data('success');
-	}
-
-	public function method(Request $request) {
-		$redirectUrl = $request->post('redirect_url');
-		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginSetting();
-		$data = [];
-		/**
-		 * @var SocialiteManager $socialite
-		 */
-		$socialite = iloader()->get(SocialiteManager::class);
-		//获取可用的第三方登录列表
-		foreach($setting['channel'] as $key => $item) {
-			if (!empty($item['setting']['enable'])) {
-				try{
-					$redirect = $socialite->config(new Config([
-						'client_id' =>  $item['setting']['app_id'],
-						'client_secret' =>  $item['setting']['secret_key'],
-						'redirect_url' => ienv('API_HOST') . 'login?app_id=' . $key . '&redirect_url=' . $redirectUrl
-					]))->driver($key)->stateless()->redirect()->getTargetUrl();
-				} catch(Throwable $e) {
-					
-				}
-
-				$data[] = [
-					'id' => $key,
-					'name' => $item['setting']['name'],
-					'logo' => $item['setting']['logo'],
-					'redirect_url' => $redirect
-				];
-			}
-		}
-		return $this->data($data);
-	}
-
-	public function defaultLoginUrl(Request $request)
-	{
-		$redirectUrl = $request->post('redirect_url');
-		$defaultSetting = ThirdPartyLoginLogic::instance()->getDefaultLoginSetting();
-		if (!empty($defaultSetting['default_login_channel']) && $setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($defaultSetting['default_login_channel'])) {
-			/**
-			 * @var SocialiteManager $socialite
-			 */
-			$socialite = iloader()->get(SocialiteManager::class);
-			try{
-				return $this->data($socialite->config(new Config([
-					'client_id' =>  $setting['setting']['app_id'],
-					'client_secret' =>  $setting['setting']['secret_key'],
-					'redirect_url' => ienv('API_HOST') . 'login?app_id=' . $defaultSetting['default_login_channel'] . '&redirect_url=' . $redirectUrl
-				]))->driver($defaultSetting['default_login_channel'])->stateless()->redirect()->getTargetUrl());
-			} catch(Throwable $e) {
-				throw new ErrorHttpException($e->getMessage());
-			}
-		}
-		
-		return $this->data('');
-	}
-
 	public function user(Request $request)
 	{
 		$userSession = $request->session->get('user');
@@ -183,7 +83,7 @@ class AuthController extends BaseController
 		if ($userOldPass && $user->userpass != UserLogic::instance()->userPwdEncryption($user->username, $userOldPass)) {
 			throw new ErrorHttpException('旧密码错误');
 		}
-		
+
 		$updateUser['id'] = $user->id;
 		$updateUser['username'] = empty($userName) ? $user->username : $userName;
 		!empty($updateUser['username']) && $updateUser['userpass'] = $userOldPass;
@@ -196,7 +96,132 @@ class AuthController extends BaseController
 		}
 	}
 
-	public function thirdPartyLogin(Request $request) {
+	public function login(Request $request)
+	{
+		$data = $this->validate($request, [
+			'username' => 'required',
+			'userpass' => 'required',
+			'code' => 'required',
+		], [
+			'username.required' => '用户名不能为空',
+			'userpass.required' => '密码不能为空',
+			'code.required' => '验证码不能为空',
+		]);
+		$code = $request->session->get('img_code');
+		if (strtolower($data['code']) != strtolower($code)) {
+			throw new ErrorHttpException('请输入正确的验证码');
+		}
+
+		$user = UserLogic::instance()->getByUserName($data['username']);
+		if (empty($user)) {
+			throw new ErrorHttpException('用户名或密码错误，请检查');
+		}
+
+		if ($user->userpass != UserLogic::instance()->userPwdEncryption($user->username, $data['userpass'])) {
+			throw new ErrorHttpException('用户名或密码错误，请检查');
+		}
+
+		if (!empty($user->is_ban)) {
+			throw new ErrorHttpException('您使用的用户已经被禁用，请联系管理员');
+		}
+
+		$request->session->destroy();
+
+		$request->session->set('user', [
+			'uid' => $user->id,
+			'username' => $user->username,
+		]);
+
+		return $this->data('success');
+	}
+
+	public function loginByAppId(Request $request)
+	{
+		$app = $request->getAttribute('app');
+
+		if (empty($app->user_id)) {
+			$user = [
+				'username' => $app->name . $app->appid,
+				'userpass' => trim($app->appid),
+			];
+			$data['remark'] = $app->name;
+			try {
+				$app->user_id = UserLogic::instance()->createUser($user);
+			} catch (Throwable $e) {
+				throw new ErrorHttpException($e->getMessage());
+			}
+
+			$app->save();
+		}
+
+		$user = UserLogic::instance()->getByUid($app->user_id);
+		$request->session->destroy();
+		$request->session->set('user', [
+			'uid' => $user->id,
+			'username' => $user->username,
+		]);
+
+		return $this->data('success');
+	}
+
+	public function method(Request $request)
+	{
+		$redirectUrl = $request->post('redirect_url');
+		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginSetting();
+		$data = [];
+		/**
+		 * @var SocialiteManager $socialite
+		 */
+		$socialite = iloader()->get(SocialiteManager::class);
+		//获取可用的第三方登录列表
+		foreach ($setting['channel'] as $key => $item) {
+			if (!empty($item['setting']['enable'])) {
+				try {
+					$redirect = $socialite->config(new Config([
+						'client_id' => $item['setting']['app_id'],
+						'client_secret' => $item['setting']['secret_key'],
+						'redirect_url' => ienv('API_HOST') . 'login?app_id=' . $key . '&redirect_url=' . $redirectUrl
+					]))->driver($key)->stateless()->redirect()->getTargetUrl();
+				} catch (Throwable $e) {
+					null;
+				}
+
+				$data[] = [
+					'id' => $key,
+					'name' => $item['setting']['name'],
+					'logo' => $item['setting']['logo'],
+					'redirect_url' => $redirect
+				];
+			}
+		}
+		return $this->data($data);
+	}
+
+	public function defaultLoginUrl(Request $request)
+	{
+		$redirectUrl = $request->post('redirect_url');
+		$defaultSetting = ThirdPartyLoginLogic::instance()->getDefaultLoginSetting();
+		if (!empty($defaultSetting['default_login_channel']) && $setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($defaultSetting['default_login_channel'])) {
+			/**
+			 * @var SocialiteManager $socialite
+			 */
+			$socialite = iloader()->get(SocialiteManager::class);
+			try {
+				return $this->data($socialite->config(new Config([
+					'client_id' => $setting['setting']['app_id'],
+					'client_secret' => $setting['setting']['secret_key'],
+					'redirect_url' => ienv('API_HOST') . 'login?app_id=' . $defaultSetting['default_login_channel'] . '&redirect_url=' . $redirectUrl
+				]))->driver($defaultSetting['default_login_channel'])->stateless()->redirect()->getTargetUrl());
+			} catch (Throwable $e) {
+				throw new ErrorHttpException($e->getMessage());
+			}
+		}
+		
+		return $this->data('');
+	}
+
+	public function thirdPartyLogin(Request $request)
+	{
 		$code = $request->input('code');
 		if (empty($code)) {
 			throw new ErrorHttpException('Code码错误');
@@ -311,6 +336,12 @@ class AuthController extends BaseController
 			'username' => $user->username,
 		]);
 
+		return $this->data('success');
+	}
+
+	public function logout(Request $request)
+	{
+		$request->session->destroy();
 		return $this->data('success');
 	}
 }
