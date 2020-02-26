@@ -13,7 +13,7 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 	//管理文档列表
 	$route->post('/document/all', 'Admin\DocumentController@all');
 	$route->post('/document/all-by-uid', 'Admin\DocumentController@getAllByUid');
-	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix'=>'/document'], function (\W7\Core\Route\Route $route){
+	$route->middleware(['AppAuthMiddleware', 'BackendDocumentPermissionMiddleware'])->group(['prefix'=>'/document'], function (\W7\Core\Route\Route $route){
 		//文档管理设置
 		$route->post('/detail', 'Admin\DocumentController@detail');
 		$route->post('/operator', 'Admin\DocumentController@operator');
@@ -26,7 +26,7 @@ irouter()->middleware(['CheckAuthMiddleware'])->group(['prefix'=>'/admin'], func
 	});
 
 	//文档内容管理
-	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix'=>'/chapter'], function (\W7\Core\Route\Route $route){
+	$route->middleware(['AppAuthMiddleware', 'BackendDocumentPermissionMiddleware'])->group(['prefix'=>'/chapter'], function (\W7\Core\Route\Route $route){
 		//文档管理设置
 		$route->post('/detail', 'Admin\ChapterController@detail');
 		$route->post('/create', 'Admin\ChapterController@create');

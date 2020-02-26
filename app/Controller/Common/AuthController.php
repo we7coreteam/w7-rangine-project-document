@@ -135,35 +135,6 @@ class AuthController extends BaseController
 		return $this->data('success');
 	}
 
-	public function loginByAppId(Request $request)
-	{
-		$app = $request->getAttribute('app');
-
-		if (empty($app->user_id)) {
-			$user = [
-				'username' => $app->name . $app->appid,
-				'userpass' => trim($app->appid),
-			];
-			$data['remark'] = $app->name;
-			try {
-				$app->user_id = UserLogic::instance()->createUser($user);
-			} catch (Throwable $e) {
-				throw new ErrorHttpException($e->getMessage());
-			}
-
-			$app->save();
-		}
-
-		$user = UserLogic::instance()->getByUid($app->user_id);
-		$request->session->destroy();
-		$request->session->set('user', [
-			'uid' => $user->id,
-			'username' => $user->username,
-		]);
-
-		return $this->data('success');
-	}
-
 	public function method(Request $request)
 	{
 		$redirectUrl = $request->post('redirect_url');
