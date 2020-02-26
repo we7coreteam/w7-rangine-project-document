@@ -8,7 +8,7 @@ class AppLogic extends BaseLogic
 {
 	public function getByAppId($appId)
 	{
-		if (empty($appid)) {
+		if (empty($appId)) {
 			throw new \RuntimeException('Invalid appid');
 		}
 		return App::where('appid', '=', $appId)->first();
