@@ -11,7 +11,7 @@ class CreateUserThirdParty extends Migration {
 	 */
 	public function up() {
 		$this->schema->create('user_third_party', function (Blueprint $table) {
-			$table->bigIncrements('id');
+			$table->increments('id');
 			$table->integer('uid');
 			$table->string('openid', '200');
 			$table->string('username', '100');
