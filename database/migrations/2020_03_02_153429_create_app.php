@@ -15,7 +15,7 @@ class CreateApp extends Migration {
 			$table->string('name', '30');
 			$table->string('appid', '18');
 			$table->string('appsecret', '64');
-			$table->integer('user_id');
+			$table->integer('user_id')->comment('用户id,一个appid对应一个用户');
 		});
 	}
 
