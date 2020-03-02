@@ -216,7 +216,7 @@ class AuthController extends BaseController
 		]))->driver($appId)->stateless();
 
 		$user = $driver->user($driver->getAccessToken($code));
-		//添加QQ用户数据
+		//获取第三方数据
 		$userInfo = [
 			'uid' => $user->uid,
 			'username' => $user->username
@@ -228,7 +228,9 @@ class AuthController extends BaseController
 		$loginSetting = ThirdPartyLoginLogic::instance()->getDefaultLoginSetting();
 		$user = OauthLogic::instance()->getThirdPartyUserByUsernameUid($userInfo['uid'], $userInfo['username']);
 		if (empty($user)) {
+			//判断是否需要绑定文档用户
 			if (empty($loginSetting['is_need_bind'])) {
+				//不需要绑定的话，直接创建新用户
 				$localUsername = 'tpl_' . $userInfo['username'] . $userInfo['uid'];
 				$uid = UserLogic::instance()->createBucket($localUsername);
 			} else {
@@ -257,7 +259,12 @@ class AuthController extends BaseController
 		}
 
 		$request->session->destroy();
+		//记录第三方登录app_id
+		$request->session->set('user-source-app', $appId);
+
+		//需要绑定用户
 		if (!empty($loginSetting['is_need_bind']) && empty($user)) {
+			//保存第三方用户信息，触发用户绑定
 			$request->session->set('third-party-user', $localUser);
 			return $this->data([
 				'is_need_bind' => true
@@ -301,6 +308,7 @@ class AuthController extends BaseController
 		]);
 
 		$request->session->destroy();
+		//记录第三方登录app_id
 		$request->session->set('user-source-app', $thirdPartyUser['app_id']);
 		$request->session->set('user', [
 			'uid' => $user->id,
