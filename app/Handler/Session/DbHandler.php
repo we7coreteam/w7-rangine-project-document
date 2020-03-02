@@ -27,7 +27,6 @@ class DbHandler extends HandlerAbstract
 		if (empty($session) || $session->expired_at < time()) {
 			return '';
 		}
-		$this->write($session_id, $session->data);
 		return $session->data;
 	}
 
@@ -51,5 +50,10 @@ class DbHandler extends HandlerAbstract
 			$session->save();
 		}
 		return true;
+	}
+
+	public function gc($maxlifetime)
+	{
+		Session::query()->where('expired_at', '<', time() - $maxlifetime)->delete();
 	}
 }

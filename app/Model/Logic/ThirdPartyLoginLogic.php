@@ -17,12 +17,14 @@ use W7\Core\Helper\Traiter\InstanceTraiter;
 class ThirdPartyLoginLogic extends BaseLogic
 {
 	use InstanceTraiter;
+
 	const THIRD_PARTY_LOGIN_SETTING_KEY = 'third_party_login';
 
 	public function __construct()
 	{
 		$setting = $this->getThirdPartyLoginSetting();
 		if (empty($setting['channel'])) {
+			//qq，微信为默认项
 			$setting['channel'] = [
 				'1' => [
 					'is_default' => true,
