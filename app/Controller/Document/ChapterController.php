@@ -14,11 +14,13 @@ namespace W7\App\Controller\Document;
 
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
+use W7\App\Model\Entity\Share;
 use W7\App\Model\Entity\Star;
 use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\App\Model\Logic\UserOperateLogic;
+use W7\App\Model\Logic\UserShareLogic;
 use W7\Http\Message\Server\Request;
 
 class ChapterController extends BaseController
@@ -69,8 +71,13 @@ class ChapterController extends BaseController
 			'chapter_id.required' => '章节id必填',
 			'chapter_id.integer' => '章节id非法'
 		]);
+		$shareKey = $request->post('share_key');
 
 		try {
+			$shareInfo = [];
+			if ($shareKey) {
+				$shareInfo = UserShareLogic::instance()->getUidAndChapterByShareKey($shareKey);
+			}
 			$chapter = ChapterLogic::instance()->getById($params['chapter_id'], $params['document_id']);
 
 			$user = $request->getAttribute('user');
@@ -84,6 +91,17 @@ class ChapterController extends BaseController
 					'chapter_id' => $params['chapter_id'],
 					'operate' => UserOperateLog::PREVIEW
 				]);
+				//如果当前用户不是分享者并且是当前章节时，添加分享记录
+				if ($shareInfo && $shareInfo[0] != $user->id && $shareInfo[1] == $params['chapter_id']) {
+					if (!Share::query()->where('sharer_id', '=', $shareInfo[0])->where('user_id', '=', $user->id)->where('chapter_id', '=', $params['chapter_id'])->exists()) {
+						Share::query()->create([
+							'sharer_id' => $shareInfo[0],
+							'user_id' => $user->id,
+							'document_id' => $params['document_id'],
+							'chapter_id' => $params['chapter_id']
+						]);
+					}
+				}
 			}
 		} catch (\Exception $e) {
 			throw new ErrorHttpException($e->getMessage());
