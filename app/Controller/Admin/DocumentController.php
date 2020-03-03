@@ -59,6 +59,7 @@ class DocumentController extends BaseController
 					$result['data'][] = [
 						'id' => $row->id,
 						'name' => $row->name,
+						'cover' => $row->cover,
 						'author' => [
 							'name' => $row->user->username
 						],
@@ -110,6 +111,7 @@ class DocumentController extends BaseController
 					$result['data'][] = [
 						'id' => $row->document->id,
 						'name' => $row->document->name,
+						'cover' => $row->cover,
 						'author' => [
 							'name' => $row->document->user->username
 						],
@@ -446,6 +448,11 @@ class DocumentController extends BaseController
 
 		if (!empty($request->input('login_preview'))) {
 			$document->is_public = $request->input('login_preview') == 2 ? Document::LOGIN_PREVIEW_DOCUMENT : Document::PRIVATE_DOCUMENT;
+		}
+
+		$cover = $request->input('cover');
+		if (isset($cover)) {
+			$document->cover = $cover;
 		}
 
 		$document->save();
