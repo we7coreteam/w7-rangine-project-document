@@ -42,14 +42,13 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 		$route->post('/delete-by-documentid', 'Admin\UserOperateLogController@deleteByDocumentId');
 	});
 
-	//搜索用户
-	$route->post('/user/search', 'Admin\UserController@search');
-
-	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix'=>'/user'], function (\W7\Core\Route\Route $route){
+	$route->group(['prefix'=>'/user'], function (\W7\Core\Route\Route $route){
 		//文档管理设置
+		$route->post('/search', 'Admin\UserController@search');
 		$route->post('/add', 'Admin\UserController@add');
 		$route->post('/detail-by-id', 'Admin\UserController@detailById');
-		$route->post('/update', 'Admin\UserController@update');
+		$route->post('/update-by-id', 'Admin\UserController@updateById');
+		$route->post('/update-self', 'Admin\UserController@updateSelf');
 		$route->post('/delete-by-ids', 'Admin\UserController@deleteByIds');
 		$route->post('/batch-update-permission', 'Admin\UserController@batchUpdateDocPermissionByUid');
 	});

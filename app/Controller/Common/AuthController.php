@@ -67,35 +67,6 @@ class AuthController extends BaseController
 		return $this->data($result);
 	}
 
-	public function updateUser(Request $request)
-	{
-		/**
-		 * @var User $user
-		 */
-		$user = $request->getAttribute('user');
-
-		$userName = trim($request->post('username'));
-		$userOldPass = trim($request->post('old_userpass'));
-		$userPass = trim($request->post('userpass'));
-		if (empty($userName) && empty($userPass)) {
-			throw new ErrorHttpException('参数错误');
-		}
-		if ($userOldPass && $user->userpass != UserLogic::instance()->userPwdEncryption($user->username, $userOldPass)) {
-			throw new ErrorHttpException('旧密码错误');
-		}
-
-		$updateUser['id'] = $user->id;
-		$updateUser['username'] = empty($userName) ? $user->username : $userName;
-		!empty($updateUser['username']) && $updateUser['userpass'] = $userOldPass;
-		$userPass && $updateUser['userpass'] = $userPass;
-		try {
-			$res = UserLogic::instance()->updateUser($updateUser);
-			return $this->data($res);
-		} catch (\Throwable $e) {
-			throw new ErrorHttpException($e->getMessage());
-		}
-	}
-
 	public function login(Request $request)
 	{
 		$data = $this->validate($request, [
