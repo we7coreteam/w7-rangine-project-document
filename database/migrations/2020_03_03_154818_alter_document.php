@@ -11,7 +11,7 @@ class AlterDocument extends Migration {
 	 */
 	public function up() {
 		$this->schema->table('document', function (Blueprint $table) {
-			$table->string('cover', 120)->after('creator_id')->nullable()->default('');
+			$table->string('cover', 120)->after('creator_id')->nullable()->default('')->comment('文档封面');
 		});
 	}
 
