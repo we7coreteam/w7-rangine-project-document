@@ -37,7 +37,7 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 		$route->post('/default-show', 'Admin\ChapterController@defaultShow');
 	});
 
-	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix'=>'/operate'], function (\W7\Core\Route\Route $route){
+	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix'=>'/operate-log'], function (\W7\Core\Route\Route $route){
 		$route->post('/all', 'Admin\UserOperateLogController@all');
 		$route->post('/delete-by-documentid', 'Admin\UserOperateLogController@deleteByDocumentId');
 	});
