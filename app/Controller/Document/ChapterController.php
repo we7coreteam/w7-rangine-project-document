@@ -14,6 +14,7 @@ namespace W7\App\Controller\Document;
 
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
+use W7\App\Model\Entity\Star;
 use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Logic\DocumentLogic;
@@ -76,7 +77,7 @@ class ChapterController extends BaseController
 			if (empty($user->isReader)) {
 				throw new ErrorHttpException('无权限阅读该文档');
 			}
-			if ($user && !empty($user->id)) {
+			if (!empty($user->id)) {
 				UserOperateLog::query()->create([
 					'user_id' => $user->id,
 					'document_id' => $params['document_id'],
@@ -99,6 +100,11 @@ class ChapterController extends BaseController
 		} else {
 			$author = $document->user;
 		}
+
+		$hasStar = false;
+		if (!empty($user->id)) {
+			$hasStar = Star::query()->where('user_id', '=', $user->id)->where('chapter_id', '=', $chapter->id)->exists();
+		}
 		$result = [
 			'id' => $chapter->id,
 			'parent_id' => $chapter->parent_id,
@@ -107,6 +113,7 @@ class ChapterController extends BaseController
 			'created_at' => $chapter->created_at->toDateTimeString(),
 			'updated_at' => $chapter->updated_at->toDateTimeString(),
 			'content' => $chapter->content->content,
+			'has_star' => $hasStar,
 			'prev_item' => [
 				'id' => $chapter->prevItem->id ?? '',
 				'name' => $chapter->prevItem->name ?? '',

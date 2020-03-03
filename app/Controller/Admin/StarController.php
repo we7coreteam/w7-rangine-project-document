@@ -19,7 +19,7 @@ class StarController extends BaseController
 		 * @var User $user
 		 */
 		$user = $request->getAttribute('user');
-		$query = Star::query()->where('user_id', '=', $user->id);
+		$query = Star::query()->where('user_id', '=', $user->id)->where('chapter_id', '=', 0);
 		if ($name) {
 			$query->whereHas('document', function ($query) use ($name) {
 				return $query->where('name', 'LIKE', "%{$name}%");
@@ -71,6 +71,7 @@ class StarController extends BaseController
 		$star = new Star();
 		$star->user_id = $user->id;
 		$star->document_id = $params['document_id'];
+		$star->chapter_id = (int)$request->post('chapter_id', 0);
 		$star->save();
 
 		return $this->data('success');
@@ -83,6 +84,7 @@ class StarController extends BaseController
 		], [
 			'document_id.required' => '文档ID必传',
 		]);
+		$chapterId = (int)$request->post('chapter_id', 0);
 
 		/**
 		 * @var User $user
@@ -97,7 +99,7 @@ class StarController extends BaseController
 			throw new ErrorHttpException('您操作的文档不存在');
 		}
 
-		Star::query()->where('document_id', '=', $params['document_id'])->where('user_id', '=', $user->id)->delete();
+		Star::query()->where('document_id', '=', $params['document_id'])->where('user_id', '=', $user->id)->where('chapter_id', '=', $chapterId)->delete();
 		return $this->data('success');
 	}
 }
