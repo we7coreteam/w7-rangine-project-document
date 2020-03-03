@@ -20,8 +20,6 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 		$route->post('/update', 'Admin\DocumentController@update');
 		$route->post('/delete', 'Admin\DocumentController@delete');
 		$route->post('/create', 'Admin\DocumentController@create');
-		$route->post('/operate-log', 'Admin\DocumentController@operateLog');
-		$route->post('/delete-operate-log', 'Admin\DocumentController@deleteOperateLog');
 		$route->post('/change-founder', 'Admin\DocumentController@changeDocumentFounder');
 	});
 
@@ -37,6 +35,11 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 		$route->post('/search', 'Admin\ChapterController@search');
 		$route->post('/sort', 'Admin\ChapterController@sort');
 		$route->post('/default-show', 'Admin\ChapterController@defaultShow');
+	});
+
+	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix'=>'/operate'], function (\W7\Core\Route\Route $route){
+		$route->post('/all', 'Admin\UserOperateLogController@all');
+		$route->post('/delete-by-documentid', 'Admin\UserOperateLogController@deleteByDocumentId');
 	});
 
 	//搜索用户
