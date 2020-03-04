@@ -42,6 +42,11 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 		$route->post('/delete-by-documentid', 'Admin\UserOperateLogController@deleteByDocumentId');
 	});
 
+	$route->group(['prefix'=>'/share'], function (\W7\Core\Route\Route $route){
+		$route->post('/all', 'Admin\UserShareController@all');
+		$route->post('/key', 'Admin\UserShareController@shareKey');
+	});
+
 	$route->group(['prefix'=>'/user'], function (\W7\Core\Route\Route $route){
 		//文档管理设置
 		$route->post('/search', 'Admin\UserController@search');
