@@ -15,7 +15,7 @@ class AppAuthMiddleware extends MiddlewareAbstract
 {
 	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
 	{
-		$params = $request->getParsedBody();
+		$params = $request->input();
 		if ((empty($params['appid']) && empty($params['sign'])) || !empty($request->session->get('user'))) {
 			return $handler->handle($request);
 		}
