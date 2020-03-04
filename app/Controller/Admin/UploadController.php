@@ -27,11 +27,6 @@ class UploadController extends BaseController
 			'file' => 'required|file|mimes:bmp,png,jpeg,jpg|max:2048'
 		]);
 
-		$user = $request->getAttribute('user');
-		if (!$user->isManager && !$user->isFounder && !$user->isOperator) {
-			throw new ErrorHttpException('您没有权限管理该文档');
-		}
-
 		$file = $request->file('file');
 
 		$fileName = sprintf('/%s.%s', irandom(32), pathinfo($file->getClientFilename(), PATHINFO_EXTENSION));

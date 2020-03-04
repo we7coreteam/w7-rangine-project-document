@@ -89,5 +89,5 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 	});
 
 	//图片上传
-	$route->middleware('BackendDocumentPermissionMiddleware')->post('/upload/image', 'Admin\UploadController@image');
+	$route->post('/upload/image', 'Admin\UploadController@image');
 });
