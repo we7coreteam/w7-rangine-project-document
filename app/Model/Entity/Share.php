@@ -9,11 +9,11 @@ class Share extends BaseModel
 
 	public function sharer()
 	{
-		return $this->belongsTo(User::class, 'id', 'sharer_id');
+		return $this->belongsTo(User::class, 'sharer_id', 'id');
 	}
 
 	public function user()
 	{
-		return $this->belongsTo(User::class, 'id', 'user_id');
+		return $this->belongsTo(User::class, 'user_id', 'id');
 	}
 }
