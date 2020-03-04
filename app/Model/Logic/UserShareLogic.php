@@ -10,9 +10,9 @@ class UserShareLogic extends BaseLogic
 
 	const SHARE_KEY = '';
 
-	public function makeShareKeyByUidAndChapterId($userId, $chapterId)
+	public function getShareUrl($userId, $documentId, $chapterId)
 	{
-		return authcode($userId . '-' . $chapterId, 'ENCODED', self::SHARE_KEY);
+		return rtrim(ienv('API_HOST'), '/') . '/chapter/' . $documentId. '?id=' . $chapterId . '&share_key=' . authcode($userId . '-' . $chapterId, 'ENCODED', self::SHARE_KEY);
 	}
 
 	public function getUidAndChapterByShareKey($shareKey)

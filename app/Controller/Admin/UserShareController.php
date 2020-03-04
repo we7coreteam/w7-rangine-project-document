@@ -27,7 +27,7 @@ class UserShareController extends BaseController
 		foreach ($list->items() as $row) {
 			$result['data'][] = [
 				'sharer_name' => $row->sharer->username,
-				'share_key' => UserShareLogic::instance()->makeShareKeyByUidAndChapterId($row->sharer_id, $row->chapter_id),
+				'share_url' => UserShareLogic::instance()->getShareUrl($row->sharer_id, $row->document_id, $row->chapter_id),
 				'user_name' => $row->user->username,
 				'time' => $row->created_at->toDateTimeString()
 			];
@@ -40,14 +40,15 @@ class UserShareController extends BaseController
 		return $this->data($result);
 	}
 
-	public function shareKey(Request $request)
+	public function shareUrl(Request $request)
 	{
 		$params = $this->validate($request, [
-			'chapter_id' => 'required'
+			'chapter_id' => 'required|integer',
+			'document_id' => 'required|integer'
 		]);
 
 		$user = $request->getAttribute('user');
 
-		return $this->data(UserShareLogic::instance()->makeShareKeyByUidAndChapterId($user->id, $params['chapter_id']));
+		return $this->data(UserShareLogic::instance()->getShareUrl($user->id, $params['document_id'], $params['chapter_id']));
 	}
 }

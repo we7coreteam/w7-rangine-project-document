@@ -44,7 +44,7 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 
 	$route->group(['prefix'=>'/share'], function (\W7\Core\Route\Route $route){
 		$route->post('/all', 'Admin\UserShareController@all');
-		$route->post('/key', 'Admin\UserShareController@shareKey');
+		$route->post('/url', 'Admin\UserShareController@shareUrl');
 	});
 
 	$route->group(['prefix'=>'/user'], function (\W7\Core\Route\Route $route){
