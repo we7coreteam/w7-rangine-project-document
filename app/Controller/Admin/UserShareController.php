@@ -11,10 +11,16 @@ class UserShareController extends BaseController
 {
 	public function all(Request $request)
 	{
+		$params = $this->validate($request, [
+			'document_id' => 'required|integer',
+		], [
+			'document_id.required' => '请指定文档',
+		]);
+
 		$page = intval($request->post('page'));
 
 		$user = $request->getAttribute('user');
-		$query = Share::query()->where('sharer_id', '=', $user->id)->orderByDesc('id');
+		$query = Share::query()->where('sharer_id', '=', $user->id)->where('document_id', '=', $params['document_id'])->orderByDesc('id');
 		$list = $query->paginate(null, '*', 'page', $page);
 
 		$result['data'] = [];
