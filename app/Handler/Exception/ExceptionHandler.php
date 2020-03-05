@@ -2,6 +2,7 @@
 
 namespace W7\App\Handler\Exception;
 
+use function GuzzleHttp\Psr7\build_query;
 use Overtrue\Socialite\Config;
 use Overtrue\Socialite\SocialiteManager;
 use Psr\Http\Message\ResponseInterface;
@@ -19,6 +20,9 @@ class ExceptionHandler extends ExceptionHandlerAbstract {
 	public function handle(ResponseExceptionAbstract $e) : ResponseInterface {
 		if ($e instanceof RouteNotFoundException || $e instanceof RouteNotAllowException) {
 			$route = icontext()->getRequest()->getUri()->getPath();
+			if (icontext()->getRequest()->getQueryParams()) {
+				$route .= '?' . build_query(icontext()->getRequest()->getQueryParams());
+			}
 			//如果访问的是admin下的路由，先检测是否登录
 			if (substr($route, 0, 12) == '/admin-login') {
 				return App::getApp()->getContext()->getResponse()->html(iloader()->singleton(View::class)->render('@public/index'));
