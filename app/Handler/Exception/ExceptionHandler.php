@@ -60,11 +60,11 @@ class ExceptionHandler extends ExceptionHandlerAbstract {
 	{
 		$defaultLoginChannel = ThirdPartyLoginLogic::instance()->getDefaultLoginSetting();
 		if (empty($defaultLoginChannel['default_login_channel'])) {
-			return '/login?redirect_url=' . $redirectUrl;
+			return '/login?redirect_url=' . urlencode($redirectUrl);
 		} else {
 			$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($defaultLoginChannel['default_login_channel']);
 			if (!$setting) {
-				return '/login?redirect_url=' . $redirectUrl;
+				return '/login?redirect_url=' . urlencode($redirectUrl);
 			} else {
 				/**
 				 * @var SocialiteManager $socialite
