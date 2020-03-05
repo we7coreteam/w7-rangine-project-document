@@ -12,12 +12,12 @@ class UserShareLogic extends BaseLogic
 
 	public function getShareUrl($userId, $documentId, $chapterId)
 	{
-		return rtrim(ienv('API_HOST'), '/') . '/chapter/' . $documentId. '?id=' . $chapterId . '&share_key=' . authcode($userId . '-' . $chapterId, 'ENCODED', self::SHARE_KEY);
+		return rtrim(ienv('API_HOST'), '/') . '/chapter/' . $documentId. '?id=' . $chapterId . '&share_key=' . urlencode(authcode($userId . '-' . $chapterId, 'ENCODED', self::SHARE_KEY));
 	}
 
 	public function getUidAndChapterByShareKey($shareKey)
 	{
-		$data = authcode($shareKey, 'DECODE', self::SHARE_KEY);
+		$data = urldecode(authcode($shareKey, 'DECODE', self::SHARE_KEY));
 		$data = explode('-', $data);
 		if (count($data) != 2) {
 			throw new \RuntimeException('share key error');
