@@ -7,6 +7,11 @@ class Share extends BaseModel
 	protected $table = 'user_share';
 	protected $primaryKey = 'id';
 
+	public function setUpdatedAt($value)
+	{
+		return null;
+	}
+
 	public function sharer()
 	{
 		return $this->belongsTo(User::class, 'sharer_id', 'id');
