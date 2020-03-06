@@ -480,6 +480,6 @@ class ChapterController extends BaseController
 			$newChapterContent->save();
 		}
 
-		return $this->data('success');
+		return $this->data($newChapter->toArray());
 	}
 }
