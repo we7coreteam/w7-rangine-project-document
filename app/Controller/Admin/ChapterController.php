@@ -300,7 +300,7 @@ class ChapterController extends BaseController
 		}
 
 		if (!empty($chapter->content)) {
-			$chapter->content->content =  $request->post('content');
+			$chapter->content->content = $request->post('content');
 			$chapter->content->save();
 		} else {
 			ChapterContent::query()->create([
@@ -367,8 +367,11 @@ class ChapterController extends BaseController
 
 	/**
 	 * 设置章节目录默认显示文章内容
+	 * @param Request $request
+	 * @return array
 	 */
-	public function defaultShow(Request $request) {
+	public function defaultShow(Request $request)
+	{
 		$this->validate($request, [
 			'chapter_id' => 'required',
 			'show_chapter_id' => 'required',
@@ -385,7 +388,7 @@ class ChapterController extends BaseController
 		$showChapterId = intval($request->post('show_chapter_id'));
 		$showChapter = ChapterLogic::instance()->getById($showChapterId);
 
-		if (($chapterId && empty($chapter))|| empty($showChapter)) {
+		if (($chapterId && empty($chapter)) || empty($showChapter)) {
 			throw new ErrorHttpException('您要操作的章节或是目录不存在');
 		}
 
