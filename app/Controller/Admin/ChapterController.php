@@ -435,4 +435,50 @@ class ChapterController extends BaseController
 			throw new ErrorHttpException($e->getMessage());
 		}
 	}
+
+	public function copy(Request $request)
+	{
+		$params = $this->validate($request, [
+			'parent_id' => 'required',
+			'document_id' => 'required|integer|min:1',
+			'chapter_id' => 'required|integer|min:1',
+		]);
+
+		$user = $request->getAttribute('user');
+		if (!$user->isOperator) {
+			throw new ErrorHttpException('您没有权限管理该文档');
+		}
+		if ($params['parent_id']) {
+			$chapter = ChapterLogic::instance()->getById($params['parent_id']);
+			if (!$chapter) {
+				throw new ErrorHttpException('目标章节不存在');
+			}
+		}
+		$chapter = ChapterLogic::instance()->getById($params['chapter_id']);
+		if (!$chapter) {
+			throw new ErrorHttpException('章节不存在');
+		}
+
+		$maxSort = Chapter::query()->where('document_id', '=', $params['document_id'])->where('parent_id', '=', $params['parent_id'])->max('sort');
+		$sort = intval($request->post('sort', ++$maxSort));
+
+		$newChapter = new Chapter();
+		$newChapter->parent_id = $params['parent_id'];
+		$newChapter->name = $chapter->name;
+		$newChapter->document_id = $params['document_id'];
+		$newChapter->sort = $sort;
+		$newChapter->is_dir = $chapter->is_dir;
+		$newChapter->save();
+
+		$chapterContent = ChapterContent::query()->where('chapter_id', '=', $params['chapter_id'])->first();
+		if ($chapterContent) {
+			$newChapterContent = new ChapterContent();
+			$newChapterContent->chapter_id = $newChapter->id;
+			$newChapterContent->content = $chapterContent->content;
+			$newChapterContent->layout = $chapterContent->layout;
+			$newChapterContent->save();
+		}
+
+		return $this->data('success');
+	}
 }

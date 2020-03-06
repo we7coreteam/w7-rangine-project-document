@@ -35,6 +35,7 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 		$route->post('/search', 'Admin\ChapterController@search');
 		$route->post('/sort', 'Admin\ChapterController@sort');
 		$route->post('/default-show', 'Admin\ChapterController@defaultShow');
+		$route->post('/copy', 'Admin\ChapterController@copy');
 	});
 
 	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix'=>'/operate-log'], function (\W7\Core\Route\Route $route){
