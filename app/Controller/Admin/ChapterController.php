@@ -440,6 +440,7 @@ class ChapterController extends BaseController
 	{
 		$params = $this->validate($request, [
 			'parent_id' => 'required',
+			'name' => 'required',
 			'document_id' => 'required|integer|min:1',
 			'chapter_id' => 'required|integer|min:1',
 		]);
@@ -464,7 +465,7 @@ class ChapterController extends BaseController
 
 		$newChapter = new Chapter();
 		$newChapter->parent_id = $params['parent_id'];
-		$newChapter->name = $chapter->name;
+		$newChapter->name = $params['name'];
 		$newChapter->document_id = $params['document_id'];
 		$newChapter->sort = $sort;
 		$newChapter->is_dir = $chapter->is_dir;
