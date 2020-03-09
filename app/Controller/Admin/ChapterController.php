@@ -397,6 +397,12 @@ class ChapterController extends BaseController
 		}
 
 		if ($chapterId == 0) {
+			//找到已存在的顶级默认文章
+			$defaultShowChapter = Chapter::query()->where('document_id', '=', $showChapter->document_id)->where('parent_id', '=', 0)->where('default_show_chapter_id', '!=', 0)->first();
+			if ($defaultShowChapter) {
+				$defaultShowChapter->default_show_chapter_id = 0;
+				$defaultShowChapter->save();
+			}
 			$chapter = $showChapter;
 		}
 
