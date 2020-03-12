@@ -71,9 +71,7 @@ class ThirdPartyLoginController extends BaseController
 			'setting.name.required' => 'name必填',
 			'setting.logo.required' => 'logo必传',
 			'setting.app_id.required' => 'app_id必填',
-			'setting.secret_key.required' => 'secret_key必填',
-			'setting.access_token_url.url' => '获取access_token接口地址错误',
-			'setting.user_info_url.url' => '获取用户信息接口地址错误'
+			'setting.secret_key.required' => 'secret_key必填'
 		]);
 		$params['setting']['user_info_url'] = rtrim($params['setting']['user_info_url'], '/');
 		$params['setting']['access_token_url'] = rtrim($params['setting']['access_token_url'], '/');
@@ -103,9 +101,7 @@ class ThirdPartyLoginController extends BaseController
 			'setting.name.required' => 'name必填',
 			'setting.logo.required' => 'logo必传',
 			'setting.app_id.required' => 'app_id必填',
-			'setting.secret_key.required' => 'secret_key必填',
-			'setting.access_token_url.url' => '获取access_token接口地址错误',
-			'setting.user_info_url.url' => '获取用户信息接口地址错误',
+			'setting.secret_key.required' => 'secret_key必填'
 		]);
 		$params['setting']['user_info_url'] = rtrim($params['setting']['user_info_url'], '/');
 		$params['setting']['access_token_url'] = rtrim($params['setting']['access_token_url'], '/');

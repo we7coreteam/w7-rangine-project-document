@@ -24,8 +24,13 @@ class We7Oauth extends AbstractProvider implements ProviderInterface
 			'appid' => $this->clientId
 		];
 
+		$headers = [];
+		if (ienv('OAUTH_TEST')) {
+			$headers['User-Agent'] = 'we7test-develop';
+		}
 		$response = (new Client())->post('http://api.w7.cc/oauth/login-url/index', [
 			'form_params' => $data,
+			'headers' => $headers
 		]);
 
 		$result = $response->getBody()->getContents();

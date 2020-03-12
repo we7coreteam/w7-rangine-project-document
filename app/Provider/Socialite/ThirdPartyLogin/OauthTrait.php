@@ -13,10 +13,6 @@ trait OauthTrait
 
 	private function initConfig()
 	{
-		if ($this->config) {
-			return true;
-		}
-
 		$config = iloader()->get(ThirdPartyLoginLogic::class)->getThirdPartyLoginChannelById($this->getAppUnionId());
 		if (!$config['setting']) {
 			throw new \RuntimeException('授权登陆方式 ' . $this->getAppUnionId() . ' 不存在');
