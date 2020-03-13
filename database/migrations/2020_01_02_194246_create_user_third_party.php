@@ -16,7 +16,6 @@ class CreateUserThirdParty extends Migration {
 			$table->string('openid', '200');
 			$table->string('username', '100');
 			$table->smallInteger('source');
-			$table->timestamps();
 		});
 	}
 
