@@ -12,11 +12,11 @@ class CreateUserShare extends Migration {
 	public function up() {
 		$this->schema->create('user_share', function (Blueprint $table) {
 			$table->increments('id');
-			$table->integer('sharer_id')->comment('分享者id');
+			$table->integer('sharer_id')->index()->comment('分享者id');
 			$table->integer('user_id')->comment('接收分享的用户id');
-			$table->integer('document_id');
+			$table->integer('document_id')->index();
 			$table->integer('chapter_id');
-			$table->timestamps();
+			$table->timestamp('created_at');
 		});
 	}
 

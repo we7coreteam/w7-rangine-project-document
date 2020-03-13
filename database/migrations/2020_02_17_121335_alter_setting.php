@@ -11,7 +11,7 @@ class AlterSetting extends Migration {
 	 */
 	public function up() {
 		$this->schema->table('setting', function (Blueprint $table) {
-			$table->text('value')->after('key');
+			$table->text('value')->after('key')->change();
 		});
 	}
 
@@ -22,7 +22,7 @@ class AlterSetting extends Migration {
 	 */
 	public function down() {
 		$this->schema->table('setting', function (Blueprint $table) {
-			$table->string('value', 1000)->after('key');
+			$table->string('value', 1000)->after('key')->change();
 		});
 	}
 }
