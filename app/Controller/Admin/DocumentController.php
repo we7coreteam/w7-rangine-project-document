@@ -452,7 +452,8 @@ class DocumentController extends BaseController
 		Document::query()->where('id', $params['document_id'])->update(['creator_id' => $user->id]);
 		$managerPermission = DocumentPermissionLogic::instance()->getByDocIdAndPermission($params['document_id'], DocumentPermission::MANAGER_PERMISSION);
 		if ($managerPermission) {
-			$managerPermission->delete();
+			$managerPermission->permission = DocumentPermission::OPERATOR_PERMISSION;
+			$managerPermission->save();
 		}
 		DocumentPermissionLogic::instance()->add($params['document_id'], $user->id, DocumentPermission::MANAGER_PERMISSION);
 
