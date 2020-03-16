@@ -41,7 +41,7 @@ class StarController extends BaseController
 				],
 				'is_public' => $row->document->isPublicDoc,
 				'document_id' => $row->document->id,
-				'chapter_id' => $row->document->id
+				'chapter_id' => $row->chapter->id
 			];
 		}
 
