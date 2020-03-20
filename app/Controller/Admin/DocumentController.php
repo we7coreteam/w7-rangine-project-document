@@ -295,10 +295,6 @@ class DocumentController extends BaseController
 		$permission = intval($request->post('permission'));
 		$documentId = intval($request->post('document_id'));
 
-		if ($uid == $user->id) {
-			throw new ErrorHttpException('不能添加自己为管理员');
-		}
-
 		/**
 		 * permission 值不存在时，意味着删除权限
 		 * 只要权限合适，减少判断直接删除
