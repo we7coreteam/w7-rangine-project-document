@@ -16,7 +16,7 @@ class CreateUserShare extends Migration {
 			$table->integer('user_id')->comment('接收分享的用户id');
 			$table->integer('document_id')->index();
 			$table->integer('chapter_id');
-			$table->timestamp('created_at');
+			$table->integer('created_at');
 		});
 	}
 
