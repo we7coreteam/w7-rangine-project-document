@@ -497,7 +497,7 @@ class DocumentController extends BaseController
 		}
 		//删除该用户在源文档上的权限
 		$originPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($params['document_id'], $targetUser->id);
-		if (!$originPermission) {
+		if ($originPermission) {
 			$originPermission->delete();
 		}
 		//设置目标用户为管理员
