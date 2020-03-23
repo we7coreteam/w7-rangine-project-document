@@ -31,7 +31,7 @@ class UserOperateLogController extends BaseController
 		if ($time) {
 			$query = $query->where('created_at', '<', time() - 86400 * $time);
 		}
-		$list = $query->paginate(null, ['user_id', 'document_id', 'operate', 'remark', 'created_at'], 'page', $page);
+		$list = $query->paginate(null, ['id', 'user_id', 'document_id', 'operate', 'remark', 'created_at'], 'page', $page);
 		foreach ($list->items() as $i => $row) {
 			$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->document_id)->first();
 			$result['data'][] = [
@@ -76,7 +76,7 @@ class UserOperateLogController extends BaseController
 		if ($time) {
 			$query = $query->where('created_at', '<', time() - 86400 * $time);
 		}
-		$list = $query->paginate(null, ['user_id', 'document_id', 'operate', 'remark', 'created_at'], 'page', $page);
+		$list = $query->paginate(null, ['id', 'user_id', 'document_id', 'operate', 'remark', 'created_at'], 'page', $page);
 		foreach ($list->items() as $i => $row) {
 			$result['data'][] = [
 				'id' => $row->id,
