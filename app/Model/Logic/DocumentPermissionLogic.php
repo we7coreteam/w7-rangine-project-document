@@ -43,7 +43,7 @@ class DocumentPermissionLogic extends BaseLogic
 		return true;
 	}
 
-	private function updateByDocIdAndUid($documentId, $userId, $permission)
+	public function updateByDocIdAndUid($documentId, $userId, $permission)
 	{
 		if (!Document::query()->find($documentId)) {
 			throw new \RuntimeException('该文档不存在');
@@ -53,7 +53,7 @@ class DocumentPermissionLogic extends BaseLogic
 		$documentPermission = $this->getByDocIdAndUid($documentId, $userId);
 		if (!$permission) {
 			$documentPermission && $documentPermission->delete();
-			return true;
+			return $documentPermission;
 		}
 		if (!$documentPermission) {
 			$documentPermission = new DocumentPermission();
@@ -67,21 +67,7 @@ class DocumentPermissionLogic extends BaseLogic
 			throw new \RuntimeException('文档权限变更失败');
 		}
 
-		return true;
-	}
-
-	public function addByUidAndDocPermissions($userId, array $documentPermissions)
-	{
-		idb()->beginTransaction();
-		try {
-			foreach ($documentPermissions as $documentPermission) {
-				$this->updateByDocIdAndUid($documentPermission['document_id'], $userId, $documentPermission['permission']);
-			}
-			idb()->commit();
-		} catch (\Throwable $e) {
-			idb()->rollBack();
-			throw $e;
-		}
+		return $documentPermission;
 	}
 
 	public function getByDocIdAndUid($documentId, $userId)
