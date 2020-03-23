@@ -489,11 +489,18 @@ class DocumentController extends BaseController
 		}
 
 		Document::query()->where('id', $params['document_id'])->update(['creator_id' => $targetUser->id]);
+		//设置原管理员的权限为操作员
 		$managerPermission = DocumentPermissionLogic::instance()->getByDocIdAndPermission($params['document_id'], DocumentPermission::MANAGER_PERMISSION);
 		if ($managerPermission) {
 			$managerPermission->permission = DocumentPermission::OPERATOR_PERMISSION;
 			$managerPermission->save();
 		}
+		//删除该用户在源文档上的权限
+		$originPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($params['document_id'], $targetUser->id);
+		if (!$originPermission) {
+			$originPermission->delete();
+		}
+		//设置目标用户为管理员
 		DocumentPermissionLogic::instance()->add($params['document_id'], $targetUser->id, DocumentPermission::MANAGER_PERMISSION);
 
 		UserOperateLog::query()->create([
