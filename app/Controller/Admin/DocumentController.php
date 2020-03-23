@@ -111,7 +111,7 @@ class DocumentController extends BaseController
 					$result['data'][] = [
 						'id' => $row->document->id,
 						'name' => $row->document->name,
-						'cover' => $row->cover,
+						'cover' => $row->document->cover,
 						'author' => [
 							'name' => $row->document->user->username
 						],
