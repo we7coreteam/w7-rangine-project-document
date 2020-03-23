@@ -202,7 +202,7 @@ class ChapterController extends BaseController
 		//放入到目录节点中，但不存在排序
 		if ($position == 'inner' || $position == 'move') {
 			try {
-				ChapterLogic::instance()->moveByChapter($chapter, $targetChapter);
+				$targetChapter && ChapterLogic::instance()->moveByChapter($chapter, $targetChapter);
 			} catch (\Throwable $e) {
 				throw new ErrorHttpException($e->getMessage());
 			}
@@ -221,6 +221,9 @@ class ChapterController extends BaseController
 			}
 		}
 
+		if ($position != 'move') {
+			$targetChapter && $targetChapter = ChapterLogic::instance()->getById($targetChapter->parent_id);
+		}
 		UserOperateLog::query()->create([
 			'user_id' => $user->id,
 			'document_id' => $chapter->document_id,
