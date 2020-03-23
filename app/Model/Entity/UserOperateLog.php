@@ -8,6 +8,10 @@ class UserOperateLog extends BaseModel
 	const PREVIEW = 2;
 	const EDIT = 3;
 	const DELETE = 4;
+	const CHAPTER_MOVE = 5;
+	const CHAPTER_COPY = 6;
+	const DOCUMENT_TRANSFER = 7;
+	const SHARE = 8;
 
 	protected $table = 'user_operate_log';
 	protected $primaryKey = 'id';
@@ -20,6 +24,11 @@ class UserOperateLog extends BaseModel
 	public function user()
 	{
 		return $this->belongsTo(User::class, 'user_id', 'id');
+	}
+
+	public function targetUser()
+	{
+		return $this->belongsTo(User::class, 'target_user_id', 'id');
 	}
 
 	public function document()

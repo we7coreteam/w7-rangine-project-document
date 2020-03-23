@@ -88,8 +88,8 @@ class DocumentController extends BaseController
 				$permissions = [DocumentPermission::READER_PERMISSION];
 			}
 			$query = DocumentPermission::query()->where('user_id', '=', $user->id)
-					->whereIn('permission', $permissions)
-					->orderByDesc('id')->with('document');
+				->whereIn('permission', $permissions)
+				->orderByDesc('id')->with('document');
 			if (!empty($keyword)) {
 				$query->whereHas('document', function ($query) use ($keyword) {
 					return $query->where('name', 'LIKE', "%{$keyword}%");
@@ -351,16 +351,24 @@ class DocumentController extends BaseController
 
 		$user = $request->getAttribute('user');
 
-		$docuemnt = Document::query()->create([
+		$document = Document::query()->create([
 			'name' => trim($request->input('name')),
 			'description' => trim($request->input('description')),
 			'creator_id' => $user->id,
 			'is_public' => intval($request->post('is_public')) ?? 1,
 		]);
 
-		DocumentLogic::instance()->createCreatorPermission($docuemnt);
+		DocumentLogic::instance()->createCreatorPermission($document);
 
-		return $this->data($docuemnt->id);
+		UserOperateLog::query()->create([
+			'user_id' => $user->id,
+			'document_id' => $document->id,
+			'chapter_id' => 0,
+			'operate' => UserOperateLog::CREATE,
+			'remark' => '创建文档'
+		]);
+
+		return $this->data($document->id);
 	}
 
 	public function update(Request $request)
@@ -394,6 +402,15 @@ class DocumentController extends BaseController
 			DocumentPermission::query()->where('document_id', '=', $document->id)->where('permission', '=', DocumentPermission::READER_PERMISSION)->delete();
 		}
 
+		$user = $request->getAttribute('user');
+		UserOperateLog::query()->create([
+			'user_id' => $user->id,
+			'document_id' => $document->id,
+			'chapter_id' => 0,
+			'operate' => UserOperateLog::EDIT,
+			'remark' => '编辑文档基本信息'
+		]);
+
 		return $this->data('success');
 	}
 
@@ -401,7 +418,15 @@ class DocumentController extends BaseController
 	{
 		$document = $this->checkPermissionAndGetDocument($request);
 		try {
+			$user = $request->getAttribute('user');
 			DocumentLogic::instance()->deleteByDocument($document);
+			UserOperateLog::query()->create([
+				'user_id' => $user->id,
+				'document_id' => $document->id,
+				'chapter_id' => 0,
+				'operate' => UserOperateLog::DELETE,
+				'remark' => '删除文档'
+			]);
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());
 		}
@@ -452,6 +477,15 @@ class DocumentController extends BaseController
 			$managerPermission->save();
 		}
 		DocumentPermissionLogic::instance()->add($params['document_id'], $user->id, DocumentPermission::MANAGER_PERMISSION);
+
+		UserOperateLog::query()->create([
+			'user_id' => !empty($managerPermission->user_id) ? $managerPermission->user_id : 0,
+			'document_id' => $params['document_id'],
+			'chapter_id' => 0,
+			'target_user_id' => $user->id,
+			'operate' => UserOperateLog::DOCUMENT_TRANSFER,
+			'remark' => '转让文档到' . $user->username
+		]);
 
 		return $this->data('success');
 	}

@@ -14,11 +14,11 @@ namespace W7\App\Controller\Document;
 
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
-use W7\App\Model\Entity\Share;
 use W7\App\Model\Entity\Star;
 use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Logic\DocumentLogic;
+use W7\App\Model\Logic\UserLogic;
 use W7\App\Model\Logic\UserOperateLogic;
 use W7\App\Model\Logic\UserShareLogic;
 use W7\Http\Message\Server\Request;
@@ -93,12 +93,15 @@ class ChapterController extends BaseController
 				]);
 				//如果当前用户不是分享者并且是当前章节时，添加分享记录
 				if ($shareInfo && $shareInfo[0] != $user->id && $shareInfo[1] == $params['chapter_id']) {
-					if (!Share::query()->where('sharer_id', '=', $shareInfo[0])->where('user_id', '=', $user->id)->where('chapter_id', '=', $params['chapter_id'])->exists()) {
-						Share::query()->create([
-							'sharer_id' => $shareInfo[0],
-							'user_id' => $user->id,
+					if (!UserOperateLog::query()->where('user_id', '=', $shareInfo[0])->where('target_user_id', '=', $user->id)->where('chapter_id', '=', $params['chapter_id'])->exists()) {
+						$sharerUser = UserLogic::instance()->getByUid($shareInfo[0]);
+						UserOperateLog::query()->create([
+							'user_id' => $shareInfo[0],
 							'document_id' => $params['document_id'],
-							'chapter_id' => $params['chapter_id']
+							'chapter_id' => $params['chapter_id'],
+							'target_user_id' => $user->id,
+							'operate' => UserOperateLog::SHARE,
+							'remark' => $sharerUser->username . '分享链接' . UserShareLogic::instance()->getShareUrl($shareInfo[0], $params['document_id'], $params['chapter_id']) . '给' . $user->username
 						]);
 					}
 				}

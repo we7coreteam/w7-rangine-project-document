@@ -17,6 +17,7 @@ class UserOperateLogController extends BaseController
 		$page = intval($request->post('page'));
 		//时间按天为单位
 		$time = intval($request->post('time'));
+
 		/**
 		 * @var User $user
 		 */
@@ -30,26 +31,52 @@ class UserOperateLogController extends BaseController
 		if ($time) {
 			$query = $query->where('created_at', '<', time() - 86400 * $time);
 		}
-
 		$list = $query->paginate(null, ['user_id', 'document_id', 'operate', 'remark', 'created_at'], 'page', $page);
+		foreach ($list->items() as $i => $row) {
+			$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->document_id)->first();
+			$result['data'][] = [
+				'id' => $row->id,
+				'document_id' => $row->document->id,
+				'name' => $row->document->name,
+				'has_star' => $star ? true : false,
+				'author' => [
+					'name' => $row->document->user->username
+				],
+				'description' => $row->document->descriptionShort,
+				'is_public' => $row->document->isPublicDoc,
+				'time' => $row->created_at->toDateTimeString()
+			];
+		}
 
-		$document = $list->items();
-		if (!empty($document)) {
-			foreach ($document as $i => $row) {
-				$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->document_id)->first();
-				$result['data'][] = [
-					'id' => $row->id,
-					'document_id' => $row->document->id,
-					'name' => $row->document->name,
-					'has_star' => $star ? true : false,
-					'author' => [
-						'name' => $row->document->user->username
-					],
-					'description' => $row->document->descriptionShort,
-					'is_public' => $row->document->isPublicDoc,
-					'time' => $row->created_at->toDateTimeString()
-				];
-			}
+		$result['page_count'] = $list->lastPage();
+		$result['total'] = $list->total();
+		$result['page_current'] = $list->currentPage();
+
+		return $this->data($result);
+	}
+
+	public function getByDocument(Request $request)
+	{
+		$params = $this->validate($request, [
+			'document_id' => 'required|integer'
+		]);
+		$page = intval($request->post('page'));
+		//时间按天为单位
+		$time = intval($request->post('time'));
+
+		$query = UserOperateLog::query()->where('document_id', '=', $params['document_id'])
+			->where('operate', '!=', UserOperateLog::PREVIEW)->where('remark', '!=' . '')->orderByDesc('created_at');
+		if ($time) {
+			$query = $query->where('created_at', '<', time() - 86400 * $time);
+		}
+		$list = $query->paginate(null, ['user_id', 'document_id', 'operate', 'remark', 'created_at'], 'page', $page);
+		foreach ($list->items() as $i => $row) {
+			$result['data'][] = [
+				'id' => $row->id,
+				'document_id' => $row->document->id,
+				'remark' => $row->remark,
+				'time' => $row->created_at->toDateTimeString()
+			];
 		}
 
 		$result['page_count'] = $list->lastPage();

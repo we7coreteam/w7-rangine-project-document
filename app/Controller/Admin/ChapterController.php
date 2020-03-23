@@ -108,7 +108,8 @@ class ChapterController extends BaseController
 			'user_id' => $user->id,
 			'document_id' => $documentId,
 			'chapter_id' => $chapter->id,
-			'operate' => UserOperateLog::CREATE
+			'operate' => UserOperateLog::CREATE,
+			'remark' => '创建章节' . $chapter->name
 		]);
 
 		return $this->data($chapter->toArray());
@@ -157,7 +158,7 @@ class ChapterController extends BaseController
 			'document_id' => $chapter->document_id,
 			'chapter_id' => $chapter->id,
 			'operate' => UserOperateLog::EDIT,
-			'remark' => '编辑文档标题'
+			'remark' => '编辑章节' . $chapter->name . '基本信息'
 		]);
 
 		return $this->data('success');
@@ -227,8 +228,8 @@ class ChapterController extends BaseController
 			'user_id' => $user->id,
 			'document_id' => $chapter->document_id,
 			'chapter_id' => $chapter->id,
-			'operate' => UserOperateLog::EDIT,
-			'remark' => '移动文档'
+			'operate' => UserOperateLog::CHAPTER_MOVE,
+			'remark' => '移动章节' . $chapter->name . '到' . $targetChapter->name
 		]);
 
 		return $this->data('success');
@@ -263,13 +264,18 @@ class ChapterController extends BaseController
 				if (empty($id)) {
 					continue;
 				}
-				ChapterLogic::instance()->deleteById($id);
-				UserOperateLog::query()->create([
-					'user_id' => $user->id,
-					'document_id' => $documentId,
-					'chapter_id' => $id,
-					'operate' => UserOperateLog::DELETE
-				]);
+				$chapter = ChapterLogic::instance()->getById($id);
+				if ($chapter) {
+					ChapterLogic::instance()->deleteById($id);
+
+					UserOperateLog::query()->create([
+						'user_id' => $user->id,
+						'document_id' => $documentId,
+						'chapter_id' => $id,
+						'operate' => UserOperateLog::DELETE,
+						'删除章节' . $chapter->name
+					]);
+				}
 			}
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());
@@ -317,7 +323,7 @@ class ChapterController extends BaseController
 			'document_id' => $chapter->document_id,
 			'chapter_id' => $chapter->id,
 			'operate' => UserOperateLog::EDIT,
-			'remark' => '编辑文档内容'
+			'remark' => '编辑章节' . $chapter->name . '内容'
 		]);
 
 		return $this->data('success');
@@ -416,9 +422,9 @@ class ChapterController extends BaseController
 		UserOperateLog::query()->create([
 			'user_id' => $user->id,
 			'document_id' => $chapter->document_id,
-			'chapter_id' => $chapter->id,
+			'chapter_id' => $showChapterId,
 			'operate' => UserOperateLog::EDIT,
-			'remark' => '设置文档默认显示'
+			'remark' => '设置章节' . $chapter->name . '默认显示'
 		]);
 
 		return $this->data('success');
@@ -488,6 +494,14 @@ class ChapterController extends BaseController
 			$newChapterContent->layout = $chapterContent->layout;
 			$newChapterContent->save();
 		}
+
+		UserOperateLog::query()->create([
+			'user_id' => $user->id,
+			'document_id' => $chapter->document_id,
+			'chapter_id' => $chapter->id,
+			'operate' => UserOperateLog::CHAPTER_COPY,
+			'remark' => '复制章节' . $chapter->name . '到' . $newChapter->name
+		]);
 
 		return $this->data($newChapter->toArray());
 	}

@@ -40,6 +40,7 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 
 	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix'=>'/operate-log'], function (\W7\Core\Route\Route $route){
 		$route->post('/get-by-user', 'Admin\UserOperateLogController@getByUser');
+		$route->post('/get-by-document', 'Admin\UserOperateLogController@getByDocument');
 		$route->post('/delete-by-id', 'Admin\UserOperateLogController@deleteById');
 	});
 
