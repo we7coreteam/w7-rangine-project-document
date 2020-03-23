@@ -314,7 +314,7 @@ class DocumentController extends BaseController
 					'chapter_id' => 0,
 					'operate' => UserOperateLog::EDIT,
 					'target_user_id' => $uid,
-					'remark' => '删除用户' . $operator->username . '的' . $hasPermission->aclName . '权限'
+					'remark' => $user->username . '删除用户' . $operator->username . '的' . $hasPermission->aclName . '权限'
 				]);
 			}
 			return $this->data('success');
@@ -352,7 +352,7 @@ class DocumentController extends BaseController
 			'chapter_id' => 0,
 			'operate' => UserOperateLog::EDIT,
 			'target_user_id' => $uid,
-			'remark' => '设置用户' . $operator->username . '为' . $hasPermission->aclName
+			'remark' => $user->username . '设置用户' . $operator->username . '为' . $hasPermission->aclName
 		]);
 
 		return $this->data('success');
@@ -382,7 +382,7 @@ class DocumentController extends BaseController
 			'document_id' => $document->id,
 			'chapter_id' => 0,
 			'operate' => UserOperateLog::CREATE,
-			'remark' => '创建文档'
+			'remark' => $user->username . '创建文档'
 		]);
 
 		return $this->data($document->id);
@@ -425,7 +425,7 @@ class DocumentController extends BaseController
 			'document_id' => $document->id,
 			'chapter_id' => 0,
 			'operate' => UserOperateLog::EDIT,
-			'remark' => '编辑文档基本信息'
+			'remark' => $user->username . '编辑文档基本信息'
 		]);
 
 		return $this->data('success');
@@ -442,7 +442,7 @@ class DocumentController extends BaseController
 				'document_id' => $document->id,
 				'chapter_id' => 0,
 				'operate' => UserOperateLog::DELETE,
-				'remark' => '删除文档'
+				'remark' => $user->username . '删除文档'
 			]);
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());
@@ -484,24 +484,24 @@ class DocumentController extends BaseController
 			throw new ErrorHttpException('您没有权限管理该文档');
 		}
 
-		if (!$user = UserLogic::instance()->getByUserName($params['username'])) {
+		if (!$targetUser = UserLogic::instance()->getByUserName($params['username'])) {
 			throw new ErrorHttpException('该用户不存在');
 		}
-		Document::query()->where('id', $params['document_id'])->update(['creator_id' => $user->id]);
+		Document::query()->where('id', $params['document_id'])->update(['creator_id' => $targetUser->id]);
 		$managerPermission = DocumentPermissionLogic::instance()->getByDocIdAndPermission($params['document_id'], DocumentPermission::MANAGER_PERMISSION);
 		if ($managerPermission) {
 			$managerPermission->permission = DocumentPermission::OPERATOR_PERMISSION;
 			$managerPermission->save();
 		}
-		DocumentPermissionLogic::instance()->add($params['document_id'], $user->id, DocumentPermission::MANAGER_PERMISSION);
+		DocumentPermissionLogic::instance()->add($params['document_id'], $targetUser->id, DocumentPermission::MANAGER_PERMISSION);
 
 		UserOperateLog::query()->create([
 			'user_id' => !empty($managerPermission->user_id) ? $managerPermission->user_id : 0,
 			'document_id' => $params['document_id'],
 			'chapter_id' => 0,
-			'target_user_id' => $user->id,
+			'target_user_id' => $targetUser->id,
 			'operate' => UserOperateLog::DOCUMENT_TRANSFER,
-			'remark' => '转让文档到' . $user->username
+			'remark' => $user->username . '转让文档到' . $targetUser->username
 		]);
 
 		return $this->data('success');

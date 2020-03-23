@@ -109,7 +109,7 @@ class ChapterController extends BaseController
 			'document_id' => $documentId,
 			'chapter_id' => $chapter->id,
 			'operate' => UserOperateLog::CREATE,
-			'remark' => '创建章节' . $chapter->name
+			'remark' => $user->username . '创建章节' . $chapter->name
 		]);
 
 		return $this->data($chapter->toArray());
@@ -158,7 +158,7 @@ class ChapterController extends BaseController
 			'document_id' => $chapter->document_id,
 			'chapter_id' => $chapter->id,
 			'operate' => UserOperateLog::EDIT,
-			'remark' => '编辑章节' . $chapter->name . '基本信息'
+			'remark' => $user->username . '编辑章节' . $chapter->name . '基本信息'
 		]);
 
 		return $this->data('success');
@@ -229,7 +229,7 @@ class ChapterController extends BaseController
 			'document_id' => $chapter->document_id,
 			'chapter_id' => $chapter->id,
 			'operate' => UserOperateLog::CHAPTER_MOVE,
-			'remark' => '移动章节' . $chapter->name . '到' . $targetChapter->name
+			'remark' => $user->username . '移动章节' . $chapter->name . '到' . $targetChapter->name
 		]);
 
 		return $this->data('success');
@@ -273,7 +273,7 @@ class ChapterController extends BaseController
 						'document_id' => $documentId,
 						'chapter_id' => $id,
 						'operate' => UserOperateLog::DELETE,
-						'删除章节' . $chapter->name
+						'remark' => $user->username . '删除章节' . $chapter->name
 					]);
 				}
 			}
@@ -323,7 +323,7 @@ class ChapterController extends BaseController
 			'document_id' => $chapter->document_id,
 			'chapter_id' => $chapter->id,
 			'operate' => UserOperateLog::EDIT,
-			'remark' => '编辑章节' . $chapter->name . '内容'
+			'remark' => $user->username . '编辑章节' . $chapter->name . '内容'
 		]);
 
 		return $this->data('success');
@@ -424,7 +424,7 @@ class ChapterController extends BaseController
 			'document_id' => $chapter->document_id,
 			'chapter_id' => $showChapterId,
 			'operate' => UserOperateLog::EDIT,
-			'remark' => '设置章节' . $chapter->name . '默认显示'
+			'remark' => $user->username . '设置章节' . $chapter->name . '默认显示'
 		]);
 
 		return $this->data('success');
@@ -464,9 +464,10 @@ class ChapterController extends BaseController
 		if (!$user->isOperator) {
 			throw new ErrorHttpException('您没有权限管理该文档');
 		}
+		$parentChapter = null;
 		if ($params['parent_id']) {
-			$chapter = ChapterLogic::instance()->getById($params['parent_id']);
-			if (!$chapter) {
+			$parentChapter = ChapterLogic::instance()->getById($params['parent_id']);
+			if (!$parentChapter) {
 				throw new ErrorHttpException('目标章节不存在');
 			}
 		}
@@ -500,7 +501,7 @@ class ChapterController extends BaseController
 			'document_id' => $chapter->document_id,
 			'chapter_id' => $chapter->id,
 			'operate' => UserOperateLog::CHAPTER_COPY,
-			'remark' => '复制章节' . $chapter->name . '到' . $newChapter->name
+			'remark' => $user->username . '复制章节' . $chapter->name . '到' . !empty($parentChapter) ? $parentChapter->name : '根节点'
 		]);
 
 		return $this->data($newChapter->toArray());
