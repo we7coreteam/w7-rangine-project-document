@@ -437,6 +437,7 @@ class DocumentController extends BaseController
 		try {
 			$user = $request->getAttribute('user');
 			DocumentLogic::instance()->deleteByDocument($document);
+
 			UserOperateLog::query()->create([
 				'user_id' => $user->id,
 				'document_id' => $document->id,
@@ -483,10 +484,10 @@ class DocumentController extends BaseController
 		if (!$user->isManager) {
 			throw new ErrorHttpException('您没有权限管理该文档');
 		}
-
 		if (!$targetUser = UserLogic::instance()->getByUserName($params['username'])) {
 			throw new ErrorHttpException('该用户不存在');
 		}
+
 		Document::query()->where('id', $params['document_id'])->update(['creator_id' => $targetUser->id]);
 		$managerPermission = DocumentPermissionLogic::instance()->getByDocIdAndPermission($params['document_id'], DocumentPermission::MANAGER_PERMISSION);
 		if ($managerPermission) {
