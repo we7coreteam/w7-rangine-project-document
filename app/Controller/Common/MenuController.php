@@ -13,7 +13,7 @@ class MenuController extends BaseController
 		$setting = MenuSettingLogic::instance()->getMenuSetting();
 		$list = $setting['list'] ?? [];
 		$sorts = array_column($list, 'sort');
-		array_multisort($list, SORT_ASC, $sorts);
+		array_multisort($sorts, SORT_ASC, $list);
 		foreach ($list as $index => &$item) {
 			$item['id'] = $index;
 		}
