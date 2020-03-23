@@ -292,6 +292,11 @@ class DocumentController extends BaseController
 			}
 			$uid = $findUser->id;
 		}
+		$operator = UserLogic::instance()->getByUid($uid);
+		if (empty($operator)) {
+			throw new ErrorHttpException('您操作的用户不存在');
+		}
+
 		$permission = intval($request->post('permission'));
 		$documentId = intval($request->post('document_id'));
 
@@ -303,6 +308,14 @@ class DocumentController extends BaseController
 			$hasPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($documentId, $uid);
 			if (!empty($hasPermission)) {
 				$hasPermission->delete();
+				UserOperateLog::query()->create([
+					'user_id' => $user->id,
+					'document_id' => $documentId,
+					'chapter_id' => 0,
+					'operate' => UserOperateLog::EDIT,
+					'target_user_id' => $uid,
+					'remark' => '删除用户' . $operator->username . '的' . $hasPermission->aclName . '权限'
+				]);
 			}
 			return $this->data('success');
 		}
@@ -324,11 +337,6 @@ class DocumentController extends BaseController
 			throw new ErrorHttpException('管理的文档的不存在或是已经被删除');
 		}
 
-		$operator = UserLogic::instance()->getByUid($uid);
-		if (empty($operator)) {
-			throw new ErrorHttpException('您操作的用户不存在');
-		}
-
 		$hasPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($documentId, $uid);
 		if (empty($hasPermission)) {
 			$hasPermission = new DocumentPermission();
@@ -337,6 +345,15 @@ class DocumentController extends BaseController
 		}
 		$hasPermission->permission = $permission;
 		$hasPermission->save();
+
+		UserOperateLog::query()->create([
+			'user_id' => $user->id,
+			'document_id' => $documentId,
+			'chapter_id' => 0,
+			'operate' => UserOperateLog::EDIT,
+			'target_user_id' => $uid,
+			'remark' => '设置用户' . $operator->username . '为' . $hasPermission->aclName
+		]);
 
 		return $this->data('success');
 	}
