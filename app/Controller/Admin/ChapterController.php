@@ -226,7 +226,7 @@ class ChapterController extends BaseController
 			'document_id' => $chapter->document_id,
 			'chapter_id' => $chapter->id,
 			'operate' => UserOperateLog::CHAPTER_MOVE,
-			'remark' => $user->username . '移动章节' . $chapter->name . '到' . $targetChapter->name
+			'remark' => $user->username . '移动章节' . $chapter->name . '到' . !empty($targetChapter) ? $targetChapter->name : '根节点'
 		]);
 
 		return $this->data('success');
