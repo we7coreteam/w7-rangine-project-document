@@ -3,6 +3,7 @@
 namespace W7\App\Controller\Admin;
 
 use W7\App\Controller\BaseController;
+use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Star;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserOperateLog;
@@ -10,7 +11,7 @@ use W7\Http\Message\Server\Request;
 
 class UserOperateLogController extends BaseController
 {
-	public function all(Request $request)
+	public function getByUser(Request $request)
 	{
 		$name = $request->post('name');
 		$page = intval($request->post('page'));
@@ -37,7 +38,8 @@ class UserOperateLogController extends BaseController
 			foreach ($document as $i => $row) {
 				$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->document_id)->first();
 				$result['data'][] = [
-					'id' => $row->document->id,
+					'id' => $row->id,
+					'document_id' => $row->document->id,
 					'name' => $row->document->name,
 					'has_star' => $star ? true : false,
 					'author' => [
@@ -57,19 +59,24 @@ class UserOperateLogController extends BaseController
 		return $this->data($result);
 	}
 
-	public function deleteByDocumentId(Request $request)
+	public function deleteById(Request $request)
 	{
 		$params = $this->validate($request, [
 			'document_id' => 'required|integer',
+			'operate_log_id' => 'required|integer',
 		], [
 			'document_id.required' => '文档ID必传',
+			'operate_log_id.required' => '操作记录ID必传',
 		]);
 
 		/**
 		 * @var User $user
 		 */
 		$user = $request->getAttribute('user');
-		UserOperateLog::query()->where('document_id', '=', $params['document_id'])->where('user_id', '=', $user->id)->delete();
+		if (!$user->isManager) {
+			throw new ErrorHttpException('您没有权限管理该文档');
+		}
+		UserOperateLog::query()->where('id', '=', $params['operate_log_id'])->delete();
 
 		return $this->data('success');
 	}
