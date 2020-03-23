@@ -106,7 +106,11 @@ class UserOperateLogController extends BaseController
 		 * @var User $user
 		 */
 		$user = $request->getAttribute('user');
-		UserOperateLog::query()->where('id', '=', $params['operate_log_id'])->where('user_id', '=', $user->id)->delete();
+		$query = UserOperateLog::query()->where('id', '=', $params['operate_log_id']);
+		if (!$user->isManager) {
+			$query = $query->where('user_id', '=', $user->id);
+		}
+		$query->delete();
 
 		return $this->data('success');
 	}
