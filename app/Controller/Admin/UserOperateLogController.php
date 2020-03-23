@@ -73,7 +73,6 @@ class UserOperateLogController extends BaseController
 		foreach ($list->items() as $i => $row) {
 			$result['data'][] = [
 				'id' => $row->id,
-				'document_id' => $row->document->id,
 				'remark' => $row->remark,
 				'time' => $row->created_at->toDateTimeString()
 			];
