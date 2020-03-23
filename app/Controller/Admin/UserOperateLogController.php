@@ -63,9 +63,16 @@ class UserOperateLogController extends BaseController
 		$page = intval($request->post('page'));
 		//时间按天为单位
 		$time = intval($request->post('time'));
+		/**
+		 * @var User $user
+		 */
+		$user = $request->getAttribute('user');
+		if (!$user->isManager) {
+			throw new ErrorHttpException('您没有权限管理该文档');
+		}
 
 		$query = UserOperateLog::query()->where('document_id', '=', $params['document_id'])
-			->where('operate', '!=', UserOperateLog::PREVIEW)->where('remark', '!=' . '')->orderByDesc('created_at');
+			->where('operate', '!=', UserOperateLog::PREVIEW)->where('remark', '!=' , '')->orderByDesc('created_at');
 		if ($time) {
 			$query = $query->where('created_at', '<', time() - 86400 * $time);
 		}
@@ -99,10 +106,7 @@ class UserOperateLogController extends BaseController
 		 * @var User $user
 		 */
 		$user = $request->getAttribute('user');
-		if (!$user->isManager) {
-			throw new ErrorHttpException('您没有权限管理该文档');
-		}
-		UserOperateLog::query()->where('id', '=', $params['operate_log_id'])->delete();
+		UserOperateLog::query()->where('id', '=', $params['operate_log_id'])->where('user_id', '=', $user->id)->delete();
 
 		return $this->data('success');
 	}
