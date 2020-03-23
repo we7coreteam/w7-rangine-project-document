@@ -12,6 +12,8 @@ class MenuController extends BaseController
 	{
 		$setting = MenuSettingLogic::instance()->getMenuSetting();
 		$list = $setting['list'] ?? [];
+		$sorts = array_column($list, 'sort');
+		array_multisort($list, SORT_ASC, $sorts);
 		foreach ($list as $index => &$item) {
 			$item['id'] = $index;
 		}
