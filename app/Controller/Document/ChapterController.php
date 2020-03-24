@@ -51,7 +51,8 @@ class ChapterController extends BaseController
 					'user_id' => $user->id,
 					'document_id' => $params['document_id'],
 					'chapter_id' => 0,
-					'operate' => UserOperateLog::PREVIEW
+					'operate' => UserOperateLog::PREVIEW,
+					'remark' => $user->username . '阅读文档'
 				]);
 			}
 			return $this->data($result);
@@ -89,7 +90,8 @@ class ChapterController extends BaseController
 					'user_id' => $user->id,
 					'document_id' => $params['document_id'],
 					'chapter_id' => $params['chapter_id'],
-					'operate' => UserOperateLog::PREVIEW
+					'operate' => UserOperateLog::PREVIEW,
+					'remark' => $user->username . '浏览章节' . $chapter->name
 				]);
 				//如果当前用户不是分享者并且是当前章节时，添加分享记录
 				if ($shareInfo && $shareInfo[0] != $user->id && $shareInfo[1] == $params['chapter_id']) {
