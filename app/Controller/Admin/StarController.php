@@ -80,7 +80,7 @@ class StarController extends BaseController
 		$star->chapter_id = (int)$request->post('chapter_id', 0);
 		$star->save();
 
-		return $this->data($star->id);
+		return $this->data(['star_id' => $star->id]);
 	}
 
 	public function delete(Request $request)
