@@ -63,6 +63,6 @@ trait OauthTrait
 
 	public function logout(Response $response): Response
 	{
-		return $response;
+		return $response->redirect(ienv('API_HOST') . 'login');
 	}
 }
