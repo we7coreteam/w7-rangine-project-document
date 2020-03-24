@@ -28,7 +28,7 @@ class UserOperateLogController extends BaseController
 		 * @var User $user
 		 */
 		$user = $request->getAttribute('user');
-		$query = UserOperateLog::query()->where('user_id', '=', $user->id)->where('operate', '=', UserOperateLog::PREVIEW)->groupBy(['document_id'])->orderByDesc('created_at');
+		$query = UserOperateLog::query()->where('user_id', '=', $user->id)->where('operate', '=', UserOperateLog::PREVIEW)->groupBy(['document_id'])->orderByDesc('id');
 		if ($name) {
 			$query->whereHas('document', function ($query) use ($name) {
 				return $query->where('name', 'LIKE', "%{$name}%");
