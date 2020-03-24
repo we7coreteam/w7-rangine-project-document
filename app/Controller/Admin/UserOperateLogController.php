@@ -108,17 +108,19 @@ class UserOperateLogController extends BaseController
 	{
 		$params = $this->validate($request, [
 			'document_id' => 'required|integer',
-			'operate_log_id' => 'required|integer',
 		], [
-			'document_id.required' => '文档ID必传',
-			'operate_log_id.required' => '操作记录ID必传',
+			'document_id.required' => '文档ID必传'
 		]);
+		$operateLogId = $request->post('operate_log_id');
 
 		/**
 		 * @var User $user
 		 */
 		$user = $request->getAttribute('user');
-		$query = UserOperateLog::query()->where('id', '=', $params['operate_log_id']);
+		$query = UserOperateLog::query()->where('document_id', '=', $params['document_id']);
+		if ($operateLogId) {
+			$query = $query->where('id', '=', $operateLogId);
+		}
 		if (!$user->isManager) {
 			$query = $query->where('user_id', '=', $user->id);
 		}
