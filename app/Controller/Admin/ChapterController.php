@@ -184,6 +184,7 @@ class ChapterController extends BaseController
 
 		$position = $request->post('target')['position'];
 		$targetChapter = ChapterLogic::instance()->getById($request->post('target')['chapter_id']);
+
 		if ($position == 'move') {
 			$targetDocumentId = $request->post('target')['document_id'];
 			$documentPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($targetDocumentId, $user->id);
@@ -202,6 +203,10 @@ class ChapterController extends BaseController
 		//放入到目录节点中，但不存在排序
 		if ($position == 'inner' || $position == 'move') {
 			try {
+				if (empty($targetChapter)) {
+					//找到该文档的根节点中的其中一个章节
+					$targetChapter = Chapter::query()->where('document_id', $chapter->document_id)->where('parent_id', '=', 0)->first();
+				}
 				$targetChapter && ChapterLogic::instance()->moveByChapter($chapter, $targetChapter);
 			} catch (\Throwable $e) {
 				throw new ErrorHttpException($e->getMessage());
