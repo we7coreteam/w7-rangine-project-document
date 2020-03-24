@@ -288,7 +288,6 @@ class AuthController extends BaseController
 		$sourceApp = $request->session->get('user-source-app');
 		$request->session->destroy();
 
-		$response = $this->responseJson($this->data('success'));
 		if ($sourceApp) {
 			$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($sourceApp);
 			if (!$setting) {
@@ -301,10 +300,10 @@ class AuthController extends BaseController
 			return $socialite->config(new Config([
 				'client_id' => $setting['setting']['app_id'],
 				'client_secret' => $setting['setting']['secret_key']
-			]))->driver($sourceApp)->logout($response);
+			]))->driver($sourceApp)->logout($this->response());
+		} else {
+			return $this->response()->redirect(ienv('API_HOST') . 'login');
 		}
-
-		return $response;
 	}
 
 	private function saveUserInfo(Session $session, $user)

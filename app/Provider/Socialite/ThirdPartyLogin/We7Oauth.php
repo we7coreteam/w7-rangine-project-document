@@ -88,6 +88,7 @@ class We7Oauth extends AbstractProvider implements ProviderInterface
 		$data = [
 			'access_token' => $token->getToken()
 		];
+
 		$response = $this->getHttpClient()->post($this->getUserInfoUrl(), [
 			'form_params' => $data
 		]);
@@ -98,7 +99,7 @@ class We7Oauth extends AbstractProvider implements ProviderInterface
 	public function logout(Response $psrResponse): Response
 	{
 		$data = [
-			'redirect_url' => ienv('API_HOST')
+			'redirect_url' => ienv('API_HOST') . 'login'
 		];
 
 		$headers = [];
@@ -112,7 +113,7 @@ class We7Oauth extends AbstractProvider implements ProviderInterface
 
 		$result = $response->getBody()->getContents();
 		if (empty($result)) {
-			throw new \RuntimeException('获取授权地址错误');
+			throw new \RuntimeException('获取退出授权地址错误');
 		}
 
 		$result = json_decode($result, true);
