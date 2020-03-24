@@ -2,6 +2,7 @@
 
 namespace W7\App\Controller\Admin;
 
+use Illuminate\Support\Facades\DB;
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Star;
@@ -19,16 +20,18 @@ class UserOperateLogController extends BaseController
 	public function getByUser(Request $request)
 	{
 		$name = $request->post('name');
-		$page = intval($request->post('page'));
-		$pageSize = intval($request->post('page_size'));
+		$page = intval($request->post('page', 1));
+		$pageSize = intval($request->post('page_size', 15));
 		//时间按天为单位
 		$time = intval($request->post('time'));
+		$operateLogType = $request->post('operate_log_type', UserOperateLog::PREVIEW);
 
 		/**
 		 * @var User $user
 		 */
 		$user = $request->getAttribute('user');
-		$query = UserOperateLog::query()->where('user_id', '=', $user->id)->where('operate', '=', UserOperateLog::PREVIEW)->groupBy(['document_id'])->orderByDesc('id');
+
+		$query = UserOperateLog::query();
 		if ($name) {
 			$query->whereHas('document', function ($query) use ($name) {
 				return $query->where('name', 'LIKE', "%{$name}%");
@@ -37,8 +40,16 @@ class UserOperateLogController extends BaseController
 		if ($time) {
 			$query = $query->where('created_at', '<', time() - 86400 * $time);
 		}
-		$list = $query->paginate($pageSize, ['id', 'user_id', 'document_id', 'operate', 'remark', 'created_at'], 'page', $page);
-		foreach ($list->items() as $i => $row) {
+		$groupOperate = UserOperateLog::query()->where('user_id', '=', $user->id)
+			->where('operate', '=', $operateLogType)
+			->groupBy(['document_id'])->orderByDesc('id')->select([
+				'document_id',
+				DB::raw('max(id) max_id')
+			])->take($pageSize)->skip(($page - 1) * $pageSize)->getQuery();
+		$dataQuery = clone $query;
+		$dataQuery = $dataQuery->joinSub($groupOperate, 'sub', 'id', '=', 'max_id')->orderByDesc('id');
+
+		foreach ($dataQuery->get() as $i => $row) {
 			$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->document_id)->where('chapter_id', '=', 0)->first();
 			$result['data'][] = [
 				'id' => $row->id,
@@ -54,6 +65,8 @@ class UserOperateLogController extends BaseController
 			];
 		}
 
+		$query = $query->where('user_id', '=', $user->id)->where('operate', '=', $operateLogType)->groupBy(['document_id']);
+		$list = $query->paginate($pageSize, ['*'], 'page', $page);
 		$result['page_count'] = $list->lastPage();
 		$result['total'] = $list->total();
 		$result['page_current'] = $list->currentPage();
