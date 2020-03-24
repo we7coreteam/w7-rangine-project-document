@@ -112,6 +112,7 @@ class UserOperateLogController extends BaseController
 			'document_id.required' => '文档ID必传'
 		]);
 		$operateLogId = $request->post('operate_log_id');
+		$operateLogType = $request->post('operate_log_type', UserOperateLog::PREVIEW);
 
 		/**
 		 * @var User $user
@@ -120,6 +121,8 @@ class UserOperateLogController extends BaseController
 		$query = UserOperateLog::query()->where('document_id', '=', $params['document_id']);
 		if ($operateLogId) {
 			$query = $query->where('id', '=', $operateLogId);
+		} else {
+			$query = $query->where('operate', '=', $operateLogType);
 		}
 		if (!$user->isManager) {
 			$query = $query->where('user_id', '=', $user->id);
