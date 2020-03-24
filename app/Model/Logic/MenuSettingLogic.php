@@ -33,7 +33,8 @@ class MenuSettingLogic extends BaseLogic
 	public function add(array $config)
 	{
 		$setting = $this->getMenuSetting();
-		$maxId = max(array_keys($setting['list'] ?? [])) + 1;
+		$setting['list'] = $setting['list'] ?? [];
+		$maxId = !empty($setting['list']) ? max(array_keys($setting['list'])) + 1 : 1;
 		$setting['list'][$maxId] = $config;
 		SettingLogic::instance()->save(self::MENU_SETTING_KEY, $setting);
 	}
