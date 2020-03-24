@@ -285,8 +285,26 @@ class AuthController extends BaseController
 
 	public function logout(Request $request)
 	{
+		$sourceApp = $request->session->get('user-source-app');
 		$request->session->destroy();
-		return $this->data('success');
+
+		$response = $this->responseJson($this->data('success'));
+		if ($sourceApp) {
+			$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($sourceApp);
+			if (!$setting) {
+				throw new ErrorHttpException('不支持该授权方式');
+			}
+			/**
+			 * @var SocialiteManager $socialite
+			 */
+			$socialite = iloader()->get(SocialiteManager::class);
+			return $socialite->config(new Config([
+				'client_id' => $setting['setting']['app_id'],
+				'client_secret' => $setting['setting']['secret_key']
+			]))->driver($sourceApp)->logout($response);
+		}
+
+		return $response;
 	}
 
 	private function saveUserInfo(Session $session, $user)

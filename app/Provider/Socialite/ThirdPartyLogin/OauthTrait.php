@@ -5,6 +5,7 @@ namespace W7\App\Provider\Socialite\ThirdPartyLogin;
 use W7\App\Model\Logic\ThirdPartyLoginLogic;
 use Overtrue\Socialite\User;
 use RuntimeException;
+use W7\Http\Message\Server\Response;
 
 trait OauthTrait
 {
@@ -58,5 +59,10 @@ trait OauthTrait
 			$userConvert[$key] = $this->arrayItem($user, $value);
 		}
 		return new User($userConvert);
+	}
+
+	public function logout(Response $response): Response
+	{
+		return $response;
 	}
 }

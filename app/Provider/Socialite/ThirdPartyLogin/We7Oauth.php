@@ -6,7 +6,7 @@ use GuzzleHttp\Client;
 use Overtrue\Socialite\ProviderInterface;
 use Overtrue\Socialite\Providers\AbstractProvider;
 use Overtrue\Socialite\AccessTokenInterface;
-use Overtrue\Socialite\User;
+use W7\Http\Message\Server\Response;
 
 class We7Oauth extends AbstractProvider implements ProviderInterface
 {
@@ -93,5 +93,33 @@ class We7Oauth extends AbstractProvider implements ProviderInterface
 		]);
 
 		return \json_decode($response->getBody()->getContents(), true);
+	}
+
+	public function logout(Response $psrResponse): Response
+	{
+		$data = [
+			'redirect_url' => ienv('API_HOST')
+		];
+
+		$headers = [];
+		if (ienv('OAUTH_USER_AGENT')) {
+			$headers['User-Agent'] = ienv('OAUTH_USER_AGENT');
+		}
+		$response = (new Client())->post('http://api.w7.cc/oauth/logout-url/index', [
+			'form_params' => $data,
+			'headers' => $headers
+		]);
+
+		$result = $response->getBody()->getContents();
+		if (empty($result)) {
+			throw new \RuntimeException('获取授权地址错误');
+		}
+
+		$result = json_decode($result, true);
+		if (!empty($result['error'])) {
+			throw new \RuntimeException($result['error']);
+		}
+
+		return $psrResponse->redirect($result['url']);
 	}
 }
