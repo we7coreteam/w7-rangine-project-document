@@ -195,7 +195,11 @@ class AuthController extends BaseController
 		}
 
 		$loginSetting = ThirdPartyLoginLogic::instance()->getDefaultLoginSetting();
-		$user = OauthLogic::instance()->getThirdPartyUserByUsernameUid($userInfo['uid'], $userInfo['username']);
+		$user = UserThirdParty::query()->where([
+			'openid' => $userInfo['uid'],
+			'username' => $userInfo['username'],
+			'source' => $appId
+		])->first();
 		if (empty($user)) {
 			//判断是否需要绑定文档用户
 			if (empty($loginSetting['is_need_bind'])) {
