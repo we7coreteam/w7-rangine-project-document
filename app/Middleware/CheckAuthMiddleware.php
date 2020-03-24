@@ -27,7 +27,7 @@ class CheckAuthMiddleware extends MiddlewareAbstract
 		if (empty($user)) {
 			throw new ErrorHttpException('请先登录', [], 444);
 		}
-		if (!icache()->has(sprintf(UserLogic::USER_LOGOUT_AFTER_CHANGE_PWD, $user->id))) {
+		if (!icache()->has(sprintf(UserLogic::USER_LOGOUT_AFTER_CHANGE_PWD, $user['uid']))) {
 			$request->session->destroy();
 			throw new ErrorHttpException('请先登录', [], 444);
 		}

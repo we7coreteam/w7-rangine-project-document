@@ -292,6 +292,6 @@ class AuthController extends BaseController
 			'username' => $user->username,
 		]);
 		//用户在修改密码后，删除该值，触发退出操作
-		icache()->set(sprintf(UserLogic::USER_LOGOUT_AFTER_CHANGE_PWD, $user->id), 1);
+		icache()->set(sprintf(UserLogic::USER_LOGOUT_AFTER_CHANGE_PWD, $user->id), 1, 7 * 86400);
 	}
 }
