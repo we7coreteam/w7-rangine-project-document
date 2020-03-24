@@ -34,6 +34,7 @@ class DocumentController extends BaseController
 		$pageSize = intval($request->post('page_size'));
 		$isPublic = $request->post('is_public');
 		$role = $request->post('role');
+		//获取只能阅读的文档列表
 		$onlyRead = $request->post('only_reader');
 
 		$user = $request->getAttribute('user');
@@ -54,7 +55,7 @@ class DocumentController extends BaseController
 			$document = $list->items();
 			if (!empty($document)) {
 				foreach ($document as $i => $row) {
-					$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->id)->first();
+					$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->id)->where('chapter_id', '=', 0)->first();
 					$lastOperate = UserOperateLog::query()->where('document_id', '=', $row->id)->whereIn('operate', [UserOperateLog::CREATE, UserOperateLog::DELETE, UserOperateLog::EDIT])->latest()->first();
 					$result['data'][] = [
 						'id' => $row->id,
@@ -67,7 +68,7 @@ class DocumentController extends BaseController
 							'name' => !empty($lastOperate) ? $lastOperate->operateDesc : '',
 							'time' => !empty($lastOperate) ? $lastOperate->created_at->toDateTimeString() : ''
 						],
-						'has_star' => $star ? true : false,
+						'star_id' => !empty($star) ? $star->id : '',
 						'description' => $row->descriptionShort,
 						'is_public' => $row->isPublicDoc,
 						'acl' => DocumentPermissionLogic::instance()->getFounderACL(),
@@ -106,7 +107,7 @@ class DocumentController extends BaseController
 			$document = $list->items();
 			if (!empty($document)) {
 				foreach ($document as $i => $row) {
-					$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->document_id)->first();
+					$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->document_id)->where('chapter_id', '=', 0)->first();
 					$lastOperate = UserOperateLog::query()->where('document_id', '=', $row->id)->whereIn('operate', [UserOperateLog::CREATE, UserOperateLog::DELETE, UserOperateLog::EDIT])->latest()->first();
 					$result['data'][] = [
 						'id' => $row->document->id,
@@ -119,7 +120,7 @@ class DocumentController extends BaseController
 							'name' => !empty($lastOperate) ? $lastOperate->operateDesc : '',
 							'time' => !empty($lastOperate) ? $lastOperate->created_at->toDateTimeString() : ''
 						],
-						'has_star' => $star ? true : false,
+						'star_id' => !empty($star) ? $star->id : '',
 						'description' => $row->document->descriptionShort,
 						'is_public' => $row->document->isPublicDoc,
 						'acl' => $row->acl,

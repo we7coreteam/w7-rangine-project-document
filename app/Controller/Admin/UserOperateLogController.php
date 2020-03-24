@@ -11,6 +11,11 @@ use W7\Http\Message\Server\Request;
 
 class UserOperateLogController extends BaseController
 {
+	/**
+	 * 目前获取的是用户阅读过的文档数据
+	 * @param Request $request
+	 * @return array
+	 */
 	public function getByUser(Request $request)
 	{
 		$name = $request->post('name');
@@ -34,12 +39,12 @@ class UserOperateLogController extends BaseController
 		}
 		$list = $query->paginate($pageSize, ['id', 'user_id', 'document_id', 'operate', 'remark', 'created_at'], 'page', $page);
 		foreach ($list->items() as $i => $row) {
-			$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->document_id)->first();
+			$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->document_id)->where('chapter_id', '=', 0)->first();
 			$result['data'][] = [
 				'id' => $row->id,
 				'document_id' => $row->document->id,
 				'name' => $row->document->name,
-				'has_star' => $star ? true : false,
+				'star_id' => !empty($star) ? $star->id : '',
 				'author' => [
 					'name' => $row->document->user->username
 				],
@@ -56,6 +61,11 @@ class UserOperateLogController extends BaseController
 		return $this->data($result);
 	}
 
+	/**
+	 * 获取文档的所有操作记录
+	 * @param Request $request
+	 * @return array
+	 */
 	public function getByDocument(Request $request)
 	{
 		$params = $this->validate($request, [
