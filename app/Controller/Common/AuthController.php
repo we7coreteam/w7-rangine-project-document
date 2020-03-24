@@ -22,6 +22,7 @@ use W7\App\Model\Entity\UserThirdParty;
 use W7\App\Model\Logic\OauthLogic;
 use W7\App\Model\Logic\ThirdPartyLoginLogic;
 use W7\App\Model\Logic\UserLogic;
+use W7\Core\Session\Session;
 use W7\Http\Message\Server\Request;
 
 class AuthController extends BaseController
@@ -98,10 +99,7 @@ class AuthController extends BaseController
 
 		$request->session->destroy();
 
-		$request->session->set('user', [
-			'uid' => $user->id,
-			'username' => $user->username,
-		]);
+		$this->saveUserInfo($request->session, $user);
 
 		return $this->data('success');
 	}
@@ -222,11 +220,6 @@ class AuthController extends BaseController
 				'third-party-uid' => $thirdPartyUser->id,
 				'username' => $localUsername,
 			];
-		} else {
-			$localUser = [
-				'uid' => $user->bindUser->id,
-				'username' => $user->bindUser->username,
-			];
 		}
 
 		$request->session->destroy();
@@ -242,7 +235,7 @@ class AuthController extends BaseController
 			]);
 		} else {
 			$request->session->set('user-source-app', $appId);
-			$request->session->set('user', $localUser);
+			$this->saveUserInfo($request->session, $user->bindUser);
 			return $this->data('success');
 		}
 	}
@@ -281,10 +274,7 @@ class AuthController extends BaseController
 		$request->session->destroy();
 		//记录第三方登录app_id
 		$request->session->set('user-source-app', $thirdPartyUser['app_id']);
-		$request->session->set('user', [
-			'uid' => $user->id,
-			'username' => $user->username,
-		]);
+		$this->saveUserInfo($request->session, $user);
 
 		return $this->data('success');
 	}
@@ -293,5 +283,15 @@ class AuthController extends BaseController
 	{
 		$request->session->destroy();
 		return $this->data('success');
+	}
+
+	private function saveUserInfo(Session $session, $user)
+	{
+		$session->set('user', [
+			'uid' => $user->id,
+			'username' => $user->username,
+		]);
+		//用户在修改密码后，删除该值，触发退出操作
+		icache()->set(sprintf(UserLogic::USER_LOGOUT_AFTER_CHANGE_PWD, $user->id), 1);
 	}
 }

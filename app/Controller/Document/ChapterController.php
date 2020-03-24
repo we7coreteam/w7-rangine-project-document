@@ -122,9 +122,8 @@ class ChapterController extends BaseController
 			$author = $document->user;
 		}
 
-		$hasStar = false;
 		if (!empty($user->id)) {
-			$hasStar = Star::query()->where('user_id', '=', $user->id)->where('chapter_id', '=', $chapter->id)->exists();
+			$star = Star::query()->where('user_id', '=', $user->id)->where('chapter_id', '=', $chapter->id)->first();
 		}
 		$result = [
 			'id' => $chapter->id,
@@ -134,7 +133,7 @@ class ChapterController extends BaseController
 			'created_at' => $chapter->created_at->toDateTimeString(),
 			'updated_at' => $chapter->updated_at->toDateTimeString(),
 			'content' => $chapter->content->content,
-			'has_star' => $hasStar,
+			'star_id' => !empty($star) ? $star->id : '',
 			'prev_item' => [
 				'id' => $chapter->prevItem->id ?? '',
 				'name' => $chapter->prevItem->name ?? '',

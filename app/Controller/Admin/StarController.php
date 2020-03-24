@@ -86,11 +86,12 @@ class StarController extends BaseController
 	public function delete(Request $request)
 	{
 		$params = $this->validate($request, [
+			'id' => 'required|integer',
 			'document_id' => 'required|integer',
 		], [
+			'id.required' => 'ID必传',
 			'document_id.required' => '文档ID必传',
 		]);
-		$chapterId = (int)$request->post('chapter_id', 0);
 
 		/**
 		 * @var User $user
@@ -105,7 +106,8 @@ class StarController extends BaseController
 			throw new ErrorHttpException('您操作的文档不存在');
 		}
 
-		Star::query()->where('document_id', '=', $params['document_id'])->where('user_id', '=', $user->id)->where('chapter_id', '=', $chapterId)->delete();
+		Star::query()->where('user_id', '=', $user->id)->where('id', '=', $params['id'])->delete();
+
 		return $this->data('success');
 	}
 }
