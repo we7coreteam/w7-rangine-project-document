@@ -17,14 +17,13 @@ class UserOperateLogController extends BaseController
 	 * @param Request $request
 	 * @return array
 	 */
-	public function getByUser(Request $request)
+	public function getUserReaderLog(Request $request)
 	{
 		$name = $request->post('name');
 		$page = intval($request->post('page', 1));
 		$pageSize = intval($request->post('page_size', 15));
 		//时间按天为单位
 		$time = intval($request->post('time'));
-		$operateLogType = $request->post('operate_log_type', UserOperateLog::PREVIEW);
 
 		/**
 		 * @var User $user
@@ -41,8 +40,8 @@ class UserOperateLogController extends BaseController
 			$query = $query->where('created_at', '<', time() - 86400 * $time);
 		}
 		$groupOperate = UserOperateLog::query()->where('user_id', '=', $user->id)
-			->where('operate', '=', $operateLogType)
-			->groupBy(['document_id'])->orderByDesc('id')->select([
+			->where('operate', '=', UserOperateLog::PREVIEW)
+			->groupBy(['document_id'])->orderByDesc('max_id')->select([
 				'document_id',
 				DB::raw('max(id) max_id')
 			])->take($pageSize)->skip(($page - 1) * $pageSize)->getQuery();
@@ -65,7 +64,7 @@ class UserOperateLogController extends BaseController
 			];
 		}
 
-		$query = $query->where('user_id', '=', $user->id)->where('operate', '=', $operateLogType)->groupBy(['document_id']);
+		$query = $query->where('user_id', '=', $user->id)->where('operate', '=', UserOperateLog::PREVIEW)->groupBy(['document_id']);
 		$list = $query->paginate($pageSize, ['*'], 'page', $page);
 		$result['page_count'] = $list->lastPage();
 		$result['total'] = $list->total();
