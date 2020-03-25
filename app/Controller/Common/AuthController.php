@@ -19,7 +19,6 @@ use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserThirdParty;
-use W7\App\Model\Logic\OauthLogic;
 use W7\App\Model\Logic\ThirdPartyLoginLogic;
 use W7\App\Model\Logic\UserLogic;
 use W7\Core\Session\Session;
@@ -194,44 +193,50 @@ class AuthController extends BaseController
 			throw new ErrorHttpException('登录用户数据错误，请重试');
 		}
 
+		//创建用户和绑定关系
 		$loginSetting = ThirdPartyLoginLogic::instance()->getDefaultLoginSetting();
-		$user = UserThirdParty::query()->where([
+		$thirdPartyUser = UserThirdParty::query()->where([
 			'openid' => $userInfo['uid'],
 			'username' => $userInfo['username'],
 			'source' => $appId
 		])->first();
-		if (empty($user)) {
-			//判断是否需要绑定文档用户
-			if (empty($loginSetting['is_need_bind'])) {
-				//不需要绑定的话，直接创建新用户
-				$localUsername = 'tpl_' . $userInfo['username'] . $userInfo['uid'];
-				$uid = UserLogic::instance()->createBucket($localUsername);
-			} else {
-				$localUsername = $userInfo['username'];
-				$uid = 0;
-			}
-			
+
+		if (empty($thirdPartyUser)) {
 			$thirdPartyUser = UserThirdParty::query()->create([
 				'openid' => $userInfo['uid'],
 				'username' => $userInfo['username'],
-				'uid' => $uid,
+				'uid' => 0,
 				'source' => $appId,
 			]);
-
-			$localUser = [
-				'app_id' => $appId,
-				'uid' => $uid,
-				'third-party-uid' => $thirdPartyUser->id,
-				'username' => $localUsername,
-			];
 		}
+
+		$username = $thirdPartyUser->username;
+		//如果当前第三方用户绑定的用户为空，执行绑定操作
+		if (empty($thirdPartyUser->uid)) {
+			if (empty($loginSetting['is_need_bind'])) {
+				//不需要绑定已有账户的话，直接创建新用户
+				$username = 'tpl_' . $userInfo['username'] . $userInfo['uid'];
+				$thirdPartyUser->uid = UserLogic::instance()->createBucket($username);
+				$thirdPartyUser->save();
+			} else {
+				$username = $userInfo['username'];
+				$thirdPartyUser->uid = 0;
+			}
+		}
+
+		$localUser = [
+			'app_id' => $appId,
+			'uid' => $thirdPartyUser->uid,
+			'third-party-uid' => $thirdPartyUser->id,
+			'username' => $username,
+		];
 
 		$request->session->destroy();
 		//记录第三方登录app_id
 		$request->session->set('user-source-app', $appId);
 
-		//需要绑定用户
-		if (!empty($loginSetting['is_need_bind']) && empty($user)) {
+		//需要绑定已有账户
+		if (!empty($loginSetting['is_need_bind']) && empty($thirdPartyUser->uid)) {
 			//保存第三方用户信息，触发用户绑定
 			$request->session->set('third-party-user', $localUser);
 			return $this->data([
@@ -239,7 +244,7 @@ class AuthController extends BaseController
 			]);
 		} else {
 			$request->session->set('user-source-app', $appId);
-			$this->saveUserInfo($request->session, $user->bindUser);
+			$this->saveUserInfo($request->session, $thirdPartyUser->bindUser);
 			return $this->data('success');
 		}
 	}
