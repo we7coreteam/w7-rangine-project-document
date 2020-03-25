@@ -16,7 +16,7 @@ function authcode($string, $operation = 'DECODE', $key = '', $expiry = 0)
 	$key         = md5($key);
 	$keya        = md5(substr($key, 0, 16));
 	$keyb        = md5(substr($key, 16, 16));
-	$keyc        = $ckey_length ? ($operation == 'DECODE' ? substr($string, 0, $ckey_length) : substr(md5(microtime()), -$ckey_length)) : '';
+	$keyc        = $ckey_length ? ($operation == 'DECODE' ? substr($string, 0, $ckey_length) : substr(md5($key), -$ckey_length)) : '';
 
 	$cryptkey   = $keya . md5($keya . $keyc);
 	$key_length = strlen($cryptkey);
