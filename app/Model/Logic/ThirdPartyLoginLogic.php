@@ -111,17 +111,15 @@ class ThirdPartyLoginLogic extends BaseLogic
 		}
 		$config['is_default'] = $setting['channel'][$id]['is_default'] ?? false;
 		$setting['channel'][$id] = $config;
-		var_dump($config);
-		var_dump($id);
+		SettingLogic::instance()->save(self::THIRD_PARTY_LOGIN_SETTING_KEY, $setting);
+
 		if (empty($config['setting']['enable'])) {
 			$loginSetting = $this->getDefaultLoginSetting();
-			var_dump($loginSetting);
 			if (!empty($loginSetting['default_login_channel']) && $loginSetting['default_login_channel'] == $id) {
 				$loginSetting['default_login_channel'] = '';
 				$this->setDefaultLoginSetting($loginSetting);
 			}
 		}
-		SettingLogic::instance()->save(self::THIRD_PARTY_LOGIN_SETTING_KEY, $setting);
 	}
 	
 	public function setDefaultLoginSetting(array $data)
