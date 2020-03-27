@@ -24,27 +24,12 @@ class UploadController extends BaseController
 	public function image(Request $request)
 	{
 		$this->validate($request, [
-			'file' => 'required|file|mimes:bmp,png,jpeg,jpg|max:2048',
-			'chapter_id' => 'required',
-			'document_id' => 'required',
+			'file' => 'required|file|mimes:bmp,png,jpeg,jpg|max:2048'
 		]);
-
-		$user = $request->getAttribute('user');
-		if (!$user->isManager && !$user->isFounder && !$user->isOperator) {
-			throw new ErrorHttpException('您没有权限管理该文档');
-		}
-
-		$chapterId = intval($request->post('chapter_id'));
-		$documentId = intval($request->post('document_id'));
-
-		$chapter = ChapterLogic::instance()->getById($chapterId);
-		if (empty($chapter) || $chapter->document_id != $documentId) {
-			throw new ErrorHttpException('章节不存在');
-		}
 
 		$file = $request->file('file');
 
-		$fileName = sprintf('/%s/%s/%s.%s', $chapter->document_id, $chapterId, irandom(32), pathinfo($file->getClientFilename(), PATHINFO_EXTENSION));
+		$fileName = sprintf('/%s.%s', irandom(32), pathinfo($file->getClientFilename(), PATHINFO_EXTENSION));
 		try {
 			$url = CdnLogic::instance()->channel(SettingLogic::KEY_COS)->uploadFile($fileName, $file->getTmpFile());
 		} catch (\Throwable $e) {

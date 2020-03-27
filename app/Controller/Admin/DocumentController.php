@@ -32,6 +32,9 @@ class DocumentController extends BaseController
 		$keyword = trim($request->input('keyword'));
 		$page = intval($request->post('page'));
 		$pageSize = intval($request->post('page_size'));
+		$isPublic = $request->post('is_public');
+		$role = $request->post('role');
+		//获取只能阅读的文档列表
 		$onlyRead = $request->post('only_reader');
 
 		$user = $request->getAttribute('user');
@@ -41,6 +44,9 @@ class DocumentController extends BaseController
 			if (!empty($keyword)) {
 				$query->where('name', 'LIKE', "%{$keyword}%");
 			}
+			if (!empty($isPublic)) {
+				$query->where('is_public', '=', $isPublic);
+			}
 			/**
 			 * @var LengthAwarePaginator $result
 			 */
@@ -49,14 +55,20 @@ class DocumentController extends BaseController
 			$document = $list->items();
 			if (!empty($document)) {
 				foreach ($document as $i => $row) {
-					$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->id)->first();
+					$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->id)->where('chapter_id', '=', 0)->first();
+					$lastOperate = UserOperateLog::query()->where('document_id', '=', $row->id)->whereIn('operate', [UserOperateLog::CREATE, UserOperateLog::EDIT])->latest()->first();
 					$result['data'][] = [
 						'id' => $row->id,
 						'name' => $row->name,
+						'cover' => $row->cover,
 						'author' => [
 							'name' => $row->user->username
 						],
-						'has_star' => $star ? true : false,
+						'operator' => [
+							'name' => !empty($lastOperate) ? $lastOperate->operateDesc : '',
+							'time' => !empty($lastOperate) ? $lastOperate->created_at->toDateTimeString() : ''
+						],
+						'star_id' => !empty($star) ? $star->id : '',
 						'description' => $row->descriptionShort,
 						'is_public' => $row->isPublicDoc,
 						'acl' => DocumentPermissionLogic::instance()->getFounderACL(),
@@ -65,15 +77,28 @@ class DocumentController extends BaseController
 			}
 		} else {
 			$permissions = [DocumentPermission::MANAGER_PERMISSION, DocumentPermission::OPERATOR_PERMISSION];
+			//$role代表为创建者
+			if ($role == 1) {
+				$permissions = [DocumentPermission::MANAGER_PERMISSION];
+			}
+			//$role为2代表为参与者
+			if ($role == 2) {
+				$permissions = [DocumentPermission::OPERATOR_PERMISSION];
+			}
 			if ($onlyRead) {
 				$permissions = [DocumentPermission::READER_PERMISSION];
 			}
 			$query = DocumentPermission::query()->where('user_id', '=', $user->id)
-					->whereIn('permission', $permissions)
-					->orderByDesc('id')->with('document');
+				->whereIn('permission', $permissions)
+				->orderByDesc('id')->with('document');
 			if (!empty($keyword)) {
 				$query->whereHas('document', function ($query) use ($keyword) {
 					return $query->where('name', 'LIKE', "%{$keyword}%");
+				});
+			}
+			if (!empty($isPublic)) {
+				$query->whereHas('document', function ($query) use ($isPublic) {
+					return $query->where('is_public', '=', $isPublic);
 				});
 			}
 
@@ -82,14 +107,20 @@ class DocumentController extends BaseController
 			$document = $list->items();
 			if (!empty($document)) {
 				foreach ($document as $i => $row) {
-					$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->document_id)->first();
+					$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->document_id)->where('chapter_id', '=', 0)->first();
+					$lastOperate = UserOperateLog::query()->where('document_id', '=', $row->id)->whereIn('operate', [UserOperateLog::CREATE, UserOperateLog::EDIT])->latest()->first();
 					$result['data'][] = [
 						'id' => $row->document->id,
 						'name' => $row->document->name,
+						'cover' => $row->document->cover,
 						'author' => [
 							'name' => $row->document->user->username
 						],
-						'has_star' => $star ? true : false,
+						'operator' => [
+							'name' => !empty($lastOperate) ? $lastOperate->operateDesc : '',
+							'time' => !empty($lastOperate) ? $lastOperate->created_at->toDateTimeString() : ''
+						],
+						'star_id' => !empty($star) ? $star->id : '',
 						'description' => $row->document->descriptionShort,
 						'is_public' => $row->document->isPublicDoc,
 						'acl' => $row->acl,
@@ -182,70 +213,6 @@ class DocumentController extends BaseController
 		return $this->data($result);
 	}
 
-	public function operateLog(Request $request)
-	{
-		$name = $request->post('name');
-		$page = intval($request->post('page'));
-		//时间按天为单位
-		$time = intval($request->post('time'));
-		/**
-		 * @var User $user
-		 */
-		$user = $request->getAttribute('user');
-		$query = UserOperateLog::query()->where('user_id', '=', $user->id)->where('operate', '=', UserOperateLog::PREVIEW)->groupBy(['document_id'])->orderByDesc('created_at');
-		if ($name) {
-			$query->whereHas('document', function ($query) use ($name) {
-				return $query->where('name', 'LIKE', "%{$name}%");
-			});
-		}
-		if ($time) {
-			$query = $query->where('created_at', '<', time() - 86400 * $time);
-		}
-
-		$list = $query->paginate(null, ['user_id', 'document_id', 'operate', 'remark', 'created_at'], 'page', $page);
-
-		$document = $list->items();
-		if (!empty($document)) {
-			foreach ($document as $i => $row) {
-				$star = Star::query()->where('user_id', '=', $user->id)->where('document_id', '=', $row->document_id)->first();
-				$result['data'][] = [
-					'id' => $row->document->id,
-					'name' => $row->document->name,
-					'has_star' => $star ? true : false,
-					'author' => [
-						'name' => $row->document->user->username
-					],
-					'description' => $row->document->descriptionShort,
-					'is_public' => $row->document->isPublicDoc,
-					'time' => $row->created_at->toDateTimeString()
-				];
-			}
-		}
-
-		$result['page_count'] = $list->lastPage();
-		$result['total'] = $list->total();
-		$result['page_current'] = $list->currentPage();
-
-		return $this->data($result);
-	}
-
-	public function deleteOperateLog(Request $request)
-	{
-		$params = $this->validate($request, [
-			'document_id' => 'required|integer',
-		], [
-			'document_id.required' => '文档ID必传',
-		]);
-
-		/**
-		 * @var User $user
-		 */
-		$user = $request->getAttribute('user');
-		UserOperateLog::query()->where('document_id', '=', $params['document_id'])->where('user_id', '=', $user->id)->delete();
-
-		return $this->data('success');
-	}
-
 	public function detail(Request $request)
 	{
 		$document = $this->checkPermissionAndGetDocument($request);
@@ -257,6 +224,7 @@ class DocumentController extends BaseController
 		$result = [
 			'id' => $document->id,
 			'name' => $document->name,
+			'cover' => $document->cover,
 			'description' => $document->description,
 			'is_public' => $document->isPublicDoc,
 			'login_preview' => $document->is_public == Document::LOGIN_PREVIEW_DOCUMENT,
@@ -325,12 +293,13 @@ class DocumentController extends BaseController
 			}
 			$uid = $findUser->id;
 		}
+		$operator = UserLogic::instance()->getByUid($uid);
+		if (empty($operator)) {
+			throw new ErrorHttpException('您操作的用户不存在');
+		}
+
 		$permission = intval($request->post('permission'));
 		$documentId = intval($request->post('document_id'));
-
-		if ($uid == $user->id) {
-			throw new ErrorHttpException('不能添加自己为管理员');
-		}
 
 		/**
 		 * permission 值不存在时，意味着删除权限
@@ -340,6 +309,14 @@ class DocumentController extends BaseController
 			$hasPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($documentId, $uid);
 			if (!empty($hasPermission)) {
 				$hasPermission->delete();
+				UserOperateLog::query()->create([
+					'user_id' => $user->id,
+					'document_id' => $documentId,
+					'chapter_id' => 0,
+					'operate' => UserOperateLog::EDIT,
+					'target_user_id' => $uid,
+					'remark' => $user->username . '删除用户' . $operator->username . '的' . $hasPermission->aclName . '权限'
+				]);
 			}
 			return $this->data('success');
 		}
@@ -361,11 +338,6 @@ class DocumentController extends BaseController
 			throw new ErrorHttpException('管理的文档的不存在或是已经被删除');
 		}
 
-		$operator = UserLogic::instance()->getByUid($uid);
-		if (empty($operator)) {
-			throw new ErrorHttpException('您操作的用户不存在');
-		}
-
 		$hasPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($documentId, $uid);
 		if (empty($hasPermission)) {
 			$hasPermission = new DocumentPermission();
@@ -374,6 +346,15 @@ class DocumentController extends BaseController
 		}
 		$hasPermission->permission = $permission;
 		$hasPermission->save();
+
+		UserOperateLog::query()->create([
+			'user_id' => $user->id,
+			'document_id' => $documentId,
+			'chapter_id' => 0,
+			'operate' => UserOperateLog::EDIT,
+			'target_user_id' => $uid,
+			'remark' => $user->username . '设置用户' . $operator->username . '为' . $hasPermission->aclName
+		]);
 
 		return $this->data('success');
 	}
@@ -388,16 +369,24 @@ class DocumentController extends BaseController
 
 		$user = $request->getAttribute('user');
 
-		$docuemnt = Document::query()->create([
+		$document = Document::query()->create([
 			'name' => trim($request->input('name')),
 			'description' => trim($request->input('description')),
 			'creator_id' => $user->id,
 			'is_public' => intval($request->post('is_public')) ?? 1,
 		]);
 
-		DocumentLogic::instance()->createCreatorPermission($docuemnt);
+		DocumentLogic::instance()->createCreatorPermission($document);
 
-		return $this->data($docuemnt->id);
+		UserOperateLog::query()->create([
+			'user_id' => $user->id,
+			'document_id' => $document->id,
+			'chapter_id' => 0,
+			'operate' => UserOperateLog::CREATE,
+			'remark' => $user->username . '创建文档'
+		]);
+
+		return $this->data($document->id);
 	}
 
 	public function update(Request $request)
@@ -420,11 +409,25 @@ class DocumentController extends BaseController
 			$document->is_public = $request->input('login_preview') == 2 ? Document::LOGIN_PREVIEW_DOCUMENT : Document::PRIVATE_DOCUMENT;
 		}
 
+		$cover = $request->input('cover');
+		if (isset($cover)) {
+			$document->cover = $cover;
+		}
+
 		$document->save();
 
 		if ($document->is_public == Document::PUBLIC_DOCUMENT) {
 			DocumentPermission::query()->where('document_id', '=', $document->id)->where('permission', '=', DocumentPermission::READER_PERMISSION)->delete();
 		}
+
+		$user = $request->getAttribute('user');
+		UserOperateLog::query()->create([
+			'user_id' => $user->id,
+			'document_id' => $document->id,
+			'chapter_id' => 0,
+			'operate' => UserOperateLog::EDIT,
+			'remark' => $user->username . '编辑文档基本信息'
+		]);
 
 		return $this->data('success');
 	}
@@ -433,7 +436,16 @@ class DocumentController extends BaseController
 	{
 		$document = $this->checkPermissionAndGetDocument($request);
 		try {
+			$user = $request->getAttribute('user');
 			DocumentLogic::instance()->deleteByDocument($document);
+
+			UserOperateLog::query()->create([
+				'user_id' => $user->id,
+				'document_id' => $document->id,
+				'chapter_id' => 0,
+				'operate' => UserOperateLog::DELETE,
+				'remark' => $user->username . '删除文档'
+			]);
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());
 		}
@@ -460,5 +472,47 @@ class DocumentController extends BaseController
 		}
 
 		return $document;
+	}
+
+	public function changeDocumentFounder(Request $request)
+	{
+		$params = $this->validate($request, [
+			'document_id' => 'required|integer',
+			'username' => 'required',
+		]);
+
+		$user = $request->getAttribute('user');
+		if (!$user->isManager) {
+			throw new ErrorHttpException('您没有权限管理该文档');
+		}
+		if (!$targetUser = UserLogic::instance()->getByUserName($params['username'])) {
+			throw new ErrorHttpException('该用户不存在');
+		}
+
+		Document::query()->where('id', $params['document_id'])->update(['creator_id' => $targetUser->id]);
+		//设置原管理员的权限为操作员
+		$managerPermission = DocumentPermissionLogic::instance()->getByDocIdAndPermission($params['document_id'], DocumentPermission::MANAGER_PERMISSION);
+		if ($managerPermission) {
+			$managerPermission->permission = DocumentPermission::OPERATOR_PERMISSION;
+			$managerPermission->save();
+		}
+		//删除该用户在源文档上的权限
+		$originPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($params['document_id'], $targetUser->id);
+		if ($originPermission) {
+			$originPermission->delete();
+		}
+		//设置目标用户为管理员
+		DocumentPermissionLogic::instance()->add($params['document_id'], $targetUser->id, DocumentPermission::MANAGER_PERMISSION);
+
+		UserOperateLog::query()->create([
+			'user_id' => !empty($managerPermission->user_id) ? $managerPermission->user_id : 0,
+			'document_id' => $params['document_id'],
+			'chapter_id' => 0,
+			'target_user_id' => $targetUser->id,
+			'operate' => UserOperateLog::DOCUMENT_TRANSFER,
+			'remark' => $user->username . '转让文档到' . $targetUser->username
+		]);
+
+		return $this->data('success');
 	}
 }

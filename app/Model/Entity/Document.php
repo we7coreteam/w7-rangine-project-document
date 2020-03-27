@@ -24,11 +24,10 @@ class Document extends BaseModel
 
 	/**
 	 * 关联作者
-	 * @return \Illuminate\Database\Eloquent\Relations\HasOne
 	 */
 	public function user()
 	{
-		return $this->hasOne(User::class, 'id', 'creator_id');
+		return $this->belongsTo(User::class, 'creator_id', 'id');
 	}
 
 	/**

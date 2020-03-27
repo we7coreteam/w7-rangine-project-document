@@ -16,6 +16,7 @@ use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\DocumentPermission;
 use W7\App\Model\Entity\User;
+use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\DocumentPermissionLogic;
 use W7\Http\Message\Server\Request;
 use W7\App\Model\Logic\UserLogic;
@@ -111,7 +112,46 @@ class UserController extends BaseController
 		}
 	}
 
-	public function update(Request $request)
+	/**
+	 * 用户编辑用户信息，如果编辑用户名，需要提供用户密码；如果编辑用户密码，需要提供原密码和新密码
+	 * @param Request $request
+	 * @return array
+	 */
+	public function updateSelf(Request $request)
+	{
+		/**
+		 * @var User $user
+		 */
+		$user = $request->getAttribute('user');
+
+		$userName = trim($request->post('username'));
+		$userPass = trim($request->post('userpass'));
+		$userOldPass = trim($request->post('old_userpass'));
+		if (empty($userName) && empty($userPass)) {
+			throw new ErrorHttpException('参数错误');
+		}
+		if ($userOldPass && $user->userpass != UserLogic::instance()->userPwdEncryption($user->username, $userOldPass)) {
+			throw new ErrorHttpException('旧密码错误');
+		}
+
+		$updateUser['id'] = $user->id;
+		$updateUser['username'] = empty($userName) ? $user->username : $userName;
+		!empty($updateUser['username']) && $updateUser['userpass'] = $userOldPass;
+		$userPass && $updateUser['userpass'] = $userPass;
+		try {
+			$res = UserLogic::instance()->updateUser($updateUser);
+			return $this->data($res);
+		} catch (\Throwable $e) {
+			throw new ErrorHttpException($e->getMessage());
+		}
+	}
+
+	/**
+	 * 管理员编辑用户信息
+	 * @param Request $request
+	 * @return array
+	 */
+	public function updateById(Request $request)
 	{
 		/**
 		 * @var User $user
@@ -124,23 +164,16 @@ class UserController extends BaseController
 		$user = $this->validate($request, [
 			'id' => 'required',
 			'username' => 'required',
-			'userpass' => 'required',
-			'confirm_userpass' => 'required',
+			'userpass' => 'required|confirmed',
 			'remark' => '',
 		], [
 			'id.required' => '用户ID不能为空',
 			'username.required' => '用户名不能为空',
-			'userpass.required' => '密码不能为空',
-			'confirm_userpass.required' => '确认密码不能为空',
+			'userpass.required' => '密码不能为空'
 		]);
-
+		unset($user['userpass_confirmation']);
 		$user['username'] = trim($user['username']);
 		$user['userpass'] = trim($user['userpass']);
-		$user['confirm_userpass'] = trim($user['confirm_userpass']);
-		if ($user['userpass'] != $user['confirm_userpass']) {
-			throw new ErrorHttpException('密码和确认密码不一致');
-		}
-		unset($user['confirm_userpass']);
 		if ($request->input('is_ban') !== null) {
 			$user['is_ban'] = $request->input('is_ban');
 		}
@@ -196,7 +229,32 @@ class UserController extends BaseController
 		]);
 
 		try {
-			DocumentPermissionLogic::instance()->addByUidAndDocPermissions($params['user_id'], $params['document_permission']);
+			idb()->beginTransaction();
+			try {
+				foreach ($params['document_permission'] as $documentPermission) {
+					$permission = DocumentPermissionLogic::instance()->updateByDocIdAndUid($documentPermission['document_id'], $params['user_id'], $documentPermission['permission']);
+					if ($permission) {
+						if (!empty($documentPermission['permission'])) {
+							$remark = '设置用户' . $permission->user->username . '为' . $permission->aclName;
+						} else {
+							$remark = '删除用户' . $permission->user->username . '的' . $permission->aclName . '权限';
+						}
+						UserOperateLog::query()->create([
+							'user_id' => $user->id,
+							'document_id' => $documentPermission['document_id'],
+							'chapter_id' => 0,
+							'operate' => UserOperateLog::EDIT,
+							'target_user_id' => $params['user_id'],
+							'remark' => $user->username . $remark
+						]);
+					}
+				}
+				idb()->commit();
+			} catch (\Throwable $e) {
+				idb()->rollBack();
+				throw $e;
+			}
+
 			return $this->data('success');
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());

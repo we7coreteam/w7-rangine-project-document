@@ -33,7 +33,8 @@
 		"w7/rangine": "*",
 		"ext-json": "*",
 		"gregwar/captcha": "^1.1",
-		"qcloud/cos-sdk-v5": "^1.3"
+		"qcloud/cos-sdk-v5": "^1.3",
+		"overtrue/socialite": "^2.0"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "^7.0",

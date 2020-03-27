@@ -32,9 +32,9 @@ class DbHandler extends HandlerAbstract
 		}
 
 		if ($this->has($key)) {
-			$result = Cache::query()->where('key', $key)->update(['value'=>$value , 'expired_at' => $this->getTtl($ttl)]);
+			$result = Cache::query()->where('key', $key)->update(['value' => $value, 'expired_at' => $this->getTtl($ttl)]);
 		} else {
-			$result = Cache::query()->insert(['key'=>$key,'value'=>$value , 'expired_at' => $this->getTtl($ttl)]);
+			$result = Cache::query()->insert(['key' => $key,'value' => $value, 'expired_at' => $this->getTtl($ttl)]);
 		}
 		if ($result) {
 			return true;

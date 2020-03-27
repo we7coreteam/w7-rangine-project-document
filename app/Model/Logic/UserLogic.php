@@ -19,6 +19,8 @@ class UserLogic extends BaseLogic
 {
 	use InstanceTraiter;
 
+	const USER_LOGOUT_AFTER_CHANGE_PWD = 'user:logout:after:change:pwd:id:%s';
+
 	/**
 	 * 根据用户名获取用户
 	 * @param $username
@@ -79,7 +81,12 @@ class UserLogic extends BaseLogic
 			throw new \RuntimeException('用户名已经存在');
 		}
 
-		$userInfo['userpass'] = $this->userPwdEncryption($userInfo['username'], $userInfo['userpass']);
+		if (!empty($userInfo['userpass'])) {
+			$userInfo['userpass'] = $this->userPwdEncryption($userInfo['username'], $userInfo['userpass']);
+			//修改完密码后强制退出
+			icache()->delete(sprintf(self::USER_LOGOUT_AFTER_CHANGE_PWD, $userInfo['id']));
+		}
+		
 		$result = User::query()->where('id', $userInfo['id'])->update($userInfo);
 		if (!$result) {
 			throw new \RuntimeException('修改用户信息失败');
@@ -88,7 +95,7 @@ class UserLogic extends BaseLogic
 		return $result;
 	}
 
-	public function deleteByIds($ids)
+	public function deleteByIds(array $ids)
 	{
 		$docLogic = new DocumentLogic();
 

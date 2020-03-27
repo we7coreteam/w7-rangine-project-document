@@ -116,6 +116,8 @@ class ChapterLogic extends BaseLogic
 
 			UserOperateLog::query()->where('document_id', '=', $chapter->document_id)->where('chapter_id', '=', $chapterId)->delete();
 
+			StarLogic::instance()->clearByChapterId($chapterId);
+
 			CdnLogic::instance()->channel(SettingLogic::KEY_COS)->deletePath(sprintf('/%s/%s', $chapter->document_id, $chapterId));
 
 			return true;
@@ -124,7 +126,8 @@ class ChapterLogic extends BaseLogic
 		throw new \RuntimeException('章节删除失败');
 	}
 
-	public function sortByChapter(Chapter $source, Chapter $target, $position = 'before') {
+	public function sortByChapter(Chapter $source, Chapter $target, $position = 'before')
+	{
 		if ($source->parent_id != $target->parent_id) {
 			throw new \RuntimeException('文档不在一个目录内');
 		}

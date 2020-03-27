@@ -28,14 +28,20 @@ class StarController extends BaseController
 		$list = $query->paginate(null, '*', 'page', $page);
 		$data = [];
 		foreach ($list->items() as $row) {
+			if ($row->chapter_id) {
+				$name = $row->chapter->name;
+			} else {
+				$name = $row->document->name;
+			}
 			$data[] = [
 				'id' => $row->id,
-				'name' => $row->document->name,
+				'name' => $name,
 				'author' => [
 					'name' => $row->document->user->username
 				],
 				'is_public' => $row->document->isPublicDoc,
-				'document_id' => $row->document->id
+				'document_id' => $row->document->id,
+				'chapter_id' => $row->chapter->id
 			];
 		}
 
@@ -71,16 +77,19 @@ class StarController extends BaseController
 		$star = new Star();
 		$star->user_id = $user->id;
 		$star->document_id = $params['document_id'];
+		$star->chapter_id = (int)$request->post('chapter_id', 0);
 		$star->save();
 
-		return $this->data('success');
+		return $this->data(['star_id' => $star->id]);
 	}
 
 	public function delete(Request $request)
 	{
 		$params = $this->validate($request, [
+			'id' => 'required|integer',
 			'document_id' => 'required|integer',
 		], [
+			'id.required' => 'ID必传',
 			'document_id.required' => '文档ID必传',
 		]);
 
@@ -97,7 +106,8 @@ class StarController extends BaseController
 			throw new ErrorHttpException('您操作的文档不存在');
 		}
 
-		Star::query()->where('document_id', '=', $params['document_id'])->where('user_id', '=', $user->id)->delete();
+		Star::query()->where('user_id', '=', $user->id)->where('id', '=', $params['id'])->delete();
+
 		return $this->data('success');
 	}
 }

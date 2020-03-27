@@ -77,12 +77,11 @@ class ChapterController extends BaseController
 		]);
 
 		$user = $request->getAttribute('user');
-		if (!$user->isManager && !$user->isFounder && !$user->isOperator) {
+		if (!$user->isOperator) {
 			throw new ErrorHttpException('您没有权限管理该文档');
 		}
 
 		$parentId = intval($request->post('parent_id'));
-		$isDir = $request->post('is_dir');
 		if (!empty($parentId)) {
 			$parentChapter = ChapterLogic::instance()->getById($parentId);
 			if (empty($parentChapter)) {
@@ -90,6 +89,7 @@ class ChapterController extends BaseController
 			}
 		}
 
+		$isDir = $request->post('is_dir');
 		$documentId = intval($request->post('document_id'));
 		$maxSort = Chapter::query()->where('document_id', '=', $documentId)->where('parent_id', '=', $parentId)->max('sort');
 		$sort = intval($request->post('sort', ++$maxSort));
@@ -108,7 +108,8 @@ class ChapterController extends BaseController
 			'user_id' => $user->id,
 			'document_id' => $documentId,
 			'chapter_id' => $chapter->id,
-			'operate' => UserOperateLog::CREATE
+			'operate' => UserOperateLog::CREATE,
+			'remark' => $user->username . '创建章节' . $chapter->name
 		]);
 
 		return $this->data($chapter->toArray());
@@ -129,16 +130,15 @@ class ChapterController extends BaseController
 		]);
 
 		$user = $request->getAttribute('user');
-		if (!$user->isManager && !$user->isFounder && !$user->isOperator) {
+		if (!$user->isOperator) {
 			throw new ErrorHttpException('您没有权限管理该文档');
 		}
 
-		$parentId = $request->post('parent_id', null);
-		$chapterId = intval($request->post('chapter_id'));
-		$chapter = ChapterLogic::instance()->getById($chapterId);
+		$chapter = ChapterLogic::instance()->getById($request->post('chapter_id'));
 		if (empty($chapter)) {
 			throw new ErrorHttpException('章节不存在');
 		}
+		$parentId = $request->post('parent_id', null);
 		if (isset($parentId)) {
 			if ($parentId != 0) {
 				$parentChapter = ChapterLogic::instance()->getById($parentId);
@@ -157,7 +157,7 @@ class ChapterController extends BaseController
 			'document_id' => $chapter->document_id,
 			'chapter_id' => $chapter->id,
 			'operate' => UserOperateLog::EDIT,
-			'remark' => '编辑文档标题'
+			'remark' => $user->username . '编辑章节' . $chapter->name . '基本信息'
 		]);
 
 		return $this->data('success');
@@ -173,18 +173,17 @@ class ChapterController extends BaseController
 		]);
 
 		$user = $request->getAttribute('user');
-		if (!$user->isManager && !$user->isFounder && !$user->isOperator) {
+		if (!$user->isOperator) {
 			throw new ErrorHttpException('您没有权限管理该文档');
 		}
 
-		$targetChapter = ChapterLogic::instance()->getById($request->post('target')['chapter_id']);
 		$chapter = ChapterLogic::instance()->getById($request->post('chapter_id'));
-
-		$position = $request->post('target')['position'];
-
 		if (empty($chapter)) {
 			throw new ErrorHttpException('要移动的章节不存在');
 		}
+
+		$position = $request->post('target')['position'];
+		$targetChapter = ChapterLogic::instance()->getById($request->post('target')['chapter_id']);
 
 		if ($position == 'move') {
 			$targetDocumentId = $request->post('target')['document_id'];
@@ -204,7 +203,11 @@ class ChapterController extends BaseController
 		//放入到目录节点中，但不存在排序
 		if ($position == 'inner' || $position == 'move') {
 			try {
-				ChapterLogic::instance()->moveByChapter($chapter, $targetChapter);
+				if (empty($targetChapter)) {
+					//找到该文档的根节点中的其中一个章节
+					$targetChapter = Chapter::query()->where('document_id', $chapter->document_id)->where('parent_id', '=', 0)->first();
+				}
+				$targetChapter && ChapterLogic::instance()->moveByChapter($chapter, $targetChapter);
 			} catch (\Throwable $e) {
 				throw new ErrorHttpException($e->getMessage());
 			}
@@ -223,12 +226,15 @@ class ChapterController extends BaseController
 			}
 		}
 
+		if ($position != 'move') {
+			$targetChapter && $targetChapter = ChapterLogic::instance()->getById($targetChapter->parent_id);
+		}
 		UserOperateLog::query()->create([
 			'user_id' => $user->id,
 			'document_id' => $chapter->document_id,
 			'chapter_id' => $chapter->id,
-			'operate' => UserOperateLog::EDIT,
-			'remark' => '移动文档'
+			'operate' => UserOperateLog::CHAPTER_MOVE,
+			'remark' => $user->username . '移动章节' . $chapter->name . '到' . !empty($targetChapter) ? $targetChapter->name : '根节点'
 		]);
 
 		return $this->data('success');
@@ -245,7 +251,7 @@ class ChapterController extends BaseController
 		]);
 
 		$user = $request->getAttribute('user');
-		if (!$user->isManager && !$user->isFounder && !$user->isOperator) {
+		if (!$user->isOperator) {
 			throw new ErrorHttpException('您没有权限管理该文档');
 		}
 
@@ -263,13 +269,18 @@ class ChapterController extends BaseController
 				if (empty($id)) {
 					continue;
 				}
-				ChapterLogic::instance()->deleteById($id);
-				UserOperateLog::query()->create([
-					'user_id' => $user->id,
-					'document_id' => $documentId,
-					'chapter_id' => $id,
-					'operate' => UserOperateLog::DELETE
-				]);
+				$chapter = ChapterLogic::instance()->getById($id);
+				if ($chapter) {
+					ChapterLogic::instance()->deleteById($id);
+
+					UserOperateLog::query()->create([
+						'user_id' => $user->id,
+						'document_id' => $documentId,
+						'chapter_id' => $id,
+						'operate' => UserOperateLog::DELETE,
+						'remark' => $user->username . '删除章节' . $chapter->name
+					]);
+				}
 			}
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());
@@ -289,22 +300,21 @@ class ChapterController extends BaseController
 		]);
 
 		$user = $request->getAttribute('user');
-		if (!$user->isManager && !$user->isFounder && !$user->isOperator) {
+		if (!$user->isOperator) {
 			throw new ErrorHttpException('您没有权限管理该文档');
 		}
 
-		$chapterId = intval($request->post('chapter_id'));
-		$chapter = ChapterLogic::instance()->getById($chapterId);
+		$chapter = ChapterLogic::instance()->getById(intval($request->post('chapter_id')));
 		if (empty($chapter)) {
 			throw new ErrorHttpException('章节不存在');
 		}
 
 		if (!empty($chapter->content)) {
-			$chapter->content->content =  $request->post('content');
+			$chapter->content->content = $request->post('content');
 			$chapter->content->save();
 		} else {
 			ChapterContent::query()->create([
-				'chapter_id' => $chapterId,
+				'chapter_id' => $chapter->id,
 				'content' => $request->post('content')
 			]);
 		}
@@ -317,7 +327,7 @@ class ChapterController extends BaseController
 			'document_id' => $chapter->document_id,
 			'chapter_id' => $chapter->id,
 			'operate' => UserOperateLog::EDIT,
-			'remark' => '编辑文档内容'
+			'remark' => $user->username . '编辑章节' . $chapter->name . '内容'
 		]);
 
 		return $this->data('success');
@@ -334,25 +344,23 @@ class ChapterController extends BaseController
 			'document_id.required' => '文档id必填',
 		]);
 		$user = $request->getAttribute('user');
-		if (!$user->isManager && !$user->isFounder && !$user->isOperator) {
+		if (!$user->isOperator) {
 			throw new ErrorHttpException('您没有权限管理该文档');
 		}
 
-		$chapterId = intval($request->post('chapter_id'));
-		$chapter = ChapterLogic::instance()->getById($chapterId);
-
+		$chapter = ChapterLogic::instance()->getById(intval($request->post('chapter_id')));
 		if (empty($chapter)) {
 			throw new ErrorHttpException('章节不存在');
 		}
 
-		$creator = UserOperateLogic::instance()->getByChapterAndOperate($chapterId, UserOperateLog::CREATE);
+		$creator = UserOperateLogic::instance()->getByChapterAndOperate($chapter->id, UserOperateLog::CREATE);
 		if ($creator) {
 			$author = $creator->user;
 		} else {
 			$author = $chapter->document->user;
 		}
 		$result = [
-			'chapter_id' => $chapterId,
+			'chapter_id' => $chapter->id,
 			'name' => $chapter->name,
 			'content' => $chapter->content->content,
 			'author' => [
@@ -367,15 +375,18 @@ class ChapterController extends BaseController
 
 	/**
 	 * 设置章节目录默认显示文章内容
+	 * @param Request $request
+	 * @return array
 	 */
-	public function defaultShow(Request $request) {
+	public function defaultShow(Request $request)
+	{
 		$this->validate($request, [
 			'chapter_id' => 'required',
 			'show_chapter_id' => 'required',
 		]);
 
 		$user = $request->getAttribute('user');
-		if (!$user->isManager && !$user->isFounder && !$user->isOperator) {
+		if (!$user->isOperator) {
 			throw new ErrorHttpException('您没有权限管理该文档');
 		}
 
@@ -385,20 +396,25 @@ class ChapterController extends BaseController
 		$showChapterId = intval($request->post('show_chapter_id'));
 		$showChapter = ChapterLogic::instance()->getById($showChapterId);
 
-		if (($chapterId && empty($chapter))|| empty($showChapter)) {
+		if (($chapterId && empty($chapter)) || empty($showChapter)) {
 			throw new ErrorHttpException('您要操作的章节或是目录不存在');
 		}
 
 		if ($chapter && empty($chapter->is_dir)) {
 			throw new ErrorHttpException('此操作只能设置目录的默认显示');
 		}
-
-		if ($chapterId == 0) {
-			$chapter = $showChapter;
-		}
-
 		if (!empty($showChapter->is_dir)) {
 			throw new ErrorHttpException('设置显示的章节不能为目录');
+		}
+
+		if ($chapterId == 0) {
+			//找到已存在的顶级默认文章
+			$defaultShowChapter = Chapter::query()->where('document_id', '=', $showChapter->document_id)->where('parent_id', '=', 0)->where('default_show_chapter_id', '!=', 0)->first();
+			if ($defaultShowChapter) {
+				$defaultShowChapter->default_show_chapter_id = 0;
+				$defaultShowChapter->save();
+			}
+			$chapter = $showChapter;
 		}
 
 		$chapter->default_show_chapter_id = $showChapterId;
@@ -407,9 +423,9 @@ class ChapterController extends BaseController
 		UserOperateLog::query()->create([
 			'user_id' => $user->id,
 			'document_id' => $chapter->document_id,
-			'chapter_id' => $chapter->id,
+			'chapter_id' => $showChapterId,
 			'operate' => UserOperateLog::EDIT,
-			'remark' => '设置文档默认显示'
+			'remark' => $user->username . '设置章节' . $chapter->name . '默认显示'
 		]);
 
 		return $this->data('success');
@@ -434,5 +450,61 @@ class ChapterController extends BaseController
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());
 		}
+	}
+
+	public function copy(Request $request)
+	{
+		$params = $this->validate($request, [
+			'parent_id' => 'required',
+			'name' => 'required',
+			'document_id' => 'required|integer|min:1',
+			'chapter_id' => 'required|integer|min:1',
+		]);
+
+		$user = $request->getAttribute('user');
+		if (!$user->isOperator) {
+			throw new ErrorHttpException('您没有权限管理该文档');
+		}
+		$parentChapter = null;
+		if ($params['parent_id']) {
+			$parentChapter = ChapterLogic::instance()->getById($params['parent_id']);
+			if (!$parentChapter) {
+				throw new ErrorHttpException('目标章节不存在');
+			}
+		}
+		$chapter = ChapterLogic::instance()->getById($params['chapter_id']);
+		if (!$chapter) {
+			throw new ErrorHttpException('章节不存在');
+		}
+
+		$maxSort = Chapter::query()->where('document_id', '=', $params['document_id'])->where('parent_id', '=', $params['parent_id'])->max('sort');
+		$sort = intval($request->post('sort', ++$maxSort));
+
+		$newChapter = new Chapter();
+		$newChapter->parent_id = $params['parent_id'];
+		$newChapter->name = $params['name'];
+		$newChapter->document_id = $params['document_id'];
+		$newChapter->sort = $sort;
+		$newChapter->is_dir = $chapter->is_dir;
+		$newChapter->save();
+
+		$chapterContent = ChapterContent::query()->where('chapter_id', '=', $params['chapter_id'])->first();
+		if ($chapterContent) {
+			$newChapterContent = new ChapterContent();
+			$newChapterContent->chapter_id = $newChapter->id;
+			$newChapterContent->content = $chapterContent->content;
+			$newChapterContent->layout = $chapterContent->layout;
+			$newChapterContent->save();
+		}
+
+		UserOperateLog::query()->create([
+			'user_id' => $user->id,
+			'document_id' => $chapter->document_id,
+			'chapter_id' => $chapter->id,
+			'operate' => UserOperateLog::CHAPTER_COPY,
+			'remark' => $user->username . '复制章节' . $chapter->name . '到' . !empty($parentChapter) ? $parentChapter->name : '根节点'
+		]);
+
+		return $this->data($newChapter->toArray());
 	}
 }

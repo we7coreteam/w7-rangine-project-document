@@ -20,11 +20,13 @@ class SessionLogic extends LogicAbstract
 {
 	use InstanceTraiter;
 
-	public function getBySessionId($sessionId) {
+	public function getBySessionId($sessionId)
+	{
 		return Session::query()->where('session_id', '=', $sessionId)->first();
 	}
 
-	public function deleteBySessionId($sessionId) {
+	public function deleteBySessionId($sessionId)
+	{
 		return Session::query()->where('session_id', '=', $sessionId)->delete();
 	}
 }

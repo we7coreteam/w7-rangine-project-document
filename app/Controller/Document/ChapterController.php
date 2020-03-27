@@ -14,10 +14,13 @@ namespace W7\App\Controller\Document;
 
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
+use W7\App\Model\Entity\Star;
 use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Logic\DocumentLogic;
+use W7\App\Model\Logic\UserLogic;
 use W7\App\Model\Logic\UserOperateLogic;
+use W7\App\Model\Logic\UserShareLogic;
 use W7\Http\Message\Server\Request;
 
 class ChapterController extends BaseController
@@ -48,7 +51,8 @@ class ChapterController extends BaseController
 					'user_id' => $user->id,
 					'document_id' => $params['document_id'],
 					'chapter_id' => 0,
-					'operate' => UserOperateLog::PREVIEW
+					'operate' => UserOperateLog::PREVIEW,
+					'remark' => $user->username . '阅读文档'
 				]);
 			}
 			return $this->data($result);
@@ -68,21 +72,41 @@ class ChapterController extends BaseController
 			'chapter_id.required' => '章节id必填',
 			'chapter_id.integer' => '章节id非法'
 		]);
+		$shareKey = $request->post('share_key');
 
 		try {
+			$shareInfo = [];
+			if ($shareKey) {
+				$shareInfo = UserShareLogic::instance()->getUidAndChapterByShareKey($shareKey);
+			}
 			$chapter = ChapterLogic::instance()->getById($params['chapter_id'], $params['document_id']);
 
 			$user = $request->getAttribute('user');
 			if (empty($user->isReader)) {
 				throw new ErrorHttpException('无权限阅读该文档');
 			}
-			if ($user && !empty($user->id)) {
+			if (!empty($user->id)) {
 				UserOperateLog::query()->create([
 					'user_id' => $user->id,
 					'document_id' => $params['document_id'],
 					'chapter_id' => $params['chapter_id'],
-					'operate' => UserOperateLog::PREVIEW
+					'operate' => UserOperateLog::PREVIEW,
+					'remark' => $user->username . '浏览章节' . $chapter->name
 				]);
+				//如果当前用户不是分享者并且是当前章节时，添加分享记录
+				if ($shareInfo && $shareInfo[0] != $user->id && $shareInfo[1] == $params['chapter_id']) {
+					if (!UserOperateLog::query()->where('user_id', '=', $shareInfo[0])->where('target_user_id', '=', $user->id)->where('chapter_id', '=', $params['chapter_id'])->exists()) {
+						$sharerUser = UserLogic::instance()->getByUid($shareInfo[0]);
+						UserOperateLog::query()->create([
+							'user_id' => $shareInfo[0],
+							'document_id' => $params['document_id'],
+							'chapter_id' => $params['chapter_id'],
+							'target_user_id' => $user->id,
+							'operate' => UserOperateLog::SHARE,
+							'remark' => $sharerUser->username . '分享链接' . UserShareLogic::instance()->getShareUrl($shareInfo[0], $params['document_id'], $params['chapter_id']) . '给' . $user->username
+						]);
+					}
+				}
 			}
 		} catch (\Exception $e) {
 			throw new ErrorHttpException($e->getMessage());
@@ -99,6 +123,10 @@ class ChapterController extends BaseController
 		} else {
 			$author = $document->user;
 		}
+
+		if (!empty($user->id)) {
+			$star = Star::query()->where('user_id', '=', $user->id)->where('chapter_id', '=', $chapter->id)->first();
+		}
 		$result = [
 			'id' => $chapter->id,
 			'parent_id' => $chapter->parent_id,
@@ -107,6 +135,7 @@ class ChapterController extends BaseController
 			'created_at' => $chapter->created_at->toDateTimeString(),
 			'updated_at' => $chapter->updated_at->toDateTimeString(),
 			'content' => $chapter->content->content,
+			'star_id' => !empty($star) ? $star->id : '',
 			'prev_item' => [
 				'id' => $chapter->prevItem->id ?? '',
 				'name' => $chapter->prevItem->name ?? '',

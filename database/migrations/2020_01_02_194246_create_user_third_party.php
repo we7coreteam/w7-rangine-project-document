@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Schema\Blueprint;
-use W7\Core\Database\Migrate\Migration;
+use W7\DatabaseTool\Migrate\Migration;
 
 class CreateUserThirdParty extends Migration {
 	/**
@@ -11,12 +11,11 @@ class CreateUserThirdParty extends Migration {
 	 */
 	public function up() {
 		$this->schema->create('user_third_party', function (Blueprint $table) {
-			$table->bigIncrements('id');
+			$table->increments('id');
 			$table->integer('uid');
 			$table->string('openid', '200');
 			$table->string('username', '100');
 			$table->smallInteger('source');
-			$table->timestamps();
 		});
 	}
 

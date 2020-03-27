@@ -18,4 +18,9 @@ class StarLogic extends BaseLogic
 	{
 		Star::query()->where('user_id', '=', $userId)->delete();
 	}
+
+	public function clearByChapterId($chapterId)
+	{
+		Star::query()->where('chapter_id', '=', $chapterId)->delete();
+	}
 }

@@ -20,20 +20,24 @@ class Chapter extends BaseModel
 	const IS_DIR = 1;
 	protected $table = 'document_chapter';
 
-	public function content() {
+	public function content()
+	{
 		return $this->hasOne(ChapterContent::class, 'chapter_id', 'id');
 	}
 
-	public function document() {
-		return $this->hasOne(Document::class, 'id', 'document_id');
+	public function document()
+	{
+		return $this->belongsTo(Document::class, 'document_id', 'id');
 	}
 
-	public function getPrevItemAttribute() {
+	public function getPrevItemAttribute()
+	{
 		$item = static::query()->where('parent_id', $this->parent_id)->where('sort', '<=', $this->sort)->where('id', '!=', $this->id)->orderBy('sort')->first();
 		return $item;
 	}
 
-	public function getNextItemAttribute() {
+	public function getNextItemAttribute()
+	{
 		$item = static::query()->where('parent_id', $this->parent_id)->where('sort', '>=', $this->sort)->where('id', '!=', $this->id)->orderBy('sort')->first();
 		return $item;
 	}
