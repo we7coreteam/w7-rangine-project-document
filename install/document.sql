@@ -19,19 +19,6 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- 表的结构 `ims_app`
---
-DROP TABLE IF EXISTS `ims_app`;
-CREATE TABLE `ims_app` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(30) NOT NULL,
-  `appid` varchar(18) NOT NULL,
-  `appsecret` varchar(64) NOT NULL,
-  `user_id` int(11) DEFAULT NULL COMMENT '用户id',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
 -- 表的结构 `ims_cache`
 --
 
@@ -134,7 +121,7 @@ DROP TABLE IF EXISTS `ims_setting`;
 CREATE TABLE `ims_setting` (
   `id` int(10) UNSIGNED NOT NULL,
   `key` varchar(60) NOT NULL,
-  `value` text NOT NULL
+  `value` varchar(1000) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
