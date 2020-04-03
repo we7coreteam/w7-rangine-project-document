@@ -40,8 +40,12 @@ class ChapterRecordService
 			'api' => '',
 			'apiHeader' => '',
 			'apiParam' => '',
-			'apiSuccess' => ''
+			'apiParamExample' => '',
+			'apiSuccess' => '',
+			'apiSuccessExample' => '',
+			'apiFailExample' => '',
 		];
+
 		foreach ($this->record as $key => $val) {
 			if (is_array($val)) {
 				if ($key == 'api') {
@@ -51,6 +55,14 @@ class ChapterRecordService
 				} elseif ($key == 'apiParam') {
 					$markdown['apiParam'] = $this->buildApiParam($val);
 				}
+			} else {
+				if ($key == 'apiParamExample') {
+					$markdown['apiParamExample'] = $this->buildJsonExample('请求示例', $val);
+				} elseif ($key == 'apiSuccessExample') {
+					$markdown['apiSuccessExample'] = $this->buildJsonExample('返回成功示例', $val);
+				} elseif ($key == 'apiFailExample') {
+					$markdown['apiFailExample'] = $this->buildJsonExample('返回失败示例', $val);
+				}
 			}
 		}
 
@@ -58,8 +70,20 @@ class ChapterRecordService
 		return $markdownText;
 	}
 
-	public function buildApiParamChildren($data, $childrenTop = '')
+	public function buildJsonExample($title, $data)
 	{
+		$text = '### '.$title."\n\n```\n".$data."\n```";
+		return $text;
+	}
+
+	public function getChildrenTop($level)
+	{
+		return str_repeat('&emsp;', $level);
+	}
+
+	public function buildApiParamChildren($data, $level = 0)
+	{
+		$childrenTop = $this->getChildrenTop($level);
 		$key = $childrenTop . '';
 		$type = '';
 		$value = '';
@@ -84,8 +108,7 @@ class ChapterRecordService
 		$text = $this->strLengthAdaptation($key, ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($type, ChapterRecord::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation($mustText, ChapterRecord::TABLE_MUST_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($value, ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
 		if (isset($data['children']) && (!empty($data['children'])) && is_array($data['children'])) {
 			foreach ($data['children'] as $k => $val) {
-				$nowTop = $key . '.';
-				$text .= $this->buildApiParamChildren($val, $nowTop);
+				$text .= $this->buildApiParamChildren($val, $level + 1);
 			}
 		}
 		return $text;
