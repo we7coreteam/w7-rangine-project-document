@@ -20,4 +20,10 @@ class ChapterRecord extends BaseModel
 	protected $table = 'document_chapter_record';
 	protected $primaryKey = 'chapter_id';
 
+	public function record_to_markdown($record)
+	{
+		foreach ($record as $key=>$val){
+
+		}
+	}
 }

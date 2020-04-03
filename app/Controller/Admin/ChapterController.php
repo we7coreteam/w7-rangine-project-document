@@ -16,6 +16,7 @@ use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document\Chapter;
 use W7\App\Model\Entity\Document\ChapterContent;
+use W7\App\Model\Entity\Document\ChapterRecord;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\ChapterLogic;
@@ -289,11 +290,27 @@ class ChapterController extends BaseController
 		return $this->data('success');
 	}
 
+	/**
+	 * @api {post} /chapter/save 文档内容-保存
+	 * @apiName save
+	 * @apiGroup Chapter
+	 *
+	 * @apiParam {Number} chapter_id 章节ID
+	 * @apiParam {Number} document_id 文档ID
+	 * @apiParam {Number} layout 文档类型 0：MARKDOWM文本，提交content 1：HTTP请求，提交record
+	 * @apiParam {String} content 文档内容（layout为1时用record生成，提交无效）
+	 * @apiParam {Array} record 请求记录
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {status: true, code: 200, data: "success", message: "ok"}
+	 */
 	public function save(Request $request)
 	{
+		$LayoutLabel = array_keys(ChapterContent::getLayoutLabel());
 		$this->validate($request, [
 			'chapter_id' => 'required|integer|min:1',
 			'document_id' => 'required|integer',
+			'layout' => 'in:' . implode(',', $LayoutLabel),
 		], [
 			'chapter_id.required' => '文档id必填',
 			'document_id.required' => '文档id必填',
@@ -309,19 +326,22 @@ class ChapterController extends BaseController
 			throw new ErrorHttpException('章节不存在');
 		}
 
-		//新增http类型
-		$layout = $request->query('layout', 0);
-		if ($layout) {
-			throw new ErrorHttpException('暂不支持的文档数据类型');
+		$layout = $request->post('layout', 0);
+		$content = $request->post('content', '');
+		if ($layout == 1) {
+			//如果是http类型
+			$record = $request->post('record', []);
+			$chapterRecord = new ChapterRecord();
+			$content = $chapterRecord->record_to_markdown($record);
 		}
 
 		if (!empty($chapter->content)) {
-			$chapter->content->content = $request->post('content');
+			$chapter->content->content = $content;
 			$chapter->content->save();
 		} else {
 			ChapterContent::query()->create([
 				'chapter_id' => $chapter->id,
-				'content' => $request->post('content')
+				'content' => $content
 			]);
 		}
 

@@ -35,6 +35,6 @@ class ErrorHttpException extends ResponseExceptionAbstract
 			'code' => $this->getCode(),
 			'data' => $this->data,
 			'message' => $this->getMessage(),
-		]));
+		],JSON_UNESCAPED_UNICODE));
 	}
 }
