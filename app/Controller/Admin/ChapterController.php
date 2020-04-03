@@ -16,10 +16,10 @@ use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document\Chapter;
 use W7\App\Model\Entity\Document\ChapterContent;
-use W7\App\Model\Entity\Document\ChapterRecord;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\ChapterLogic;
+use W7\App\Model\Logic\Document\ChapterRecordLogic;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\App\Model\Logic\DocumentPermissionLogic;
 use W7\App\Model\Logic\UserOperateLogic;
@@ -300,6 +300,15 @@ class ChapterController extends BaseController
 	 * @apiParam {Number} layout 文档类型 0：MARKDOWM文本，提交content 1：HTTP请求，提交record
 	 * @apiParam {String} content 文档内容（layout为1时用record生成，提交无效）
 	 * @apiParam {Array} record 请求记录
+	 * @apiParam {Array} record.api 请求记录地址信息
+	 * @apiParam {String} record.api.type 请求类型
+	 * @apiParam {String} record.api.value 地址
+	 * @apiParam {String} record.api.description 描述
+	 * @apiParam {Array} record.apiHeader 请求头
+	 * @apiParam {Array} record.key 请求头参数名称
+	 * @apiParam {Array} record.must 是否必传
+	 * @apiParam {Array} record.description 参数描述
+	 * @apiParam {Array} record.value 参数示例值
 	 *
 	 * @apiSuccessExample {json} Success-Response:
 	 * {status: true, code: 200, data: "success", message: "ok"}
@@ -331,7 +340,7 @@ class ChapterController extends BaseController
 		if ($layout == 1) {
 			//如果是http类型
 			$record = $request->post('record', []);
-			$chapterRecord = new ChapterRecord();
+			$chapterRecord = new ChapterRecordLogic();
 			$content = $chapterRecord->record_to_markdown($record);
 		}
 

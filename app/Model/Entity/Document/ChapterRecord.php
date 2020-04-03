@@ -20,10 +20,19 @@ class ChapterRecord extends BaseModel
 	protected $table = 'document_chapter_record';
 	protected $primaryKey = 'chapter_id';
 
-	public function record_to_markdown($record)
-	{
-		foreach ($record as $key=>$val){
+	const TABLE_NAME_LENGTH = 20;//参数名称默认宽度
+	const TABLE_TYPE_LENGTH = 8;//类型默认宽度
+	const TABLE_MUST_LENGTH = 5;//类型必填宽度
+	const TABLE_DESCRIPTION_LENGTH = 20;//描述默认宽度
+	const TABLE_VALUE_LENGTH = 20;//示例值默认宽度
+	const TABLE_MUST_YES = 1;
+	const TABLE_MUST_NO = 0;
 
-		}
+	public static function getMustLabel()
+	{
+		return [
+			self::TABLE_MUST_YES => 'Ture',
+			self::TABLE_MUST_NO => 'False',
+		];
 	}
 }
