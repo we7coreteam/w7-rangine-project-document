@@ -62,6 +62,17 @@ class ChapterController extends BaseController
 		return $this->data($result);
 	}
 
+	/**
+	 * @api {post} /chapter/create 文档（目录）-新增
+	 * @apiName create
+	 * @apiGroup Chapter
+	 *
+	 * @apiParam {Number} name 章节ID
+	 * @apiParam {Number} document_id 目录ID
+	 * @apiParam {Number} parent_id 附ID
+	 * @apiParam {Number} is_dir 是否为目录
+	 * @apiParam {Number} layout 0：markdown格式 1：http格式
+	 */
 	public function create(Request $request)
 	{
 		$this->validate($request, [
@@ -69,6 +80,7 @@ class ChapterController extends BaseController
 			'document_id' => 'required|integer|min:1',
 			'parent_id' => 'required|integer|min:0',
 			'is_dir' => 'required|boolean',
+			'layout' => 'integer'
 		], [
 			'name.required' => '章节名称必填',
 			'name.max' => '章节名最大３０个字符',
@@ -103,6 +115,21 @@ class ChapterController extends BaseController
 		]);
 		if (!$chapter) {
 			throw new ErrorHttpException('章节添加失败');
+		}
+
+		if (!$isDir) {
+			$layout = $request->post('layout', 0);
+			if (!empty($chapter->content)) {
+				$chapter->content->content = '';
+				$chapter->content->layout = $layout;
+				$chapter->content->save();
+			} else {
+				ChapterContent::query()->create([
+					'chapter_id' => $chapter->id,
+					'content' => '',
+					'layout' => $layout
+				]);
+			}
 		}
 
 		UserOperateLog::query()->create([
