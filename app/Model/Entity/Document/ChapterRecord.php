@@ -14,13 +14,10 @@ namespace W7\App\Model\Entity\Document;
 
 use W7\App\Model\Entity\BaseModel;
 
-class ChapterContent extends BaseModel
+class ChapterRecord extends BaseModel
 {
 	public $timestamps = false;
-	protected $table = 'document_chapter_content';
+	protected $table = 'document_chapter_record';
 	protected $primaryKey = 'chapter_id';
 
-	// 数据来源类型
-	const LAYOUT_MARKDOWM = 0;//MARKDOWM
-	const LAYOUT_HTTP = 1;//HTTP请求
 }

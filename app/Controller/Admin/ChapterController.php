@@ -309,6 +309,12 @@ class ChapterController extends BaseController
 			throw new ErrorHttpException('章节不存在');
 		}
 
+		//新增http类型
+		$layout = $request->query('layout', 0);
+		if ($layout) {
+			throw new ErrorHttpException('暂不支持的文档数据类型');
+		}
+
 		if (!empty($chapter->content)) {
 			$chapter->content->content = $request->post('content');
 			$chapter->content->save();
