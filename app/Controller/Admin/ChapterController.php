@@ -298,23 +298,24 @@ class ChapterController extends BaseController
 	 * @apiParam {Number} chapter_id 章节ID
 	 * @apiParam {Number} document_id 文档ID
 	 * @apiParam {Number} layout 文档类型 0：MARKDOWM文本，提交content 1：HTTP请求，提交record
-	 * @apiParam {String} content 文档内容（layout为1时用record生成，提交无效）
+	 * @apiParam {String} content 文档内容（layout为1时用record生成content，此字段提交无效）
 	 * @apiParam {Array} record 请求记录
 	 * @apiParam {Array} record.api 请求记录地址信息
 	 * @apiParam {String} record.api.type 请求类型
 	 * @apiParam {String} record.api.value 地址
 	 * @apiParam {String} record.api.description 描述
 	 * @apiParam {Array} record.apiHeader 请求头
-	 * @apiParam {Array} record.apiHeader.key 参数名称
-	 * @apiParam {Array} record.apiHeader.must 是否必传
-	 * @apiParam {Array} record.apiHeader.description 参数描述
-	 * @apiParam {Array} record.apiHeader.value 参数示例值
+	 * @apiParam {String} record.apiHeader.key 参数名称
+	 * @apiParam {Number} record.apiHeader.must 是否必传
+	 * @apiParam {String} record.apiHeader.description 参数描述
+	 * @apiParam {String} record.apiHeader.value 参数示例值
 	 * @apiParam {Array} record.apiParam 请求参数
-	 * @apiParam {Array} record.apiParam.key 参数名称
-	 * @apiParam {Array} record.apiParam.type 参数类型 int,string....
-	 * @apiParam {Array} record.apiParam.must 是否必传
-	 * @apiParam {Array} record.apiParam.description 参数描述
-	 * @apiParam {Array} record.apiParam.value 参数示例值
+	 * @apiParam {String} record.apiParam.key 参数名称
+	 * @apiParam {String} record.apiParam.type 参数类型 int,string....
+	 * @apiParam {Number} record.apiParam.must 是否必传
+	 * @apiParam {String} record.apiParam.description 参数描述
+	 * @apiParam {String} record.apiParam.value 参数示例值
+	 * @apiParam {Array} record.apiParam.children 参数子类
 	 *
 	 * @apiSuccessExample {json} Success-Response:
 	 * {status: true, code: 200, data: "success", message: "ok"}
