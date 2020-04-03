@@ -409,16 +409,21 @@ class ChapterController extends BaseController
 		} else {
 			$author = $chapter->document->user;
 		}
+
 		$result = [
 			'chapter_id' => $chapter->id,
 			'name' => $chapter->name,
 			'content' => $chapter->content->content,
+			'layout' => $chapter->content->layout,
 			'author' => [
 				'uid' => $author->id,
 				'username' => $author->username,
 			],
 			'updated_at' => $chapter->updated_at->toDateTimeString()
 		];
+		if ($chapter->content->layout == 1 && $chapter->record) {
+			$result['record'] = json_decode($chapter->record->record);
+		}
 
 		return $this->data($result);
 	}
