@@ -19,10 +19,10 @@ use W7\App\Model\Entity\Document\ChapterContent;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\ChapterLogic;
-use W7\App\Model\Logic\Document\ChapterRecordLogic;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\App\Model\Logic\DocumentPermissionLogic;
 use W7\App\Model\Logic\UserOperateLogic;
+use W7\App\Model\Service\ChapterRecordService;
 use W7\Http\Message\Server\Request;
 
 /**
@@ -305,10 +305,16 @@ class ChapterController extends BaseController
 	 * @apiParam {String} record.api.value 地址
 	 * @apiParam {String} record.api.description 描述
 	 * @apiParam {Array} record.apiHeader 请求头
-	 * @apiParam {Array} record.key 请求头参数名称
-	 * @apiParam {Array} record.must 是否必传
-	 * @apiParam {Array} record.description 参数描述
-	 * @apiParam {Array} record.value 参数示例值
+	 * @apiParam {Array} record.apiHeader.key 参数名称
+	 * @apiParam {Array} record.apiHeader.must 是否必传
+	 * @apiParam {Array} record.apiHeader.description 参数描述
+	 * @apiParam {Array} record.apiHeader.value 参数示例值
+	 * @apiParam {Array} record.apiParam 请求参数
+	 * @apiParam {Array} record.apiParam.key 参数名称
+	 * @apiParam {Array} record.apiParam.type 参数类型 int,string....
+	 * @apiParam {Array} record.apiParam.must 是否必传
+	 * @apiParam {Array} record.apiParam.description 参数描述
+	 * @apiParam {Array} record.apiParam.value 参数示例值
 	 *
 	 * @apiSuccessExample {json} Success-Response:
 	 * {status: true, code: 200, data: "success", message: "ok"}
@@ -340,8 +346,8 @@ class ChapterController extends BaseController
 		if ($layout == 1) {
 			//如果是http类型
 			$record = $request->post('record', []);
-			$chapterRecord = new ChapterRecordLogic();
-			$content = $chapterRecord->record_to_markdown($record);
+			$chapterRecord = new ChapterRecordService($record);
+			$content = $chapterRecord->recordToMarkdown();
 		}
 
 		if (!empty($chapter->content)) {
