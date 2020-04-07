@@ -185,7 +185,7 @@ class ChapterRecordService
 		if ($description) {
 			$text = '- **接口说明：** ' . $description . "\n- **接口地址：** " . $value . "\n- **请求方式：** ==" . $type . "==\n";
 		} else {
-			$text = '*- **接口地址：** ' . $value . "\n- **请求方式：** ==" . $type . "==\n";
+			$text = '**接口地址：** ' . $value . "\n- **请求方式：** ==" . $type . "==\n";
 		}
 		return $text;
 	}

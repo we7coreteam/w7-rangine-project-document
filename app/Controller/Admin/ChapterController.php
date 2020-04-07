@@ -16,6 +16,7 @@ use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document\Chapter;
 use W7\App\Model\Entity\Document\ChapterContent;
+use W7\App\Model\Entity\Document\ChapterRecord;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\ChapterLogic;
@@ -380,20 +381,32 @@ class ChapterController extends BaseController
 
 		$layout = $request->post('layout', 0);
 		$content = $request->post('content', '');
+
 		if ($layout == 1) {
 			//如果是http类型
 			$record = $request->post('record', []);
 			$chapterRecord = new ChapterRecordService($record);
 			$content = $chapterRecord->recordToMarkdown();
+			if (!empty($chapter->record)) {
+				$chapter->record->record = json_encode($record);
+				$chapter->record->save();
+			} else {
+				ChapterRecord::query()->create([
+					'chapter_id' => $chapter->id,
+					'record' => $record
+				]);
+			}
 		}
 
 		if (!empty($chapter->content)) {
 			$chapter->content->content = $content;
+			$chapter->content->layout = $layout;
 			$chapter->content->save();
 		} else {
 			ChapterContent::query()->create([
 				'chapter_id' => $chapter->id,
-				'content' => $content
+				'content' => $content,
+				'layout' => $layout
 			]);
 		}
 
