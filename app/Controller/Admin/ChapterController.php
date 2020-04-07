@@ -335,20 +335,20 @@ class ChapterController extends BaseController
 	 * @apiParam {String} record.api.description 描述
 	 * @apiParam {Array} record.apiHeader 请求头
 	 * @apiParam {String} record.apiHeader.key 参数名称
-	 * @apiParam {Number} record.apiHeader.must 是否必传
+	 * @apiParam {Number} record.apiHeader.enabled 是否必传
 	 * @apiParam {String} record.apiHeader.description 参数描述
 	 * @apiParam {String} record.apiHeader.value 参数示例值
 	 * @apiParam {Array} record.apiParam 请求参数
 	 * @apiParam {String} record.apiParam.key 参数名称
 	 * @apiParam {String} record.apiParam.type 参数类型 int,string...
-	 * @apiParam {Number} record.apiParam.must 是否必传
+	 * @apiParam {Number} record.apiParam.enabled 是否必传
 	 * @apiParam {String} record.apiParam.description 参数描述
 	 * @apiParam {String} record.apiParam.value 参数示例值
 	 * @apiParam {Array} record.apiParam.children 参数子类数组同父级
 	 * @apiParam {Array} record.apiSuccess 返回参数
 	 * @apiParam {String} record.apiSuccess.key 参数名称
 	 * @apiParam {String} record.apiSuccess.type 参数类型 int,string...
-	 * @apiParam {Number} record.apiSuccess.must 是否必传
+	 * @apiParam {Number} record.apiSuccess.enabled 是否必传
 	 * @apiParam {String} record.apiSuccess.description 参数描述
 	 * @apiParam {String} record.apiSuccess.value 参数示例值
 	 * @apiParam {Array} record.apiSuccess.children 参数子类数组同父级
@@ -442,27 +442,27 @@ class ChapterController extends BaseController
 	 * @apiParam {String} record.api.description 描述
 	 * @apiParam {Array} record.apiHeader 请求头
 	 * @apiParam {String} record.apiHeader.key 参数名称
-	 * @apiParam {Number} record.apiHeader.must 是否必传
+	 * @apiParam {Number} record.apiHeader.enabled 是否必传
 	 * @apiParam {String} record.apiHeader.description 参数描述
 	 * @apiParam {String} record.apiHeader.value 参数示例值
 	 * @apiParam {Array} record.apiParam 请求参数
 	 * @apiParam {String} record.apiParam.key 参数名称
 	 * @apiParam {String} record.apiParam.type 参数类型 int,string....
-	 * @apiParam {Number} record.apiParam.must 是否必传
+	 * @apiParam {Number} record.apiParam.enabled 是否必传
 	 * @apiParam {String} record.apiParam.description 参数描述
 	 * @apiParam {String} record.apiParam.value 参数示例值
 	 * @apiParam {Array} record.apiParam.children 参数子类数组同父级
 	 * @apiParam {Array} record.apiSuccess 返回参数
 	 * @apiParam {String} record.apiSuccess.key 参数名称
 	 * @apiParam {String} record.apiSuccess.type 参数类型 int,string....
-	 * @apiParam {Number} record.apiSuccess.must 是否必传
+	 * @apiParam {Number} record.apiSuccess.enabled 是否必传
 	 * @apiParam {String} record.apiSuccess.description 参数描述
 	 * @apiParam {String} record.apiSuccess.value 参数示例值
 	 * @apiParam {Array} record.apiSuccess.children 参数子类数组同父级
 	 * @apiParam {String} apiExtend 扩展内容
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 * {"status":true,"code":200,"data":{"chapter_id":3,"name":"1111","content":"","layout":1,"author":{"uid":1,"username":"admin"},"updated_at":"2020-04-03 17:56:21","record":{"api":{"type":"GET","value":"http:\/\/baidu.com","description":"这是文档说明"},"apiHeader":[],"apiParam":[]},"message":"ok"}}
+	 * {"status":true,"code":200,"data":{"chapter_id":49,"name":"clj1","content":"- **接口说明：** 这是文档说明\n- **接口地址：** http:\/\/baidu.com\n- **请求方式：** ==GET==\n\n### 请求头\n\n参数名称            |必填 |描述                |示例值              \n|:-                 |:-:  |:-                  |:-                  \nAccess-Token        |False|这是头部说明1       |                    \nToken               |Ture |this is address     |                    \n\n### 请求参数\n\n参数名称            |类型    |必填 |描述                |示例值              \n|:-                 |:-:     |:-:  |:-                  |:-                  \nid                  |number  |False|这是参数详情1       |                    \nboday               |array   |False|这是参数详情3       |                    \n&emsp;a             |array   |Ture |这是二级参数a       |                    \n&emsp;&emsp;c       |string  |Ture |这是三级参数ac      |                    \n&emsp;&emsp;d       |string  |Ture |这是三级参数ad      |                    \n&emsp;b             |array   |Ture |这是二级参数b       |                    \n&emsp;&emsp;c       |string  |Ture |这是三级参数bc      |                    \n&emsp;&emsp;e       |array   |Ture |这是三级参数bd      |                    \n&emsp;&emsp;&emsp;ec|string  |Ture |这是四级参数ec      |                    \n&emsp;&emsp;&emsp;ed|string  |Ture |这是四级参数ed      |                    \n\n### 返回参数\n\n参数名称            |类型    |必填 |描述                |示例值              \n|:-                 |:-:     |:-:  |:-                  |:-                  \nid                  |number  |False|这是参数详情1       |                    \nboday               |array   |False|这是参数详情3       |                    \n&emsp;a             |array   |Ture |这是二级参数a       |                    \n&emsp;&emsp;c       |string  |Ture |这是三级参数ac      |                    \n&emsp;&emsp;d       |string  |Ture |这是三级参数ad      |                    \n&emsp;b             |array   |Ture |这是二级参数b       |                    \n&emsp;&emsp;c       |string  |Ture |这是三级参数bc      |                    \n&emsp;&emsp;e       |array   |Ture |这是三级参数bd      |                    \n&emsp;&emsp;&emsp;ec|string  |Ture |这是四级参数ec      |                    \n&emsp;&emsp;&emsp;ed|string  |Ture |这是四级参数ed      |                    \n\n### 示例说明\n\n>请求示例：\n\n```\n{\n    \"Header\":{\n        \"Token\":\"\",\n        \"Version\":\"3.2.0\",\n        \"SystemId\":100,\n        \"Timestamp\":1502870664\n    },\n    \"Body\":{\n        \"Mobile\":\"18520322032\",\n        \"Password\":\"acb000000\"\n    }\n}\n\n```","layout":1,"author":{"uid":1,"username":"admin"},"updated_at":"2020-04-07 13:55:35","record":{"api":{"type":"GET","value":"http:\/\/baidu.com","description":"这是文档说明"},"apiHeader":[{"key":"Access-Token","description":"这是头部说明1","enabled":0,"value":""},{"type":"json","key":"Token","description":"this is address","enabled":1,"value":""}],"apiParam":[{"type":"number","key":"id","description":"这是参数详情1","enabled":0,"value":""},{"type":"array","key":"boday","description":"这是参数详情3","enabled":0,"value":"","children":[{"type":"array","key":"a","description":"这是二级参数a","enabled":1,"value":"","children":[{"type":"string","key":"c","description":"这是三级参数ac","enabled":1,"value":""},{"type":"string","key":"d","description":"这是三级参数ad","enabled":1,"value":"","children":[]}]},{"type":"array","key":"b","description":"这是二级参数b","enabled":1,"value":"","children":[{"type":"string","key":"c","description":"这是三级参数bc","enabled":1,"value":""},{"type":"array","key":"e","description":"这是三级参数bd","enabled":1,"value":"","children":[{"type":"string","key":"ec","description":"这是四级参数ec","enabled":1,"value":""},{"type":"string","key":"ed","description":"这是四级参数ed","enabled":1,"value":"","children":[]}]}]}]}],"apiSuccess":[{"type":"number","key":"id","description":"这是参数详情1","enabled":0,"value":""},{"type":"array","key":"boday","description":"这是参数详情3","enabled":0,"value":"","children":[{"type":"array","key":"a","description":"这是二级参数a","enabled":1,"value":"","children":[{"type":"string","key":"c","description":"这是三级参数ac","enabled":1,"value":""},{"type":"string","key":"d","description":"这是三级参数ad","enabled":1,"value":"","children":[]}]},{"type":"array","key":"b","description":"这是二级参数b","enabled":1,"value":"","children":[{"type":"string","key":"c","description":"这是三级参数bc","enabled":1,"value":""},{"type":"array","key":"e","description":"这是三级参数bd","enabled":1,"value":"","children":[{"type":"string","key":"ec","description":"这是四级参数ec","enabled":1,"value":""},{"type":"string","key":"ed","description":"这是四级参数ed","enabled":1,"value":"","children":[]}]}]}]}],"apiExtend":"### 示例说明\n\n>请求示例：\n\n```\n{\n    \"Header\":{\n        \"Token\":\"\",\n        \"Version\":\"3.2.0\",\n        \"SystemId\":100,\n        \"Timestamp\":1502870664\n    },\n    \"Body\":{\n        \"Mobile\":\"18520322032\",\n        \"Password\":\"acb000000\"\n    }\n}\n\n```"}},"message":"ok"}
 	 */
 	public function content(Request $request)
 	{

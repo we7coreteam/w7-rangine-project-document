@@ -22,17 +22,17 @@ class ChapterRecord extends BaseModel
 
 	const TABLE_NAME_LENGTH = 20;//参数名称默认宽度
 	const TABLE_TYPE_LENGTH = 8;//类型默认宽度
-	const TABLE_MUST_LENGTH = 5;//类型必填宽度
+	const TABLE_ENABLED_LENGTH = 5;//类型必填宽度
 	const TABLE_DESCRIPTION_LENGTH = 20;//描述默认宽度
 	const TABLE_VALUE_LENGTH = 20;//示例值默认宽度
-	const TABLE_MUST_YES = 1;
-	const TABLE_MUST_NO = 0;
+	const TABLE_ENABLED_YES = 1;
+	const TABLE_ENABLED_NO = 0;
 
-	public static function getMustLabel()
+	public static function getEnabledLabel()
 	{
 		return [
-			self::TABLE_MUST_YES => 'Ture',
-			self::TABLE_MUST_NO => 'False',
+			self::TABLE_ENABLED_YES => 'Ture',
+			self::TABLE_ENABLED_NO => 'False',
 		];
 	}
 }

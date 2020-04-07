@@ -58,8 +58,8 @@ class ChapterRecordService
 	public function buildApiSuccess($data)
 	{
 		$text = "### 返回参数\n\n";
-		$text = $text . $this->strLengthAdaptation('参数名称', ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation('类型', ChapterRecord::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation('必填', ChapterRecord::TABLE_MUST_LENGTH) . '|' . $this->strLengthAdaptation('描述', ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation('示例值', ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
-		$text = $text . $this->strLengthAdaptation('|:-', ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation(':-:', ChapterRecord::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation(':-:', ChapterRecord::TABLE_MUST_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
+		$text = $text . $this->strLengthAdaptation('参数名称', ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation('类型', ChapterRecord::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation('必填', ChapterRecord::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation('描述', ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation('示例值', ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
+		$text = $text . $this->strLengthAdaptation('|:-', ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation(':-:', ChapterRecord::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation(':-:', ChapterRecord::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
 		foreach ($data as $k => $val) {
 			$text .= $this->buildParamChildren($val);
 		}
@@ -78,15 +78,15 @@ class ChapterRecordService
 		$type = '';
 		$value = '';
 		$description = '';
-		$must = 0;
+		$enabled = 0;
 		if (isset($data['key'])) {
 			$key = $childrenTop . $data['key'];
 		}
 		if (isset($data['type'])) {
 			$type = $data['type'];
 		}
-		if (isset($data['must'])) {
-			$must = $data['must'];
+		if (isset($data['enabled'])) {
+			$enabled = $data['enabled'];
 		}
 		if (isset($data['value'])) {
 			$value = $data['value'];
@@ -94,8 +94,8 @@ class ChapterRecordService
 		if (isset($data['description'])) {
 			$description = $data['description'];
 		}
-		$mustText = $this->getMustText($must);
-		$text = $this->strLengthAdaptation($key, ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($type, ChapterRecord::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation($mustText, ChapterRecord::TABLE_MUST_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($value, ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
+		$enabledText = $this->getEnabledText($enabled);
+		$text = $this->strLengthAdaptation($key, ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($type, ChapterRecord::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation($enabledText, ChapterRecord::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($value, ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
 		if (isset($data['children']) && (!empty($data['children'])) && is_array($data['children'])) {
 			foreach ($data['children'] as $k => $val) {
 				$text .= $this->buildParamChildren($val, $level + 1);
@@ -107,35 +107,35 @@ class ChapterRecordService
 	public function buildApiParam($data)
 	{
 		$text = "### 请求参数\n\n";
-		$text = $text . $this->strLengthAdaptation('参数名称', ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation('类型', ChapterRecord::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation('必填', ChapterRecord::TABLE_MUST_LENGTH) . '|' . $this->strLengthAdaptation('描述', ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation('示例值', ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
-		$text = $text . $this->strLengthAdaptation('|:-', ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation(':-:', ChapterRecord::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation(':-:', ChapterRecord::TABLE_MUST_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
+		$text = $text . $this->strLengthAdaptation('参数名称', ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation('类型', ChapterRecord::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation('必填', ChapterRecord::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation('描述', ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation('示例值', ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
+		$text = $text . $this->strLengthAdaptation('|:-', ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation(':-:', ChapterRecord::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation(':-:', ChapterRecord::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
 		foreach ($data as $k => $val) {
 			$text .= $this->buildParamChildren($val);
 		}
 		return $text;
 	}
 
-	public function getMustText($must)
+	public function getEnabledText($enabled)
 	{
-		$mustLabel = ChapterRecord::getMustLabel();
-		return $mustLabel[$must];
+		$enabledLabel = ChapterRecord::getEnabledLabel();
+		return $enabledLabel[$enabled];
 	}
 
 	public function buildApiHeader($data)
 	{
 		$text = "### 请求头\n\n";
-		$text = $text . $this->strLengthAdaptation('参数名称', ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation('必填', ChapterRecord::TABLE_MUST_LENGTH) . '|' . $this->strLengthAdaptation('描述', ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation('示例值', ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
-		$text = $text . $this->strLengthAdaptation('|:-', ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation(':-:', ChapterRecord::TABLE_MUST_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
+		$text = $text . $this->strLengthAdaptation('参数名称', ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation('必填', ChapterRecord::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation('描述', ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation('示例值', ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
+		$text = $text . $this->strLengthAdaptation('|:-', ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation(':-:', ChapterRecord::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
 		foreach ($data as $k => $val) {
 			$key = '';
 			$value = '';
 			$description = '';
-			$must = 0;
+			$enabled = 0;
 			if (isset($val['key'])) {
 				$key = $val['key'];
 			}
-			if (isset($val['must'])) {
-				$must = $val['must'];
+			if (isset($val['enabled'])) {
+				$enabled = $val['enabled'];
 			}
 			if (isset($val['value'])) {
 				$value = $val['value'];
@@ -143,8 +143,8 @@ class ChapterRecordService
 			if (isset($val['description'])) {
 				$description = $val['description'];
 			}
-			$mustText = $this->getMustText($must);
-			$text .= $this->strLengthAdaptation($key, ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($mustText, ChapterRecord::TABLE_MUST_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($value, ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
+			$enabledText = $this->getEnabledText($enabled);
+			$text .= $this->strLengthAdaptation($key, ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($enabledText, ChapterRecord::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($value, ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
 		}
 		return $text;
 	}
