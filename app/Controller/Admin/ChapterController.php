@@ -399,8 +399,10 @@ class ChapterController extends BaseController
 		}
 
 		if (!empty($chapter->content)) {
+			if ($chapter->content->layout != $layout) {
+				throw new ErrorHttpException('不可更改文档类型');
+			}
 			$chapter->content->content = $content;
-			$chapter->content->layout = $layout;
 			$chapter->content->save();
 		} else {
 			ChapterContent::query()->create([
@@ -629,6 +631,16 @@ class ChapterController extends BaseController
 			$newChapterContent->content = $chapterContent->content;
 			$newChapterContent->layout = $chapterContent->layout;
 			$newChapterContent->save();
+			if ($chapterContent->layout == 1) {
+				//如果是HTTP类型
+				$chapterRecord = ChapterRecord::query()->where('chapter_id', '=', $params['chapter_id'])->first();
+				if ($chapterRecord) {
+					$newChapterRecord = new ChapterRecord();
+					$newChapterRecord->chapter_id = $newChapter->id;
+					$newChapterRecord->record = $chapterRecord->record;
+					$newChapterRecord->save();
+				}
+			}
 		}
 
 		UserOperateLog::query()->create([

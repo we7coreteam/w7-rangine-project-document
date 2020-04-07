@@ -83,7 +83,8 @@ class ChapterLogic extends BaseLogic
 		return $query->first();
 	}
 
-	public function getMaxSort($parentId) {
+	public function getMaxSort($parentId)
+	{
 		return Chapter::query()->where('parent_id', '=', $parentId)->max('sort');
 	}
 
@@ -114,11 +115,16 @@ class ChapterLogic extends BaseLogic
 			]);
 			ChapterContent::query()->where('chapter_id', '=', $chapterId)->delete();
 
+			Document\ChapterRecord::query()->where('chapter_id', '=', $chapterId)->delete();
+
 			UserOperateLog::query()->where('document_id', '=', $chapter->document_id)->where('chapter_id', '=', $chapterId)->delete();
 
 			StarLogic::instance()->clearByChapterId($chapterId);
 
-			CdnLogic::instance()->channel(SettingLogic::KEY_COS)->deletePath(sprintf('/%s/%s', $chapter->document_id, $chapterId));
+			$setting = SettingLogic::instance()->getByKey(SettingLogic::KEY_COS);
+			if ($setting) {
+				CdnLogic::instance()->channel(SettingLogic::KEY_COS)->deletePath(sprintf('/%s/%s', $chapter->document_id, $chapterId));
+			}
 
 			return true;
 		}
@@ -139,9 +145,9 @@ class ChapterLogic extends BaseLogic
 		if ($position == 'before') {
 			//把大于target sort先全部后移一位，然后把当前插入到target后面
 			Chapter::query()->where('document_id', '=', $source->document_id)
-							->where('parent_id', '=', $target->parent_id)
-							->where('id', '!=', $source->id)
-							->where('sort', '>=', $target->sort)->increment('sort');
+				->where('parent_id', '=', $target->parent_id)
+				->where('id', '!=', $source->id)
+				->where('sort', '>=', $target->sort)->increment('sort');
 
 			$source->sort = $target->sort;
 			$source->save();
@@ -151,14 +157,15 @@ class ChapterLogic extends BaseLogic
 				->where('parent_id', '=', $target->parent_id)
 				->where('id', '!=', $source->id)
 				->where('sort', '>', $target->sort)->increment('sort');
-			$source->sort = $target->sort+1;
+			$source->sort = $target->sort + 1;
 			$source->save();
 		}
 
 		return true;
 	}
 
-	public function moveByChapter(Chapter $source, Chapter $target) {
+	public function moveByChapter(Chapter $source, Chapter $target)
+	{
 		if (!$target->is_dir) {
 			throw new \RuntimeException('移动的目标不是目录，不能移动');
 		}
@@ -172,8 +179,8 @@ class ChapterLogic extends BaseLogic
 
 	public function searchDocument($id, $keyword)
 	{
-		$content_ids = ChapterContent::where('content', 'like', '%'.$keyword.'%')->pluck('chapter_id')->toArray();
-		$document_ids = Chapter::where('name', 'like', '%'.$keyword.'%')->where('document_id', $id)->pluck('id')->toArray();
+		$content_ids = ChapterContent::where('content', 'like', '%' . $keyword . '%')->pluck('chapter_id')->toArray();
+		$document_ids = Chapter::where('name', 'like', '%' . $keyword . '%')->where('document_id', $id)->pluck('id')->toArray();
 		$document_ids = array_merge($content_ids, $document_ids);
 		$documents = Chapter::whereIn('id', $document_ids)->where('document_id', $id)->get()->toArray();
 		foreach ($documents as &$document) {
@@ -202,10 +209,10 @@ class ChapterLogic extends BaseLogic
 	{
 		$path = $parent_id;
 		while ($parent_id != 0) {
-			$temporary =Chapter::query()->find($parent_id)->first();
+			$temporary = Chapter::query()->find($parent_id)->first();
 			if ($temporary) {
 				$parent_id = $temporary->parent_id;
-				$path = $parent_id.'/'.$path;
+				$path = $parent_id . '/' . $path;
 			} else {
 				throw new \Exception('路径信息缺失!');
 			}
@@ -215,7 +222,7 @@ class ChapterLogic extends BaseLogic
 
 	public function searchChapter($id, $keywords)
 	{
-		$chapter = Chapter::query()->select('id', 'parent_id', 'name')->where('document_id', $id)->where('name', 'like', '%'.$keywords.'%')->first();
+		$chapter = Chapter::query()->select('id', 'parent_id', 'name')->where('document_id', $id)->where('name', 'like', '%' . $keywords . '%')->first();
 		if ($chapter) {
 			$chapter['content'] = ChapterContent::find($chapter['id'])->content ?? '';
 			$chapter['path'] = $this->getPath($chapter['parent_id']);
