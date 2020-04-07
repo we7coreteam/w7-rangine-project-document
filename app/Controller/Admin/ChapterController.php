@@ -340,14 +340,14 @@ class ChapterController extends BaseController
 	 * @apiParam {String} record.apiHeader.value 参数示例值
 	 * @apiParam {Array} record.apiParam 请求参数
 	 * @apiParam {String} record.apiParam.key 参数名称
-	 * @apiParam {String} record.apiParam.type 参数类型 int,string....
+	 * @apiParam {String} record.apiParam.type 参数类型 int,string...
 	 * @apiParam {Number} record.apiParam.must 是否必传
 	 * @apiParam {String} record.apiParam.description 参数描述
 	 * @apiParam {String} record.apiParam.value 参数示例值
 	 * @apiParam {Array} record.apiParam.children 参数子类数组同父级
 	 * @apiParam {Array} record.apiSuccess 返回参数
 	 * @apiParam {String} record.apiSuccess.key 参数名称
-	 * @apiParam {String} record.apiSuccess.type 参数类型 int,string....
+	 * @apiParam {String} record.apiSuccess.type 参数类型 int,string...
 	 * @apiParam {Number} record.apiSuccess.must 是否必传
 	 * @apiParam {String} record.apiSuccess.description 参数描述
 	 * @apiParam {String} record.apiSuccess.value 参数示例值
