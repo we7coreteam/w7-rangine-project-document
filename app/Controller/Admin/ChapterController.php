@@ -72,7 +72,7 @@ class ChapterController extends BaseController
 	 * @apiParam {Number} document_id 目录ID
 	 * @apiParam {Number} parent_id 附ID
 	 * @apiParam {Number} is_dir 是否为目录
-	 * @apiParam {Number} layout 0：markdown格式 1：http格式
+	 * @apiParam {Number} layout 0：markdown格式 1：http格式(新增文件时)
 	 */
 	public function create(Request $request)
 	{
