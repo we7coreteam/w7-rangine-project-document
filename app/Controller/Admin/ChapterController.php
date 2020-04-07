@@ -118,6 +118,7 @@ class ChapterController extends BaseController
 		}
 
 		if (!$isDir) {
+			//如果是非目录，创建关联表并且锁定类型
 			$layout = $request->post('layout', 0);
 			if (!empty($chapter->content)) {
 				$chapter->content->content = '';
@@ -410,6 +411,44 @@ class ChapterController extends BaseController
 		return $this->data('success');
 	}
 
+	/**
+	 * @api {post} /chapter/content 文档内容-查看
+	 * @apiName content
+	 * @apiGroup Chapter
+	 *
+	 * @apiParam {Number} chapter_id 章节ID
+	 * @apiParam {Number} document_id 文档ID
+	 * @apiParam {Number} layout 文档类型 0：MARKDOWM文本，提交content 1：HTTP请求，提交record
+	 * @apiParam {String} content 文档内容（layout为1时用record生成content，此字段提交无效）
+	 * @apiParam {Array} record 请求记录
+	 * @apiParam {Array} record.api 请求记录地址信息
+	 * @apiParam {String} record.api.type 请求类型
+	 * @apiParam {String} record.api.value 地址
+	 * @apiParam {String} record.api.description 描述
+	 * @apiParam {Array} record.apiHeader 请求头
+	 * @apiParam {String} record.apiHeader.key 参数名称
+	 * @apiParam {Number} record.apiHeader.must 是否必传
+	 * @apiParam {String} record.apiHeader.description 参数描述
+	 * @apiParam {String} record.apiHeader.value 参数示例值
+	 * @apiParam {Array} record.apiParam 请求参数
+	 * @apiParam {String} record.apiParam.key 参数名称
+	 * @apiParam {String} record.apiParam.type 参数类型 int,string....
+	 * @apiParam {Number} record.apiParam.must 是否必传
+	 * @apiParam {String} record.apiParam.description 参数描述
+	 * @apiParam {String} record.apiParam.value 参数示例值
+	 * @apiParam {Array} record.apiParam.children 参数子类数组同父级
+	 * @apiParam {Array} record.apiSuccess 返回参数
+	 * @apiParam {String} record.apiSuccess.key 参数名称
+	 * @apiParam {String} record.apiSuccess.type 参数类型 int,string....
+	 * @apiParam {Number} record.apiSuccess.must 是否必传
+	 * @apiParam {String} record.apiSuccess.description 参数描述
+	 * @apiParam {String} record.apiSuccess.value 参数示例值
+	 * @apiParam {Array} record.apiSuccess.children 参数子类数组同父级
+	 * @apiParam {String} apiExtend 扩展内容
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":{"chapter_id":3,"name":"1111","content":"","layout":1,"author":{"uid":1,"username":"admin"},"updated_at":"2020-04-03 17:56:21","record":{"api":{"type":"GET","value":"http:\/\/baidu.com","description":"这是文档说明"},"apiHeader":[],"apiParam":[]},"message":"ok"}}
+	 */
 	public function content(Request $request)
 	{
 		$this->validate($request, [
