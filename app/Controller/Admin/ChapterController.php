@@ -437,8 +437,9 @@ class ChapterController extends BaseController
 	 * @apiParam {String} content 文档内容（layout为1时用record生成content，此字段提交无效）
 	 * @apiParam {Array} record 请求记录
 	 * @apiParam {Array} record.api 请求记录地址信息
-	 * @apiParam {String} record.api.type 请求类型
+	 * @apiParam {String} record.api.method 请求类型GET
 	 * @apiParam {String} record.api.value 地址
+	 * @apiParam {String} record.api.type 请求方式form-data
 	 * @apiParam {String} record.api.description 描述
 	 * @apiParam {Array} record.apiHeader 请求头
 	 * @apiParam {String} record.apiHeader.key 参数名称
