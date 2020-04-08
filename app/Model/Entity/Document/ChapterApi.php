@@ -17,7 +17,6 @@ use W7\App\Model\Entity\BaseModel;
 class ChapterApi extends BaseModel
 {
 	protected $table = 'document_chapter_api';
-	protected $primaryKey = 'chapter_id';
 
 	const METHOD_GET = 1;
 	const METHOD_POST = 2;

@@ -334,12 +334,14 @@ class ChapterController extends BaseController
 	 * @apiParam {String} record.api.url 地址
 	 * @apiParam {String} record.api.description 描述
 	 * @apiParam {Array} record.apiHeader 请求头
+	 * @apiParam {String} record.apiHeader.id 参数id
 	 * @apiParam {String} record.apiHeader.name 参数名称
 	 * @apiParam {Number} record.apiHeader.enabled 是否必传
 	 * @apiParam {String} record.apiHeader.description 参数描述
 	 * @apiParam {String} record.apiHeader.default_value 参数示例值
 	 * @apiParam {String} record.apiHeader.rule 生成规则
 	 * @apiParam {Array} record.apiParam 请求参数
+	 * @apiParam {String} record.apiParam.id 参数id
 	 * @apiParam {String} record.apiParam.name 参数名称
 	 * @apiParam {String} record.apiParam.type 参数类型 int,string...
 	 * @apiParam {Number} record.apiParam.enabled 是否必传
@@ -348,6 +350,7 @@ class ChapterController extends BaseController
 	 * @apiParam {String} record.apiParam.rule 生成规则
 	 * @apiParam {Array} record.apiParam.children 参数子类数组同父级
 	 * @apiParam {Array} record.apiSuccess 返回参数
+	 * @apiParam {String} record.apiSuccess.id 参数id
 	 * @apiParam {String} record.apiSuccess.name 参数名称
 	 * @apiParam {String} record.apiSuccess.type 参数类型 int,string...
 	 * @apiParam {Number} record.apiSuccess.enabled 是否必传
@@ -444,12 +447,14 @@ class ChapterController extends BaseController
 	 * @apiParam {String} record.api.url 地址
 	 * @apiParam {String} record.api.description 描述
 	 * @apiParam {Array} record.apiHeader 请求头
+	 * @apiParam {String} record.apiHeader.id 参数id
 	 * @apiParam {String} record.apiHeader.name 参数名称
 	 * @apiParam {Number} record.apiHeader.enabled 是否必传
 	 * @apiParam {String} record.apiHeader.description 参数描述
 	 * @apiParam {String} record.apiHeader.default_value 参数示例值
 	 * @apiParam {String} record.apiHeader.rule 生成规则
 	 * @apiParam {Array} record.apiParam 请求参数
+	 * @apiParam {String} record.apiParam.id 参数id
 	 * @apiParam {String} record.apiParam.name 参数名称
 	 * @apiParam {String} record.apiParam.type 参数类型 int,string...
 	 * @apiParam {Number} record.apiParam.enabled 是否必传
@@ -458,6 +463,7 @@ class ChapterController extends BaseController
 	 * @apiParam {String} record.apiParam.rule 生成规则
 	 * @apiParam {Array} record.apiParam.children 参数子类数组同父级
 	 * @apiParam {Array} record.apiSuccess 返回参数
+	 * @apiParam {String} record.apiSuccess.id 参数id
 	 * @apiParam {String} record.apiSuccess.name 参数名称
 	 * @apiParam {String} record.apiSuccess.type 参数类型 int,string...
 	 * @apiParam {Number} record.apiSuccess.enabled 是否必传

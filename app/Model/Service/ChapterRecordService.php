@@ -25,7 +25,7 @@ class ChapterRecordService
 		$this->record = $record;
 	}
 
-	public function recordToMarkdown($chapter_id)
+	public function recordToMarkdown($chapterId)
 	{
 		//markdown数据-初始化顺序
 		$markdown = [
@@ -35,29 +35,35 @@ class ChapterRecordService
 			'apiSuccess' => '',
 			'apiExtend' => '',
 		];
-
-		foreach ($this->record as $key => $val) {
-			if (is_array($val)) {
-				if ($key == 'api') {
-					$markdown['api'] = $this->buildApi($chapter_id, $val);
-				} elseif ($key == 'apiHeader') {
-					$markdown['apiHeader'] = $this->buildApiHeader($chapter_id, $val);
-				} elseif ($key == 'apiParam') {
-					$markdown['apiParam'] = $this->buildApiParam($chapter_id, $val);
-				} elseif ($key == 'apiSuccess') {
-					$markdown['apiSuccess'] = $this->buildApiSuccess($chapter_id, $val);
-				}
-			} else {
-				if ($key == 'apiExtend') {
-					$markdown['apiExtend'] = $val;
+		idb()->beginTransaction();
+		try {
+			foreach ($this->record as $key => $val) {
+				if (is_array($val)) {
+					if ($key == 'api') {
+						$markdown['api'] = $this->buildApi($chapterId, $val);
+					} elseif ($key == 'apiHeader') {
+						$markdown['apiHeader'] = $this->buildApiHeader($chapterId, $val);
+					} elseif ($key == 'apiParam') {
+						$markdown['apiParam'] = $this->buildApiParam($chapterId, $val);
+					} elseif ($key == 'apiSuccess') {
+						$markdown['apiSuccess'] = $this->buildApiSuccess($chapterId, $val);
+					}
+				} else {
+					if ($key == 'apiExtend') {
+						$markdown['apiExtend'] = $val;
+					}
 				}
 			}
+			idb()->commit();
+		} catch (\Throwable $e) {
+			idb()->rollBack();
+			throw $e;
 		}
 		$markdownText = implode("\n", $markdown);
 		return $markdownText;
 	}
 
-	public function buildApiSuccess($chapter_id, $data)
+	public function buildApiSuccess($chapterId, $data)
 	{
 		$text = "### 返回参数\n\n";
 		$text = $text . $this->tableTop();
@@ -120,7 +126,7 @@ class ChapterRecordService
 		return $text;
 	}
 
-	public function buildApiParam($chapter_id, $data)
+	public function buildApiParam($chapterId, $data)
 	{
 		$text = "### 请求参数\n\n";
 		$text = $text . $this->tableTop();
@@ -148,11 +154,12 @@ class ChapterRecordService
 		throw new ErrorHttpException('必填类型错误');
 	}
 
-	public function buildApiHeader($chapter_id, $data)
+	public function buildApiHeader($chapterId, $data)
 	{
 		$text = "### 请求头\n\n";
 		$text = $text . $this->strLengthAdaptation('参数名称', ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation('必填', ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation('描述', ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation('示例值', ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation('生成规则', ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
 		$text = $text . $this->strLengthAdaptation('|:-', ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation(':-:', ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
+		$ids = [];
 		foreach ($data as $k => $val) {
 			$name = '';
 			$default_value = '';
@@ -176,6 +183,37 @@ class ChapterRecordService
 			}
 			$enabledText = $this->getEnabledText($enabled);
 			$text .= $this->strLengthAdaptation($name, ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($enabledText, ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($default_value, ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation($rule, ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
+			//存储
+			$location = ChapterApiParam::LOCATION_REQUEST_HEADER;
+			$saveData = [
+				'chapter_id' => $chapterId,
+				'parent_id' => 0,
+				'location' => $location,
+				'type' => ChapterApiParam::TYPE_STRING,
+				'name' => $name,
+				'description' => $description,
+				'enabled' => $enabled,
+				'default_value' => $default_value,
+				'rule' => $rule
+			];
+			if (isset($val['id']) && $val['id']) {
+				$ids[count($ids)] = $val['id'];
+				$chapterApiParam = ChapterApiParam::query()->find($val['id']);
+				if ($chapterApiParam && $chapterApiParam->chapter_id == $chapterId) {
+					$chapterApiParam->update($saveData);
+				} else {
+					throw new ErrorHttpException('当前保存的数据项已不存在！' . $val['id'] . '-' . $chapterId);
+				}
+			} else {
+				$chapterApiParam = ChapterApiParam::query()->create($saveData);
+				if ($chapterApiParam) {
+					$ids[count($ids)] = $chapterApiParam->id;
+				}
+			}
+		}
+		//循环结束以后，删除该章节本次未提交的ID
+		if ($ids) {
+			ChapterApiParam::query()->where('chapter_id', $chapterId)->where('location', $location)->whereNotIn('id', $ids)->delete();
 		}
 		return $text;
 	}
@@ -199,7 +237,7 @@ class ChapterRecordService
 		return $str;
 	}
 
-	public function buildApi($chapter_id, $data)
+	public function buildApi($chapterId, $data)
 	{
 		$method = 0;
 		$url = '';
@@ -231,6 +269,19 @@ class ChapterRecordService
 		$text .= '- **接口地址：** ' . $url . "\n- **请求方式：** ==" . $methodLabel[$method] . "==\n";
 		if ($statusCode) {
 			$text .= '- **状态码：** ==' . $statusCode . "==\n";
+		}
+		//存储
+		$saveData = [
+			'chapter_id' => $chapterId,
+			'url' => $url,
+			'method' => $method,
+			'description' => $description
+		];
+		$chapterApi = ChapterApi::query()->where('chapter_id', $chapterId)->first();
+		if ($chapterApi) {
+			$chapterApi->update($saveData);
+		} else {
+			ChapterApi::query()->create($saveData);
 		}
 		return $text;
 	}
