@@ -13,9 +13,7 @@
 namespace W7\App\Controller\Admin\Document;
 
 use W7\App\Controller\BaseController;
-use W7\Http\Message\Server\Request;
 
-class ChapterPostManController extends BaseController
+class PostManController extends BaseController
 {
-
 }
