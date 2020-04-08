@@ -25,6 +25,7 @@ class ChapterRecord extends BaseModel
 	const TABLE_ENABLED_LENGTH = 5;//类型必填宽度
 	const TABLE_DESCRIPTION_LENGTH = 20;//描述默认宽度
 	const TABLE_VALUE_LENGTH = 20;//示例值默认宽度
+
 	const TABLE_ENABLED_YES = 1;
 	const TABLE_ENABLED_NO = 0;
 

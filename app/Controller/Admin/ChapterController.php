@@ -330,27 +330,30 @@ class ChapterController extends BaseController
 	 * @apiParam {String} content 文档内容（layout为1时用record生成content，此字段提交无效）
 	 * @apiParam {Array} record 请求记录
 	 * @apiParam {Array} record.api 请求记录地址信息
-	 * @apiParam {String} record.api.type 请求类型
-	 * @apiParam {String} record.api.value 地址
+	 * @apiParam {String} record.api.method 请求方式
+	 * @apiParam {String} record.api.url 地址
 	 * @apiParam {String} record.api.description 描述
 	 * @apiParam {Array} record.apiHeader 请求头
-	 * @apiParam {String} record.apiHeader.key 参数名称
+	 * @apiParam {String} record.apiHeader.name 参数名称
 	 * @apiParam {Number} record.apiHeader.enabled 是否必传
 	 * @apiParam {String} record.apiHeader.description 参数描述
-	 * @apiParam {String} record.apiHeader.value 参数示例值
+	 * @apiParam {String} record.apiHeader.default_value 参数示例值
+	 * @apiParam {String} record.apiHeader.rule 生成规则
 	 * @apiParam {Array} record.apiParam 请求参数
-	 * @apiParam {String} record.apiParam.key 参数名称
+	 * @apiParam {String} record.apiParam.name 参数名称
 	 * @apiParam {String} record.apiParam.type 参数类型 int,string...
 	 * @apiParam {Number} record.apiParam.enabled 是否必传
 	 * @apiParam {String} record.apiParam.description 参数描述
-	 * @apiParam {String} record.apiParam.value 参数示例值
+	 * @apiParam {String} record.apiParam.default_value 参数示例值
+	 * @apiParam {String} record.apiParam.rule 生成规则
 	 * @apiParam {Array} record.apiParam.children 参数子类数组同父级
 	 * @apiParam {Array} record.apiSuccess 返回参数
-	 * @apiParam {String} record.apiSuccess.key 参数名称
+	 * @apiParam {String} record.apiSuccess.name 参数名称
 	 * @apiParam {String} record.apiSuccess.type 参数类型 int,string...
 	 * @apiParam {Number} record.apiSuccess.enabled 是否必传
 	 * @apiParam {String} record.apiSuccess.description 参数描述
-	 * @apiParam {String} record.apiSuccess.value 参数示例值
+	 * @apiParam {String} record.apiSuccess.default_value 参数示例值
+	 * @apiParam {String} record.apiSuccess.rule 生成规则
 	 * @apiParam {Array} record.apiSuccess.children 参数子类数组同父级
 	 * @apiParam {String} apiExtend 扩展内容
 	 *
@@ -437,28 +440,30 @@ class ChapterController extends BaseController
 	 * @apiParam {String} content 文档内容（layout为1时用record生成content，此字段提交无效）
 	 * @apiParam {Array} record 请求记录
 	 * @apiParam {Array} record.api 请求记录地址信息
-	 * @apiParam {String} record.api.method 请求类型GET
-	 * @apiParam {String} record.api.value 地址
-	 * @apiParam {String} record.api.type 请求方式form-data
+	 * @apiParam {String} record.api.method 请求方式
+	 * @apiParam {String} record.api.url 地址
 	 * @apiParam {String} record.api.description 描述
 	 * @apiParam {Array} record.apiHeader 请求头
-	 * @apiParam {String} record.apiHeader.key 参数名称
+	 * @apiParam {String} record.apiHeader.name 参数名称
 	 * @apiParam {Number} record.apiHeader.enabled 是否必传
 	 * @apiParam {String} record.apiHeader.description 参数描述
-	 * @apiParam {String} record.apiHeader.value 参数示例值
+	 * @apiParam {String} record.apiHeader.default_value 参数示例值
+	 * @apiParam {String} record.apiHeader.rule 生成规则
 	 * @apiParam {Array} record.apiParam 请求参数
-	 * @apiParam {String} record.apiParam.key 参数名称
-	 * @apiParam {String} record.apiParam.type 参数类型 int,string....
+	 * @apiParam {String} record.apiParam.name 参数名称
+	 * @apiParam {String} record.apiParam.type 参数类型 int,string...
 	 * @apiParam {Number} record.apiParam.enabled 是否必传
 	 * @apiParam {String} record.apiParam.description 参数描述
-	 * @apiParam {String} record.apiParam.value 参数示例值
+	 * @apiParam {String} record.apiParam.default_value 参数示例值
+	 * @apiParam {String} record.apiParam.rule 生成规则
 	 * @apiParam {Array} record.apiParam.children 参数子类数组同父级
 	 * @apiParam {Array} record.apiSuccess 返回参数
-	 * @apiParam {String} record.apiSuccess.key 参数名称
-	 * @apiParam {String} record.apiSuccess.type 参数类型 int,string....
+	 * @apiParam {String} record.apiSuccess.name 参数名称
+	 * @apiParam {String} record.apiSuccess.type 参数类型 int,string...
 	 * @apiParam {Number} record.apiSuccess.enabled 是否必传
 	 * @apiParam {String} record.apiSuccess.description 参数描述
-	 * @apiParam {String} record.apiSuccess.value 参数示例值
+	 * @apiParam {String} record.apiSuccess.default_value 参数示例值
+	 * @apiParam {String} record.apiSuccess.rule 生成规则
 	 * @apiParam {Array} record.apiSuccess.children 参数子类数组同父级
 	 * @apiParam {String} apiExtend 扩展内容
 	 *

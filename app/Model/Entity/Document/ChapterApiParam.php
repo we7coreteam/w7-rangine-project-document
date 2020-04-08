@@ -19,6 +19,13 @@ class ChapterApiParam extends BaseModel
 	protected $table = 'document_chapter_api_param';
 	protected $primaryKey = 'chapter_id';
 
+	const TABLE_NAME_LENGTH = 20;//参数名称默认宽度
+	const TABLE_TYPE_LENGTH = 8;//类型默认宽度
+	const TABLE_ENABLED_LENGTH = 5;//类型必填宽度
+	const TABLE_DESCRIPTION_LENGTH = 20;//描述默认宽度
+	const TABLE_VALUE_LENGTH = 20;//示例值默认宽度
+	const TABLE_RULE_LENGTH = 20;//生成规则默认宽度
+
 	const ENABLED_NO = 1;
 	const ENABLED_YES = 2;
 

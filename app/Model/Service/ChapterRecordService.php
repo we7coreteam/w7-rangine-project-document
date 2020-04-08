@@ -12,7 +12,9 @@
 
 namespace W7\App\Model\Service;
 
-use W7\App\Model\Entity\Document\ChapterRecord;
+use W7\App\Exception\ErrorHttpException;
+use W7\App\Model\Entity\Document\ChapterApi;
+use W7\App\Model\Entity\Document\ChapterApiParam;
 
 class ChapterRecordService
 {
@@ -58,11 +60,18 @@ class ChapterRecordService
 	public function buildApiSuccess($chapter_id, $data)
 	{
 		$text = "### 返回参数\n\n";
-		$text = $text . $this->strLengthAdaptation('参数名称', ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation('类型', ChapterRecord::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation('必填', ChapterRecord::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation('描述', ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation('示例值', ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
-		$text = $text . $this->strLengthAdaptation('|:-', ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation(':-:', ChapterRecord::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation(':-:', ChapterRecord::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
+		$text = $text . $this->tableTop();
 		foreach ($data as $k => $val) {
 			$text .= $this->buildParamChildren($val);
 		}
+		return $text;
+	}
+
+	public function tableTop()
+	{
+		$text = $this->strLengthAdaptation('参数名称', ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation('类型', ChapterApiParam::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation('必填', ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation('描述', ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation('示例值', ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation('生成规则', ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
+		$text = $text . $this->strLengthAdaptation('|:-', ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation(':-:', ChapterApiParam::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation(':-:', ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
+
 		return $text;
 	}
 
@@ -74,13 +83,14 @@ class ChapterRecordService
 	public function buildParamChildren($data, $level = 0)
 	{
 		$childrenTop = $this->getChildrenTop($level);
-		$key = $childrenTop . '';
+		$name = $childrenTop . '';
 		$type = '';
-		$value = '';
+		$default_value = '';
 		$description = '';
-		$enabled = 0;
-		if (isset($data['key'])) {
-			$key = $childrenTop . $data['key'];
+		$rule = '';
+		$enabled = 1;
+		if (isset($data['name'])) {
+			$name = $childrenTop . $data['name'];
 		}
 		if (isset($data['type'])) {
 			$type = $data['type'];
@@ -88,14 +98,20 @@ class ChapterRecordService
 		if (isset($data['enabled'])) {
 			$enabled = $data['enabled'];
 		}
-		if (isset($data['value'])) {
-			$value = $data['value'];
+		if (isset($data['default_value'])) {
+			$default_value = $data['default_value'];
 		}
 		if (isset($data['description'])) {
 			$description = $data['description'];
 		}
+
+		if (isset($data['rule'])) {
+			$rule = $data['rule'];
+		}
+
 		$enabledText = $this->getEnabledText($enabled);
-		$text = $this->strLengthAdaptation($key, ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($type, ChapterRecord::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation($enabledText, ChapterRecord::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($value, ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
+		$typeText = $this->getTypeText($type);
+		$text = $this->strLengthAdaptation($name, ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($typeText, ChapterApiParam::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation($enabledText, ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($default_value, ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation($rule, ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
 		if (isset($data['children']) && (!empty($data['children'])) && is_array($data['children'])) {
 			foreach ($data['children'] as $k => $val) {
 				$text .= $this->buildParamChildren($val, $level + 1);
@@ -107,44 +123,59 @@ class ChapterRecordService
 	public function buildApiParam($chapter_id, $data)
 	{
 		$text = "### 请求参数\n\n";
-		$text = $text . $this->strLengthAdaptation('参数名称', ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation('类型', ChapterRecord::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation('必填', ChapterRecord::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation('描述', ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation('示例值', ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
-		$text = $text . $this->strLengthAdaptation('|:-', ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation(':-:', ChapterRecord::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation(':-:', ChapterRecord::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
+		$text = $text . $this->tableTop();
 		foreach ($data as $k => $val) {
 			$text .= $this->buildParamChildren($val);
 		}
 		return $text;
 	}
 
+	public function getTypeText($type)
+	{
+		$typeLabel = ChapterApiParam::getTypeLabel();
+		if (isset($typeLabel[$type])) {
+			return $typeLabel[$type];
+		}
+		throw new ErrorHttpException('参数类型错误');
+	}
+
 	public function getEnabledText($enabled)
 	{
-		$enabledLabel = ChapterRecord::getEnabledLabel();
-		return $enabledLabel[$enabled];
+		$enabledLabel = ChapterApiParam::getEnabledLabel();
+		if (isset($enabledLabel[$enabled])) {
+			return $enabledLabel[$enabled];
+		}
+		throw new ErrorHttpException('必填类型错误');
 	}
 
 	public function buildApiHeader($chapter_id, $data)
 	{
 		$text = "### 请求头\n\n";
-		$text = $text . $this->strLengthAdaptation('参数名称', ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation('必填', ChapterRecord::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation('描述', ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation('示例值', ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
-		$text = $text . $this->strLengthAdaptation('|:-', ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation(':-:', ChapterRecord::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
+		$text = $text . $this->strLengthAdaptation('参数名称', ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation('必填', ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation('描述', ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation('示例值', ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation('生成规则', ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
+		$text = $text . $this->strLengthAdaptation('|:-', ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation(':-:', ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
 		foreach ($data as $k => $val) {
-			$key = '';
-			$value = '';
+			$name = '';
+			$default_value = '';
 			$description = '';
-			$enabled = 0;
-			if (isset($val['key'])) {
-				$key = $val['key'];
+			$enabled = 1;
+			$rule = '';
+			if (isset($val['name'])) {
+				$name = $val['name'];
 			}
 			if (isset($val['enabled'])) {
 				$enabled = $val['enabled'];
 			}
-			if (isset($val['value'])) {
-				$value = $val['value'];
+			if (isset($val['default_value'])) {
+				$default_value = $val['default_value'];
 			}
 			if (isset($val['description'])) {
 				$description = $val['description'];
 			}
+			if (isset($val['rule'])) {
+				$rule = $val['rule'];
+			}
 			$enabledText = $this->getEnabledText($enabled);
-			$text .= $this->strLengthAdaptation($key, ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($enabledText, ChapterRecord::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($value, ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
+			$text .= $this->strLengthAdaptation($name, ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($enabledText, ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($default_value, ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation($rule, ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
 		}
 		return $text;
 	}
@@ -170,22 +201,36 @@ class ChapterRecordService
 
 	public function buildApi($chapter_id, $data)
 	{
-		$type = 'get';
-		$value = '';
+		$method = 0;
+		$url = '';
 		$description = '';
-		if (isset($data['type'])) {
-			$type = $data['type'];
+		$statusCode = 0;
+		if (isset($data['method'])) {
+			$method = $data['method'];
 		}
-		if (isset($data['value'])) {
-			$value = $data['value'];
+		$methodLabel = ChapterApi::getMethodLabel();
+		if (!isset($methodLabel[$method])) {
+			throw new ErrorHttpException('请求方式错误');
+		}
+		if (isset($data['url'])) {
+			$url = $data['url'];
 		}
 		if (isset($data['description'])) {
 			$description = $data['description'];
 		}
+		if (isset($data['status_code'])) {
+			$statusCode = $data['status_code'];
+			$statusCodeLists = ChapterApi::getStatusCode();
+			if (!in_array($statusCode, $statusCodeLists)) {
+				throw new ErrorHttpException('状态码错误');
+			}
+		}
 		if ($description) {
-			$text = '- **接口说明：** ' . $description . "\n- **接口地址：** " . $value . "\n- **请求方式：** ==" . $type . "==\n";
-		} else {
-			$text = '**接口地址：** ' . $value . "\n- **请求方式：** ==" . $type . "==\n";
+			$text = '- **接口说明：** ' . $description . "\n";
+		}
+		$text .= '- **接口地址：** ' . $url . "\n- **请求方式：** ==" . $methodLabel[$method] . "==\n";
+		if ($statusCode) {
+			$text .= '- **状态码：** ==' . $statusCode . "==\n";
 		}
 		return $text;
 	}
