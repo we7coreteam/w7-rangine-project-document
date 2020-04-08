@@ -33,7 +33,7 @@ class ChapterApiController extends BaseController
 	}
 
 	/**
-	 * @api {get} /chapterapi/getMethodLabel 获取请求类型列表
+	 * @api {get} /chapterapi/getMethodLabel 获取请求方式列表
 	 * @apiName getMethodLabel
 	 * @apiGroup ChapterApi
 	 *
@@ -56,5 +56,31 @@ class ChapterApiController extends BaseController
 	public function getEnabledLabel(Request $request)
 	{
 		return ChapterApiParam::getEnabledLabel();
+	}
+
+	/**
+	 * @api {get} /chapterapi/getTypeLabel 获取字段类型列表
+	 * @apiName getTypeLabel
+	 * @apiGroup ChapterApi
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"1":"String","2":"Number","3":"Boolean","4":"Object","5":"Array","6":"Function","7":"RegExp","8":"Null"}
+	 */
+	public function getTypeLabel(Request $request)
+	{
+		return ChapterApiParam::getTypeLabel();
+	}
+
+	/**
+	 * @api {get} /chapterapi/getLocationLabel 获取字段请求类型列表
+	 * @apiName getLocationLabel
+	 * @apiGroup ChapterApi
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {{"1":"Request.Header","2":"Request.Query","3":"Request.Body.form-data","4":"Request.Body.x-www-form-urlencoded","5":"Request.Body.raw","6":"Request.Body.binary","7":"Reponse.Header","8":"Reponse.Body.form-data","9":"Reponse.Body.x-www-form-urlencoded","10":"Reponse.Body.raw","11":"Reponse.Body.binary"}
+	 */
+	public function getLocationLabel(Request $request)
+	{
+		return ChapterApiParam::getLocationLabel();
 	}
 }
