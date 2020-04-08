@@ -30,7 +30,7 @@ class CreateDocumentChapterApiParam extends Migration
 			$table->tinyInteger('type')->comment('数据类型:1、int2、string...');
 			$table->string('name', 255)->default('')->comment('数据键值');
 			$table->string('description', 255)->default('')->comment('数据键值描述');
-			$table->tinyInteger('enabled')->default(0)->comment('是否必填0否1是');
+			$table->tinyInteger('enabled')->default(1)->comment('是否必填1否2是');
 			$table->string('default_value', 255)->default('')->comment('初始值');
 			$table->string('rule', 255)->default('')->comment('生成规则');
 			$table->integer('created_at')->default(0);

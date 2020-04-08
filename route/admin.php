@@ -23,6 +23,12 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 		$route->post('/change-founder', 'Admin\DocumentController@changeDocumentFounder');
 	});
 
+	//api文档内容管理-公共
+	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix'=>'/chapterapi'], function (\W7\Core\Route\Route $route){
+		$route->get('/getStatusCode', 'Admin\ChapterApiController@getStatusCode');
+		$route->get('/getMethodLabel', 'Admin\ChapterApiController@getMethodLabel');
+		$route->get('/getEnabledLabel', 'Admin\ChapterApiController@getEnabledLabel');
+	});
 	//文档内容管理
 	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix'=>'/chapter'], function (\W7\Core\Route\Route $route){
 		//文档管理设置
