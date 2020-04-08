@@ -10,7 +10,7 @@
  * visited https://www.w7.cc for more details
  */
 
-namespace W7\App\Controller\Admin;
+namespace W7\App\Controller\Admin\Document;
 
 use W7\App\Controller\BaseController;
 use W7\App\Model\Entity\Document\ChapterApi;
@@ -20,7 +20,7 @@ use W7\Http\Message\Server\Request;
 class ChapterApiController extends BaseController
 {
 	/**
-	 * @api {get} /chapterapi/getStatusCode 获取状态码列表
+	 * @api {get} /document/chapterapi/getStatusCode 获取状态码列表
 	 * @apiName getStatusCode
 	 * @apiGroup ChapterApi
 	 *
@@ -33,7 +33,7 @@ class ChapterApiController extends BaseController
 	}
 
 	/**
-	 * @api {get} /chapterapi/getMethodLabel 获取请求方式列表
+	 * @api {get} /document/chapterapi/getMethodLabel 获取请求方式列表
 	 * @apiName getMethodLabel
 	 * @apiGroup ChapterApi
 	 *
@@ -46,7 +46,7 @@ class ChapterApiController extends BaseController
 	}
 
 	/**
-	 * @api {get} /chapterapi/getEnabledLabel 获取必填类型列表
+	 * @api {get} /document/chapterapi/getEnabledLabel 获取必填类型列表
 	 * @apiName getEnabledLabel
 	 * @apiGroup ChapterApi
 	 *
@@ -59,7 +59,7 @@ class ChapterApiController extends BaseController
 	}
 
 	/**
-	 * @api {get} /chapterapi/getTypeLabel 获取字段类型列表
+	 * @api {get} /document/chapterapi/getTypeLabel 获取字段类型列表
 	 * @apiName getTypeLabel
 	 * @apiGroup ChapterApi
 	 *
@@ -72,7 +72,7 @@ class ChapterApiController extends BaseController
 	}
 
 	/**
-	 * @api {get} /chapterapi/getLocationLabel 获取字段请求类型列表
+	 * @api {get} /document/chapterapi/getLocationLabel 获取字段请求类型列表
 	 * @apiName getLocationLabel
 	 * @apiGroup ChapterApi
 	 *
@@ -85,7 +85,7 @@ class ChapterApiController extends BaseController
 	}
 
 	/**
-	 * @api {get} /chapterapi/rawContentType 获取RAW请求头列表
+	 * @api {get} /document/chapterapi/rawContentType 获取RAW请求头列表
 	 * @apiName rawContentType
 	 * @apiGroup ChapterApi
 	 *
