@@ -41,9 +41,9 @@ class ChapterRecordService
 			$chapterApiParam = ChapterApiParam::query()->where('chapter_id', $chapterId)->where('parent_id', 0)->get();
 			if ($chapterApiParam) {
 				foreach ($chapterApiParam as $key => $val) {
-					$val->children = $this->copyBodyChildren($chapterId, $val->id, $newChapterId);
 					$val->chapter_id = $newChapterId;
-					ChapterApiParam::query()->create($val->toArray());
+					$newChapterApiParam = ChapterApiParam::query()->create($val->toArray());
+					$val->children = $this->copyBodyChildren($chapterId, $val->id, $newChapterId, $newChapterApiParam->id);
 				}
 			}
 			$chapterApiExtend = ChapterApiExtend::query()->where('chapter_id', $chapterId)->first();
@@ -55,14 +55,15 @@ class ChapterRecordService
 		return true;
 	}
 
-	public function copyBodyChildren($chapterId, $parent_id, $newChapterId)
+	public function copyBodyChildren($chapterId, $parentId, $newChapterId, $newParentId)
 	{
-		$chapterApiParam = ChapterApiParam::query()->where('chapter_id', $chapterId)->where('parent_id', $parent_id)->get();
+		$chapterApiParam = ChapterApiParam::query()->where('chapter_id', $chapterId)->where('parent_id', $parentId)->get();
 		if ($chapterApiParam) {
 			foreach ($chapterApiParam as $key => $val) {
-				$val->children = $this->getBodyChildren($chapterId, $val->id);
 				$val->chapter_id = $newChapterId;
-				ChapterApiParam::query()->create($val->toArray());
+				$val->parent_id = $newParentId;
+				$newChapterApiParam = ChapterApiParam::query()->create($val->toArray());
+				$val->children = $this->copyBodyChildren($chapterId, $val->id, $newChapterId, $newChapterApiParam->id);
 			}
 			return $chapterApiParam;
 		}
@@ -98,9 +99,9 @@ class ChapterRecordService
 		return $record;
 	}
 
-	public function getBodyChildren($chapterId, $parent_id)
+	public function getBodyChildren($chapterId, $parentId)
 	{
-		$chapterApiParam = ChapterApiParam::query()->where('chapter_id', $chapterId)->where('parent_id', $parent_id)->get();
+		$chapterApiParam = ChapterApiParam::query()->where('chapter_id', $chapterId)->where('parent_id', $parentId)->get();
 		if ($chapterApiParam) {
 			foreach ($chapterApiParam as $key => $val) {
 				$val->children = $this->getBodyChildren($chapterId, $val->id);
