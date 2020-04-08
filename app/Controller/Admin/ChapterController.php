@@ -332,8 +332,9 @@ class ChapterController extends BaseController
 	 * @apiParam {String} record.api.method 请求方式
 	 * @apiParam {String} record.api.url 地址
 	 * @apiParam {String} record.api.description 描述
+	 * @apiParam {String} record.api.body_param_location body_param默认类型
 	 * @apiParam {Array} record.body 请求
-	 * @apiParam {Array} record.body.location 请求类型1-11参考getLocationLabel
+	 * @apiParam {Array} record.body.location 请求类型1-11参考getLocationLabel，bodyparam请求参数默认3返回参数默认10
 	 * @apiParam {String} record.body.location.id 参数id
 	 * @apiParam {String} record.body.location.name 参数名称
 	 * @apiParam {String} record.body.location.type 参数类型（location=1,7header的时候固定为string可不传） int,string...
@@ -421,8 +422,9 @@ class ChapterController extends BaseController
 	 * @apiParam {String} record.api.method 请求方式
 	 * @apiParam {String} record.api.url 地址
 	 * @apiParam {String} record.api.description 描述
+	 * @apiParam {String} record.api.body_param_location body_param默认类型
 	 * @apiParam {Array} record.body 请求
-	 * @apiParam {Array} record.body.location 请求类型1-11参考getLocationLabel
+	 * @apiParam {Array} record.body.location 请求类型1-11参考getLocationLabel，bodyparam请求参数默认3返回参数默认10
 	 * @apiParam {String} record.body.location.id 参数id
 	 * @apiParam {String} record.body.location.name 参数名称
 	 * @apiParam {String} record.body.location.type 参数类型（location=1,7header的时候固定为string可不传） int,string...

@@ -22,6 +22,8 @@ class ChapterRecordService
 	protected $chapterId;
 	protected $record;
 	protected $ids = [];
+	protected $bodyParamLocation = 3;
+	protected $bodyReponseLocation = 10;
 
 	public function __construct($chapterId, $record = [])
 	{
@@ -127,21 +129,14 @@ class ChapterRecordService
 	{
 		ksort($data);
 		$text = '';
-		$requestBody = [
-			ChapterApiParam::LOCATION_REQUEST_QUERY => 'Request.Query',
-			ChapterApiParam::LOCATION_REQUEST_BODY_FROM => 'Request.Body.form-data',
-			ChapterApiParam::LOCATION_REQUEST_BODY_URLENCODED => 'Request.Body.urlencoded',
-			ChapterApiParam::LOCATION_REQUEST_BODY_RAW => 'Request.Body.raw',
-			ChapterApiParam::LOCATION_REQUEST_BODY_BINARY => 'Request.Body.binary',
-			ChapterApiParam::LOCATION_REPONSE_BODY_FROM => 'Reponse.Body.form-data',
-			ChapterApiParam::LOCATION_REPONSE_BODY_URLENCODED => 'Reponse.Body.urlencoded',
-			ChapterApiParam::LOCATION_REPONSE_BODY_RAW => 'Reponse.Body.raw',
-			ChapterApiParam::LOCATION_REPONSE_BODY_BINARY => 'Reponse.Body.binary',
-		];
 		foreach ($data as $k => $v) {
 			if (in_array($k, [ChapterApiParam::LOCATION_REQUEST_HEADER, ChapterApiParam::LOCATION_REPONSE_HEADER])) {
 				$text .= $this->buildApiHeader($k, $v);
-			} elseif (in_array($k, array_keys($requestBody))) {
+			} elseif (in_array($k, [ChapterApiParam::LOCATION_REQUEST_QUERY])) {
+				$text .= $this->buildApiBody($k, $v);
+			} elseif ($k == $this->bodyParamLocation) {
+				$text .= $this->buildApiBody($k, $v);
+			} elseif ($k == $this->bodyReponseLocation) {
 				$text .= $this->buildApiBody($k, $v);
 			}
 		}
@@ -364,6 +359,7 @@ class ChapterRecordService
 		$url = '';
 		$description = '';
 		$statusCode = 0;
+		$bodyParamLocation = 3;
 		if (isset($data['method'])) {
 			$method = $data['method'];
 		}
@@ -376,6 +372,10 @@ class ChapterRecordService
 		}
 		if (isset($data['description'])) {
 			$description = $data['description'];
+		}
+		if (isset($data['body_param_location'])) {
+			$bodyParamLocation = $data['body_param_location'];
+			$this->bodyParamLocation = $bodyParamLocation;
 		}
 		if (isset($data['status_code'])) {
 			$statusCode = $data['status_code'];
@@ -396,7 +396,8 @@ class ChapterRecordService
 			'chapter_id' => $chapterId,
 			'url' => $url,
 			'method' => $method,
-			'description' => $description
+			'description' => $description,
+			'body_param_location' => $bodyParamLocation
 		];
 		$chapterApi = ChapterApi::query()->where('chapter_id', $chapterId)->first();
 		if ($chapterApi) {
