@@ -17,7 +17,7 @@ use W7\App\Model\Entity\BaseModel;
 class ChapterApiParam extends BaseModel
 {
 	protected $table = 'document_chapter_api_param';
-	
+
 	const TABLE_NAME_LENGTH = 20;//参数名称默认宽度
 	const TABLE_TYPE_LENGTH = 8;//类型默认宽度
 	const TABLE_ENABLED_LENGTH = 5;//类型必填宽度
@@ -40,14 +40,12 @@ class ChapterApiParam extends BaseModel
 	const LOCATION_REQUEST_HEADER = 1;
 	const LOCATION_REQUEST_QUERY = 2;
 	const LOCATION_REQUEST_BODY_FROM = 3;
-	const LOCATION_REQUEST_BODY_FROM_URLENCODED = 4;
-	const LOCATION_REQUEST_BODY_RAW = 5;
-	const LOCATION_REQUEST_BODY_BINARY = 6;
-	const LOCATION_REPONSE_HEADER = 7;
-	const LOCATION_REPONSE_BODY_FROM = 8;
-	const LOCATION_REPONSE_BODY_FROM_URLENCODED = 9;
-	const LOCATION_REPONSE_BODY_RAW = 10;
-	const LOCATION_REPONSE_BODY_BINARY = 11;
+	const LOCATION_REQUEST_BODY_RAW = 4;
+	const LOCATION_REQUEST_BODY_BINARY = 5;
+	const LOCATION_REPONSE_HEADER = 6;
+	const LOCATION_REPONSE_BODY_FROM = 7;
+	const LOCATION_REPONSE_BODY_RAW = 8;
+	const LOCATION_REPONSE_BODY_BINARY = 9;
 
 	public static function getLocationLabel()
 	{
@@ -55,12 +53,10 @@ class ChapterApiParam extends BaseModel
 			self::LOCATION_REQUEST_HEADER => 'Request.Header',
 			self::LOCATION_REQUEST_QUERY => 'Request.Query',
 			self::LOCATION_REQUEST_BODY_FROM => 'Request.Body.form-data',
-			self::LOCATION_REQUEST_BODY_FROM_URLENCODED => 'Request.Body.x-www-form-urlencoded',
 			self::LOCATION_REQUEST_BODY_RAW => 'Request.Body.raw',
 			self::LOCATION_REQUEST_BODY_BINARY => 'Request.Body.binary',
 			self::LOCATION_REPONSE_HEADER => 'Reponse.Header',
 			self::LOCATION_REPONSE_BODY_FROM => 'Reponse.Body.form-data',
-			self::LOCATION_REPONSE_BODY_FROM_URLENCODED => 'Reponse.Body.x-www-form-urlencoded',
 			self::LOCATION_REPONSE_BODY_RAW => 'Reponse.Body.raw',
 			self::LOCATION_REPONSE_BODY_BINARY => 'Reponse.Body.binary',
 		];

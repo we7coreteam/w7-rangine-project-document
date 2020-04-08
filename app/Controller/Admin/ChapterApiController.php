@@ -77,7 +77,7 @@ class ChapterApiController extends BaseController
 	 * @apiGroup ChapterApi
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 * {{"1":"Request.Header","2":"Request.Query","3":"Request.Body.form-data","4":"Request.Body.x-www-form-urlencoded","5":"Request.Body.raw","6":"Request.Body.binary","7":"Reponse.Header","8":"Reponse.Body.form-data","9":"Reponse.Body.x-www-form-urlencoded","10":"Reponse.Body.raw","11":"Reponse.Body.binary"}
+	 * {"1":"Request.Header","2":"Request.Query","3":"Request.Body.form-data","4":"Request.Body.raw","5":"Request.Body.binary","6":"Reponse.Header","7":"Reponse.Body.form-data","8":"Reponse.Body.raw","9":"Reponse.Body.binary"}
 	 */
 	public function getLocationLabel(Request $request)
 	{

@@ -389,19 +389,19 @@ class ChapterController extends BaseController
 		$content = $request->post('content', '');
 
 		if ($layout == 1) {
-			//如果是http类型
-			$record = $request->post('record', []);
-			$chapterRecord = new ChapterRecordService($record);
-			$content = $chapterRecord->recordToMarkdown();
-			if (!empty($chapter->record)) {
-				$chapter->record->record = json_encode($record);
-				$chapter->record->save();
-			} else {
-				ChapterRecord::query()->create([
-					'chapter_id' => $chapter->id,
-					'record' => $record
-				]);
-			}
+//			//如果是http类型
+//			$record = $request->post('record', []);
+//			$chapterRecord = new ChapterRecordService($record);
+//			$content = $chapterRecord->recordToMarkdown();
+//			if (!empty($chapter->record)) {
+//				$chapter->record->record = json_encode($record);
+//				$chapter->record->save();
+//			} else {
+//				ChapterRecord::query()->create([
+//					'chapter_id' => $chapter->id,
+//					'record' => $record
+//				]);
+//			}
 		}
 
 		if (!empty($chapter->content)) {
