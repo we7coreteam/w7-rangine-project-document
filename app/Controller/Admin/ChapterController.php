@@ -376,8 +376,8 @@ class ChapterController extends BaseController
 		if ($layout == 1) {
 			//如果是http类型
 			$record = $request->post('record', []);
-			$chapterRecord = new ChapterRecordService($chapter->id, $record);
-			$content = $chapterRecord->recordToMarkdown();
+			$chapterRecord = new ChapterRecordService($chapter->id);
+			$content = $chapterRecord->recordToMarkdown($record);
 		}
 
 		if (!empty($chapter->content)) {

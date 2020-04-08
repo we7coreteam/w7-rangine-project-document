@@ -20,15 +20,13 @@ use W7\App\Model\Entity\Document\ChapterApiParam;
 class ChapterRecordService
 {
 	protected $chapterId;
-	protected $record;
 	protected $ids = [];
 	protected $bodyParamLocation = 3;
 	protected $bodyReponseLocation = 10;
 
-	public function __construct($chapterId, $record = [])
+	public function __construct($chapterId)
 	{
 		$this->chapterId = $chapterId;
-		$this->record = $record;
 	}
 
 	public function copyRecord($newChapterId)
@@ -112,7 +110,7 @@ class ChapterRecordService
 		return [];
 	}
 
-	public function recordToMarkdown()
+	public function recordToMarkdown($record)
 	{
 		//markdown数据-初始化顺序
 		$markdown = [
@@ -122,7 +120,7 @@ class ChapterRecordService
 		];
 		idb()->beginTransaction();
 		try {
-			foreach ($this->record as $key => $val) {
+			foreach ($record as $key => $val) {
 				if (is_array($val)) {
 					if ($key == 'api') {
 						$markdown['api'] = $this->buildApi($val);
