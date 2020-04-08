@@ -14,6 +14,7 @@ namespace W7\App\Model\Service;
 
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document\ChapterApi;
+use W7\App\Model\Entity\Document\ChapterApiExtend;
 use W7\App\Model\Entity\Document\ChapterApiParam;
 
 class ChapterRecordService
@@ -22,10 +23,50 @@ class ChapterRecordService
 	protected $record;
 	protected $ids = [];
 
-	public function __construct($chapterId, $record)
+	public function __construct($chapterId, $record = [])
 	{
 		$this->chapterId = $chapterId;
 		$this->record = $record;
+	}
+
+	public function dataToRecord()
+	{
+		$chapterId = $this->chapterId;
+		$record = [
+			'api' => [],
+			'body' => [],
+			'extend' => ''
+		];
+		$body = [];
+		$chapterApi = ChapterApi::query()->where('chapter_id', $chapterId)->first();
+		$record['api'] = $chapterApi;
+		$chapterApiParam = ChapterApiParam::query()->where('chapter_id', $chapterId)->where('parent_id', 0)->get();
+		if ($chapterApiParam) {
+			foreach ($chapterApiParam as $key => $val) {
+				$val->children = $this->getBodyChildren($chapterId, $val->id);
+				$body[$val->location][] = $val;
+			}
+			ksort($body);
+			$record['body'] = $body;
+		}
+		$chapterApiExtend = ChapterApiExtend::query()->where('chapter_id', $chapterId)->first();
+		if ($chapterApiExtend) {
+			$record['extend'] = $chapterApiExtend->extend;
+		}
+		return $record;
+	}
+
+	public function getBodyChildren($chapterId, $parent_id)
+	{
+		$chapterApiParam = ChapterApiParam::query()->where('chapter_id', $chapterId)->where('parent_id', $parent_id)->get();
+		if ($chapterApiParam) {
+			foreach ($chapterApiParam as $key => $val) {
+				$val->children = $this->getBodyChildren($chapterId, $val->id);
+				$body[$val->location][] = $val;
+			}
+			return $chapterApiParam;
+		}
+		return [];
 	}
 
 	public function recordToMarkdown()
@@ -33,8 +74,7 @@ class ChapterRecordService
 		//markdown数据-初始化顺序
 		$markdown = [
 			'api' => '',
-			'request' => '',
-			'response' => '',
+			'body' => '',
 			'extend' => '',
 		];
 		idb()->beginTransaction();
@@ -43,14 +83,12 @@ class ChapterRecordService
 				if (is_array($val)) {
 					if ($key == 'api') {
 						$markdown['api'] = $this->buildApi($val);
-					} elseif ($key == 'request') {
-						$markdown['request'] = $this->buildRequest($val);
-					} elseif ($key == 'response') {
-						$markdown['response'] = $this->buildResponse($val);
+					} elseif ($key == 'body') {
+						$markdown['body'] = $this->buildBody($val);
 					}
 				} else {
-					if ($key == 'apiExtend') {
-						$markdown['apiExtend'] = $val;
+					if ($key == 'extend') {
+						$markdown['extend'] = $this->buildExtend($val);
 					}
 				}
 			}
@@ -69,27 +107,23 @@ class ChapterRecordService
 		return $markdownText;
 	}
 
-	public function buildResponse($data)
+	public function buildExtend($data)
 	{
-		ksort($data);
-		$text = '';
-		$responseBody = [
-			ChapterApiParam::LOCATION_REPONSE_BODY_FROM => 'Reponse.Body.form-data',
-			ChapterApiParam::LOCATION_REPONSE_BODY_URLENCODED => 'Reponse.Body.urlencoded',
-			ChapterApiParam::LOCATION_REPONSE_BODY_RAW => 'Reponse.Body.raw',
-			ChapterApiParam::LOCATION_REPONSE_BODY_BINARY => 'Reponse.Body.binary',
+		$chapterId = $this->chapterId;
+		$saveData = [
+			'chapter_id' => $chapterId,
+			'extend' => $data,
 		];
-		foreach ($data as $k => $v) {
-			if ($k == ChapterApiParam::LOCATION_REPONSE_HEADER) {
-				$text .= $this->buildApiHeader($k, $v);
-			} elseif (in_array($k, array_keys($responseBody))) {
-				$text .= $this->buildApiBody($k, $v);
-			}
+		$chapterApiExtend = ChapterApiExtend::query()->where('chapter_id', $chapterId)->first();
+		if ($chapterApiExtend) {
+			$chapterApiExtend->update($saveData);
+		} else {
+			ChapterApiExtend::query()->create($saveData);
 		}
-		return $text;
+		return $data;
 	}
 
-	public function buildRequest($data)
+	public function buildBody($data)
 	{
 		ksort($data);
 		$text = '';
@@ -99,9 +133,13 @@ class ChapterRecordService
 			ChapterApiParam::LOCATION_REQUEST_BODY_URLENCODED => 'Request.Body.urlencoded',
 			ChapterApiParam::LOCATION_REQUEST_BODY_RAW => 'Request.Body.raw',
 			ChapterApiParam::LOCATION_REQUEST_BODY_BINARY => 'Request.Body.binary',
+			ChapterApiParam::LOCATION_REPONSE_BODY_FROM => 'Reponse.Body.form-data',
+			ChapterApiParam::LOCATION_REPONSE_BODY_URLENCODED => 'Reponse.Body.urlencoded',
+			ChapterApiParam::LOCATION_REPONSE_BODY_RAW => 'Reponse.Body.raw',
+			ChapterApiParam::LOCATION_REPONSE_BODY_BINARY => 'Reponse.Body.binary',
 		];
 		foreach ($data as $k => $v) {
-			if ($k == ChapterApiParam::LOCATION_REQUEST_HEADER) {
+			if (in_array($k, [ChapterApiParam::LOCATION_REQUEST_HEADER, ChapterApiParam::LOCATION_REPONSE_HEADER])) {
 				$text .= $this->buildApiHeader($k, $v);
 			} elseif (in_array($k, array_keys($requestBody))) {
 				$text .= $this->buildApiBody($k, $v);
