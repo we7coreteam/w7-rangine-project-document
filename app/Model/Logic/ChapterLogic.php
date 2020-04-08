@@ -14,6 +14,9 @@ namespace W7\App\Model\Logic;
 
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\Document\Chapter;
+use W7\App\Model\Entity\Document\ChapterApi;
+use W7\App\Model\Entity\Document\ChapterApiExtend;
+use W7\App\Model\Entity\Document\ChapterApiParam;
 use W7\App\Model\Entity\Document\ChapterContent;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserOperateLog;
@@ -114,6 +117,10 @@ class ChapterLogic extends BaseLogic
 				'default_show_chapter_id' => 0
 			]);
 			ChapterContent::query()->where('chapter_id', '=', $chapterId)->delete();
+
+			ChapterApi::query()->where('chapter_id', '=', $chapterId)->delete();
+			ChapterApiParam::query()->where('chapter_id', '=', $chapterId)->delete();
+			ChapterApiExtend::query()->where('chapter_id', '=', $chapterId)->delete();
 
 			UserOperateLog::query()->where('document_id', '=', $chapter->document_id)->where('chapter_id', '=', $chapterId)->delete();
 

@@ -31,7 +31,45 @@ class ChapterRecordService
 		$this->record = $record;
 	}
 
-	public function dataToRecord()
+	public function copyRecord($newChapterId)
+	{
+		$chapterId = $this->chapterId;
+		$chapterApi = ChapterApi::query()->where('chapter_id', $chapterId)->first();
+		if ($chapterApi) {
+			$chapterApi->chapter_id = $newChapterId;
+			ChapterApi::query()->create($chapterApi->toArray());
+			$chapterApiParam = ChapterApiParam::query()->where('chapter_id', $chapterId)->where('parent_id', 0)->get();
+			if ($chapterApiParam) {
+				foreach ($chapterApiParam as $key => $val) {
+					$val->children = $this->copyBodyChildren($chapterId, $val->id, $newChapterId);
+					$val->chapter_id = $newChapterId;
+					ChapterApiParam::query()->create($val->toArray());
+				}
+			}
+			$chapterApiExtend = ChapterApiExtend::query()->where('chapter_id', $chapterId)->first();
+			if ($chapterApiExtend) {
+				$chapterApiExtend->chapter_id = $newChapterId;
+				ChapterApiExtend::query()->create($chapterApiExtend->toArray());
+			}
+		}
+		return true;
+	}
+
+	public function copyBodyChildren($chapterId, $parent_id, $newChapterId)
+	{
+		$chapterApiParam = ChapterApiParam::query()->where('chapter_id', $chapterId)->where('parent_id', $parent_id)->get();
+		if ($chapterApiParam) {
+			foreach ($chapterApiParam as $key => $val) {
+				$val->children = $this->getBodyChildren($chapterId, $val->id);
+				$val->chapter_id = $newChapterId;
+				ChapterApiParam::query()->create($val->toArray());
+			}
+			return $chapterApiParam;
+		}
+		return [];
+	}
+
+	public function showRecord()
 	{
 		$chapterId = $this->chapterId;
 		$record = [
@@ -41,19 +79,21 @@ class ChapterRecordService
 		];
 		$body = [];
 		$chapterApi = ChapterApi::query()->where('chapter_id', $chapterId)->first();
-		$record['api'] = $chapterApi;
-		$chapterApiParam = ChapterApiParam::query()->where('chapter_id', $chapterId)->where('parent_id', 0)->get();
-		if ($chapterApiParam) {
-			foreach ($chapterApiParam as $key => $val) {
-				$val->children = $this->getBodyChildren($chapterId, $val->id);
-				$body[$val->location][] = $val;
+		if ($chapterApi) {
+			$record['api'] = $chapterApi;
+			$chapterApiParam = ChapterApiParam::query()->where('chapter_id', $chapterId)->where('parent_id', 0)->get();
+			if ($chapterApiParam) {
+				foreach ($chapterApiParam as $key => $val) {
+					$val->children = $this->getBodyChildren($chapterId, $val->id);
+					$body[$val->location][] = $val;
+				}
+				ksort($body);
+				$record['body'] = $body;
 			}
-			ksort($body);
-			$record['body'] = $body;
-		}
-		$chapterApiExtend = ChapterApiExtend::query()->where('chapter_id', $chapterId)->first();
-		if ($chapterApiExtend) {
-			$record['extend'] = $chapterApiExtend->extend;
+			$chapterApiExtend = ChapterApiExtend::query()->where('chapter_id', $chapterId)->first();
+			if ($chapterApiExtend) {
+				$record['extend'] = $chapterApiExtend->extend;
+			}
 		}
 		return $record;
 	}

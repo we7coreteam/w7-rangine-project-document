@@ -478,7 +478,7 @@ class ChapterController extends BaseController
 		];
 		if ($chapter->content->layout == 1) {
 			$obj = new ChapterRecordService($chapter->id);
-			$result['record'] = $obj->dataToRecord();
+			$result['record'] = $obj->showRecord();
 		}
 
 		return $this->data($result);
@@ -591,34 +591,42 @@ class ChapterController extends BaseController
 		$maxSort = Chapter::query()->where('document_id', '=', $params['document_id'])->where('parent_id', '=', $params['parent_id'])->max('sort');
 		$sort = intval($request->post('sort', ++$maxSort));
 
-		$newChapter = new Chapter();
-		$newChapter->parent_id = $params['parent_id'];
-		$newChapter->name = $params['name'];
-		$newChapter->document_id = $params['document_id'];
-		$newChapter->sort = $sort;
-		$newChapter->is_dir = $chapter->is_dir;
-		$newChapter->save();
+		idb()->beginTransaction();
+		try {
+			$newChapter = new Chapter();
+			$newChapter->parent_id = $params['parent_id'];
+			$newChapter->name = $params['name'];
+			$newChapter->document_id = $params['document_id'];
+			$newChapter->sort = $sort;
+			$newChapter->is_dir = $chapter->is_dir;
+			$newChapter->save();
 
-		$chapterContent = ChapterContent::query()->where('chapter_id', '=', $params['chapter_id'])->first();
-		if ($chapterContent) {
-			$newChapterContent = new ChapterContent();
-			$newChapterContent->chapter_id = $newChapter->id;
-			$newChapterContent->content = $chapterContent->content;
-			$newChapterContent->layout = $chapterContent->layout;
-			$newChapterContent->save();
-			if ($chapterContent->layout == 1) {
-				//如果是HTTP类型@todo
+			$chapterContent = ChapterContent::query()->where('chapter_id', '=', $params['chapter_id'])->first();
+			if ($chapterContent) {
+				$newChapterContent = new ChapterContent();
+				$newChapterContent->chapter_id = $newChapter->id;
+				$newChapterContent->content = $chapterContent->content;
+				$newChapterContent->layout = $chapterContent->layout;
+				$newChapterContent->save();
+				if ($chapterContent->layout == 1) {
+					//如果是HTTP类型
+					$obj = new ChapterRecordService($chapter->id);
+					$obj->copyRecord($newChapter->id);
+				}
 			}
+
+			UserOperateLog::query()->create([
+				'user_id' => $user->id,
+				'document_id' => $chapter->document_id,
+				'chapter_id' => $chapter->id,
+				'operate' => UserOperateLog::CHAPTER_COPY,
+				'remark' => $user->username . '复制章节' . $chapter->name . '到' . !empty($parentChapter) ? $parentChapter->name : '根节点'
+			]);
+			idb()->commit();
+			return $this->data($newChapter->toArray());
+		} catch (\Throwable $e) {
+			idb()->rollBack();
+			throw new ErrorHttpException($e->getMessage(), $e->getCode());
 		}
-
-		UserOperateLog::query()->create([
-			'user_id' => $user->id,
-			'document_id' => $chapter->document_id,
-			'chapter_id' => $chapter->id,
-			'operate' => UserOperateLog::CHAPTER_COPY,
-			'remark' => $user->username . '复制章节' . $chapter->name . '到' . !empty($parentChapter) ? $parentChapter->name : '根节点'
-		]);
-
-		return $this->data($newChapter->toArray());
 	}
 }
