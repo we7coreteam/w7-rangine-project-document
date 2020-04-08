@@ -20,6 +20,7 @@ class ChapterRecordService
 {
 	protected $chapterId;
 	protected $record;
+	protected $ids = [];
 
 	public function __construct($chapterId, $record)
 	{
@@ -53,6 +54,12 @@ class ChapterRecordService
 					}
 				}
 			}
+			//循环结束以后，删除该父级本次未提交的ID
+			$ids = $this->ids;
+			$chapterId = $this->chapterId;
+			if ($ids) {
+				ChapterApiParam::query()->where('chapter_id', $chapterId)->whereNotIn('id', $ids)->delete();
+			}
 			idb()->commit();
 		} catch (\Throwable $e) {
 			idb()->rollBack();
@@ -62,17 +69,58 @@ class ChapterRecordService
 		return $markdownText;
 	}
 
-	public function buildBodyChildren($location, $data, $level = 0)
+	public function buildResponse($data)
+	{
+		ksort($data);
+		$text = '';
+		$responseBody = [
+			ChapterApiParam::LOCATION_REPONSE_BODY_FROM => 'Reponse.Body.form-data',
+			ChapterApiParam::LOCATION_REPONSE_BODY_URLENCODED => 'Reponse.Body.urlencoded',
+			ChapterApiParam::LOCATION_REPONSE_BODY_RAW => 'Reponse.Body.raw',
+			ChapterApiParam::LOCATION_REPONSE_BODY_BINARY => 'Reponse.Body.binary',
+		];
+		foreach ($data as $k => $v) {
+			if ($k == ChapterApiParam::LOCATION_REPONSE_HEADER) {
+				$text .= $this->buildApiHeader($k, $v);
+			} elseif (in_array($k, array_keys($responseBody))) {
+				$text .= $this->buildApiBody($k, $v);
+			}
+		}
+		return $text;
+	}
+
+	public function buildRequest($data)
+	{
+		ksort($data);
+		$text = '';
+		$requestBody = [
+			ChapterApiParam::LOCATION_REQUEST_QUERY => 'Request.Query',
+			ChapterApiParam::LOCATION_REQUEST_BODY_FROM => 'Request.Body.form-data',
+			ChapterApiParam::LOCATION_REQUEST_BODY_URLENCODED => 'Request.Body.urlencoded',
+			ChapterApiParam::LOCATION_REQUEST_BODY_RAW => 'Request.Body.raw',
+			ChapterApiParam::LOCATION_REQUEST_BODY_BINARY => 'Request.Body.binary',
+		];
+		foreach ($data as $k => $v) {
+			if ($k == ChapterApiParam::LOCATION_REQUEST_HEADER) {
+				$text .= $this->buildApiHeader($k, $v);
+			} elseif (in_array($k, array_keys($requestBody))) {
+				$text .= $this->buildApiBody($k, $v);
+			}
+		}
+		return $text;
+	}
+
+	public function buildBodyChildren($location, $data, $level = 0, $parentId = 0)
 	{
 		$childrenTop = $this->getChildrenTop($level);
-		$name = $childrenTop . '';
-		$type = '';
+		$name = '';
+		$type = 1;
 		$default_value = '';
 		$description = '';
 		$rule = '';
 		$enabled = 1;
 		if (isset($data['name'])) {
-			$name = $childrenTop . $data['name'];
+			$name = $data['name'];
 		}
 		if (isset($data['type'])) {
 			$type = $data['type'];
@@ -93,10 +141,42 @@ class ChapterRecordService
 
 		$enabledText = $this->getEnabledText($enabled);
 		$typeText = $this->getTypeText($type);
-		$text = $this->strLengthAdaptation($name, ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($typeText, ChapterApiParam::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation($enabledText, ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($default_value, ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation($rule, ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
+		$text = $this->strLengthAdaptation($childrenTop . $name, ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($typeText, ChapterApiParam::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation($enabledText, ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($default_value, ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation($rule, ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
+		//存储
+		$ids = $this->ids;
+		$chapterId = $this->chapterId;
+		$saveData = [
+			'chapter_id' => $chapterId,
+			'parent_id' => $parentId,
+			'location' => $location,
+			'type' => $type,
+			'name' => $name,
+			'description' => $description,
+			'enabled' => $enabled,
+			'default_value' => $default_value,
+			'rule' => $rule
+		];
+		$id = $parentId;
+		if (isset($data['id']) && $data['id']) {
+			$ids[count($ids)] = $data['id'];
+			$id = $data['id'];
+			$chapterApiParam = ChapterApiParam::query()->find($data['id']);
+			if ($chapterApiParam && $chapterApiParam->chapter_id == $chapterId && $chapterApiParam->location == $location) {
+				$chapterApiParam->update($saveData);
+			} else {
+				throw new ErrorHttpException('当前保存的数据项已不存在！' . $data['id'] . '-' . $chapterId);
+			}
+		} else {
+			$chapterApiParam = ChapterApiParam::query()->create($saveData);
+			if ($chapterApiParam) {
+				$ids[count($ids)] = $chapterApiParam->id;
+				$id = $chapterApiParam->id;
+			}
+		}
+		$this->ids = $ids;
 		if (isset($data['children']) && (!empty($data['children'])) && is_array($data['children'])) {
 			foreach ($data['children'] as $k => $val) {
-				$text .= $this->buildBodyChildren($location, $val, $level + 1);
+				$text .= $this->buildBodyChildren($location, $val, $level + 1, $id);
 			}
 		}
 		return $text;
@@ -113,47 +193,13 @@ class ChapterRecordService
 		return $text;
 	}
 
-	public function buildResponse($data)
-	{
-		ksort($data);
-		$text = '';
-		foreach ($data as $k => $v) {
-			if ($k == ChapterApiParam::LOCATION_REPONSE_HEADER) {
-				$text .= $this->buildApiHeader($k, $v);
-			}
-		}
-		return $text;
-	}
-
 	public function getLocatinonText($location)
 	{
 		$typeLabel = ChapterApiParam::getLocationLabel();
 		if (isset($typeLabel[$location])) {
 			return $typeLabel[$location];
 		}
-		throw new ErrorHttpException('参数类型错误' . $location);
-	}
-
-	public function buildRequest($data)
-	{
-		ksort($data);
-		$text = '';
-		$requestBody = [
-			ChapterApiParam::LOCATION_REQUEST_QUERY => 'Request.Query',
-			ChapterApiParam::LOCATION_REQUEST_BODY_FROM => 'Request.Body.form-data',
-			ChapterApiParam::LOCATION_REQUEST_BODY_URLENCODED => 'Request.Body.urlencoded',
-			ChapterApiParam::LOCATION_REQUEST_BODY_RAW => 'Request.Body.raw',
-			ChapterApiParam::LOCATION_REQUEST_BODY_BINARY => 'Request.Body.binary',
-		];
-		foreach ($data as $k => $v) {
-			if ($k == ChapterApiParam::LOCATION_REQUEST_HEADER) {
-				$text .= $this->buildApiHeader($k, $v);
-			} elseif (in_array($k, array_keys($requestBody))) {
-				dump($k);
-				$text .= $this->buildApiBody($k, $v);
-			}
-		}
-		return $text;
+		throw new ErrorHttpException('响应类型错误');
 	}
 
 	public function headTableTop()
@@ -169,7 +215,7 @@ class ChapterRecordService
 		$title = $this->getLocatinonText($location);
 		$text = '### ' . $title . "\n\n";
 		$text = $text . $this->headTableTop();
-		$ids = [];
+		$ids = $this->ids;
 		foreach ($data as $k => $val) {
 			$name = '';
 			$default_value = '';
@@ -220,10 +266,7 @@ class ChapterRecordService
 				}
 			}
 		}
-		//循环结束以后，删除该章节本次未提交的ID
-		if ($ids) {
-			ChapterApiParam::query()->where('chapter_id', $chapterId)->where('location', $location)->whereNotIn('id', $ids)->delete();
-		}
+		$this->ids = $ids;
 		return $text;
 	}
 
