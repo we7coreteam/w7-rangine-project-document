@@ -117,9 +117,9 @@ class ChapterController extends BaseController
 			throw new ErrorHttpException('章节添加失败');
 		}
 
-		if (!$isDir) {
-			//如果是非目录，创建关联表并且锁定类型
-			$layout = $request->post('layout', 0);
+		$layout = $request->post('layout', 0);
+		if ($layout) {
+			//如果是非默认类型，新建时锁定类型
 			if (!empty($chapter->content)) {
 				$chapter->content->content = '';
 				$chapter->content->layout = $layout;
