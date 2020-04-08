@@ -30,6 +30,7 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 		$route->get('/getEnabledLabel', 'Admin\ChapterApiController@getEnabledLabel');
 		$route->get('/getTypeLabel', 'Admin\ChapterApiController@getTypeLabel');
 		$route->get('/getLocationLabel', 'Admin\ChapterApiController@getLocationLabel');
+		$route->get('/rawContentType', 'Admin\ChapterApiController@rawContentType');
 	});
 	//文档内容管理
 	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix'=>'/chapter'], function (\W7\Core\Route\Route $route){

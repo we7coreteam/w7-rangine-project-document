@@ -64,7 +64,7 @@ class ChapterApiController extends BaseController
 	 * @apiGroup ChapterApi
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 * {"1":"String","2":"Number","3":"Boolean","4":"Object","5":"Array","6":"Function","7":"RegExp","8":"Null"}
+	 * ["1":"String","2":"Number","3":"Boolean","4":"Object","5":"Array","6":"Function","7":"RegExp","8":"Null"]
 	 */
 	public function getTypeLabel(Request $request)
 	{
@@ -77,10 +77,23 @@ class ChapterApiController extends BaseController
 	 * @apiGroup ChapterApi
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 * {"1":"Request.Header","2":"Request.Query","3":"Request.Body.form-data","4":"Request.Body.raw","5":"Request.Body.binary","6":"Reponse.Header","7":"Reponse.Body.form-data","8":"Reponse.Body.raw","9":"Reponse.Body.binary"}
+	 * {"1":"Request.Header","2":"Request.Query","3":"Request.Body.form-data","4":"Request.Body.form-data","5":"Request.Body.urlencoded","6":"Request.Body.binary","7":"Reponse.Header","8":"Reponse.Body.form-data","9":"Reponse.Body.urlencoded","10":"Reponse.Body.raw","11":"Reponse.Body.binary"}
 	 */
 	public function getLocationLabel(Request $request)
 	{
 		return ChapterApiParam::getLocationLabel();
+	}
+
+	/**
+	 * @api {get} /chapterapi/rawContentType 获取RAW请求头列表
+	 * @apiName rawContentType
+	 * @apiGroup ChapterApi
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * ["text\/plain","application\/json","application\/javascript","application\/xml","text\/xml","text\/html"]
+	 */
+	public function rawContentType(Request $request)
+	{
+		return ChapterApiParam::rawContentType();
 	}
 }

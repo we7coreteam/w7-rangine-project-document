@@ -40,12 +40,21 @@ class ChapterApiParam extends BaseModel
 	const LOCATION_REQUEST_HEADER = 1;
 	const LOCATION_REQUEST_QUERY = 2;
 	const LOCATION_REQUEST_BODY_FROM = 3;
-	const LOCATION_REQUEST_BODY_RAW = 4;
-	const LOCATION_REQUEST_BODY_BINARY = 5;
-	const LOCATION_REPONSE_HEADER = 6;
-	const LOCATION_REPONSE_BODY_FROM = 7;
-	const LOCATION_REPONSE_BODY_RAW = 8;
-	const LOCATION_REPONSE_BODY_BINARY = 9;
+	const LOCATION_REQUEST_BODY_URLENCODED = 4;
+	const LOCATION_REQUEST_BODY_RAW = 5;
+	const LOCATION_REQUEST_BODY_BINARY = 6;
+	const LOCATION_REPONSE_HEADER = 7;
+	const LOCATION_REPONSE_BODY_FROM = 8;
+	const LOCATION_REPONSE_BODY_URLENCODED = 9;
+	const LOCATION_REPONSE_BODY_RAW = 10;
+	const LOCATION_REPONSE_BODY_BINARY = 11;
+
+	public static function rawContentType()
+	{
+		return [
+			'text/plain', 'application/json', 'application/javascript', 'application/xml', 'text/xml', 'text/html'
+		];
+	}
 
 	public static function getLocationLabel()
 	{
@@ -53,10 +62,12 @@ class ChapterApiParam extends BaseModel
 			self::LOCATION_REQUEST_HEADER => 'Request.Header',
 			self::LOCATION_REQUEST_QUERY => 'Request.Query',
 			self::LOCATION_REQUEST_BODY_FROM => 'Request.Body.form-data',
-			self::LOCATION_REQUEST_BODY_RAW => 'Request.Body.raw',
+			self::LOCATION_REQUEST_BODY_URLENCODED => 'Request.Body.form-data',
+			self::LOCATION_REQUEST_BODY_RAW => 'Request.Body.urlencoded',
 			self::LOCATION_REQUEST_BODY_BINARY => 'Request.Body.binary',
 			self::LOCATION_REPONSE_HEADER => 'Reponse.Header',
 			self::LOCATION_REPONSE_BODY_FROM => 'Reponse.Body.form-data',
+			self::LOCATION_REPONSE_BODY_URLENCODED => 'Reponse.Body.urlencoded',
 			self::LOCATION_REPONSE_BODY_RAW => 'Reponse.Body.raw',
 			self::LOCATION_REPONSE_BODY_BINARY => 'Reponse.Body.binary',
 		];
