@@ -25,11 +25,6 @@ class Chapter extends BaseModel
 		return $this->hasOne(ChapterContent::class, 'chapter_id', 'id');
 	}
 
-	public function record()
-	{
-		return $this->hasOne(ChapterRecord::class, 'chapter_id', 'id');
-	}
-
 	public function document()
 	{
 		return $this->belongsTo(Document::class, 'document_id', 'id');

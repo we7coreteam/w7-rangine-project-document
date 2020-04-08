@@ -16,7 +16,6 @@ use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document\Chapter;
 use W7\App\Model\Entity\Document\ChapterContent;
-use W7\App\Model\Entity\Document\ChapterRecord;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\ChapterLogic;
@@ -333,31 +332,16 @@ class ChapterController extends BaseController
 	 * @apiParam {String} record.api.method 请求方式
 	 * @apiParam {String} record.api.url 地址
 	 * @apiParam {String} record.api.description 描述
-	 * @apiParam {Array} record.apiHeader 请求头
-	 * @apiParam {String} record.apiHeader.id 参数id
-	 * @apiParam {String} record.apiHeader.name 参数名称
-	 * @apiParam {Number} record.apiHeader.enabled 是否必传
-	 * @apiParam {String} record.apiHeader.description 参数描述
-	 * @apiParam {String} record.apiHeader.default_value 参数示例值
-	 * @apiParam {String} record.apiHeader.rule 生成规则
-	 * @apiParam {Array} record.apiParam 请求参数
-	 * @apiParam {String} record.apiParam.id 参数id
-	 * @apiParam {String} record.apiParam.name 参数名称
-	 * @apiParam {String} record.apiParam.type 参数类型 int,string...
-	 * @apiParam {Number} record.apiParam.enabled 是否必传
-	 * @apiParam {String} record.apiParam.description 参数描述
-	 * @apiParam {String} record.apiParam.default_value 参数示例值
-	 * @apiParam {String} record.apiParam.rule 生成规则
-	 * @apiParam {Array} record.apiParam.children 参数子类数组同父级
-	 * @apiParam {Array} record.apiSuccess 返回参数
-	 * @apiParam {String} record.apiSuccess.id 参数id
-	 * @apiParam {String} record.apiSuccess.name 参数名称
-	 * @apiParam {String} record.apiSuccess.type 参数类型 int,string...
-	 * @apiParam {Number} record.apiSuccess.enabled 是否必传
-	 * @apiParam {String} record.apiSuccess.description 参数描述
-	 * @apiParam {String} record.apiSuccess.default_value 参数示例值
-	 * @apiParam {String} record.apiSuccess.rule 生成规则
-	 * @apiParam {Array} record.apiSuccess.children 参数子类数组同父级
+	 * @apiParam {Array} record.request 请求
+	 * @apiParam {Array} record.request.location 请求类型1-11参考getLocationLabel
+	 * @apiParam {String} record.request.location.id 参数id
+	 * @apiParam {String} record.request.location.name 参数名称
+	 * @apiParam {String} record.request.location.type 参数类型（location=1,7header的时候固定为string可不传） int,string...
+	 * @apiParam {Number} record.request.location.enabled 是否必传
+	 * @apiParam {String} record.request.location.description 参数描述
+	 * @apiParam {String} record.request.location.default_value 参数示例值
+	 * @apiParam {String} record.request.location.rule 生成规则
+	 * @apiParam {Array} record.request.location.children 参数子类数组同父级
 	 * @apiParam {String} apiExtend 扩展内容
 	 *
 	 * @apiSuccessExample {json} Success-Response:
@@ -389,19 +373,10 @@ class ChapterController extends BaseController
 		$content = $request->post('content', '');
 
 		if ($layout == 1) {
-//			//如果是http类型
-//			$record = $request->post('record', []);
-//			$chapterRecord = new ChapterRecordService($record);
-//			$content = $chapterRecord->recordToMarkdown();
-//			if (!empty($chapter->record)) {
-//				$chapter->record->record = json_encode($record);
-//				$chapter->record->save();
-//			} else {
-//				ChapterRecord::query()->create([
-//					'chapter_id' => $chapter->id,
-//					'record' => $record
-//				]);
-//			}
+			//如果是http类型
+			$record = $request->post('record', []);
+			$chapterRecord = new ChapterRecordService($chapter->id, $record);
+			$content = $chapterRecord->recordToMarkdown();
 		}
 
 		if (!empty($chapter->content)) {
@@ -644,14 +619,7 @@ class ChapterController extends BaseController
 			$newChapterContent->layout = $chapterContent->layout;
 			$newChapterContent->save();
 			if ($chapterContent->layout == 1) {
-				//如果是HTTP类型
-				$chapterRecord = ChapterRecord::query()->where('chapter_id', '=', $params['chapter_id'])->first();
-				if ($chapterRecord) {
-					$newChapterRecord = new ChapterRecord();
-					$newChapterRecord->chapter_id = $newChapter->id;
-					$newChapterRecord->record = $chapterRecord->record;
-					$newChapterRecord->save();
-				}
+				//如果是HTTP类型@todo
 			}
 		}
 

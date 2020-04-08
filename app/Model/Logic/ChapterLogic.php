@@ -115,8 +115,6 @@ class ChapterLogic extends BaseLogic
 			]);
 			ChapterContent::query()->where('chapter_id', '=', $chapterId)->delete();
 
-			Document\ChapterRecord::query()->where('chapter_id', '=', $chapterId)->delete();
-
 			UserOperateLog::query()->where('document_id', '=', $chapter->document_id)->where('chapter_id', '=', $chapterId)->delete();
 
 			StarLogic::instance()->clearByChapterId($chapterId);
