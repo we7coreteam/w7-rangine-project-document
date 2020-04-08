@@ -23,7 +23,7 @@ class ChapterRecordService
 		$this->record = $record;
 	}
 
-	public function recordToMarkdown()
+	public function recordToMarkdown($chapter_id)
 	{
 		//markdown数据-初始化顺序
 		$markdown = [
@@ -37,13 +37,13 @@ class ChapterRecordService
 		foreach ($this->record as $key => $val) {
 			if (is_array($val)) {
 				if ($key == 'api') {
-					$markdown['api'] = $this->buildApi($val);
+					$markdown['api'] = $this->buildApi($chapter_id, $val);
 				} elseif ($key == 'apiHeader') {
-					$markdown['apiHeader'] = $this->buildApiHeader($val);
+					$markdown['apiHeader'] = $this->buildApiHeader($chapter_id, $val);
 				} elseif ($key == 'apiParam') {
-					$markdown['apiParam'] = $this->buildApiParam($val);
+					$markdown['apiParam'] = $this->buildApiParam($chapter_id, $val);
 				} elseif ($key == 'apiSuccess') {
-					$markdown['apiSuccess'] = $this->buildApiSuccess($val);
+					$markdown['apiSuccess'] = $this->buildApiSuccess($chapter_id, $val);
 				}
 			} else {
 				if ($key == 'apiExtend') {
@@ -55,7 +55,7 @@ class ChapterRecordService
 		return $markdownText;
 	}
 
-	public function buildApiSuccess($data)
+	public function buildApiSuccess($chapter_id, $data)
 	{
 		$text = "### 返回参数\n\n";
 		$text = $text . $this->strLengthAdaptation('参数名称', ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation('类型', ChapterRecord::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation('必填', ChapterRecord::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation('描述', ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation('示例值', ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
@@ -104,7 +104,7 @@ class ChapterRecordService
 		return $text;
 	}
 
-	public function buildApiParam($data)
+	public function buildApiParam($chapter_id, $data)
 	{
 		$text = "### 请求参数\n\n";
 		$text = $text . $this->strLengthAdaptation('参数名称', ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation('类型', ChapterRecord::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation('必填', ChapterRecord::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation('描述', ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation('示例值', ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
@@ -121,7 +121,7 @@ class ChapterRecordService
 		return $enabledLabel[$enabled];
 	}
 
-	public function buildApiHeader($data)
+	public function buildApiHeader($chapter_id, $data)
 	{
 		$text = "### 请求头\n\n";
 		$text = $text . $this->strLengthAdaptation('参数名称', ChapterRecord::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation('必填', ChapterRecord::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation('描述', ChapterRecord::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation('示例值', ChapterRecord::TABLE_VALUE_LENGTH) . "\n";
@@ -168,7 +168,7 @@ class ChapterRecordService
 		return $str;
 	}
 
-	public function buildApi($data)
+	public function buildApi($chapter_id, $data)
 	{
 		$type = 'get';
 		$value = '';
