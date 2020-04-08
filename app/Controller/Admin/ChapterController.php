@@ -382,7 +382,7 @@ class ChapterController extends BaseController
 
 		if (!empty($chapter->content)) {
 			if ($chapter->content->layout != $layout) {
-				throw new ErrorHttpException('不可更改文档类型');
+				throw new ErrorHttpException('文档类型不可更改');
 			}
 			$chapter->content->content = $content;
 			$chapter->content->save();
