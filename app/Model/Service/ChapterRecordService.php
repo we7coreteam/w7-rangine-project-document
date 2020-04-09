@@ -31,7 +31,9 @@ class ChapterRecordService
 
 	public function textToData($text, $type = 0)
 	{
-		if ($this->isJson($text) || (!$text)) {
+		if (!$text) {
+			return [];
+		} elseif ($this->isJson($text)) {
 			//如果是json或不存在
 			$type = 1;
 		} else {
@@ -41,9 +43,14 @@ class ChapterRecordService
 			}
 		}
 		if ($type == 1) {
-			return $this->jsonToData($text);
+			//如果是json-转数组
+			$data = json_decode($text, true);
+		} else {
+			//如果是键值对-转数组
+			$data = $this->keyValueToArray($text);
 		}
-		return $this->keyValueToData($text);
+		//数组转列表数据
+		return $this->arrayToData($data);
 	}
 
 	public function isJson($data = '', $assoc = false)
@@ -56,7 +63,7 @@ class ChapterRecordService
 	}
 
 	//键值对导入转列表数组
-	public function keyValueToData($text)
+	public function keyValueToArray($text)
 	{
 		$data = [];
 		$strData = [];
@@ -80,24 +87,23 @@ class ChapterRecordService
 		return array_keys($arr) !== range(0, count($arr) - 1);
 	}
 
-	//json导入转列表数组
-	public function jsonToData($json)
+	//数组转列表数据
+	public function arrayToData($inputData)
 	{
-		if (!$json) {
+		if (!$inputData) {
 			return [];
 		}
-		$inputData = json_decode($json, true);
 		if ((!$this->is_assoc($inputData)) && (count($inputData) != count($inputData, 1))) {
 			//不是对象，并且不是一维数组
-			$data = $this->getjsonToDataChildrenMany($inputData);
+			$data = $this->getArrayToDataChildrenMany($inputData);
 		} else {
-			$data = $this->getjsonToDataChildren($inputData);
+			$data = $this->getArrayToDataChildren($inputData);
 		}
 		return $data;
 	}
 
 	//多维数组转换[{"a":"1","b":"2"},{"c":"3"}]
-	public function getjsonToDataChildrenMany($inputData)
+	public function getArrayToDataChildrenMany($inputData)
 	{
 		$dataRow = [];
 		foreach ($inputData as $key => $val) {
@@ -118,12 +124,12 @@ class ChapterRecordService
 				}
 			}
 		}
-		$data = $this->getjsonToDataChildren($dataRow, 1);
+		$data = $this->getArrayToDataChildren($dataRow, 1);
 		return $data;
 	}
 
 	//普通转换
-	public function getjsonToDataChildren($inputData, $many = 0)
+	public function getArrayToDataChildren($inputData, $many = 0)
 	{
 		$data = [];
 		foreach ($inputData as $key => $val) {
@@ -137,7 +143,7 @@ class ChapterRecordService
 						'enabled' => 1,
 						'default_value' => '',
 						'rule' => '',
-						'children' => $this->getjsonToDataChildren($val)
+						'children' => $this->getArrayToDataChildren($val)
 					];
 				} else {
 					//判断键值对-数组["1","a"]
@@ -160,7 +166,7 @@ class ChapterRecordService
 							'enabled' => 1,
 							'default_value' => '',
 							'rule' => '',
-							'children' => $this->getjsonToDataChildrenMany($val)
+							'children' => $this->getArrayToDataChildrenMany($val)
 						];
 					}
 				}
