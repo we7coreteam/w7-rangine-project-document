@@ -29,74 +29,65 @@ class ChapterRecordService
 		$this->chapterId = $chapterId;
 	}
 
+	public function keyValueToData()
+	{
+	}
+
+	public function is_assoc($arr)
+	{
+		//array(1, 2, 3, 4, 5, 6, 7);// 输出false
+		return array_keys($arr) !== range(0, count($arr) - 1);
+	}
+
 	public function jsonToData($json)
 	{
 		if (!$json) {
 			return [];
 		}
 		$inputData = json_decode($json, true);
-		$data = [];
-		foreach ($inputData as $key => $val) {
-			if (is_array($val)) {
-				if (count($val) == count($val, 1)) {
-					//一维数组
-					$data[] = [
-						'name' => $key,
-						'type' => 4,
-						'description' => '',
-						'enabled' => 1,
-						'default_value' => '',
-						'rule' => '',
-						'children' => $this->getjsonToDataChildren($val, 4)
-					];
-				} else {
-					//多维数组
-					$data[] = [
-						'name' => $key,
-						'type' => 5,
-						'description' => '',
-						'enabled' => 1,
-						'default_value' => '',
-						'rule' => '',
-						'children' => $this->getjsonToDataChildren($val, 5)
-					];
-				}
-			} else {
-				if ($val == null) {
-					$data[] = [
-						'name' => $key,
-						'type' => 8,
-						'description' => '',
-						'enabled' => 1,
-						'default_value' => '',
-						'rule' => ''
-					];
-				} elseif (in_array($val, [true, false])) {
-					$data[] = [
-						'name' => $key,
-						'type' => 3,
-						'description' => '',
-						'enabled' => 1,
-						'default_value' => $val,
-						'rule' => ''
-					];
-				}
-			}
+		if ((!$this->is_assoc($inputData)) && (count($inputData) != count($inputData, 1))) {
+			//不是对象，并且不是一维数组
+			$data = $this->getjsonToDataChildrenMany($inputData);
+		} else {
+			$data = $this->getjsonToDataChildren($inputData);
 		}
 		return $data;
 	}
 
-	public function getjsonToDataChildren($inputData, $type = 4)
+	//多维数组转换[{"a":"1","b":"2"},{"c":"3"}]
+	public function getjsonToDataChildrenMany($inputData)
+	{
+		$dataRow = [];
+		foreach ($inputData as $key => $val) {
+			//每行数据
+			foreach ($val as $k => $v) {
+				if (is_array($v)) {
+					$dataRow[$k] = $v;
+				} else {
+					if (isset($dataRow[$k]) && $dataRow[$k]) {
+						//第二次-获取默认值-加入值列表-去重
+						$rowVal = json_decode($dataRow[$k], true);
+						$rowVal[count($rowVal)] = $v;
+						$dataRow[$k] = json_encode(array_unique($rowVal));
+					} else {
+						//第一次
+						$dataRow[$k] = json_encode([$v]);
+					}
+				}
+			}
+		}
+		$data = $this->getjsonToDataChildren($dataRow, 1);
+		return $data;
+	}
+
+	//普通转换
+	public function getjsonToDataChildren($inputData, $many = 0)
 	{
 		$data = [];
-		if ($type == 5) {
-			//如果是多维数组{[],[],[]}
-			return $this->getjsonToDataChildren($inputData[0]);
-		}
 		foreach ($inputData as $key => $val) {
 			if (is_array($val)) {
-				if (count($val) == count($val, 1)) {
-					//一维数组
+				if ($this->is_assoc($val)) {
+					//判断键值对-非数组-对象{"0":"b","b":"4"}
 					$data[] = [
 						'name' => $key,
 						'type' => 4,
@@ -104,40 +95,54 @@ class ChapterRecordService
 						'enabled' => 1,
 						'default_value' => '',
 						'rule' => '',
-						'children' => $this->getjsonToDataChildren($val, 4)
+						'children' => $this->getjsonToDataChildren($val)
 					];
 				} else {
-					//多维数组
-					$data[] = [
-						'name' => $key,
-						'type' => 5,
-						'description' => '',
-						'enabled' => 1,
-						'default_value' => '',
-						'rule' => '',
-						'children' => $this->getjsonToDataChildren($val, 5)
-					];
+					//判断键值对-数组["1","a"]
+					if (count($val) == count($val, 1)) {
+						//一维
+						$data[] = [
+							'name' => $key,
+							'type' => 5,
+							'description' => '',
+							'enabled' => 1,
+							'default_value' => $val,
+							'rule' => ''
+						];
+					} else {
+						//多维[{"a":"1","b":"2"},{"c":"3"}]
+						$data[] = [
+							'name' => $key,
+							'type' => 5,
+							'description' => '',
+							'enabled' => 1,
+							'default_value' => '',
+							'rule' => '',
+							'children' => $this->getjsonToDataChildrenMany($val)
+						];
+					}
 				}
 			} else {
+				$type = 1;
 				if ($val == null) {
-					$data[] = [
-						'name' => $key,
-						'type' => 8,
-						'description' => '',
-						'enabled' => 1,
-						'default_value' => '',
-						'rule' => ''
-					];
-				} elseif (in_array($val, [true, false])) {
-					$data[] = [
-						'name' => $key,
-						'type' => 3,
-						'description' => '',
-						'enabled' => 1,
-						'default_value' => $val,
-						'rule' => ''
-					];
+					$type = 8;
+				} elseif (is_numeric($val)) {
+					$type = 2;
+				} elseif ($val === true || $val === false) {
+					$type = 3;
 				}
+				if ($many == 1) {
+					//如果是多维数组-强制单个字段类型为数组
+					$type = 5;
+				}
+				$data[] = [
+					'name' => $key,
+					'type' => $type,
+					'description' => '',
+					'enabled' => 1,
+					'default_value' => $val,
+					'rule' => ''
+				];
 			}
 		}
 		return $data;
