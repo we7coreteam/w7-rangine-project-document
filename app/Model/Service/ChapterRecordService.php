@@ -29,22 +29,72 @@ class ChapterRecordService
 		$this->chapterId = $chapterId;
 	}
 
-	public function getChapterDemo()
+	public function getChapterDemo($locationType)
 	{
 		$chapterId = $this->chapterId;
-		$list = ChapterApiParam::query()->where('chapter_id', $chapterId)->where('parent_id', 0)->get();
+		if ($locationType == 2) {
+			$locationList = array_keys($this->reponseIds());
+		} else {
+			$locationList = array_keys($this->requestIds());
+		}
+		$list = ChapterApiParam::query()->where('chapter_id', $chapterId)->where('parent_id', 0)->whereIn('location', $locationList)->get();
+		return $this->getChapterDemoChildrenArray($list);
+	}
 
-		$this->getChapterDemoChildren($list, $request, $reponse);
-		$data = [
-			'request' => $request,
-			'reponse' => $reponse
-		];
+	public function getChapterDemoChildrenArray($listChildren,$defaultValue=''){
+//		$defaultValue = $row->default_value;
+		if ($this->isJson($defaultValue)) {
+			//如果是json
+			$defaultValueList = json_decode($defaultValue, true);
+		}else{
+			$defaultValueList=[];
+		}
+		$data=[];
+
+		$i=0;
+		foreach ($listChildren as $key =>$val){
+			if($val->default_value){
+				$defaultValue=$val->default_value;
+			}else{
+				if(isset($defaultValueList[$i])){
+					$defaultValue=$defaultValueList[$i];
+				}
+			}
+			if (in_array($val->type, [ChapterApiParam::TYPE_OBJECT, ChapterApiParam::TYPE_ARRAY])) {
+				//如果里面还是数组或者对象
+				$listChildrenSun = ChapterApiParam::query()->where('chapter_id', $val->chapter_id)
+					->where('parent_id', $val->id)->get();
+				if (count($listChildrenSun)>0) {
+					if(is_numeric($val->rule)&&($val->rule>1)){
+						$rule='|'.$val->rule;
+						$data[$val->name.$rule][]=$this->getChapterDemoChildrenArray($listChildrenSun,$val);
+					}else{
+						$data[$val->name]=$this->getChapterDemoChildrenArray($listChildrenSun,$val);
+					}
+				} else {
+					//没有子类
+					if ($this->isJson($defaultValue)) {
+						//如果是json
+						$defaultValue = json_decode($defaultValue, true);
+					}
+					$data[$val->name] = $defaultValue;
+				}
+			}else{
+				if($val->name){
+					//对象
+					$data[$val->name]=$defaultValue;
+				}else{
+					//数字键值
+					$data[]=$defaultValue;
+				}
+			}
+		}
 		return $data;
 	}
 
-	public function getChapterDemoChildren($list, &$request, &$reponse)
+	public function requestIds()
 	{
-		$requestIds = [
+		return [
 			ChapterApiParam::LOCATION_REQUEST_HEADER => 'Request.Header',
 			ChapterApiParam::LOCATION_REQUEST_QUERY => 'Request.Query',
 			ChapterApiParam::LOCATION_REQUEST_BODY_FROM => 'Request.Body.form-data',
@@ -52,24 +102,17 @@ class ChapterRecordService
 			ChapterApiParam::LOCATION_REQUEST_BODY_RAW => 'Request.Body.raw',
 			ChapterApiParam::LOCATION_REQUEST_BODY_BINARY => 'Request.Body.binary',
 		];
-		$reponseIds = [
+	}
+
+	public function reponseIds()
+	{
+		return [
 			ChapterApiParam::LOCATION_REPONSE_HEADER => 'Reponse.Header',
 			ChapterApiParam::LOCATION_REPONSE_BODY_FROM => 'Reponse.Body.form-data',
 			ChapterApiParam::LOCATION_REPONSE_BODY_URLENCODED => 'Reponse.Body.urlencoded',
 			ChapterApiParam::LOCATION_REPONSE_BODY_RAW => 'Reponse.Body.raw',
 			ChapterApiParam::LOCATION_REPONSE_BODY_BINARY => 'Reponse.Body.binary',
 		];
-
-		foreach ($list as $key => $val) {
-			dump('||||||||||||');
-			if (in_array($val->location, array_keys($requestIds))) {
-				dump($val->location);
-				$request[$val->name] = $val->default_value;
-			} elseif (in_array($val->location, array_keys($reponseIds))) {
-				$reponse[$val->name] = $val->default_value;
-			}
-		}
-		return true;
 	}
 
 	public function textToData($text, $type = 0)
@@ -134,7 +177,7 @@ class ChapterRecordService
 	}
 
 	//多维数组转换[{"a":"1","b":"2"},{"c":"3"}]
-	public function getArrayToDataChildrenMany($inputData)
+	public function getArrayToDataChildrenMany($inputData, &$n)
 	{
 		$dataRow = [];
 		foreach ($inputData as $key => $val) {
@@ -143,23 +186,24 @@ class ChapterRecordService
 				if (is_array($v)) {
 					$dataRow[$k] = $v;
 				} else {
-					if (isset($dataRow[$k]) && $dataRow[$k]) {
-						//第二次-获取默认值-加入值列表-去重
-						$rowVal = json_decode($dataRow[$k], true);
-						$rowVal[count($rowVal)] = $v;
-						$dataRow[$k] = json_encode(array_unique($rowVal));
-					} else {
-						//第一次
-						$dataRow[$k] = json_encode([$v]);
-					}
+//					if (isset($dataRow[$k]) && $dataRow[$k]) {
+//						//第二次-获取默认值-加入值列表-去重
+//						$rowVal = json_decode($dataRow[$k], true);
+//						$rowVal[count($rowVal)] = $v;
+//						$dataRow[$k] = json_encode(array_unique($rowVal));
+//					} else {
+//						//第一次
+					$dataRow[$k] = json_encode([$v]);
+//					}
 				}
 			}
+			$n++;
 		}
 		$data = $this->getArrayToDataChildren($dataRow, 1);
 		return $data;
 	}
 
-	//普通转换
+	//普通转换many=0默认=1多维数组=2单数组无键值
 	public function getArrayToDataChildren($inputData, $many = 0)
 	{
 		$data = [];
@@ -180,25 +224,34 @@ class ChapterRecordService
 					//判断键值对-数组["1","a"]
 					if (count($val) == count($val, 1)) {
 						//一维
-						$data[] = [
+						$oneArray = [
 							'name' => $key,
 							'type' => 5,
 							'description' => '',
 							'enabled' => 1,
 							'default_value' => $val,
-							'rule' => ''
+							'rule' => '+1'
 						];
+						if (count($val) > 1) {
+							$oneArray['children'] = $this->getArrayToDataChildren($val, 2);
+						}
+						$data[] = $oneArray;
 					} else {
 						//多维[{"a":"1","b":"2"},{"c":"3"}]
-						$data[] = [
+						$n = 0;
+						$manyArray = [
 							'name' => $key,
 							'type' => 5,
 							'description' => '',
 							'enabled' => 1,
 							'default_value' => '',
 							'rule' => '',
-							'children' => $this->getArrayToDataChildrenMany($val)
+							'children' => $this->getArrayToDataChildrenMany($val, $n)
 						];
+						if ($n > 0) {
+							$manyArray['rule'] = $n;
+						}
+						$data[] = $manyArray;
 					}
 				}
 			} else {
@@ -213,6 +266,9 @@ class ChapterRecordService
 				if ($many == 1) {
 					//如果是多维数组-强制单个字段类型为数组
 					$type = 5;
+				}
+				if ($many == 2) {
+					$key = '';
 				}
 				$data[] = [
 					'name' => $key,
@@ -385,7 +441,7 @@ class ChapterRecordService
 		$childrenTop = $this->getChildrenTop($level);
 		$name = '';
 		$type = 1;
-		$default_value = '';
+		$defaultValue = '';
 		$description = '';
 		$rule = '';
 		$enabled = 1;
@@ -399,10 +455,10 @@ class ChapterRecordService
 			$enabled = $data['enabled'];
 		}
 		if (isset($data['default_value'])) {
-			$default_value = $data['default_value'];
-			if (is_array($default_value)) {
+			$defaultValue = $data['default_value'];
+			if (is_array($defaultValue)) {
 				//如果默认值是个数组
-				$default_value = json_encode($default_value, JSON_UNESCAPED_UNICODE);
+				$defaultValue = json_encode($defaultValue, JSON_UNESCAPED_UNICODE);
 			}
 		}
 		if (isset($data['description'])) {
@@ -415,7 +471,7 @@ class ChapterRecordService
 
 		$enabledText = $this->getEnabledText($enabled);
 		$typeText = $this->getTypeText($type);
-		$text = $this->strLengthAdaptation($childrenTop . $name, ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($typeText, ChapterApiParam::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation($enabledText, ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($default_value, ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation($rule, ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
+		$text = $this->strLengthAdaptation($childrenTop . $name, ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($typeText, ChapterApiParam::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation($enabledText, ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($defaultValue, ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation($rule, ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
 		//存储
 		$ids = $this->ids;
 		$chapterId = $this->chapterId;
@@ -427,7 +483,7 @@ class ChapterRecordService
 			'name' => $name,
 			'description' => $description,
 			'enabled' => $enabled,
-			'default_value' => $default_value,
+			'default_value' => $defaultValue,
 			'rule' => $rule
 		];
 		$id = $parentId;
@@ -493,7 +549,7 @@ class ChapterRecordService
 		$ids = $this->ids;
 		foreach ($data as $k => $val) {
 			$name = '';
-			$default_value = '';
+			$defaultValue = '';
 			$description = '';
 			$enabled = 1;
 			$rule = '';
@@ -504,7 +560,7 @@ class ChapterRecordService
 				$enabled = $val['enabled'];
 			}
 			if (isset($val['default_value'])) {
-				$default_value = $val['default_value'];
+				$defaultValue = $val['default_value'];
 			}
 			if (isset($val['description'])) {
 				$description = $val['description'];
@@ -513,7 +569,7 @@ class ChapterRecordService
 				$rule = $val['rule'];
 			}
 			$enabledText = $this->getEnabledText($enabled);
-			$text .= $this->strLengthAdaptation($name, ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($enabledText, ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($default_value, ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation($rule, ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
+			$text .= $this->strLengthAdaptation($name, ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($enabledText, ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($defaultValue, ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation($rule, ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
 			//存储
 			$saveData = [
 				'chapter_id' => $chapterId,
@@ -523,7 +579,7 @@ class ChapterRecordService
 				'name' => $name,
 				'description' => $description,
 				'enabled' => $enabled,
-				'default_value' => $default_value,
+				'default_value' => $defaultValue,
 				'rule' => $rule
 			];
 			if (isset($val['id']) && $val['id']) {
