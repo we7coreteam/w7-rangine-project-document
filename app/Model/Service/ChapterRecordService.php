@@ -29,6 +29,49 @@ class ChapterRecordService
 		$this->chapterId = $chapterId;
 	}
 
+	public function getChapterDemo()
+	{
+		$chapterId = $this->chapterId;
+		$list = ChapterApiParam::query()->where('chapter_id', $chapterId)->where('parent_id', 0)->get();
+
+		$this->getChapterDemoChildren($list, $request, $reponse);
+		$data = [
+			'request' => $request,
+			'reponse' => $reponse
+		];
+		return $data;
+	}
+
+	public function getChapterDemoChildren($list, &$request, &$reponse)
+	{
+		$requestIds = [
+			ChapterApiParam::LOCATION_REQUEST_HEADER => 'Request.Header',
+			ChapterApiParam::LOCATION_REQUEST_QUERY => 'Request.Query',
+			ChapterApiParam::LOCATION_REQUEST_BODY_FROM => 'Request.Body.form-data',
+			ChapterApiParam::LOCATION_REQUEST_BODY_URLENCODED => 'Request.Body.urlencoded',
+			ChapterApiParam::LOCATION_REQUEST_BODY_RAW => 'Request.Body.raw',
+			ChapterApiParam::LOCATION_REQUEST_BODY_BINARY => 'Request.Body.binary',
+		];
+		$reponseIds = [
+			ChapterApiParam::LOCATION_REPONSE_HEADER => 'Reponse.Header',
+			ChapterApiParam::LOCATION_REPONSE_BODY_FROM => 'Reponse.Body.form-data',
+			ChapterApiParam::LOCATION_REPONSE_BODY_URLENCODED => 'Reponse.Body.urlencoded',
+			ChapterApiParam::LOCATION_REPONSE_BODY_RAW => 'Reponse.Body.raw',
+			ChapterApiParam::LOCATION_REPONSE_BODY_BINARY => 'Reponse.Body.binary',
+		];
+
+		foreach ($list as $key => $val) {
+			dump('||||||||||||');
+			if (in_array($val->location, array_keys($requestIds))) {
+				dump($val->location);
+				$request[$val->name] = $val->default_value;
+			} elseif (in_array($val->location, array_keys($reponseIds))) {
+				$reponse[$val->name] = $val->default_value;
+			}
+		}
+		return true;
+	}
+
 	public function textToData($text, $type = 0)
 	{
 		if (!$text) {
@@ -67,59 +110,6 @@ class ChapterRecordService
 			return $data;
 		}
 		return false;
-	}
-
-	//键值对导入转列表数组
-	public function keyValueToArray($text)
-	{
-		$data = [];
-		$strData = [];
-
-		$inputData = str_replace("\n", '&', $text);
-		$inputData = str_replace(':', '=', $inputData);
-		return $inputData;
-		$inputData = explode('&', $inputData);
-		foreach ($inputData as $k => $v) {
-			$arr = explode(':', $v);
-			$res[$arr[0]] = $arr[1];
-		}
-
-		return $res;
-//		$inputData = explode("\n", $text);
-//		foreach ($inputData as $key => $val) {
-//			$rowdata = explode(':', $val);
-//			$strData[$rowdata[0]] = $rowdata[1];
-//		}
-
-//		$text='';
-//		foreach ($strData as $key => $val) {
-//			$text=$key.'='.$val
-//		}
-
-//		foreach ($strData as $key => $val) {
-//			if((substr_count($key, '[')==substr_count($key, ']'))&&(substr_count($key, '[')>0)){
-//				//如果是对称数组
-		////				b[]:1
-		////b[]:1
-//				$keyStr=str_replace("]","",$key);
-//				$keyArray=explode("[",$keyStr);
-//				$ndata=[];
-//				$ndata=$this->getKeyValueChildren($keyArray,1,count($keyArray),$ndata);
-//				$data[$keyArray[0]]=$ndata;
-//			}else{
-//				//字符串
-//				$data[$key]=$val;
-//			}
-//		}
-		return $strData;
-	}
-
-	public function getKeyValueChildren($keyArray, $level, $num, $ndata)
-	{
-		if ($num > $level) {
-			$ndata[$keyArray[$level]] = $this->getKeyValueChildren($keyArray, $level + 1, count($keyArray), $ndata);
-		}
-		return $ndata[$keyArray[$level]] = [];
 	}
 
 	public function is_assoc($arr)
@@ -326,7 +316,7 @@ class ChapterRecordService
 			'body' => '',
 			'extend' => '',
 		];
-		idb()->beginTransaction();
+//		idb()->beginTransaction();
 		try {
 			foreach ($record as $key => $val) {
 				if (is_array($val)) {
@@ -347,10 +337,10 @@ class ChapterRecordService
 			if ($ids) {
 				ChapterApiParam::query()->where('chapter_id', $chapterId)->whereNotIn('id', $ids)->delete();
 			}
-			idb()->commit();
+//			idb()->commit();
 		} catch (\Throwable $e) {
-			idb()->rollBack();
-			throw new ErrorHttpException($e->getMessage(), $e->getCode());
+//			idb()->rollBack();
+			throw new ErrorHttpException('数据库存储失败' . $e->getLine() . $e->getMessage());
 		}
 		$markdownText = implode("\n", $markdown);
 		return $markdownText;
@@ -410,6 +400,10 @@ class ChapterRecordService
 		}
 		if (isset($data['default_value'])) {
 			$default_value = $data['default_value'];
+			if (is_array($default_value)) {
+				//如果默认值是个数组
+				$default_value = json_encode($default_value, JSON_UNESCAPED_UNICODE);
+			}
 		}
 		if (isset($data['description'])) {
 			$description = $data['description'];
@@ -437,6 +431,7 @@ class ChapterRecordService
 			'rule' => $rule
 		];
 		$id = $parentId;
+
 		if (isset($data['id']) && $data['id']) {
 			$ids[count($ids)] = $data['id'];
 			$id = $data['id'];

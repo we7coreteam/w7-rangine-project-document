@@ -13,8 +13,10 @@
 namespace W7\App\Controller\Admin\Document;
 
 use W7\App\Controller\BaseController;
+use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document\ChapterApi;
 use W7\App\Model\Entity\Document\ChapterApiParam;
+use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Service\ChapterRecordService;
 use W7\Http\Message\Server\Request;
 
@@ -78,7 +80,7 @@ class ChapterApiController extends BaseController
 	 * @apiGroup ChapterApi
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 * {"1":"Request.Header","2":"Request.Query","3":"Request.Body.form-data","4":"Request.Body.form-data","5":"Request.Body.urlencoded","6":"Request.Body.binary","7":"Reponse.Header","8":"Reponse.Body.form-data","9":"Reponse.Body.urlencoded","10":"Reponse.Body.raw","11":"Reponse.Body.binary"}
+	 * {"1":"Request.Header","2":"Request.Query","3":"Request.Body.form-data","4":"Request.Body.urlencoded","5":"Request.Body.raw","6":"Request.Body.binary","7":"Reponse.Header","8":"Reponse.Body.form-data","9":"Reponse.Body.urlencoded","10":"Reponse.Body.raw","11":"Reponse.Body.binary"}
 	 */
 	public function getLocationLabel(Request $request)
 	{
@@ -119,14 +121,38 @@ class ChapterApiController extends BaseController
 	}
 
 	/**
-	 * @api {post} /document/chapterapi/getChapterJson 单个文档请求或响应转换成json
-	 * @apiName getChapterJson
+	 * @api {post} /document/chapterapi/getChapterDemo 单个文档请求或响应演示
+	 * @apiName getChapterDemo
 	 * @apiGroup Chapter
+	 *
+	 * @apiParam {Number} document_id 章节ID
+	 * @apiParam {Number} chapter_id 文档ID
 	 *
 	 * @apiSuccessExample {json} Success-Response:
 	 * [{"name":"type","type":8,"description":"","enabled":1,"default_value":"","rule":""},{"name":"image","type":3,"description":"","enabled":1,"default_value":"images\/20\/01\/13\/TFKPAt8u0fx6XqkCLBwohBjJa9Id0NVaxc5ViKSq.png","rule":""},{"name":"buy_type","type":3,"description":"","enabled":1,"default_value":2,"rule":""},{"name":"buy_limit","type":8,"description":"","enabled":1,"default_value":"","rule":""},{"name":"shipping_required","type":8,"description":"","enabled":1,"default_value":"","rule":""},{"name":"option_values","type":4,"description":"","enabled":1,"default_value":"","rule":"","children":[]},{"name":"image_path","type":3,"description":"","enabled":1,"default_value":"\/\/cdn.w7.cc\/images\/20\/01\/13\/TFKPAt8u0fx6XqkCLBwohBjJa9Id0NVaxc5ViKSq.png","rule":""}]
 	 */
-	public function getChapterJson(Request $request)
+	public function getChapterDemo(Request $request)
 	{
+		$this->validate($request, [
+			'chapter_id' => 'required|integer|min:1',
+			'document_id' => 'required|integer',
+		], [
+			'chapter_id.required' => '文档id必填',
+			'chapter_id.min' => '文档id最小为0',
+			'document_id.required' => '文档id必填',
+		]);
+		$user = $request->getAttribute('user');
+		if (!$user->isOperator) {
+			throw new ErrorHttpException('您没有权限管理该文档');
+		}
+
+		$chapter = ChapterLogic::instance()->getById(intval($request->post('chapter_id')));
+		if (empty($chapter)) {
+			throw new ErrorHttpException('章节不存在');
+		}
+
+		$obj = new ChapterRecordService($chapter->id);
+		$data = $obj->getChapterDemo();
+		return $data;
 	}
 }
