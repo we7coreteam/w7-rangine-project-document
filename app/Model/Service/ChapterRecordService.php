@@ -33,21 +33,28 @@ class ChapterRecordService
 	{
 		if (!$text) {
 			return [];
+		} elseif (is_array($text)) {
+			//如果是数组
+			$type = 2;
+			if ($type != 2 && $type === 0) {
+				throw new ErrorHttpException('当前数据不是数组格式');
+			}
 		} elseif ($this->isJson($text)) {
 			//如果是json或不存在
 			$type = 1;
-		} else {
-			//如果不是JSON指定了json
-			if ($type == 1) {
+			if ($type != 1 && $type === 0) {
 				throw new ErrorHttpException('当前数据不是json格式');
 			}
 		}
+
 		if ($type == 1) {
 			//如果是json-转数组
 			$data = json_decode($text, true);
+		} elseif ($type == 2) {
+			//如果是数组格式
+			$data = $text;
 		} else {
-			//如果是键值对-转数组
-			$data = $this->keyValueToArray($text);
+			throw new ErrorHttpException('不支持的数据格式');
 		}
 		//数组转列表数据
 		return $this->arrayToData($data);
@@ -67,18 +74,52 @@ class ChapterRecordService
 	{
 		$data = [];
 		$strData = [];
-		$inputData = explode("\n", $text);
-		foreach ($inputData as $key => $val) {
-			$rowdata = explode(':', $val);
-			$strData[$rowdata[0]] = $rowdata[1];
+
+		$inputData = str_replace("\n", '&', $text);
+		$inputData = str_replace(':', '=', $inputData);
+		return $inputData;
+		$inputData = explode('&', $inputData);
+		foreach ($inputData as $k => $v) {
+			$arr = explode(':', $v);
+			$res[$arr[0]] = $arr[1];
 		}
-		$i = 0;
-		foreach ($strData as $key => $val) {
-			preg_match_all("/(?:\[)(.*)(?:\])/i", $key, $result);
-			$data[$i++] = $result;
-			//去]然后按[分割
-		}
+
+		return $res;
+//		$inputData = explode("\n", $text);
+//		foreach ($inputData as $key => $val) {
+//			$rowdata = explode(':', $val);
+//			$strData[$rowdata[0]] = $rowdata[1];
+//		}
+
+//		$text='';
+//		foreach ($strData as $key => $val) {
+//			$text=$key.'='.$val
+//		}
+
+//		foreach ($strData as $key => $val) {
+//			if((substr_count($key, '[')==substr_count($key, ']'))&&(substr_count($key, '[')>0)){
+//				//如果是对称数组
+		////				b[]:1
+		////b[]:1
+//				$keyStr=str_replace("]","",$key);
+//				$keyArray=explode("[",$keyStr);
+//				$ndata=[];
+//				$ndata=$this->getKeyValueChildren($keyArray,1,count($keyArray),$ndata);
+//				$data[$keyArray[0]]=$ndata;
+//			}else{
+//				//字符串
+//				$data[$key]=$val;
+//			}
+//		}
 		return $strData;
+	}
+
+	public function getKeyValueChildren($keyArray, $level, $num, $ndata)
+	{
+		if ($num > $level) {
+			$ndata[$keyArray[$level]] = $this->getKeyValueChildren($keyArray, $level + 1, count($keyArray), $ndata);
+		}
+		return $ndata[$keyArray[$level]] = [];
 	}
 
 	public function is_assoc($arr)
