@@ -42,7 +42,6 @@ class ChapterRecordService
 	}
 
 	public function getChapterDemoChildrenArray($listChildren,$defaultValue=''){
-//		$defaultValue = $row->default_value;
 		if ($this->isJson($defaultValue)) {
 			//如果是json
 			$defaultValueList = json_decode($defaultValue, true);
