@@ -32,7 +32,7 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 		$route->get('/getTypeLabel', 'Admin\Document\ChapterApiController@getTypeLabel');
 		$route->get('/getLocationLabel', 'Admin\Document\ChapterApiController@getLocationLabel');
 		$route->get('/rawContentType', 'Admin\Document\ChapterApiController@rawContentType');
-		$route->post('/jsonToData', 'Admin\Document\ChapterApiController@jsonToData');
+		$route->post('/textToData', 'Admin\Document\ChapterApiController@textToData');
 	});
 	//文档内容管理
 	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix' => '/chapter'], function (\W7\Core\Route\Route $route) {

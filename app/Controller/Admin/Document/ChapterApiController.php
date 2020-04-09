@@ -99,18 +99,22 @@ class ChapterApiController extends BaseController
 	}
 
 	/**
-	 * @api {post} /document/chapterapi/jsonToData json转换成data
-	 * @apiName jsonToData
+	 * @api {post} /document/chapterapi/textToData json或者键值对转换成data
+	 * @apiName textToData
 	 * @apiGroup ChapterApi
+	 *
+	 * @apiParam {String} text 文本内容
+	 * @apiParam {String} type 0自适应，1指定json,2指定键值对。默认0
 	 *
 	 * @apiSuccessExample {json} Success-Response:
 	 * [{"name":"type","type":8,"description":"","enabled":1,"default_value":"","rule":""},{"name":"image","type":3,"description":"","enabled":1,"default_value":"images\/20\/01\/13\/TFKPAt8u0fx6XqkCLBwohBjJa9Id0NVaxc5ViKSq.png","rule":""},{"name":"buy_type","type":3,"description":"","enabled":1,"default_value":2,"rule":""},{"name":"buy_limit","type":8,"description":"","enabled":1,"default_value":"","rule":""},{"name":"shipping_required","type":8,"description":"","enabled":1,"default_value":"","rule":""},{"name":"option_values","type":4,"description":"","enabled":1,"default_value":"","rule":"","children":[]},{"name":"image_path","type":3,"description":"","enabled":1,"default_value":"\/\/cdn.w7.cc\/images\/20\/01\/13\/TFKPAt8u0fx6XqkCLBwohBjJa9Id0NVaxc5ViKSq.png","rule":""}]
 	 */
-	public function jsonToData(Request $request)
+	public function textToData(Request $request)
 	{
-		$json = $request->post('json');
+		$text = $request->post('text');
+		$type = $request->post('type', 0);
 		$obj = new ChapterRecordService(0);
-		$data = $obj->jsonToData($json);
+		$data = $obj->textToData($text, $type);
 		return $data;
 	}
 

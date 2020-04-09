@@ -29,8 +29,49 @@ class ChapterRecordService
 		$this->chapterId = $chapterId;
 	}
 
-	public function keyValueToData()
+	public function textToData($text, $type = 0)
 	{
+		if ($this->isJson($text) || (!$text)) {
+			//如果是json或不存在
+			$type = 1;
+		} else {
+			//如果不是JSON指定了json
+			if ($type == 1) {
+				throw new ErrorHttpException('当前数据不是json格式');
+			}
+		}
+		if ($type == 1) {
+			return $this->jsonToData($text);
+		}
+		return $this->keyValueToData($text);
+	}
+
+	public function isJson($data = '', $assoc = false)
+	{
+		$data = json_decode($data, $assoc);
+		if (($data && is_object($data)) || (is_array($data) && !empty($data))) {
+			return $data;
+		}
+		return false;
+	}
+
+	//键值对导入转列表数组
+	public function keyValueToData($text)
+	{
+		$data = [];
+		$strData = [];
+		$inputData = explode("\n", $text);
+		foreach ($inputData as $key => $val) {
+			$rowdata = explode(':', $val);
+			$strData[$rowdata[0]] = $rowdata[1];
+		}
+		$i = 0;
+		foreach ($strData as $key => $val) {
+			preg_match_all("/(?:\[)(.*)(?:\])/i", $key, $result);
+			$data[$i++] = $result;
+			//去]然后按[分割
+		}
+		return $strData;
 	}
 
 	public function is_assoc($arr)
@@ -39,6 +80,7 @@ class ChapterRecordService
 		return array_keys($arr) !== range(0, count($arr) - 1);
 	}
 
+	//json导入转列表数组
 	public function jsonToData($json)
 	{
 		if (!$json) {
