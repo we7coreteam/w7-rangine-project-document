@@ -29,6 +29,120 @@ class ChapterRecordService
 		$this->chapterId = $chapterId;
 	}
 
+	public function jsonToData($json)
+	{
+		if (!$json) {
+			return [];
+		}
+		$inputData = json_decode($json, true);
+		$data = [];
+		foreach ($inputData as $key => $val) {
+			if (is_array($val)) {
+				if (count($val) == count($val, 1)) {
+					//一维数组
+					$data[] = [
+						'name' => $key,
+						'type' => 4,
+						'description' => '',
+						'enabled' => 1,
+						'default_value' => '',
+						'rule' => '',
+						'children' => $this->getjsonToDataChildren($val, 4)
+					];
+				} else {
+					//多维数组
+					$data[] = [
+						'name' => $key,
+						'type' => 5,
+						'description' => '',
+						'enabled' => 1,
+						'default_value' => '',
+						'rule' => '',
+						'children' => $this->getjsonToDataChildren($val, 5)
+					];
+				}
+			} else {
+				if ($val == null) {
+					$data[] = [
+						'name' => $key,
+						'type' => 8,
+						'description' => '',
+						'enabled' => 1,
+						'default_value' => '',
+						'rule' => ''
+					];
+				} elseif (in_array($val, [true, false])) {
+					$data[] = [
+						'name' => $key,
+						'type' => 3,
+						'description' => '',
+						'enabled' => 1,
+						'default_value' => $val,
+						'rule' => ''
+					];
+				}
+			}
+		}
+		return $data;
+	}
+
+	public function getjsonToDataChildren($inputData, $type = 4)
+	{
+		$data = [];
+		if ($type == 5) {
+			//如果是多维数组{[],[],[]}
+			return $this->getjsonToDataChildren($inputData[0]);
+		}
+		foreach ($inputData as $key => $val) {
+			if (is_array($val)) {
+				if (count($val) == count($val, 1)) {
+					//一维数组
+					$data[] = [
+						'name' => $key,
+						'type' => 4,
+						'description' => '',
+						'enabled' => 1,
+						'default_value' => '',
+						'rule' => '',
+						'children' => $this->getjsonToDataChildren($val, 4)
+					];
+				} else {
+					//多维数组
+					$data[] = [
+						'name' => $key,
+						'type' => 5,
+						'description' => '',
+						'enabled' => 1,
+						'default_value' => '',
+						'rule' => '',
+						'children' => $this->getjsonToDataChildren($val, 5)
+					];
+				}
+			} else {
+				if ($val == null) {
+					$data[] = [
+						'name' => $key,
+						'type' => 8,
+						'description' => '',
+						'enabled' => 1,
+						'default_value' => '',
+						'rule' => ''
+					];
+				} elseif (in_array($val, [true, false])) {
+					$data[] = [
+						'name' => $key,
+						'type' => 3,
+						'description' => '',
+						'enabled' => 1,
+						'default_value' => $val,
+						'rule' => ''
+					];
+				}
+			}
+		}
+		return $data;
+	}
+
 	public function copyRecord($newChapterId)
 	{
 		$chapterId = $this->chapterId;
