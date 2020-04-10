@@ -43,11 +43,11 @@ class ChapterApiController extends BaseController
 	 * @apiGroup ChapterApi
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 * {"1":"GET","2":"POST","3":"PUT","4":"PATCH","5":"DELETE","6":"COPY","7":"HEAD","8":"PTIONS","9":"LINK","10":"UNLINK","11":"PURGE","12":"LOCK","13":"UNLOCK","14":"PROPFIND","15":"VIEW"}
+	 * {"label":"请求方式","option":[{"label":"GET","value":1},{"label":"POST","value":2},{"label":"PUT","value":3},{"label":"PATCH","value":4},{"label":"DELETE","value":5},{"label":"COPY","value":6},{"label":"HEAD","value":7},{"label":"PTIONS","value":8},{"label":"LINK","value":9},{"label":"UNLINK","value":10},{"label":"PURGE","value":11},{"label":"LOCK","value":12},{"label":"UNLOCK","value":13},{"label":"PROPFIND","value":14},{"label":"VIEW","value":15}]}
 	 */
 	public function getMethodLabel(Request $request)
 	{
-		return ChapterApi::getMethodLabel();
+		return generate_label('请求方式', ChapterApi::getMethodLabel());
 	}
 
 	/**
@@ -56,11 +56,11 @@ class ChapterApiController extends BaseController
 	 * @apiGroup ChapterApi
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 * {"1":"False","2":"Ture"}
+	 * {"label":"必填类型","option":[{"label":"False","value":1},{"label":"Ture","value":2}]}
 	 */
 	public function getEnabledLabel(Request $request)
 	{
-		return ChapterApiParam::getEnabledLabel();
+		return generate_label('必填类型', ChapterApiParam::getEnabledLabel());
 	}
 
 	/**
@@ -69,24 +69,24 @@ class ChapterApiController extends BaseController
 	 * @apiGroup ChapterApi
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 * ["1":"String","2":"Number","3":"Boolean","4":"Object","5":"Array","6":"Function","7":"RegExp","8":"Null"]
+	 * {"label":"字段类型","option":[{"label":"String","value":1},{"label":"Number","value":2},{"label":"Boolean","value":3},{"label":"Object","value":4},{"label":"Array","value":5},{"label":"Function","value":6},{"label":"RegExp","value":7},{"label":"Null","value":8}]}
 	 */
 	public function getTypeLabel(Request $request)
 	{
-		return ChapterApiParam::getTypeLabel();
+		return generate_label('字段类型', ChapterApiParam::getTypeLabel());
 	}
 
 	/**
-	 * @api {get} /document/chapterapi/getLocationLabel 获取字段请求类型列表
+	 * @api {get} /document/chapterapi/getLocationLabel 获取请求类型列表
 	 * @apiName getLocationLabel
 	 * @apiGroup ChapterApi
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 * {"1":"Request.Header","2":"Request.Query","3":"Request.Body.form-data","4":"Request.Body.urlencoded","5":"Request.Body.raw","6":"Request.Body.binary","7":"Reponse.Header","8":"Reponse.Body.form-data","9":"Reponse.Body.urlencoded","10":"Reponse.Body.raw","11":"Reponse.Body.binary"}
+	 * {"label":"请求类型","option":[{"label":"Request.Header","value":1},{"label":"Request.Query","value":2},{"label":"Request.Body.form-data","value":3},{"label":"Request.Body.urlencoded","value":4},{"label":"Request.Body.raw","value":5},{"label":"Request.Body.binary","value":6},{"label":"Reponse.Header","value":7},{"label":"Reponse.Body.form-data","value":8},{"label":"Reponse.Body.urlencoded","value":9},{"label":"Reponse.Body.raw","value":10},{"label":"Reponse.Body.binary","value":11}]}
 	 */
 	public function getLocationLabel(Request $request)
 	{
-		return ChapterApiParam::getLocationLabel();
+		return generate_label('请求类型', ChapterApiParam::getLocationLabel());
 	}
 
 	/**
@@ -95,11 +95,11 @@ class ChapterApiController extends BaseController
 	 * @apiGroup ChapterApi
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 * ["text\/plain","application\/json","application\/javascript","application\/xml","text\/xml","text\/html"]
+	 * {"label":"请求类型","option":[{"label":"Request.Header","value":1},{"label":"Request.Query","value":2},{"label":"Request.Body.form-data","value":3},{"label":"Request.Body.urlencoded","value":4},{"label":"Request.Body.raw","value":5},{"label":"Request.Body.binary","value":6},{"label":"Reponse.Header","value":7},{"label":"Reponse.Body.form-data","value":8},{"label":"Reponse.Body.urlencoded","value":9},{"label":"Reponse.Body.raw","value":10},{"label":"Reponse.Body.binary","value":11}]}
 	 */
 	public function rawContentType(Request $request)
 	{
-		return ChapterApiParam::rawContentType();
+		return generate_label('RAW请求头', ChapterApiParam::rawContentType());
 	}
 
 	/**
@@ -111,7 +111,7 @@ class ChapterApiController extends BaseController
 	 * @apiParam {String} type 0自适应，1指定json,2指定数组，3键值对字符串。默认0
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 * [{"name":"type","type":8,"description":"","enabled":1,"default_value":"","rule":""},{"name":"image","type":3,"description":"","enabled":1,"default_value":"images\/20\/01\/13\/TFKPAt8u0fx6XqkCLBwohBjJa9Id0NVaxc5ViKSq.png","rule":""},{"name":"buy_type","type":3,"description":"","enabled":1,"default_value":2,"rule":""},{"name":"buy_limit","type":8,"description":"","enabled":1,"default_value":"","rule":""},{"name":"shipping_required","type":8,"description":"","enabled":1,"default_value":"","rule":""},{"name":"option_values","type":4,"description":"","enabled":1,"default_value":"","rule":"","children":[]},{"name":"image_path","type":3,"description":"","enabled":1,"default_value":"\/\/cdn.w7.cc\/images\/20\/01\/13\/TFKPAt8u0fx6XqkCLBwohBjJa9Id0NVaxc5ViKSq.png","rule":""}]
+	 * {"label":"RAW请求头","option":[{"label":"text\/plain","value":0},{"label":"application\/json","value":1},{"label":"application\/javascript","value":2},{"label":"application\/xml","value":3},{"label":"text\/xml","value":4},{"label":"text\/html","value":5}]}
 	 */
 	public function textToData(Request $request)
 	{

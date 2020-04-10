@@ -33,10 +33,11 @@ class PostManVersion2Service extends PostManCommonService
 				}
 				throw new ErrorHttpException('导入数据为空！');
 			}
-		}else{
-			if(isset($data['id'])&&isset($data['requests'])){
+			throw new ErrorHttpException('导入失败：仅支持POSTMAN Collection V2或V2.1版本数据导入！');
+		} else {
+			if (isset($data['id']) && isset($data['requests'])) {
 				//可能是V1版本
-				throw new ErrorHttpException('仅支持POSTMAN Collection V2版本的数据格式导入！');
+				throw new ErrorHttpException('仅支持POSTMAN Collection V2版本的数据格式导入！请升级您的POSTMAN');
 			}
 		}
 		throw new ErrorHttpException('导入失败：当前不是标准的POSTMAN Collection V2版本数据！');
@@ -54,26 +55,26 @@ class PostManVersion2Service extends PostManCommonService
 			idb()->rollBack();
 			throw new ErrorHttpException($e->getMessage());
 		}
-
 	}
 
 	public function importDocument($info)
 	{
-		$postmanId='';$name='';$id=0;
-		if(isset($info['_postman_id'])){
-			$postmanId=$info['_postman_id'];
-			$postmanIds=explode("-",$postmanId);
-			if($postmanIds[0]=='document'){
-				if(isset($postmanIds[1])&&is_numeric($postmanIds[1])){
-
+		$postmanId = '';
+		$name = '';
+		$id = 0;
+		if (isset($info['_postman_id'])) {
+			$postmanId = $info['_postman_id'];
+			$postmanIds = explode('-', $postmanId);
+			if ($postmanIds[0] == 'document') {
+				if (isset($postmanIds[1]) && is_numeric($postmanIds[1])) {
 				}
 			}
 		}
-		if(isset($info['name'])){
-			$name=$info['name'];
+		if (isset($info['name'])) {
+			$name = $info['name'];
 		}
-		if(!$name){
-			$name="document-".date("Y-m-d H:i:s");
+		if (!$name) {
+			$name = 'document-' . date('Y-m-d H:i:s');
 		}
 //		"info": {
 //		"_postman_id": "5ef3c7be-d42c-b548-485a-a51b6a0adb92",

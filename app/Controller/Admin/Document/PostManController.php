@@ -19,7 +19,7 @@ use W7\Http\Message\Server\Request;
 class PostManController extends BaseController
 {
 	/**
-	 * @api {post} /document/postman/postManJsonToDocument POSTMAN Collection V2格式JSON导入到项目
+	 * @api {post} /document/postman/postManJsonToDocument POSTMAN Collection V2格式JSON导入到项目根目录
 	 * @apiName postManJsonToDocument
 	 * @apiGroup PostMan
 	 *
@@ -36,7 +36,7 @@ class PostManController extends BaseController
 	}
 
 	/**
-	 * @api {post} /document/postman/documentToPostManJosn 将项目转成POSTMAN Collection V2格式JSON
+	 * @api {post} /document/postman/documentToPostManJosn 将项目根目录转成POSTMAN Collection V2格式JSON
 	 * @apiName documentToPostManJosn
 	 * @apiGroup PostMan
 	 *
