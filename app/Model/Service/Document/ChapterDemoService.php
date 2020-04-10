@@ -25,11 +25,13 @@ class ChapterDemoService extends ChapterCommonService
 	}
 
 	//type==1 array 2键值对  3键值对数组 $locationType 1请求2 响应
-	public function getChapterDemo($locationType, $type = 1)
+	public function getChapterDemo($locationType, $type = 1, $locationList = [])
 	{
 		$chapterId = $this->chapterId;
 		if ($locationType == 2) {
 			$locationList = array_keys($this->reponseIds());
+		} elseif ($locationType == 0) {
+			//使用参数locationList
 		} else {
 			$locationList = array_keys($this->requestIds());
 		}
@@ -73,7 +75,6 @@ class ChapterDemoService extends ChapterCommonService
 			$defaultValueList = [];
 		}
 		$data = [];
-
 		$i = 0;
 		foreach ($listChildren as $key => $val) {
 			if ($val->default_value) {

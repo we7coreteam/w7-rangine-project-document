@@ -10,56 +10,29 @@
  * visited https://www.w7.cc for more details
  */
 
-namespace W7\App\Model\Service\Document;
+namespace W7\App\Model\Service\Document\PostMan;
 
 use W7\App\Model\Entity\Document;
 
-class PostManService
+class PostManVersion1Service extends PostManCommonService
 {
-	protected $documentId;
-	protected $version;
-
-	public function __construct($documentId, $version = 2)
+	public function buildJson($documentId)
 	{
-		$this->documentId = $documentId;
-		$this->version = $version;
-	}
-
-	public function documentToPostMan()
-	{
-		if ($this->version == 2) {
-			$data = $this->buildJsonV2();
-		} else {
-			$data = $this->buildJsonV1();
-		}
-		return $data;
-
-//		Chapter::query()->where('document_id', $documentId)->where('parent_id', 0)->get();
-	}
-
-	public function buildJsonV1()
-	{
-		return [];
-	}
-
-	public function buildJsonV2()
-	{
-		$documentId = $this->documentId;
 		$data = [
 			'variables' => [],
-			'info' => $this->getDocumentInfoV2($documentId),
-			'item' => $this->getDocumentItemV2($documentId),
+			'info' => $this->getDocumentInfo($documentId),
+			'item' => $this->getDocumentItem($documentId),
 		];
 		return $data;
 	}
 
-	public function getDocumentItemV2($documentId)
+	public function getDocumentItem($documentId)
 	{
-		$item = $this->getDocumentItemV2Children($documentId, 0);
+		$item = $this->getDocumentItemChildren($documentId, 0);
 		return $item;
 	}
 
-	public function getDocumentItemV2Children($documentId, $parentId)
+	public function getDocumentItemChildren($documentId, $parentId)
 	{
 		$item = [];
 		$chapterList = Document\Chapter::query()->where('document_id', $documentId)->where('parent_id', $parentId)->get();
@@ -70,13 +43,13 @@ class PostManService
 					$row = [
 						'name' => $val->name,
 						'description' => '',
-						'item' => $this->getDocumentItemV2Children($documentId, $val->id)
+						'item' => $this->getDocumentItemChildren($documentId, $val->id)
 					];
 					$item[$key] = $row;
 				} else {
 					//章节是http类型
 					if ($val->content && $val->content->layout == 1) {
-						$item[$key] = $this->getChapterInfoV2($val);
+						$item[$key] = $this->getChapterInfo($val);
 					}
 				}
 			}
@@ -84,11 +57,7 @@ class PostManService
 		return $item;
 	}
 
-	public function getChapterApi()
-	{
-	}
-
-	public function getChapterInfoV2($chapter)
+	public function getChapterInfo($chapter)
 	{
 		$chapter = [
 			'name' => $chapter->name,
@@ -120,7 +89,7 @@ class PostManService
 		return $chapter;
 	}
 
-	public function getDocumentInfoV2($documentId)
+	public function getDocumentInfo($documentId)
 	{
 		$document = Document::query()->find($documentId);
 		if ($document) {
@@ -139,9 +108,5 @@ class PostManService
 			];
 		}
 		return $info;
-	}
-
-	public function postManToDocument()
-	{
 	}
 }
