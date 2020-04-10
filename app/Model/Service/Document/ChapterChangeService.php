@@ -120,7 +120,7 @@ class ChapterChangeService extends ChapterCommonService
 							'description' => '',
 							'enabled' => 1,
 							'default_value' => $val,
-							'rule' => '+1'
+							'rule' => ''
 						];
 						if (count($val) > 1) {
 							$oneArray['children'] = $this->getArrayToDataChildren($val, 2);
@@ -146,6 +146,7 @@ class ChapterChangeService extends ChapterCommonService
 				}
 			} else {
 				$type = 1;
+				$rule = '';
 				if ($val == null) {
 					$type = 8;
 				} elseif (is_numeric($val)) {
@@ -156,6 +157,11 @@ class ChapterChangeService extends ChapterCommonService
 				if ($many == 1) {
 					//如果是多维数组-强制单个字段类型为数组
 					$type = 5;
+					if ($this->isJson($val)) {
+						if (count(json_decode($val)) > 1) {
+							$rule = '+1';
+						}
+					}
 				}
 				if ($many == 2) {
 					$key = '';
@@ -166,7 +172,7 @@ class ChapterChangeService extends ChapterCommonService
 					'description' => '',
 					'enabled' => 1,
 					'default_value' => $val,
-					'rule' => ''
+					'rule' => $rule
 				];
 			}
 		}

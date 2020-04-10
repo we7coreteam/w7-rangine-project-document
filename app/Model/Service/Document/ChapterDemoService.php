@@ -16,10 +16,7 @@ namespace W7\App\Model\Service\Document;
  * 数据转生成规则样例
  */
 
-namespace W7\App\Model\Service;
-
 use W7\App\Model\Entity\Document\ChapterApiParam;
-use W7\App\Model\Service\Document\ChapterCommonService;
 
 class ChapterDemoService extends ChapterCommonService
 {
