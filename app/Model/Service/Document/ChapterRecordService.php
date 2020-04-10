@@ -20,13 +20,13 @@ use W7\App\Model\Entity\Document\ChapterApiParam;
 /**
  * 数据存储与转markdown
  */
-
 class ChapterRecordService
 {
 	protected $chapterId;
 	protected $ids = [];
 	protected $bodyParamLocation = 3;
 	protected $bodyReponseLocation = 10;
+
 	public function __construct($chapterId)
 	{
 		$this->chapterId = $chapterId;
@@ -64,7 +64,7 @@ class ChapterRecordService
 			idb()->commit();
 		} catch (\Throwable $e) {
 			idb()->rollBack();
-			throw new ErrorHttpException('数据库存储失败' . $e->getLine() . $e->getMessage());
+			throw new ErrorHttpException($e->getMessage());
 		}
 		$markdownText = implode("\n", $markdown);
 		return $markdownText;
@@ -123,12 +123,12 @@ class ChapterRecordService
 		return $str;
 	}
 
-	public function headTableTop()
-	{
-		$text = $this->strLengthAdaptation('参数名称', ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation('必填', ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation('描述', ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation('示例值', ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation('生成规则', ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
-		$text = $text . $this->strLengthAdaptation('|:-', ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation(':-:', ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
-		return $text;
-	}
+//	public function headTableTop()
+//	{
+//		$text = $this->strLengthAdaptation('参数名称', ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation('必填', ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation('描述', ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation('示例值', ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation('生成规则', ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
+//		$text = $text . $this->strLengthAdaptation('|:-', ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation(':-:', ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation(':-', ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
+//		return $text;
+//	}
 
 	public function bodyTableTop()
 	{
@@ -160,10 +160,11 @@ class ChapterRecordService
 		$chapterId = $this->chapterId;
 		$title = $this->getLocatinonText($location);
 		$text = '### ' . $title . "\n\n";
-		$text = $text . $this->headTableTop();
+		$text = $text . $this->bodyTableTop();
 		$ids = $this->ids;
 		foreach ($data as $k => $val) {
 			$name = '';
+			$type = 1;
 			$defaultValue = '';
 			$description = '';
 			$enabled = 1;
@@ -171,7 +172,10 @@ class ChapterRecordService
 			if (isset($val['name'])) {
 				$name = $val['name'];
 			}
-			if (isset($val['enabled'])) {
+			if (isset($val['type']) && $val['type']) {
+				$type = $val['type'];
+			}
+			if (isset($val['enabled']) && $val['enabled']) {
 				$enabled = $val['enabled'];
 			}
 			if (isset($val['default_value'])) {
@@ -184,13 +188,14 @@ class ChapterRecordService
 				$rule = $val['rule'];
 			}
 			$enabledText = $this->getEnabledText($enabled);
-			$text .= $this->strLengthAdaptation($name, ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($enabledText, ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($defaultValue, ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation($rule, ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
+			$typeText = $this->getTypeText($type);
+			$text .= $this->strLengthAdaptation($name, ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($typeText, ChapterApiParam::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation($enabledText, ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($defaultValue, ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation($rule, ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
 			//存储
 			$saveData = [
 				'chapter_id' => $chapterId,
 				'parent_id' => 0,
 				'location' => $location,
-				'type' => ChapterApiParam::TYPE_STRING,
+				'type' => $type,
 				'name' => $name,
 				'description' => $description,
 				'enabled' => $enabled,
@@ -309,10 +314,10 @@ class ChapterRecordService
 		if (isset($data['name'])) {
 			$name = $data['name'];
 		}
-		if (isset($data['type'])) {
+		if (isset($data['type']) && $data['type']) {
 			$type = $data['type'];
 		}
-		if (isset($data['enabled'])) {
+		if (isset($data['enabled']) && $data['enabled']) {
 			$enabled = $data['enabled'];
 		}
 		if (isset($data['default_value'])) {
@@ -347,6 +352,7 @@ class ChapterRecordService
 			'default_value' => $defaultValue,
 			'rule' => $rule
 		];
+
 		$id = $parentId;
 
 		if (isset($data['id']) && $data['id']) {
