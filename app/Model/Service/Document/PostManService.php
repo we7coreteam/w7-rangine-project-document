@@ -10,10 +10,9 @@
  * visited https://www.w7.cc for more details
  */
 
-namespace W7\App\Model\Service;
+namespace W7\App\Model\Service\Document;
 
 use W7\App\Model\Entity\Document;
-use W7\App\Model\Entity\Document\Chapter;
 
 class PostManService
 {

@@ -16,12 +16,14 @@ use W7\App\Model\Entity\Document\ChapterApiParam;
 
 class ChapterCommonService
 {
+	//是否为纯数组（非对象）
 	public function is_assoc($arr)
 	{
 		//array(1, 2, 3, 4, 5, 6, 7);// 输出false
 		return array_keys($arr) !== range(0, count($arr) - 1);
 	}
 
+	//字符串是否为JSON
 	public function isJson($data = '', $assoc = false)
 	{
 		$data = json_decode($data, $assoc);
@@ -31,6 +33,7 @@ class ChapterCommonService
 		return false;
 	}
 
+	//请求列表
 	public function requestIds()
 	{
 		return [
@@ -43,6 +46,7 @@ class ChapterCommonService
 		];
 	}
 
+	//响应列表
 	public function reponseIds()
 	{
 		return [
