@@ -18,7 +18,7 @@ namespace W7\App\Model\Service\Document;
 
 use W7\App\Model\Entity\Document\ChapterApiParam;
 
-class ChapterDemoService extends ChapterCommonService
+class ChapterRuleDemoService extends ChapterCommonService
 {
 	protected $chapterId;
 
@@ -27,6 +27,7 @@ class ChapterDemoService extends ChapterCommonService
 		$this->chapterId = $chapterId;
 	}
 
+	//获取生成规则样例
 	public function getChapterDemo($locationType)
 	{
 		$chapterId = $this->chapterId;

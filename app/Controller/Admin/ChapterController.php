@@ -100,6 +100,9 @@ class ChapterController extends BaseController
 			if (empty($parentChapter)) {
 				throw new ErrorHttpException('父章节不存在');
 			}
+			if (!$parentChapter->is_dir) {
+				throw new ErrorHttpException('父章节不是目录，不可以新增子章节或者文档');
+			}
 		}
 
 		$isDir = $request->post('is_dir');
