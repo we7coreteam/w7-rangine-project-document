@@ -58,16 +58,23 @@ class ChapterDemoService extends ChapterCommonService
 					$defaultValue = $defaultValueList[$i];
 				}
 			}
+			$rule = '';
+			$ruleTop = '';
+			if ($val->rule) {
+				$ruleTop = substr($val->rule, 0, 1);
+				$rule = '|' . $val->rule;
+			}
+
 			if (in_array($val->type, [ChapterApiParam::TYPE_OBJECT, ChapterApiParam::TYPE_ARRAY])) {
 				//如果里面还是数组或者对象
 				$listChildrenSun = ChapterApiParam::query()->where('chapter_id', $val->chapter_id)
 					->where('parent_id', $val->id)->get();
 				if (count($listChildrenSun) > 0) {
 					if (is_numeric($val->rule) && ($val->rule > 1)) {
-						$rule = '|' . $val->rule;
+						//如果是多维数组
 						$data[$val->name . $rule][] = $this->getChapterDemoChildrenArray($listChildrenSun, $val);
 					} else {
-						$data[$val->name] = $this->getChapterDemoChildrenArray($listChildrenSun, $val);
+						$data[$val->name . $rule] = $this->getChapterDemoChildrenArray($listChildrenSun, $val);
 					}
 				} else {
 					//没有子类
@@ -76,12 +83,16 @@ class ChapterDemoService extends ChapterCommonService
 						$defaultValueList = json_decode($defaultValue, true);
 						$defaultValue = $defaultValueList[0];
 					}
-					$data[$val->name] = $defaultValue;
+					if ($ruleTop == '+') {
+						$data[$val->name . $rule] = $defaultValueList;
+					} else {
+						$data[$val->name . $rule] = $defaultValue;
+					}
 				}
 			} else {
 				if ($val->name) {
 					//对象
-					$data[$val->name] = $defaultValue;
+					$data[$val->name . $rule] = $defaultValue;
 				} else {
 					//数字键值
 					$data[] = $defaultValue;
