@@ -17,6 +17,7 @@ use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document\ChapterApi;
 use W7\App\Model\Entity\Document\ChapterApiParam;
 use W7\App\Model\Logic\ChapterLogic;
+use W7\App\Model\Service\Document\ChapterDemoService;
 use W7\App\Model\Service\Document\ChapterRuleDemoService;
 use W7\App\Model\Service\Document\ChapterChangeService;
 use W7\Http\Message\Server\Request;
@@ -157,6 +158,47 @@ class ChapterApiController extends BaseController
 
 		$obj = new ChapterRuleDemoService($chapter->id);
 		$data = $obj->getChapterDemo($request->post('location_type'));
+		return $data;
+	}
+
+	/**
+	 * @api {post} /document/chapterapi/getChapterDemo 单个文档请求或响应导出json或键值对
+	 * @apiName getChapterDemo
+	 * @apiGroup Chapter
+	 *
+	 * @apiParam {Number} document_id 章节ID
+	 * @apiParam {Number} chapter_id 文档ID
+	 * @apiParam {Number} location_type 演示请求类型1请求2响应
+	 * @apiParam {Number} type 1json格式，2键值对字符串，3键值对数组
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"data":"Access-Token:\n4444:\na:1\nb[0]:1\nb[1]:1\nc[a]:a\nc[b][0]:b\nc[b][d][0]:4\nc[b][d][1]:5\ne[0][a]:1\ne[0][b]:2\ne[0][c]:3\ne[0][f][0]:1\ne[0][f][1]:2\ne[0][d][a]:1&&\ne[0][d][b]:2=="}
+	 */
+	public function getChapterDemo(Request $request)
+	{
+		$this->validate($request, [
+			'chapter_id' => 'required|integer|min:1',
+			'document_id' => 'required|integer',
+			'location_type' => 'required|in:1,2',
+			'type' => 'required|in:1,2,3',
+		], [
+			'chapter_id.required' => '文档id必填',
+			'chapter_id.min' => '文档id最小为0',
+			'document_id.required' => '文档id必填',
+			'location_type.required' => '演示请求类型id必填',
+		]);
+		$user = $request->getAttribute('user');
+		if (!$user->isOperator) {
+			throw new ErrorHttpException('您没有权限管理该文档');
+		}
+
+		$chapter = ChapterLogic::instance()->getById(intval($request->post('chapter_id')));
+		if (empty($chapter)) {
+			throw new ErrorHttpException('章节不存在');
+		}
+
+		$obj = new ChapterDemoService($chapter->id);
+		$data = $obj->getChapterDemo($request->post('location_type'), $request->post('type'));
 		return $data;
 	}
 }
