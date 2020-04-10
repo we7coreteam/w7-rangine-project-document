@@ -48,7 +48,7 @@ class PostManVersion2Service extends PostManCommonService
 	{
 		idb()->beginTransaction();
 		try {
-			$this->importDocument($userId, $info);
+			$document = $this->importDocument($userId, $info);
 			foreach ($item as $key => $val) {
 			}
 			idb()->commit();
@@ -60,34 +60,20 @@ class PostManVersion2Service extends PostManCommonService
 
 	public function importDocument($userId, $info)
 	{
-		$postmanId = '';
 		$name = '';
-		$id = 0;
-		if (isset($info['_postman_id'])) {
-			$postmanId = $info['_postman_id'];
-			$postmanIds = explode('-', $postmanId);
-			if ($postmanIds[0] == 'document') {
-				if (isset($postmanIds[1]) && $postmanIds[1]) {
-					$aes = new AES();
-					$idstr = $aes->decrypt($postmanIds[1]);
-					if (is_numeric($idstr)) {
-						//如果解密出来的字符串是数字
-						$id = $idstr;
-					}
-				}
-			}
-		}
 		if (isset($info['name'])) {
 			$name = $info['name'];
 		}
 		if (!$name) {
 			$name = 'document-' . date('Y-m-d H:i:s');
 		}
-//		"info": {
-//		"_postman_id": "5ef3c7be-d42c-b548-485a-a51b6a0adb92",
-//		"name": "test",
-//		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
-//	},
+		$document = Document::query()->create([
+			'name' => trim($name),
+			'description' => '',
+			'creator_id' => $userId,
+			'is_public' => 1,
+		]);
+		return $document;
 	}
 
 	//目录转POSTMENJSON
