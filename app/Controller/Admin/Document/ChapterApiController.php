@@ -17,7 +17,7 @@ use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document\ChapterApi;
 use W7\App\Model\Entity\Document\ChapterApiParam;
 use W7\App\Model\Logic\ChapterLogic;
-use W7\App\Model\Service\ChapterDemoService;
+use W7\App\Model\Service\Document\ChapterDemoService;
 use W7\App\Model\Service\Document\ChapterChangeService;
 use W7\Http\Message\Server\Request;
 
@@ -128,6 +128,7 @@ class ChapterApiController extends BaseController
 	 *
 	 * @apiParam {Number} document_id 章节ID
 	 * @apiParam {Number} chapter_id 文档ID
+	 * @apiParam {Number} location_type 演示请求类型1请求2响应
 	 *
 	 * @apiSuccessExample {json} Success-Response:
 	 * [{"name":"type","type":8,"description":"","enabled":1,"default_value":"","rule":""},{"name":"image","type":3,"description":"","enabled":1,"default_value":"images\/20\/01\/13\/TFKPAt8u0fx6XqkCLBwohBjJa9Id0NVaxc5ViKSq.png","rule":""},{"name":"buy_type","type":3,"description":"","enabled":1,"default_value":2,"rule":""},{"name":"buy_limit","type":8,"description":"","enabled":1,"default_value":"","rule":""},{"name":"shipping_required","type":8,"description":"","enabled":1,"default_value":"","rule":""},{"name":"option_values","type":4,"description":"","enabled":1,"default_value":"","rule":"","children":[]},{"name":"image_path","type":3,"description":"","enabled":1,"default_value":"\/\/cdn.w7.cc\/images\/20\/01\/13\/TFKPAt8u0fx6XqkCLBwohBjJa9Id0NVaxc5ViKSq.png","rule":""}]
@@ -137,10 +138,12 @@ class ChapterApiController extends BaseController
 		$this->validate($request, [
 			'chapter_id' => 'required|integer|min:1',
 			'document_id' => 'required|integer',
+			'location_type' => 'required|in:1,2',
 		], [
 			'chapter_id.required' => '文档id必填',
 			'chapter_id.min' => '文档id最小为0',
 			'document_id.required' => '文档id必填',
+			'location_type.required' => '演示请求类型id必填',
 		]);
 		$user = $request->getAttribute('user');
 		if (!$user->isOperator) {
@@ -153,7 +156,7 @@ class ChapterApiController extends BaseController
 		}
 
 		$obj = new ChapterDemoService($chapter->id);
-		$data = $obj->getChapterDemo();
+		$data = $obj->getChapterDemo($request->post('location_type'));
 		return $data;
 	}
 }
