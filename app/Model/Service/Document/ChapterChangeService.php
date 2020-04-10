@@ -53,8 +53,19 @@ class ChapterChangeService extends ChapterCommonService
 
 	public function getKeyValueToArray($str)
 	{
-		parse_str($str, $reply);
-		return $reply;
+		//键值对数组
+		$info1 = explode("\n", $str);
+		$reply = [];
+		foreach ($info1 as $key => $val) {
+			$info2 = explode(':', $val);
+			$name = urldecode($info2[0]);
+			$value = urldecode(str_replace($info2[0] . ':', '', $val));
+			$reply[$key] = urlencode($name) . '=' . urlencode($value);
+		}
+		//http参数
+		$newStr = implode('&', $reply);
+		parse_str($newStr, $result);
+		return $result;
 	}
 
 	//数组转列表数据
