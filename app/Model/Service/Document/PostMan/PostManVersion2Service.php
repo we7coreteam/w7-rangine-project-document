@@ -14,6 +14,7 @@ namespace W7\App\Model\Service\Document\PostMan;
 
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document;
+use W7\App\Model\Entity\Document\Chapter;
 use W7\App\Model\Entity\Document\ChapterApi;
 use W7\App\Model\Entity\Document\ChapterApiParam;
 use W7\App\Model\Service\AES;
@@ -49,27 +50,93 @@ class PostManVersion2Service extends PostManCommonService
 		idb()->beginTransaction();
 		try {
 			$document = $this->importDocument($userId, $info);
-			foreach ($item as $key => $val) {
-			}
+			$reply = $this->importItem($document->id, $item, 0);
 			idb()->commit();
+			return $reply;
 		} catch (\Throwable $e) {
 			idb()->rollBack();
 			throw new ErrorHttpException($e->getMessage());
 		}
 	}
 
+	public function importItem($documentId, $item, $parentId)
+	{
+		foreach ($item as $key => $val) {
+			if (isset($val['item']) && $val['item'] && is_array($val['item'])) {
+				//如果是目录
+				$this->importDir($documentId, $val, $parentId);
+			} elseif (isset($val['request']) && $val['request']) {
+				//如果是请求
+				$this->importChapter($documentId, $val, $parentId);
+			}
+		}
+		return true;
+	}
+
+	public function importChapter($documentId, $data, $parentId)
+	{
+		$name = '';
+		if (isset($data['name'])) {
+			$name = $data['name'];
+		}
+		$maxSort = Chapter::query()->where('document_id', '=', $documentId)->where('parent_id', '=', $parentId)->max('sort');
+		$sort = ++$maxSort;
+		//创建目录
+		$Chapter = Document\Chapter::query()->create([
+			'parent_id' => $parentId,
+			'name' => $name,
+			'document_id' => $documentId,
+			'sort' => $sort,
+			'is_dir' => 0
+		]);
+		$request = $data['request'];
+		if ($request && is_array($request)) {
+			$this->importRequest($documentId, $request, $Chapter->id);
+		}
+		return $Chapter;
+	}
+
+	public function importRequest($documentId, $request, $ChapterId)
+	{
+	}
+
+	public function importDir($documentId, $data, $parentId)
+	{
+		$name = '';
+		if (isset($data['name'])) {
+			$name = $data['name'];
+		}
+		$maxSort = Chapter::query()->where('document_id', '=', $documentId)->where('parent_id', '=', $parentId)->max('sort');
+		$sort = ++$maxSort;
+		//创建目录
+		$Chapter = Document\Chapter::query()->create([
+			'parent_id' => $parentId,
+			'name' => $name,
+			'document_id' => $documentId,
+			'sort' => $sort,
+			'is_dir' => 1
+		]);
+		$item = $data['item'];
+		$this->importItem($documentId, $item, $Chapter->id);
+		return $Chapter;
+	}
+
 	public function importDocument($userId, $info)
 	{
 		$name = '';
+		$description = '';
 		if (isset($info['name'])) {
 			$name = $info['name'];
+		}
+		if (isset($info['description'])) {
+			$description = $info['description'];
 		}
 		if (!$name) {
 			$name = 'document-' . date('Y-m-d H:i:s');
 		}
 		$document = Document::query()->create([
 			'name' => trim($name),
-			'description' => '',
+			'description' => $description,
 			'creator_id' => $userId,
 			'is_public' => 1,
 		]);
