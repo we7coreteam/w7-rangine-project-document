@@ -21,10 +21,10 @@ class PostManService
 		return $data;
 	}
 
-	public function postManJsonToDocument($json)
+	public function postManJsonToDocument($userId, $json)
 	{
 		$service = new PostManVersion2Service();
-		$data = $service->importToDocument($json);
+		$data = $service->importToDocument($userId, $json);
 		return $data;
 	}
 }

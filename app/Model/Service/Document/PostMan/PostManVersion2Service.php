@@ -16,12 +16,13 @@ use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\Document\ChapterApi;
 use W7\App\Model\Entity\Document\ChapterApiParam;
+use W7\App\Model\Service\AES;
 use W7\App\Model\Service\Document\ChapterDemoService;
 
 class PostManVersion2Service extends PostManCommonService
 {
 	//POSTMENJSON导入目录
-	public function importToDocument($json)
+	public function importToDocument($userId, $json)
 	{
 		$data = json_decode($json, true);
 		if (isset($data['info']['schema'])) {
@@ -29,7 +30,7 @@ class PostManVersion2Service extends PostManCommonService
 				//版本2或者2.1
 				if (isset($data['item']) && $data['item'] && is_array($data['item'])) {
 					//数据完整
-					return $this->importData($data['info'], $data['item']);
+					return $this->importData($userId, $data['info'], $data['item']);
 				}
 				throw new ErrorHttpException('导入数据为空！');
 			}
@@ -43,11 +44,11 @@ class PostManVersion2Service extends PostManCommonService
 		throw new ErrorHttpException('导入失败：当前不是标准的POSTMAN Collection V2版本数据！');
 	}
 
-	public function importData($info, $item)
+	public function importData($userId, $info, $item)
 	{
 		idb()->beginTransaction();
 		try {
-			$this->importDocument($info);
+			$this->importDocument($userId, $info);
 			foreach ($item as $key => $val) {
 			}
 			idb()->commit();
@@ -57,7 +58,7 @@ class PostManVersion2Service extends PostManCommonService
 		}
 	}
 
-	public function importDocument($info)
+	public function importDocument($userId, $info)
 	{
 		$postmanId = '';
 		$name = '';
@@ -66,7 +67,13 @@ class PostManVersion2Service extends PostManCommonService
 			$postmanId = $info['_postman_id'];
 			$postmanIds = explode('-', $postmanId);
 			if ($postmanIds[0] == 'document') {
-				if (isset($postmanIds[1]) && is_numeric($postmanIds[1])) {
+				if (isset($postmanIds[1]) && $postmanIds[1]) {
+					$aes = new AES();
+					$idstr = $aes->decrypt($postmanIds[1]);
+					if (is_numeric($idstr)) {
+						//如果解密出来的字符串是数字
+						$id = $idstr;
+					}
 				}
 			}
 		}
@@ -255,9 +262,10 @@ class PostManVersion2Service extends PostManCommonService
 	{
 		$document = Document::query()->find($documentId);
 		if ($document) {
+			$obj = new AES();
 			$info = [
 				'name' => $document->name,
-				'_postman_id' => 'document-' . $document->id,
+				'_postman_id' => 'document-' . $obj->encrypt($document->id),
 				'description' => $document->description,
 				'schema' => 'https://schema.getpostman.com/json/collection/v2.0.0/collection.json'
 			];

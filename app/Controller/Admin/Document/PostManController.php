@@ -30,8 +30,9 @@ class PostManController extends BaseController
 		$this->validate($request, [
 			'json' => 'required',
 		]);
+		$user = $request->getAttribute('user');
 		$obj = new PostManService();
-		$data = $obj->postManJsonToDocument($request->post('json'));
+		$data = $obj->postManJsonToDocument($user->id, $request->post('json'));
 		return $data;
 	}
 
