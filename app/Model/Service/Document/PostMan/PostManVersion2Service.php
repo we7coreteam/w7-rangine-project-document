@@ -12,6 +12,7 @@
 
 namespace W7\App\Model\Service\Document\PostMan;
 
+use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\Document\ChapterApi;
 use W7\App\Model\Entity\Document\ChapterApiParam;
@@ -20,8 +21,65 @@ use W7\App\Model\Service\Document\ChapterDemoService;
 class PostManVersion2Service extends PostManCommonService
 {
 	//POSTMENJSON导入目录
-	public function importToDocument($documentId)
+	public function importToDocument($json)
 	{
+		$data = json_decode($json, true);
+		if (isset($data['info']['schema'])) {
+			if (in_array($data['info']['schema'], ['https://schema.getpostman.com/json/collection/v2.0.0/collection.json', 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'])) {
+				//版本2或者2.1
+				if (isset($data['item']) && $data['item'] && is_array($data['item'])) {
+					//数据完整
+					return $this->importData($data['info'], $data['item']);
+				}
+				throw new ErrorHttpException('导入数据为空！');
+			}
+		}else{
+			if(isset($data['id'])&&isset($data['requests'])){
+				//可能是V1版本
+				throw new ErrorHttpException('仅支持POSTMAN Collection V2版本的数据格式导入！');
+			}
+		}
+		throw new ErrorHttpException('导入失败：当前不是标准的POSTMAN Collection V2版本数据！');
+	}
+
+	public function importData($info, $item)
+	{
+		idb()->beginTransaction();
+		try {
+			$this->importDocument($info);
+			foreach ($item as $key => $val) {
+			}
+			idb()->commit();
+		} catch (\Throwable $e) {
+			idb()->rollBack();
+			throw new ErrorHttpException($e->getMessage());
+		}
+
+	}
+
+	public function importDocument($info)
+	{
+		$postmanId='';$name='';$id=0;
+		if(isset($info['_postman_id'])){
+			$postmanId=$info['_postman_id'];
+			$postmanIds=explode("-",$postmanId);
+			if($postmanIds[0]=='document'){
+				if(isset($postmanIds[1])&&is_numeric($postmanIds[1])){
+
+				}
+			}
+		}
+		if(isset($info['name'])){
+			$name=$info['name'];
+		}
+		if(!$name){
+			$name="document-".date("Y-m-d H:i:s");
+		}
+//		"info": {
+//		"_postman_id": "5ef3c7be-d42c-b548-485a-a51b6a0adb92",
+//		"name": "test",
+//		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+//	},
 	}
 
 	//目录转POSTMENJSON

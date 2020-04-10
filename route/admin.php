@@ -24,6 +24,11 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 		$route->post('/change-founder', 'Admin\DocumentController@changeDocumentFounder');
 	});
 
+	//api文档内容管理-postman导入导出
+	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix' => '/document/postman'], function (\W7\Core\Route\Route $route) {
+		$route->post('/documentToPostManJosn', 'Admin\Document\PostManController@documentToPostManJosn');
+		$route->post('/postManJsonToDocument', 'Admin\Document\PostManController@postManJsonToDocument');
+	});
 	//api文档内容管理-公共
 	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix' => '/document/chapterapi'], function (\W7\Core\Route\Route $route) {
 		$route->get('/getStatusCode', 'Admin\Document\ChapterApiController@getStatusCode');

@@ -14,34 +14,17 @@ namespace W7\App\Model\Service\Document\PostMan;
 
 class PostManService
 {
-	protected $documentId;
-	protected $version;
-
-	public function __construct($documentId, $version = 2)
+	public function documentToPostManJosn($documentId)
 	{
-		$this->documentId = $documentId;
-		$this->version = $version;
-	}
-
-	public function documentToPostManJosn()
-	{
-		if ($this->version == 2) {
-			$service = new PostManVersion2Service();
-		} else {
-			$service = new PostManVersion1Service();
-		}
-		$data = $service->buildExportJson($this->documentId);
+		$service = new PostManVersion2Service();
+		$data = $service->buildExportJson($documentId);
 		return $data;
 	}
 
-	public function postManJsonToDocument()
+	public function postManJsonToDocument($json)
 	{
-		if ($this->version == 2) {
-			$service = new PostManVersion2Service();
-		} else {
-			$service = new PostManVersion1Service();
-		}
-		$data = $service->importToDocument($this->documentId);
+		$service = new PostManVersion2Service();
+		$data = $service->importToDocument($json);
 		return $data;
 	}
 }
