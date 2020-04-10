@@ -92,9 +92,9 @@ class ChapterDemoService extends ChapterCommonService
 				if (count($listChildrenSun) > 0) {
 					if (is_numeric($val->rule) && ($val->rule > 1)) {
 						//如果是多维数组
-						$data[$val->name][] = $this->getChapterDemoChildrenArray($listChildrenSun, $val);
+						$data[$val->name][] = $this->getChapterDemoChildrenArray($listChildrenSun, '');
 					} else {
-						$data[$val->name] = $this->getChapterDemoChildrenArray($listChildrenSun, $val);
+						$data[$val->name] = $this->getChapterDemoChildrenArray($listChildrenSun, '');
 					}
 				} else {
 					//没有子类

@@ -12,10 +12,18 @@
 
 namespace W7\App\Model\Service\Document\PostMan;
 
-use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document\ChapterApiParam;
 
 class PostManCommonService
 {
-
+	//请求列表
+	public function requestBodyIds()
+	{
+		return [
+			ChapterApiParam::LOCATION_REQUEST_BODY_FROM => 'Request.Body.form-data',
+			ChapterApiParam::LOCATION_REQUEST_BODY_URLENCODED => 'Request.Body.urlencoded',
+			ChapterApiParam::LOCATION_REQUEST_BODY_RAW => 'Request.Body.raw',
+			ChapterApiParam::LOCATION_REQUEST_BODY_BINARY => 'Request.Body.binary',
+		];
+	}
 }
