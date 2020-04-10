@@ -16,7 +16,11 @@ use W7\App\Model\Entity\Document;
 
 class PostManVersion1Service extends PostManCommonService
 {
-	public function buildJson($documentId)
+	public function importToDocument($documentId)
+	{
+	}
+
+	public function buildExportJson($documentId)
 	{
 		$data = [
 			'variables' => [],

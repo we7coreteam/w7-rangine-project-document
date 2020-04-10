@@ -19,7 +19,13 @@ use W7\App\Model\Service\Document\ChapterDemoService;
 
 class PostManVersion2Service extends PostManCommonService
 {
-	public function buildJson($documentId)
+	//POSTMENJSON导入目录
+	public function importToDocument($documentId)
+	{
+	}
+
+	//目录转POSTMENJSON
+	public function buildExportJson($documentId)
 	{
 		$data = [
 			'variables' => [],

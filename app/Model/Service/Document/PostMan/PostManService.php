@@ -23,18 +23,25 @@ class PostManService
 		$this->version = $version;
 	}
 
-	public function documentToPostMan()
+	public function documentToPostManJosn()
 	{
 		if ($this->version == 2) {
 			$service = new PostManVersion2Service();
 		} else {
 			$service = new PostManVersion1Service();
 		}
-		$data = $service->buildJson($this->documentId);
+		$data = $service->buildExportJson($this->documentId);
 		return $data;
 	}
 
-	public function postManToDocument()
+	public function postManJsonToDocument()
 	{
+		if ($this->version == 2) {
+			$service = new PostManVersion2Service();
+		} else {
+			$service = new PostManVersion1Service();
+		}
+		$data = $service->importToDocument($this->documentId);
+		return $data;
 	}
 }
