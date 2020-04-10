@@ -108,7 +108,7 @@ class ChapterApiController extends BaseController
 	 * @apiGroup ChapterApi
 	 *
 	 * @apiParam {String} data 数据内容
-	 * @apiParam {String} type 0自适应，1指定json,2指定数组。默认0
+	 * @apiParam {String} type 0自适应，1指定json,2指定数组，3键值对字符串。默认0
 	 *
 	 * @apiSuccessExample {json} Success-Response:
 	 * [{"name":"type","type":8,"description":"","enabled":1,"default_value":"","rule":""},{"name":"image","type":3,"description":"","enabled":1,"default_value":"images\/20\/01\/13\/TFKPAt8u0fx6XqkCLBwohBjJa9Id0NVaxc5ViKSq.png","rule":""},{"name":"buy_type","type":3,"description":"","enabled":1,"default_value":2,"rule":""},{"name":"buy_limit","type":8,"description":"","enabled":1,"default_value":"","rule":""},{"name":"shipping_required","type":8,"description":"","enabled":1,"default_value":"","rule":""},{"name":"option_values","type":4,"description":"","enabled":1,"default_value":"","rule":"","children":[]},{"name":"image_path","type":3,"description":"","enabled":1,"default_value":"\/\/cdn.w7.cc\/images\/20\/01\/13\/TFKPAt8u0fx6XqkCLBwohBjJa9Id0NVaxc5ViKSq.png","rule":""}]

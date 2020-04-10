@@ -44,10 +44,17 @@ class ChapterChangeService extends ChapterCommonService
 			//如果是数组格式
 			$data = $text;
 		} else {
-			throw new ErrorHttpException('不支持的数据格式');
+			//键值对文本
+			$data = $this->getKeyValueToArray($text);
 		}
 		//数组转列表数据
 		return $this->arrayToData($data);
+	}
+
+	public function getKeyValueToArray($str)
+	{
+		parse_str($str, $reply);
+		return $reply;
 	}
 
 	//数组转列表数据

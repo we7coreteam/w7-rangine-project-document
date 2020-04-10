@@ -35,17 +35,11 @@ class ChapterDemoService extends ChapterCommonService
 		}
 		$chapterList = ChapterApiParam::query()->where('chapter_id', $chapterId)->where('parent_id', 0)->whereIn('location', $locationList)->get();
 		$data = $this->getChapterDemoChildrenArray($chapterList);
-		if (in_array($type, [2,3])) {
+		if (in_array($type, [2, 3])) {
 			//需要转键值对
 			return $this->getArrayToKeyValue($data, $type);
 		}
 		return $data;
-	}
-
-	public function getKeyValueToArray($str)
-	{
-		parse_str($str, $reply);
-		return $reply;
 	}
 
 	public function getArrayToKeyValue($data, $type)
@@ -58,7 +52,7 @@ class ChapterDemoService extends ChapterCommonService
 			foreach ($info1 as $key => $val) {
 				$info2 = explode('=', $val);
 				$name = urldecode($info2[0]);
-				$value = urldecode(str_replace($info2[0].'=', '', $val));
+				$value = urldecode(str_replace($info2[0] . '=', '', $val));
 				$reply[$name] = $value;
 			}
 			return $reply;
