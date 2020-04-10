@@ -22,7 +22,7 @@ use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\App\Model\Logic\DocumentPermissionLogic;
 use W7\App\Model\Logic\UserOperateLogic;
-use W7\App\Model\Service\ChapterRecordService;
+use W7\App\Model\Service\Document\ChapterRecordService;
 use W7\Http\Message\Server\Request;
 
 /**

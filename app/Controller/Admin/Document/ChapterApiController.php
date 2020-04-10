@@ -17,7 +17,8 @@ use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document\ChapterApi;
 use W7\App\Model\Entity\Document\ChapterApiParam;
 use W7\App\Model\Logic\ChapterLogic;
-use W7\App\Model\Service\ChapterRecordService;
+use W7\App\Model\Service\ChapterDemoService;
+use W7\App\Model\Service\Document\ChapterChangeService;
 use W7\Http\Message\Server\Request;
 
 class ChapterApiController extends BaseController
@@ -115,7 +116,7 @@ class ChapterApiController extends BaseController
 	{
 		$data = $request->post('data');
 		$type = $request->post('type', 0);
-		$obj = new ChapterRecordService(0);
+		$obj = new ChapterChangeService();
 		$data = $obj->textToData($data, $type);
 		return $data;
 	}
@@ -151,7 +152,7 @@ class ChapterApiController extends BaseController
 			throw new ErrorHttpException('章节不存在');
 		}
 
-		$obj = new ChapterRecordService($chapter->id);
+		$obj = new ChapterDemoService($chapter->id);
 		$data = $obj->getChapterDemo();
 		return $data;
 	}
