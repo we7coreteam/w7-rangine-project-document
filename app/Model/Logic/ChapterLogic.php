@@ -100,7 +100,10 @@ class ChapterLogic extends BaseLogic
 
 		if ($chapterQuery->delete()) {
 			ChapterContent::query()->whereIn('chapter_id', $chapterIds)->delete();
-			CdnLogic::instance()->channel(SettingLogic::KEY_COS)->deletePath(sprintf('/%s', $documentId));
+			$setting = SettingLogic::instance()->getByKey(SettingLogic::KEY_COS);
+			if ($setting) {
+				CdnLogic::instance()->channel(SettingLogic::KEY_COS)->deletePath(sprintf('/%s', $documentId));
+			}
 		}
 		return true;
 	}
