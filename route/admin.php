@@ -26,13 +26,7 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 
 	//api文档内容管理-公共
 	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix' => '/document/chapterapi'], function (\W7\Core\Route\Route $route) {
-		$route->get('/getStatusCode', 'Admin\Document\ChapterApiController@getStatusCode');
-		$route->get('/getMethodLabel', 'Admin\Document\ChapterApiController@getMethodLabel');
-		$route->get('/getEnabledLabel', 'Admin\Document\ChapterApiController@getEnabledLabel');
-		$route->get('/getTypeLabel', 'Admin\Document\ChapterApiController@getTypeLabel');
-		$route->get('/getLocationLabel', 'Admin\Document\ChapterApiController@getLocationLabel');
-		$route->get('/rawContentType', 'Admin\Document\ChapterApiController@rawContentType');
-
+		$route->get('/getApiLabel', 'Admin\Document\ChapterApiController@getApiLabel');
 	});
 	//文档内容管理
 	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix' => '/chapter'], function (\W7\Core\Route\Route $route) {

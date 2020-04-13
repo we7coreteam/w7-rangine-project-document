@@ -19,6 +19,7 @@ use W7\Core\Helper\Traiter\InstanceTraiter;
 class ChapterApiLogic extends BaseLogic
 {
 	use InstanceTraiter;
+
 	public function getMethodLabel()
 	{
 		return [
@@ -45,6 +46,17 @@ class ChapterApiLogic extends BaseLogic
 	{
 		return [
 			200, 301, 403, 404, 500, 502, 503, 504
+		];
+	}
+
+	public function getApiLabel()
+	{
+		return [
+			'statusCode' => $this->getStatusCode(),
+			'methodLabel' => generate_label('请求方式', $this->getMethodLabel()),
+			'enabledLabel' => generate_label('必填类型', ChapterApiParamLogic::instance()->getEnabledLabel()),
+			'typeLabel' => generate_label('字段类型', ChapterApiParamLogic::instance()->getTypeLabel()),
+			'locationLabel' => generate_label('参数类型', ChapterApiParamLogic::instance()->getLocationLabel()),
 		];
 	}
 }
