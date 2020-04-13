@@ -121,15 +121,28 @@ class PostManVersion2Service extends PostManCommonService
 		return $result;
 	}
 
-	public function changeFormat($data, $dataType = 1)
+	public function changeFormat($data, $dataType = 3)
 	{
-		if ($dataType == 1) {
+		if ($dataType == 3) {
+			//键值对数组
 			$info = $this->getKeyValueDataToArray($data);
+		} elseif ($dataType == 1) {
+			//json
+			if ($this->isJson($data)) {
+				$info = json_decode($data, true);
+			}
+		} else {
+			//普通数组
+			$info = $data;
 		}
-		//键值对数组转换为键值对文本
-		$obj = new ChapterChangeService();
-		$infoData = $obj->arrayToData($info);
-		return $infoData;
+		if (is_array($info)) {
+			//键值对数组转换为键值对文本
+			$obj = new ChapterChangeService();
+			$infoData = $obj->arrayToData($info);
+			//补齐描述
+			return $infoData;
+		}
+		return false;
 	}
 
 	public function importRequest($documentId, $request, $chapter)
@@ -177,11 +190,8 @@ class PostManVersion2Service extends PostManCommonService
 						}
 					} elseif ($postManBody['mode'] == 'raw') {
 						$body_param_location = ChapterApiParam::LOCATION_REQUEST_BODY_RAW;
-						if (isset($postManBody['raw']) && is_array($postManBody['raw'])) {
-							if ($this->isJson($postManBody['raw'])) {
-								$raw = json_decode($postManBody['raw']);
-								$body[ChapterApiParam::LOCATION_REQUEST_BODY_RAW] = $this->changeFormat($raw);
-							}
+						if (isset($postManBody['raw']) && $postManBody['raw']) {
+							$body[ChapterApiParam::LOCATION_REQUEST_BODY_RAW] = $this->changeFormat($postManBody['raw'], 1);
 						}
 					} elseif ($postManBody['mode'] == 'file') {
 						$body_param_location = ChapterApiParam::LOCATION_REQUEST_BODY_BINARY;

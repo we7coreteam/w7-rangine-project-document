@@ -48,7 +48,10 @@ class ChapterChangeService extends ChapterCommonService
 			$data = $this->getKeyValueToArray($text);
 		}
 		//数组转列表数据
-		return $this->arrayToData($data);
+		if (is_array($data)) {
+			return $this->arrayToData($data);
+		}
+		return false;
 	}
 
 	public function getKeyValueToArray($str)
