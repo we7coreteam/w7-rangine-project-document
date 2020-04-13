@@ -19,7 +19,7 @@ use W7\Http\Message\Server\Request;
 class ChapterApiController extends BaseController
 {
 	/**
-	 * @api {get} /document/chapterapi/getTypeLabel 获取字段类型列表
+	 * @api {get} /document/chapterapi/getTypeLabel 获取参数类型列表
 	 * @apiName getTypeLabel
 	 * @apiGroup ChapterApi
 	 *
