@@ -13,7 +13,8 @@
 namespace W7\App\Controller\Admin\Document;
 
 use W7\App\Controller\BaseController;
-use W7\App\Model\Logic\Document\PostMan\PostManLogic;
+use W7\App\Model\Logic\Document\PostMan\PostManExportLogic;
+use W7\App\Model\Logic\Document\PostMan\PostManImportLogic;
 use W7\Http\Message\Server\Request;
 
 class PostManController extends BaseController
@@ -31,8 +32,8 @@ class PostManController extends BaseController
 			'json' => 'required',
 		]);
 		$user = $request->getAttribute('user');
-		$postManLogic = new PostManLogic();
-		$data = $postManLogic->postManJsonToDocument($user->id, $request->post('json'));
+		$postManImportLogic = new PostManImportLogic();
+		$data = $postManImportLogic->importToDocument($user->id, $request->post('json'));
 		return $data;
 	}
 
@@ -50,8 +51,8 @@ class PostManController extends BaseController
 		], [
 			'document_id.required' => '文档id必填',
 		]);
-		$postManLogic = new PostManLogic();
-		$data = $postManLogic->documentToPostManJosn(intval($request->post('document_id')));
+		$postManExportLogic = new PostManExportLogic();
+		$data = $postManExportLogic->buildExportJson(intval($request->post('document_id')));
 		return $data;
 	}
 }
