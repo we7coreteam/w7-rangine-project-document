@@ -14,9 +14,11 @@ namespace W7\App\Model\Logic\Document;
 
 use W7\App\Model\Entity\Document\ChapterApi;
 use W7\App\Model\Logic\BaseLogic;
+use W7\Core\Helper\Traiter\InstanceTraiter;
 
 class ChapterApiLogic extends BaseLogic
 {
+	use InstanceTraiter;
 	public function getMethodLabel()
 	{
 		return [

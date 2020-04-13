@@ -38,7 +38,7 @@ class ChapterCommonLogic
 	{
 		return [
 			ChapterApiParam::LOCATION_REQUEST_HEADER => 'Request.Header',
-			ChapterApiParam::LOCATION_REQUEST_QUERY => 'Request.Query',
+			ChapterApiParam::LOCATION_REQUEST_QUERY_STRING => 'Request.Query',
 			ChapterApiParam::LOCATION_REQUEST_BODY_FROM => 'Request.Body.form-data',
 			ChapterApiParam::LOCATION_REQUEST_BODY_URLENCODED => 'Request.Body.urlencoded',
 			ChapterApiParam::LOCATION_REQUEST_BODY_RAW => 'Request.Body.raw',

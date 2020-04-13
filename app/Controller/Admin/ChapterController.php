@@ -354,8 +354,7 @@ class ChapterController extends BaseController
 	 */
 	public function save(Request $request)
 	{
-		$chapterContentLogic = new ChapterContentLogic();
-		$layoutLabel = array_keys($chapterContentLogic->getLayoutLabel());
+		$layoutLabel = array_keys(ChapterContentLogic::instance()->getLayoutLabel());
 		$this->validate($request, [
 			'chapter_id' => 'required|integer|min:1',
 			'document_id' => 'required|integer',

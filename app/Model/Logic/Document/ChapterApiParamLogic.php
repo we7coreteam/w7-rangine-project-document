@@ -14,9 +14,11 @@ namespace W7\App\Model\Logic\Document;
 
 use W7\App\Model\Entity\Document\ChapterApiParam;
 use W7\App\Model\Logic\BaseLogic;
+use W7\Core\Helper\Traiter\InstanceTraiter;
 
 class ChapterApiParamLogic extends BaseLogic
 {
+	use InstanceTraiter;
 	public function rawContentType()
 	{
 		return [
@@ -28,7 +30,7 @@ class ChapterApiParamLogic extends BaseLogic
 	{
 		return [
 			ChapterApiParam::LOCATION_REQUEST_HEADER => 'Request.Header',
-			ChapterApiParam::LOCATION_REQUEST_QUERY => 'Request.Query',
+			ChapterApiParam::LOCATION_REQUEST_QUERY_STRING => 'Request.Query',
 			ChapterApiParam::LOCATION_REQUEST_BODY_FROM => 'Request.Body.form-data',
 			ChapterApiParam::LOCATION_REQUEST_BODY_URLENCODED => 'Request.Body.urlencoded',
 			ChapterApiParam::LOCATION_REQUEST_BODY_RAW => 'Request.Body.raw',

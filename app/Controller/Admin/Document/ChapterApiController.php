@@ -29,8 +29,7 @@ class ChapterApiController extends BaseController
 	 */
 	public function getStatusCode(Request $request)
 	{
-		$chapterApiLogic = new ChapterApiLogic();
-		return $chapterApiLogic->getStatusCode();
+		return ChapterApiLogic::instance()->getStatusCode();
 	}
 
 	/**
@@ -43,8 +42,7 @@ class ChapterApiController extends BaseController
 	 */
 	public function getMethodLabel(Request $request)
 	{
-		$chapterApiLogic = new ChapterApiLogic();
-		return generate_label('请求方式', $chapterApiLogic->getMethodLabel());
+		return generate_label('请求方式', ChapterApiLogic::instance()->getMethodLabel());
 	}
 
 	/**
@@ -57,8 +55,7 @@ class ChapterApiController extends BaseController
 	 */
 	public function getEnabledLabel(Request $request)
 	{
-		$chapterApiParamLogic = new ChapterApiParamLogic();
-		return generate_label('必填类型', $chapterApiParamLogic->getEnabledLabel());
+		return generate_label('必填类型', ChapterApiParamLogic::instance()->getEnabledLabel());
 	}
 
 	/**
@@ -71,8 +68,7 @@ class ChapterApiController extends BaseController
 	 */
 	public function getTypeLabel(Request $request)
 	{
-		$chapterApiParamLogic = new ChapterApiParamLogic();
-		return generate_label('字段类型', $chapterApiParamLogic->getTypeLabel());
+		return generate_label('字段类型', ChapterApiParamLogic::instance()->getTypeLabel());
 	}
 
 	/**
@@ -85,8 +81,7 @@ class ChapterApiController extends BaseController
 	 */
 	public function getLocationLabel(Request $request)
 	{
-		$chapterApiParamLogic = new ChapterApiParamLogic();
-		return generate_label('请求类型', $chapterApiParamLogic->getLocationLabel());
+		return generate_label('请求类型', ChapterApiParamLogic::instance()->getLocationLabel());
 	}
 
 	/**
@@ -99,7 +94,6 @@ class ChapterApiController extends BaseController
 	 */
 	public function rawContentType(Request $request)
 	{
-		$chapterApiParamLogic = new ChapterApiParamLogic();
-		return generate_label('RAW请求头', $chapterApiParamLogic->rawContentType());
+		return generate_label('RAW请求头', ChapterApiParamLogic::instance()->rawContentType());
 	}
 }

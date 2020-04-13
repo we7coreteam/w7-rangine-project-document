@@ -100,7 +100,7 @@ class ChapterRecordLogic
 		foreach ($data as $k => $v) {
 			if (in_array($k, [ChapterApiParam::LOCATION_REQUEST_HEADER, ChapterApiParam::LOCATION_REPONSE_HEADER])) {
 				$text .= $this->buildApiBody($k, $v, $sqlType);
-			} elseif (in_array($k, [ChapterApiParam::LOCATION_REQUEST_QUERY])) {
+			} elseif (in_array($k, [ChapterApiParam::LOCATION_REQUEST_QUERY_STRING])) {
 				$text .= $this->buildApiBody($k, $v, $sqlType);
 			} elseif ($k == $this->bodyParamLocation) {
 				$text .= $this->buildApiBody($k, $v, $sqlType);
@@ -139,8 +139,7 @@ class ChapterRecordLogic
 
 	public function getLocatinonText($location)
 	{
-		$chapterApiParamLogic = new ChapterApiParamLogic();
-		$typeLabel = $chapterApiParamLogic->getLocationLabel();
+		$typeLabel = ChapterApiParamLogic::instance()->getLocationLabel();
 		if (isset($typeLabel[$location])) {
 			return $typeLabel[$location];
 		}
@@ -149,8 +148,7 @@ class ChapterRecordLogic
 
 	public function getEnabledText($enabled)
 	{
-		$chapterApiParamLogic = new ChapterApiParamLogic();
-		$enabledLabel = $chapterApiParamLogic->getEnabledLabel();
+		$enabledLabel = ChapterApiParamLogic::instance()->getEnabledLabel();
 		if (isset($enabledLabel[$enabled])) {
 			return $enabledLabel[$enabled];
 		}
@@ -236,8 +234,8 @@ class ChapterRecordLogic
 		if (isset($data['method'])) {
 			$method = $data['method'];
 		}
-		$chapterApiLogic = new ChapterApiLogic();
-		$methodLabel = $chapterApiLogic->getMethodLabel();
+
+		$methodLabel = ChapterApiLogic::instance()->getMethodLabel();
 		if (!isset($methodLabel[$method])) {
 			throw new ErrorHttpException('请求方式错误');
 		}
@@ -253,8 +251,7 @@ class ChapterRecordLogic
 		}
 		if (isset($data['status_code'])) {
 			$statusCode = $data['status_code'];
-			$chapterApiLogic = new ChapterApiLogic();
-			$statusCodeLists = $chapterApiLogic->getStatusCode();
+			$statusCodeLists = ChapterApiLogic::instance()->getStatusCode();
 			if (!in_array($statusCode, $statusCodeLists)) {
 				throw new ErrorHttpException('状态码错误');
 			}
@@ -301,8 +298,7 @@ class ChapterRecordLogic
 
 	public function getTypeText($type)
 	{
-		$chapterApiParamLogic = new ChapterApiParamLogic();
-		$typeLabel = $chapterApiParamLogic->getTypeLabel();
+		$typeLabel = ChapterApiParamLogic::instance()->getTypeLabel();
 		if (isset($typeLabel[$type])) {
 			return $typeLabel[$type];
 		}

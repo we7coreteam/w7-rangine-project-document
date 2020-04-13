@@ -14,9 +14,12 @@ namespace W7\App\Model\Logic\Document;
 
 use W7\App\Model\Entity\Document\ChapterContent;
 use W7\App\Model\Logic\BaseLogic;
+use W7\Core\Helper\Traiter\InstanceTraiter;
 
 class ChapterContentLogic extends BaseLogic
 {
+	use InstanceTraiter;
+
 	public function getLayoutLabel()
 	{
 		return [
