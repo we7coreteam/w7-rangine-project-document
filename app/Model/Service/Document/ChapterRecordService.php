@@ -43,32 +43,32 @@ class ChapterRecordService
 			'body' => '',
 			'extend' => '',
 		];
-		idb()->beginTransaction();
-		try {
-			foreach ($record as $key => $val) {
-				if (is_array($val)) {
-					if ($key == 'api') {
-						$markdown['api'] = $this->buildApi($val, $sqlType);
-					} elseif ($key == 'body') {
-						$markdown['body'] = $this->buildBody($val, $sqlType);
-					}
-				} else {
-					if ($key == 'extend') {
-						$markdown['extend'] = $this->buildExtend($val, $sqlType);
-					}
+//		idb()->beginTransaction();
+//		try {
+		foreach ($record as $key => $val) {
+			if (is_array($val)) {
+				if ($key == 'api') {
+					$markdown['api'] = $this->buildApi($val, $sqlType);
+				} elseif ($key == 'body') {
+					$markdown['body'] = $this->buildBody($val, $sqlType);
+				}
+			} else {
+				if ($key == 'extend') {
+					$markdown['extend'] = $this->buildExtend($val, $sqlType);
 				}
 			}
-			//循环结束以后，删除该父级本次未提交的ID
-			$ids = $this->ids;
-			$chapterId = $this->chapterId;
-			if ($ids) {
-				ChapterApiParam::query()->where('chapter_id', $chapterId)->whereNotIn('id', $ids)->delete();
-			}
-			idb()->commit();
-		} catch (\Throwable $e) {
-			idb()->rollBack();
-			throw new ErrorHttpException($e->getMessage());
 		}
+		//循环结束以后，删除该父级本次未提交的ID
+		$ids = $this->ids;
+		$chapterId = $this->chapterId;
+		if ($ids) {
+			ChapterApiParam::query()->where('chapter_id', $chapterId)->whereNotIn('id', $ids)->delete();
+		}
+//			idb()->commit();
+//		} catch (\Throwable $e) {
+//			idb()->rollBack();
+//			throw new ErrorHttpException($e->getMessage());
+//		}
 		$markdownText = implode("\n", $markdown);
 		return $markdownText;
 	}
@@ -281,11 +281,14 @@ class ChapterRecordService
 
 	public function buildApiBody($location, $data, $sqlType)
 	{
-		$title = $this->getLocatinonText($location);
-		$text = '### ' . $title . "\n\n";
-		$text = $text . $this->bodyTableTop();
-		foreach ($data as $k => $val) {
-			$text .= $this->buildBodyChildren($location, $val, 0, 0, $sqlType);
+		$text = '';
+		if ($data && is_array($data)) {
+			$title = $this->getLocatinonText($location);
+			$text = '### ' . $title . "\n\n";
+			$text = $text . $this->bodyTableTop();
+			foreach ($data as $k => $val) {
+				$text .= $this->buildBodyChildren($location, $val, 0, 0, $sqlType);
+			}
 		}
 		return $text;
 	}
