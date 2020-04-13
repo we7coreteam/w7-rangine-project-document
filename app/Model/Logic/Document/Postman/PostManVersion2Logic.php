@@ -10,7 +10,7 @@
  * visited https://www.w7.cc for more details
  */
 
-namespace W7\App\Model\Service\Document\PostMan;
+namespace W7\App\Model\Logic\Document\PostMan;
 
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document;
@@ -24,7 +24,7 @@ use W7\App\Model\Logic\Document\ChapterApi\ChapterChangeLogic;
 use W7\App\Model\Logic\Document\ChapterApi\ChapterDemoLogic;
 use W7\App\Model\Logic\Document\ChapterApi\ChapterRecordLogic;
 
-class PostManVersion2Service extends PostManCommonService
+class PostManVersion2Logic extends PostManCommonLogic
 {
 	protected $descriptionData = [];
 

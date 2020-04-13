@@ -10,20 +10,20 @@
  * visited https://www.w7.cc for more details
  */
 
-namespace W7\App\Model\Service\Document\PostMan;
+namespace W7\App\Model\Logic\Document\PostMan;
 
-class PostManService
+class PostManLogic
 {
 	public function documentToPostManJosn($documentId)
 	{
-		$service = new PostManVersion2Service();
+		$service = new PostManVersion2Logic();
 		$data = $service->buildExportJson($documentId);
 		return $data;
 	}
 
 	public function postManJsonToDocument($userId, $json)
 	{
-		$service = new PostManVersion2Service();
+		$service = new PostManVersion2Logic();
 		$data = $service->importToDocument($userId, $json);
 		return $data;
 	}

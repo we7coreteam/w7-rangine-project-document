@@ -10,11 +10,11 @@
  * visited https://www.w7.cc for more details
  */
 
-namespace W7\App\Model\Service\Document\PostMan;
+namespace W7\App\Model\Logic\Document\PostMan;
 
 use W7\App\Model\Entity\Document\ChapterApiParam;
 
-class PostManCommonService
+class PostManCommonLogic
 {
 	//请求列表
 	public function requestBodyIds()
