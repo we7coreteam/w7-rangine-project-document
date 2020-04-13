@@ -10,14 +10,14 @@
  * visited https://www.w7.cc for more details
  */
 
-namespace W7\App\Model\Service\Document;
+namespace W7\App\Model\Logic\Document\ChapterApi;
 
 use W7\App\Exception\ErrorHttpException;
 
 /**
  * 数据转换0自适应，1json2数组（非键值对数组，纯数组）3键值对文本
  */
-class ChapterChangeService extends ChapterCommonService
+class ChapterChangeLogic extends ChapterCommonLogic
 {
 	public function textToData($text, $type = 0)
 	{

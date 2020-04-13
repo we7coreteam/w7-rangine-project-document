@@ -23,7 +23,7 @@ use W7\App\Model\Logic\Document\ChapterContentLogic;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\App\Model\Logic\DocumentPermissionLogic;
 use W7\App\Model\Logic\UserOperateLogic;
-use W7\App\Model\Service\Document\ChapterRecordService;
+use W7\App\Model\Logic\Document\ChapterApi\ChapterRecordLogic;
 use W7\Http\Message\Server\Request;
 
 /**
@@ -381,7 +381,7 @@ class ChapterController extends BaseController
 		if ($layout == 1) {
 			//如果是http类型
 			$record = $request->post('record', []);
-			$chapterRecord = new ChapterRecordService($chapter->id);
+			$chapterRecord = new ChapterRecordLogic($chapter->id);
 			$content = $chapterRecord->recordToMarkdown($record);
 		}
 
@@ -482,7 +482,7 @@ class ChapterController extends BaseController
 			'updated_at' => $chapter->updated_at->toDateTimeString()
 		];
 		if ($chapter->content->layout == 1) {
-			$obj = new ChapterRecordService($chapter->id);
+			$obj = new ChapterRecordLogic($chapter->id);
 			$result['record'] = $obj->showRecord();
 		}
 
@@ -615,7 +615,7 @@ class ChapterController extends BaseController
 				$newChapterContent->save();
 				if ($chapterContent->layout == 1) {
 					//如果是HTTP类型
-					$obj = new ChapterRecordService($chapter->id);
+					$obj = new ChapterRecordLogic($chapter->id);
 					$obj->copyRecord($newChapter->id);
 				}
 			}

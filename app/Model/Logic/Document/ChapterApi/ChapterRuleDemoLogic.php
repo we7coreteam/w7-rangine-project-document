@@ -10,7 +10,7 @@
  * visited https://www.w7.cc for more details
  */
 
-namespace W7\App\Model\Service\Document;
+namespace W7\App\Model\Logic\Document\ChapterApi;
 
 /**
  * 数据转生成规则样例
@@ -18,7 +18,7 @@ namespace W7\App\Model\Service\Document;
 
 use W7\App\Model\Entity\Document\ChapterApiParam;
 
-class ChapterRuleDemoService extends ChapterCommonService
+class ChapterRuleDemoLogic extends ChapterCommonLogic
 {
 	protected $chapterId;
 

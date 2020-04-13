@@ -20,9 +20,9 @@ use W7\App\Model\Entity\Document\ChapterApiParam;
 use W7\App\Model\Entity\Document\ChapterContent;
 use W7\App\Model\Logic\Document\ChapterApiLogic;
 use W7\App\Model\Service\AES;
-use W7\App\Model\Service\Document\ChapterChangeService;
-use W7\App\Model\Service\Document\ChapterDemoService;
-use W7\App\Model\Service\Document\ChapterRecordService;
+use W7\App\Model\Logic\Document\ChapterApi\ChapterChangeLogic;
+use W7\App\Model\Logic\Document\ChapterApi\ChapterDemoLogic;
+use W7\App\Model\Logic\Document\ChapterApi\ChapterRecordLogic;
 
 class PostManVersion2Service extends PostManCommonService
 {
@@ -154,7 +154,7 @@ class PostManVersion2Service extends PostManCommonService
 		}
 		if (is_array($info)) {
 			//键值对数组转换为键值对文本
-			$obj = new ChapterChangeService();
+			$obj = new ChapterChangeLogic();
 			$infoData = $obj->arrayToData($info, $this->descriptionData);
 			//补齐描述
 			return $infoData;
@@ -232,7 +232,7 @@ class PostManVersion2Service extends PostManCommonService
 					'body' => $body
 				];
 
-				$obj = new ChapterRecordService($chapter->id);
+				$obj = new ChapterRecordLogic($chapter->id);
 				$content = $obj->recordToMarkdown($record);
 
 				if (!empty($chapter->content)) {
@@ -378,8 +378,8 @@ class PostManVersion2Service extends PostManCommonService
 		$body = '';
 		if ($header || $form) {
 			if ($form) {
-				$chapterDemoService = new ChapterDemoService($chapterApi->chapter_id);
-				$demo = $chapterDemoService->getChapterDemo(0, 1, [ChapterApiParam::LOCATION_REPONSE_BODY_RAW]);
+				$chapterDemoLogic = new ChapterDemoLogic($chapterApi->chapter_id);
+				$demo = $chapterDemoLogic->getChapterDemo(0, 1, [ChapterApiParam::LOCATION_REPONSE_BODY_RAW]);
 				$body = json_encode($demo['data']);
 			}
 			$response = [
@@ -463,8 +463,8 @@ class PostManVersion2Service extends PostManCommonService
 
 	public function getFrom($chapterId, $locationList)
 	{
-		$chapterDemoService = new ChapterDemoService($chapterId);
-		$demo = $chapterDemoService->getChapterDemo(0, 3, $locationList);
+		$chapterDemoLogic = new ChapterDemoLogic($chapterId);
+		$demo = $chapterDemoLogic->getChapterDemo(0, 3, $locationList);
 		$data = $demo['data'];
 		$descriptionData = $demo['descriptionData'];
 		$reply = [];

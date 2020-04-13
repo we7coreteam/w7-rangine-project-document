@@ -10,7 +10,7 @@
  * visited https://www.w7.cc for more details
  */
 
-namespace W7\App\Model\Service\Document;
+namespace W7\App\Model\Logic\Document\ChapterApi;
 
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document\ChapterApi;
@@ -22,7 +22,7 @@ use W7\App\Model\Logic\Document\ChapterApiParamLogic;
 /**
  * 数据存储与转markdown
  */
-class ChapterRecordService
+class ChapterRecordLogic
 {
 	protected $chapterId;
 	protected $ids = [];

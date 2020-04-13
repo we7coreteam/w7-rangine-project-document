@@ -10,12 +10,12 @@
  * visited https://www.w7.cc for more details
  */
 
-namespace W7\App\Model\Service\Document;
+namespace W7\App\Model\Logic\Document\ChapterApi;
 
 use W7\App\Model\Entity\Document\ChapterApiParam;
 
 //返回演示数据demo
-class ChapterDemoService extends ChapterCommonService
+class ChapterDemoLogic extends ChapterCommonLogic
 {
 	protected $chapterId;
 

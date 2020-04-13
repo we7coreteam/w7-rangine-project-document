@@ -18,9 +18,9 @@ use W7\App\Model\Entity\Document\ChapterApi;
 use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Logic\Document\ChapterApiLogic;
 use W7\App\Model\Logic\Document\ChapterApiParamLogic;
-use W7\App\Model\Service\Document\ChapterDemoService;
-use W7\App\Model\Service\Document\ChapterRuleDemoService;
-use W7\App\Model\Service\Document\ChapterChangeService;
+use W7\App\Model\Logic\Document\ChapterApi\ChapterDemoLogic;
+use W7\App\Model\Logic\Document\ChapterApi\ChapterRuleDemoLogic;
+use W7\App\Model\Logic\Document\ChapterApi\ChapterChangeLogic;
 use W7\Http\Message\Server\Request;
 
 class ChapterApiController extends BaseController
@@ -124,7 +124,7 @@ class ChapterApiController extends BaseController
 	{
 		$data = $request->post('data');
 		$type = $request->post('type', 0);
-		$obj = new ChapterChangeService();
+		$obj = new ChapterChangeLogic();
 		$data = $obj->textToData($data, $type);
 		return $data;
 	}
@@ -163,7 +163,7 @@ class ChapterApiController extends BaseController
 			throw new ErrorHttpException('章节不存在');
 		}
 
-		$obj = new ChapterRuleDemoService($chapter->id);
+		$obj = new ChapterRuleDemoLogic($chapter->id);
 		$data = $obj->getChapterDemo($request->post('location_type'));
 		return $data;
 	}
@@ -204,7 +204,7 @@ class ChapterApiController extends BaseController
 			throw new ErrorHttpException('章节不存在');
 		}
 
-		$obj = new ChapterDemoService($chapter->id);
+		$obj = new ChapterDemoLogic($chapter->id);
 		$data = $obj->getChapterDemo($request->post('location_type'), $request->post('type'));
 		return $data;
 	}

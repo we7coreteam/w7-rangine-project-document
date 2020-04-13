@@ -10,11 +10,11 @@
  * visited https://www.w7.cc for more details
  */
 
-namespace W7\App\Model\Service\Document;
+namespace W7\App\Model\Logic\Document\ChapterApi;
 
 use W7\App\Model\Entity\Document\ChapterApiParam;
 
-class ChapterCommonService
+class ChapterCommonLogic
 {
 	//是否为纯数组（非对象）
 	public function is_assoc($arr)
