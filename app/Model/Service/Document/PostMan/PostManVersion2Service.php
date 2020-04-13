@@ -87,7 +87,7 @@ class PostManVersion2Service extends PostManCommonService
 		$maxSort = Chapter::query()->where('document_id', '=', $documentId)->where('parent_id', '=', $parentId)->max('sort');
 		$sort = ++$maxSort;
 		//创建目录
-		$Chapter = Document\Chapter::query()->create([
+		$chapter = Document\Chapter::query()->create([
 			'parent_id' => $parentId,
 			'name' => $name,
 			'document_id' => $documentId,
@@ -96,9 +96,9 @@ class PostManVersion2Service extends PostManCommonService
 		]);
 		$request = $data['request'];
 		if ($request && is_array($request)) {
-			$this->importRequest($documentId, $request, $Chapter->id);
+			$this->importRequest($documentId, $request, $chapter);
 		}
-		return $Chapter;
+		return $chapter;
 	}
 
 	public function getKeyValueDataToArray($info1)
@@ -106,7 +106,14 @@ class PostManVersion2Service extends PostManCommonService
 		//键值对数组
 		$reply = [];
 		foreach ($info1 as $key => $val) {
-			$reply[$key] = urlencode($key) . '=' . urlencode($val);
+			if (isset($val['key'])) {
+				$name = $val['key'];
+				$value = '';
+				if (isset($val['value'])) {
+					$value = $val['value'];
+				}
+				$reply[$key] = urlencode($name) . '=' . urlencode($value);
+			}
 		}
 		//http参数
 		$newStr = implode('&', $reply);
@@ -125,7 +132,7 @@ class PostManVersion2Service extends PostManCommonService
 		return $infoData;
 	}
 
-	public function importRequest($documentId, $request, $ChapterId)
+	public function importRequest($documentId, $request, $chapter)
 	{
 		//导入内容
 
@@ -152,8 +159,8 @@ class PostManVersion2Service extends PostManCommonService
 			if (isset($request['method']) && $request['method']) {
 				$method = $request['method'];
 			}
-			if (isset($request['header']) && is_array($request['header'])) {
-				$header = $request['header'];
+			if (isset($request['header']) && $request['header'] && is_array($request['header'])) {
+				$body[ChapterApiParam::LOCATION_REQUEST_HEADER] = $this->changeFormat($request['header']);
 			}
 			if (isset($request['body']) && is_array($request['body'])) {
 				$postManBody = $request['body'];
@@ -193,9 +200,20 @@ class PostManVersion2Service extends PostManCommonService
 					],
 					'body' => $body
 				];
-				$obj = new ChapterRecordService($ChapterId);
-				$text = $obj->recordToMarkdown($record);
-				ChapterContent::query()->where('chapter_id', $ChapterId)->update(['content' => $text]);
+
+				$obj = new ChapterRecordService($chapter->id);
+				$content = $obj->recordToMarkdown($record);
+
+				if (!empty($chapter->content)) {
+					$chapter->content->content = $content;
+					$chapter->content->save();
+				} else {
+					ChapterContent::query()->create([
+						'chapter_id' => $chapter->id,
+						'content' => $content,
+						'layout' => ChapterContent::LAYOUT_HTTP
+					]);
+				}
 				return true;
 			}
 		}
@@ -222,7 +240,7 @@ class PostManVersion2Service extends PostManCommonService
 		$maxSort = Chapter::query()->where('document_id', '=', $documentId)->where('parent_id', '=', $parentId)->max('sort');
 		$sort = ++$maxSort;
 		//创建目录
-		$Chapter = Document\Chapter::query()->create([
+		$chapter = Document\Chapter::query()->create([
 			'parent_id' => $parentId,
 			'name' => $name,
 			'document_id' => $documentId,
@@ -230,8 +248,8 @@ class PostManVersion2Service extends PostManCommonService
 			'is_dir' => 1
 		]);
 		$item = $data['item'];
-		$this->importItem($documentId, $item, $Chapter->id);
-		return $Chapter;
+		$this->importItem($documentId, $item, $chapter->id);
+		return $chapter;
 	}
 
 	public function importDocument($userId, $info)
