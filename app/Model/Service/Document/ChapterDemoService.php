@@ -44,6 +44,7 @@ class ChapterDemoService extends ChapterCommonService
 		return $data;
 	}
 
+	//导出-2键值对字符串，3键值对数组
 	public function getArrayToKeyValue($data, $type)
 	{
 		$str = http_build_query($data);

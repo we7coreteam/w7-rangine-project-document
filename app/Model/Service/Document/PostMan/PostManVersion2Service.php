@@ -121,10 +121,10 @@ class PostManVersion2Service extends PostManCommonService
 		return $result;
 	}
 
-	public function changeFormat($data, $dataType = 3)
+	public function changeFormat($data, $dataType = 0)
 	{
-		if ($dataType == 3) {
-			//键值对数组
+		if ($dataType == 0) {
+			//默认POSTMAN专用-键值对数组
 			$info = $this->getKeyValueDataToArray($data);
 		} elseif ($dataType == 1) {
 			//json

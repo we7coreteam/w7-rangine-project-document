@@ -15,7 +15,7 @@ namespace W7\App\Model\Service\Document;
 use W7\App\Exception\ErrorHttpException;
 
 /**
- * 数据转换
+ * 数据转换0自适应，1json2数组（非键值对数组，纯数组）3键值对文本
  */
 class ChapterChangeService extends ChapterCommonService
 {
