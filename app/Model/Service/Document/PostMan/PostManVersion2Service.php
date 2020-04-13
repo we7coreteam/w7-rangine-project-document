@@ -54,16 +54,17 @@ class PostManVersion2Service extends PostManCommonService
 
 	public function importData($userId, $info, $item)
 	{
-//		idb()->beginTransaction();
-//		try {
-		$document = $this->importDocument($userId, $info);
-		$reply = $this->importItem($document->id, $item, 0);
-//			idb()->commit();
-		return $reply;
-//		} catch (\Throwable $e) {
-//			idb()->rollBack();
-//			throw new ErrorHttpException($e->getMessage());
-//		}
+		idb()->beginTransaction();
+		try {
+			$document = $this->importDocument($userId, $info);
+			$reply = $this->importItem($document->id, $item, 0);
+//			throw new ErrorHttpException('导入未开启！');
+			idb()->commit();
+			return $reply;
+		} catch (\Throwable $e) {
+			idb()->rollBack();
+			throw new ErrorHttpException($e->getMessage());
+		}
 	}
 
 	public function importItem($documentId, $item, $parentId)

@@ -91,9 +91,15 @@ class ChapterChangeService extends ChapterCommonService
 	public function getArrayToDataChildrenMany($inputData, &$n, $descriptionData = [])
 	{
 		$dataRow = [];
+		$descriptionRow = [];
+		ilogger()->channel('test')->debug(json_encode($inputData) . json_encode($descriptionData));
 		foreach ($inputData as $key => $val) {
 			//每行数据
 			foreach ($val as $k => $v) {
+//				@todo 导入多维数据的时候 描述匹配不上
+				if (isset($descriptionData[$key][$k])) {
+					$descriptionRow[$k] = $descriptionData[$key][$k];
+				}
 				if (is_array($v)) {
 					$dataRow[$k] = $v;
 				} else {
@@ -110,7 +116,7 @@ class ChapterChangeService extends ChapterCommonService
 			}
 			$n++;
 		}
-		$data = $this->getArrayToDataChildren($dataRow, 1, $descriptionData);
+		$data = $this->getArrayToDataChildren($dataRow, 1, $descriptionRow);
 		return $data;
 	}
 
