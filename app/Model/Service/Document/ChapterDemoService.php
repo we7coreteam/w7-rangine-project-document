@@ -36,10 +36,13 @@ class ChapterDemoService extends ChapterCommonService
 			$locationList = array_keys($this->requestIds());
 		}
 		$chapterList = ChapterApiParam::query()->where('chapter_id', $chapterId)->where('parent_id', 0)->whereIn('location', $locationList)->get();
-		$data = $this->getChapterDemoChildrenArray($chapterList);
+		$data = $this->getChapterDemoChildrenArray($chapterList, '');
 		if (in_array($type, [2, 3])) {
 			//需要转键值对
-			return $this->getArrayToKeyValue($data, $type);
+			return [
+				'data' => $this->getArrayToKeyValue($data['data'], $type),
+				'descriptionData' => $this->getArrayToKeyValue($data['descriptionData'], $type),
+			];
 		}
 		return $data;
 	}
@@ -76,6 +79,7 @@ class ChapterDemoService extends ChapterCommonService
 			$defaultValueList = [];
 		}
 		$data = [];
+		$descriptionData = [];
 		$i = 0;
 		foreach ($listChildren as $key => $val) {
 			if ($val->default_value) {
@@ -85,6 +89,7 @@ class ChapterDemoService extends ChapterCommonService
 					$defaultValue = $defaultValueList[$i];
 				}
 			}
+			$description = $val->description;
 
 			if (in_array($val->type, [ChapterApiParam::TYPE_OBJECT, ChapterApiParam::TYPE_ARRAY])) {
 				//如果里面还是数组或者对象
@@ -93,9 +98,13 @@ class ChapterDemoService extends ChapterCommonService
 				if (count($listChildrenSun) > 0) {
 					if (is_numeric($val->rule) && ($val->rule > 1)) {
 						//如果是多维数组
-						$data[$val->name][] = $this->getChapterDemoChildrenArray($listChildrenSun, '');
+						$chapterDemoChildren = $this->getChapterDemoChildrenArray($listChildrenSun, '');
+						$data[$val->name][] = $chapterDemoChildren['data'];
+						$descriptionData[$val->name][] = $chapterDemoChildren['descriptionData'];
 					} else {
-						$data[$val->name] = $this->getChapterDemoChildrenArray($listChildrenSun, '');
+						$chapterDemoChildren = $this->getChapterDemoChildrenArray($listChildrenSun, '');
+						$data[$val->name] = $chapterDemoChildren['data'];
+						$descriptionData[$val->name] = $chapterDemoChildren['descriptionData'];
 					}
 				} else {
 					//没有子类
@@ -105,17 +114,20 @@ class ChapterDemoService extends ChapterCommonService
 						$defaultValue = $defaultValueList[0];
 					}
 					$data[$val->name] = $defaultValue;
+					$descriptionData[$val->name] = $description;
 				}
 			} else {
 				if ($val->name) {
 					//对象
 					$data[$val->name] = $defaultValue;
+					$descriptionData[$val->name] = $description;
 				} else {
 					//数字键值
 					$data[] = $defaultValue;
+					$descriptionData[] = $description;
 				}
 			}
 		}
-		return $data;
+		return ['data' => $data, 'descriptionData' => $descriptionData];
 	}
 }

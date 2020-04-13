@@ -376,7 +376,8 @@ class PostManVersion2Service extends PostManCommonService
 		if ($header || $form) {
 			if ($form) {
 				$chapterDemoService = new ChapterDemoService($chapterApi->chapter_id);
-				$body = $chapterDemoService->getChapterDemo(0, 1, [ChapterApiParam::LOCATION_REPONSE_BODY_RAW]);
+				$demo = $chapterDemoService->getChapterDemo(0, 1, [ChapterApiParam::LOCATION_REPONSE_BODY_RAW]);
+				$body = json_encode($demo['data']);
 			}
 			$response = [
 				'name' => $chapterApi->url,
@@ -460,14 +461,20 @@ class PostManVersion2Service extends PostManCommonService
 	public function getFrom($chapterId, $locationList)
 	{
 		$chapterDemoService = new ChapterDemoService($chapterId);
-		$data = $chapterDemoService->getChapterDemo(0, 3, $locationList);
+		$demo = $chapterDemoService->getChapterDemo(0, 3, $locationList);
+		$data = $demo['data'];
+		$descriptionData = $demo['descriptionData'];
 		$reply = [];
 		foreach ($data as $key => $val) {
-			$reply[] = [
+			$row = [
 				'key' => $key,
 				'value' => $val,
 				'type' => 'text'
 			];
+			if (isset($descriptionData[$key]) && $descriptionData[$key]) {
+				$row['description'] = $descriptionData[$key];
+			}
+			$reply[] = $row;
 		}
 		return $reply;
 	}

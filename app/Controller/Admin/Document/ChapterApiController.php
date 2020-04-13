@@ -172,7 +172,7 @@ class ChapterApiController extends BaseController
 	 * @apiParam {Number} type 1json格式，2键值对字符串，3键值对数组
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 * {"data":"Access-Token:\n4444:\na:1\nb[0]:1\nb[1]:1\nc[a]:a\nc[b][0]:b\nc[b][d][0]:4\nc[b][d][1]:5\ne[0][a]:1\ne[0][b]:2\ne[0][c]:3\ne[0][f][0]:1\ne[0][f][1]:2\ne[0][d][a]:1&&\ne[0][d][b]:2=="}
+	 * {"data":{"Access-Token":"","4444":"","a":"1","b":["1","1"],"c":{"a":"a","b":{"0":"b","d":["4","5"]}},"e":[{"a":"1","b":"2","c":"3","f":["1","2"],"d":{"a":"1","b":"2"}}]},"descriptionData":{"Access-Token":"这是response头部说明7","4444":"","a":"","b":["",""],"c":{"a":"","b":{"0":"","d":["",""]}},"e":[{"a":"","b":"","c":"","f":["",""],"d":{"a":"","b":""}}]}}
 	 */
 	public function getChapterDemo(Request $request)
 	{
