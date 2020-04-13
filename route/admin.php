@@ -24,11 +24,6 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 		$route->post('/change-founder', 'Admin\DocumentController@changeDocumentFounder');
 	});
 
-	//api文档内容管理-postman导入导出
-	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix' => '/document/postman'], function (\W7\Core\Route\Route $route) {
-		$route->post('/documentToPostManJosn', 'Admin\Document\PostManController@documentToPostManJosn');
-		$route->post('/postManJsonToDocument', 'Admin\Document\PostManController@postManJsonToDocument');
-	});
 	//api文档内容管理-公共
 	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix' => '/document/chapterapi'], function (\W7\Core\Route\Route $route) {
 		$route->get('/getStatusCode', 'Admin\Document\ChapterApiController@getStatusCode');
@@ -37,9 +32,7 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 		$route->get('/getTypeLabel', 'Admin\Document\ChapterApiController@getTypeLabel');
 		$route->get('/getLocationLabel', 'Admin\Document\ChapterApiController@getLocationLabel');
 		$route->get('/rawContentType', 'Admin\Document\ChapterApiController@rawContentType');
-		$route->post('/textToData', 'Admin\Document\ChapterApiController@textToData');
-		$route->post('/getChapterRuleDemo', 'Admin\Document\ChapterApiController@getChapterRuleDemo');
-		$route->post('/getChapterDemo', 'Admin\Document\ChapterApiController@getChapterDemo');
+
 	});
 	//文档内容管理
 	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix' => '/chapter'], function (\W7\Core\Route\Route $route) {
