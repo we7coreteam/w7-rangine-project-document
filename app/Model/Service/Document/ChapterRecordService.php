@@ -32,7 +32,10 @@ class ChapterRecordService
 		$this->chapterId = $chapterId;
 	}
 
-	public function recordToMarkdown($record)
+	/*
+	 * type=1仅返回markdown2同时插入数据和返回markdown
+	 * */
+	public function recordToMarkdown($record, $sqlType = 2)
 	{
 		//markdown数据-初始化顺序
 		$markdown = [
@@ -45,13 +48,13 @@ class ChapterRecordService
 			foreach ($record as $key => $val) {
 				if (is_array($val)) {
 					if ($key == 'api') {
-						$markdown['api'] = $this->buildApi($val);
+						$markdown['api'] = $this->buildApi($val, $sqlType);
 					} elseif ($key == 'body') {
-						$markdown['body'] = $this->buildBody($val);
+						$markdown['body'] = $this->buildBody($val, $sqlType);
 					}
 				} else {
 					if ($key == 'extend') {
-						$markdown['extend'] = $this->buildExtend($val);
+						$markdown['extend'] = $this->buildExtend($val, $sqlType);
 					}
 				}
 			}
@@ -70,35 +73,37 @@ class ChapterRecordService
 		return $markdownText;
 	}
 
-	public function buildExtend($data)
+	public function buildExtend($data, $sqlType)
 	{
 		$chapterId = $this->chapterId;
 		$saveData = [
 			'chapter_id' => $chapterId,
 			'extend' => $data,
 		];
-		$chapterApiExtend = ChapterApiExtend::query()->where('chapter_id', $chapterId)->first();
-		if ($chapterApiExtend) {
-			$chapterApiExtend->update($saveData);
-		} else {
-			ChapterApiExtend::query()->create($saveData);
+		if ($sqlType == 2) {
+			$chapterApiExtend = ChapterApiExtend::query()->where('chapter_id', $chapterId)->first();
+			if ($chapterApiExtend) {
+				$chapterApiExtend->update($saveData);
+			} else {
+				ChapterApiExtend::query()->create($saveData);
+			}
 		}
 		return $data;
 	}
 
-	public function buildBody($data)
+	public function buildBody($data, $sqlType)
 	{
 		ksort($data);
 		$text = '';
 		foreach ($data as $k => $v) {
 			if (in_array($k, [ChapterApiParam::LOCATION_REQUEST_HEADER, ChapterApiParam::LOCATION_REPONSE_HEADER])) {
-				$text .= $this->buildApiHeader($k, $v);
+				$text .= $this->buildApiBody($k, $v, $sqlType);
 			} elseif (in_array($k, [ChapterApiParam::LOCATION_REQUEST_QUERY])) {
-				$text .= $this->buildApiBody($k, $v);
+				$text .= $this->buildApiBody($k, $v, $sqlType);
 			} elseif ($k == $this->bodyParamLocation) {
-				$text .= $this->buildApiBody($k, $v);
+				$text .= $this->buildApiBody($k, $v, $sqlType);
 			} elseif ($k == $this->bodyReponseLocation) {
-				$text .= $this->buildApiBody($k, $v);
+				$text .= $this->buildApiBody($k, $v, $sqlType);
 			}
 		}
 		return $text;
@@ -148,73 +153,75 @@ class ChapterRecordService
 		throw new ErrorHttpException('必填类型错误');
 	}
 
-	public function buildApiHeader($location, $data)
-	{
-		$chapterId = $this->chapterId;
-		$title = $this->getLocatinonText($location);
-		$text = '### ' . $title . "\n\n";
-		$text = $text . $this->bodyTableTop();
-		$ids = $this->ids;
-		foreach ($data as $k => $val) {
-			$name = '';
-			$type = 1;
-			$defaultValue = '';
-			$description = '';
-			$enabled = 1;
-			$rule = '';
-			if (isset($val['name'])) {
-				$name = $val['name'];
-			}
-			if (isset($val['type']) && $val['type']) {
-				$type = $val['type'];
-			}
-			if (isset($val['enabled']) && $val['enabled']) {
-				$enabled = $val['enabled'];
-			}
-			if (isset($val['default_value'])) {
-				$defaultValue = $val['default_value'];
-			}
-			if (isset($val['description'])) {
-				$description = $val['description'];
-			}
-			if (isset($val['rule'])) {
-				$rule = $val['rule'];
-			}
-			$enabledText = $this->getEnabledText($enabled);
-			$typeText = $this->getTypeText($type);
-			$text .= $this->strLengthAdaptation($name, ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($typeText, ChapterApiParam::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation($enabledText, ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($defaultValue, ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation($rule, ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
-			//存储
-			$saveData = [
-				'chapter_id' => $chapterId,
-				'parent_id' => 0,
-				'location' => $location,
-				'type' => $type,
-				'name' => $name,
-				'description' => $description,
-				'enabled' => $enabled,
-				'default_value' => $defaultValue,
-				'rule' => $rule
-			];
-			if (isset($val['id']) && $val['id']) {
-				$ids[count($ids)] = $val['id'];
-				$chapterApiParam = ChapterApiParam::query()->find($val['id']);
-				if ($chapterApiParam && $chapterApiParam->chapter_id == $chapterId && $chapterApiParam->location == $location) {
-					$chapterApiParam->update($saveData);
-				} else {
-					throw new ErrorHttpException('当前保存的数据项已不存在！' . $val['id'] . '-' . $chapterId);
-				}
-			} else {
-				$chapterApiParam = ChapterApiParam::query()->create($saveData);
-				if ($chapterApiParam) {
-					$ids[count($ids)] = $chapterApiParam->id;
-				}
-			}
-		}
-		$this->ids = $ids;
-		return $text;
-	}
+//	public function buildApiHeader($location, $data, $sqlType)
+//	{
+//		$chapterId = $this->chapterId;
+//		$title = $this->getLocatinonText($location);
+//		$text = '### ' . $title . "\n\n";
+//		$text = $text . $this->bodyTableTop();
+//		$ids = $this->ids;
+//		foreach ($data as $k => $val) {
+//			$name = '';
+//			$type = 1;
+//			$defaultValue = '';
+//			$description = '';
+//			$enabled = 1;
+//			$rule = '';
+//			if (isset($val['name'])) {
+//				$name = $val['name'];
+//			}
+//			if (isset($val['type']) && $val['type']) {
+//				$type = $val['type'];
+//			}
+//			if (isset($val['enabled']) && $val['enabled']) {
+//				$enabled = $val['enabled'];
+//			}
+//			if (isset($val['default_value'])) {
+//				$defaultValue = $val['default_value'];
+//			}
+//			if (isset($val['description'])) {
+//				$description = $val['description'];
+//			}
+//			if (isset($val['rule'])) {
+//				$rule = $val['rule'];
+//			}
+//			$enabledText = $this->getEnabledText($enabled);
+//			$typeText = $this->getTypeText($type);
+//			$text .= $this->strLengthAdaptation($name, ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($typeText, ChapterApiParam::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation($enabledText, ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($defaultValue, ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation($rule, ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
+//			//存储
+//			if($sqlType==2){
+//				$saveData = [
+//					'chapter_id' => $chapterId,
+//					'parent_id' => 0,
+//					'location' => $location,
+//					'type' => $type,
+//					'name' => $name,
+//					'description' => $description,
+//					'enabled' => $enabled,
+//					'default_value' => $defaultValue,
+//					'rule' => $rule
+//				];
+//				if (isset($val['id']) && $val['id']) {
+//					$ids[count($ids)] = $val['id'];
+//					$chapterApiParam = ChapterApiParam::query()->find($val['id']);
+//					if ($chapterApiParam && $chapterApiParam->chapter_id == $chapterId && $chapterApiParam->location == $location) {
+//						$chapterApiParam->update($saveData);
+//					} else {
+//						throw new ErrorHttpException('当前保存的数据项已不存在！' . $val['id'] . '-' . $chapterId);
+//					}
+//				} else {
+//					$chapterApiParam = ChapterApiParam::query()->create($saveData);
+//					if ($chapterApiParam) {
+//						$ids[count($ids)] = $chapterApiParam->id;
+//					}
+//				}
+//			}
+//		}
+//		$this->ids = $ids;
+//		return $text;
+//	}
 
-	public function buildApi($data)
+	public function buildApi($data, $sqlType)
 	{
 		$chapterId = $this->chapterId;
 		$method = 0;
@@ -261,22 +268,24 @@ class ChapterRecordService
 			'description' => $description,
 			'body_param_location' => $bodyParamLocation
 		];
-		$chapterApi = ChapterApi::query()->where('chapter_id', $chapterId)->first();
-		if ($chapterApi) {
-			$chapterApi->update($saveData);
-		} else {
-			ChapterApi::query()->create($saveData);
+		if ($sqlType == 2) {
+			$chapterApi = ChapterApi::query()->where('chapter_id', $chapterId)->first();
+			if ($chapterApi) {
+				$chapterApi->update($saveData);
+			} else {
+				ChapterApi::query()->create($saveData);
+			}
 		}
 		return $text;
 	}
 
-	public function buildApiBody($location, $data)
+	public function buildApiBody($location, $data, $sqlType)
 	{
 		$title = $this->getLocatinonText($location);
 		$text = '### ' . $title . "\n\n";
 		$text = $text . $this->bodyTableTop();
 		foreach ($data as $k => $val) {
-			$text .= $this->buildBodyChildren($location, $val);
+			$text .= $this->buildBodyChildren($location, $val, 0, 0, $sqlType);
 		}
 		return $text;
 	}
@@ -295,7 +304,7 @@ class ChapterRecordService
 		return str_repeat('&emsp;', $level);
 	}
 
-	public function buildBodyChildren($location, $data, $level = 0, $parentId = 0)
+	public function buildBodyChildren($location, $data, $level = 0, $parentId = 0, $sqlType = 2)
 	{
 		$childrenTop = $this->getChildrenTop($level);
 		$name = '';
@@ -332,42 +341,45 @@ class ChapterRecordService
 		$typeText = $this->getTypeText($type);
 		$text = $this->strLengthAdaptation($childrenTop . $name, ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($typeText, ChapterApiParam::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation($enabledText, ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($defaultValue, ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation($rule, ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
 		//存储
-		$ids = $this->ids;
-		$chapterId = $this->chapterId;
-		$saveData = [
-			'chapter_id' => $chapterId,
-			'parent_id' => $parentId,
-			'location' => $location,
-			'type' => $type,
-			'name' => $name,
-			'description' => $description,
-			'enabled' => $enabled,
-			'default_value' => $defaultValue,
-			'rule' => $rule
-		];
+		if ($sqlType == 2) {
+			$ids = $this->ids;
+			$chapterId = $this->chapterId;
+			$saveData = [
+				'chapter_id' => $chapterId,
+				'parent_id' => $parentId,
+				'location' => $location,
+				'type' => $type,
+				'name' => $name,
+				'description' => $description,
+				'enabled' => $enabled,
+				'default_value' => $defaultValue,
+				'rule' => $rule
+			];
 
-		$id = $parentId;
+			$id = $parentId;
 
-		if (isset($data['id']) && $data['id']) {
-			$ids[count($ids)] = $data['id'];
-			$id = $data['id'];
-			$chapterApiParam = ChapterApiParam::query()->find($data['id']);
-			if ($chapterApiParam && $chapterApiParam->chapter_id == $chapterId && $chapterApiParam->location == $location) {
-				$chapterApiParam->update($saveData);
+			if (isset($data['id']) && $data['id']) {
+				$ids[count($ids)] = $data['id'];
+				$id = $data['id'];
+				$chapterApiParam = ChapterApiParam::query()->find($data['id']);
+				if ($chapterApiParam && $chapterApiParam->chapter_id == $chapterId && $chapterApiParam->location == $location) {
+					$chapterApiParam->update($saveData);
+				} else {
+					throw new ErrorHttpException('当前保存的数据项已不存在！' . $data['id'] . '-' . $chapterId);
+				}
 			} else {
-				throw new ErrorHttpException('当前保存的数据项已不存在！' . $data['id'] . '-' . $chapterId);
+				$chapterApiParam = ChapterApiParam::query()->create($saveData);
+				if ($chapterApiParam) {
+					$ids[count($ids)] = $chapterApiParam->id;
+					$id = $chapterApiParam->id;
+				}
 			}
-		} else {
-			$chapterApiParam = ChapterApiParam::query()->create($saveData);
-			if ($chapterApiParam) {
-				$ids[count($ids)] = $chapterApiParam->id;
-				$id = $chapterApiParam->id;
-			}
+			$this->ids = $ids;
 		}
-		$this->ids = $ids;
+
 		if (isset($data['children']) && (!empty($data['children'])) && is_array($data['children'])) {
 			foreach ($data['children'] as $k => $val) {
-				$text .= $this->buildBodyChildren($location, $val, $level + 1, $id);
+				$text .= $this->buildBodyChildren($location, $val, $level + 1, $id, $sqlType = 2);
 			}
 		}
 		return $text;

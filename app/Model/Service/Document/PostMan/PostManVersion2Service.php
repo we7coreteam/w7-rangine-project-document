@@ -98,6 +98,8 @@ class PostManVersion2Service extends PostManCommonService
 
 	public function importRequest($documentId, $request, $ChapterId)
 	{
+		//导入内容
+
 	}
 
 	public function importDir($documentId, $data, $parentId)
