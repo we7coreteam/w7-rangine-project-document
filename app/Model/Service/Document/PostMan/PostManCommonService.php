@@ -26,4 +26,14 @@ class PostManCommonService
 			ChapterApiParam::LOCATION_REQUEST_BODY_BINARY => 'Request.Body.binary',
 		];
 	}
+
+	//字符串是否为JSON
+	public function isJson($data = '', $assoc = false)
+	{
+		$data = json_decode($data, $assoc);
+		if (($data && is_object($data)) || (is_array($data) && !empty($data))) {
+			return $data;
+		}
+		return false;
+	}
 }

@@ -17,29 +17,34 @@ use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\Document\Chapter;
 use W7\App\Model\Entity\Document\ChapterApi;
 use W7\App\Model\Entity\Document\ChapterApiParam;
+use W7\App\Model\Entity\Document\ChapterContent;
 use W7\App\Model\Service\AES;
+use W7\App\Model\Service\Document\ChapterChangeService;
 use W7\App\Model\Service\Document\ChapterDemoService;
+use W7\App\Model\Service\Document\ChapterRecordService;
 
 class PostManVersion2Service extends PostManCommonService
 {
 	//POSTMENJSON导入目录
 	public function importToDocument($userId, $json)
 	{
-		$data = json_decode($json, true);
-		if (isset($data['info']['schema'])) {
-			if (in_array($data['info']['schema'], ['https://schema.getpostman.com/json/collection/v2.0.0/collection.json', 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'])) {
-				//版本2或者2.1
-				if (isset($data['item']) && $data['item'] && is_array($data['item'])) {
-					//数据完整
-					return $this->importData($userId, $data['info'], $data['item']);
+		if ($this->isJson($json)) {
+			$data = json_decode($json, true);
+			if (isset($data['info']['schema'])) {
+				if (in_array($data['info']['schema'], ['https://schema.getpostman.com/json/collection/v2.0.0/collection.json', 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'])) {
+					//版本2或者2.1
+					if (isset($data['item']) && $data['item'] && is_array($data['item'])) {
+						//数据完整
+						return $this->importData($userId, $data['info'], $data['item']);
+					}
+					throw new ErrorHttpException('导入数据为空！');
 				}
-				throw new ErrorHttpException('导入数据为空！');
-			}
-			throw new ErrorHttpException('导入失败：仅支持POSTMAN Collection V2或V2.1版本数据导入！');
-		} else {
-			if (isset($data['id']) && isset($data['requests'])) {
-				//可能是V1版本
-				throw new ErrorHttpException('仅支持POSTMAN Collection V2版本的数据格式导入！请升级您的POSTMAN');
+				throw new ErrorHttpException('导入失败：仅支持POSTMAN Collection V2或V2.1版本数据导入！');
+			} else {
+				if (isset($data['id']) && isset($data['requests'])) {
+					//可能是V1版本
+					throw new ErrorHttpException('仅支持POSTMAN Collection V2版本的数据格式导入！请升级您的POSTMAN');
+				}
 			}
 		}
 		throw new ErrorHttpException('导入失败：当前不是标准的POSTMAN Collection V2版本数据！');
@@ -96,10 +101,116 @@ class PostManVersion2Service extends PostManCommonService
 		return $Chapter;
 	}
 
+	public function getKeyValueDataToArray($info1)
+	{
+		//键值对数组
+		$reply = [];
+		foreach ($info1 as $key => $val) {
+			$reply[$key] = urlencode($key) . '=' . urlencode($val);
+		}
+		//http参数
+		$newStr = implode('&', $reply);
+		parse_str($newStr, $result);
+		return $result;
+	}
+
+	public function changeFormat($data, $dataType = 1)
+	{
+		if ($dataType == 1) {
+			$info = $this->getKeyValueDataToArray($data);
+		}
+		//键值对数组转换为键值对文本
+		$obj = new ChapterChangeService();
+		$infoData = $obj->arrayToData($info);
+		return $infoData;
+	}
+
 	public function importRequest($documentId, $request, $ChapterId)
 	{
 		//导入内容
 
+		$url = '';
+		$method = 'GET';
+		$description = '';
+		$body = [];
+		$body_param_location = ChapterApiParam::LOCATION_REQUEST_BODY_FROM;
+		if (isset($request['url'])) {
+			if (is_array($request['url'])) {
+				if (isset($request['url']['raw'])) {
+					$url = $request['url']['raw'];
+				}
+				if (isset($request['url']['query']) && $request['url']['query'] && is_array($request['url']['query'])) {
+					//get参数转换成标准格式
+					$body[ChapterApiParam::LOCATION_REQUEST_QUERY] = $this->changeFormat($request['url']['query']);
+				}
+			} else {
+				$url = $request['url'];
+			}
+			if (isset($request['description']) && $request['description']) {
+				$description = $request['description'];
+			}
+			if (isset($request['method']) && $request['method']) {
+				$method = $request['method'];
+			}
+			if (isset($request['header']) && is_array($request['header'])) {
+				$header = $request['header'];
+			}
+			if (isset($request['body']) && is_array($request['body'])) {
+				$postManBody = $request['body'];
+				if (isset($postManBody['mode'])) {
+					if ($postManBody['mode'] == 'formdata') {
+						$body_param_location = ChapterApiParam::LOCATION_REQUEST_BODY_FROM;
+						if (is_array($postManBody['formdata'])) {
+							$body[ChapterApiParam::LOCATION_REQUEST_BODY_FROM] = $this->changeFormat($postManBody['formdata']);
+						}
+					} elseif ($postManBody['mode'] == 'urlencoded') {
+						$body_param_location = ChapterApiParam::LOCATION_REQUEST_BODY_URLENCODED;
+						if (isset($postManBody['urlencoded']) && is_array($postManBody['urlencoded'])) {
+							$body[ChapterApiParam::LOCATION_REQUEST_BODY_URLENCODED] = $this->changeFormat($postManBody['urlencoded']);
+						}
+					} elseif ($postManBody['mode'] == 'raw') {
+						$body_param_location = ChapterApiParam::LOCATION_REQUEST_BODY_RAW;
+						if (isset($postManBody['raw']) && is_array($postManBody['raw'])) {
+							if ($this->isJson($postManBody['raw'])) {
+								$raw = json_decode($postManBody['raw']);
+								$body[ChapterApiParam::LOCATION_REQUEST_BODY_RAW] = $this->changeFormat($raw);
+							}
+						}
+					} elseif ($postManBody['mode'] == 'file') {
+						$body_param_location = ChapterApiParam::LOCATION_REQUEST_BODY_BINARY;
+					}
+				}
+			}
+
+			if ($url) {
+				$record = [
+					'api' => [
+						'url' => $url,
+						'method' => $this->getMethodId($method),
+						'description' => $description,
+						'status_code' => 200,
+						'body_param_location' => $body_param_location
+					],
+					'body' => $body
+				];
+				$obj = new ChapterRecordService($ChapterId);
+				$text = $obj->recordToMarkdown($record);
+				ChapterContent::query()->where('chapter_id', $ChapterId)->update(['content' => $text]);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public function getMethodId($method)
+	{
+		$methodList = ChapterApi::getMethodLabel();
+		foreach ($methodList as $key => $val) {
+			if ($val == $method) {
+				return $key;
+			}
+		}
+		return ChapterApi::METHOD_GET;
 	}
 
 	public function importDir($documentId, $data, $parentId)
