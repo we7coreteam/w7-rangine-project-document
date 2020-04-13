@@ -20,24 +20,6 @@ use W7\Http\Message\Server\Request;
 class PostManController extends BaseController
 {
 	/**
-	 * @api {post} /document/postman/postManJsonToDocument POSTMAN Collection V2格式JSON导入到项目根目录
-	 * @apiName postManJsonToDocument
-	 * @apiGroup PostMan
-	 *
-	 * @apiParam {String} json POSTMAN Collection V2格式JSON
-	 */
-	public function postManJsonToDocument(Request $request)
-	{
-		$this->validate($request, [
-			'json' => 'required',
-		]);
-		$user = $request->getAttribute('user');
-		$postManImportLogic = new PostManImportLogic();
-		$data = $postManImportLogic->importToDocument($user->id, $request->post('json'));
-		return $data;
-	}
-
-	/**
 	 * @api {post} /document/postman/documentToPostManJosn 将项目根目录转成POSTMAN Collection V2格式JSON
 	 * @apiName documentToPostManJosn
 	 * @apiGroup PostMan
