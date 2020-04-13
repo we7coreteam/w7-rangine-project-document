@@ -14,7 +14,6 @@ namespace W7\App\Controller\Admin\Document;
 
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
-use W7\App\Model\Entity\Document\ChapterApi;
 use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Logic\Document\ChapterApiLogic;
 use W7\App\Model\Logic\Document\ChapterApiParamLogic;
