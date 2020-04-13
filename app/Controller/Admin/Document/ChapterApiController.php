@@ -15,9 +15,9 @@ namespace W7\App\Controller\Admin\Document;
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document\ChapterApi;
-use W7\App\Model\Entity\Document\ChapterApiParam;
 use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Logic\Document\ChapterApiLogic;
+use W7\App\Model\Logic\Document\ChapterApiParamLogic;
 use W7\App\Model\Service\Document\ChapterDemoService;
 use W7\App\Model\Service\Document\ChapterRuleDemoService;
 use W7\App\Model\Service\Document\ChapterChangeService;
@@ -63,7 +63,8 @@ class ChapterApiController extends BaseController
 	 */
 	public function getEnabledLabel(Request $request)
 	{
-		return generate_label('必填类型', ChapterApiParam::getEnabledLabel());
+		$chapterApiParamLogic = new ChapterApiParamLogic();
+		return generate_label('必填类型', $chapterApiParamLogic->getEnabledLabel());
 	}
 
 	/**
@@ -76,7 +77,8 @@ class ChapterApiController extends BaseController
 	 */
 	public function getTypeLabel(Request $request)
 	{
-		return generate_label('字段类型', ChapterApiParam::getTypeLabel());
+		$chapterApiParamLogic = new ChapterApiParamLogic();
+		return generate_label('字段类型', $chapterApiParamLogic->getTypeLabel());
 	}
 
 	/**
@@ -89,7 +91,8 @@ class ChapterApiController extends BaseController
 	 */
 	public function getLocationLabel(Request $request)
 	{
-		return generate_label('请求类型', ChapterApiParam::getLocationLabel());
+		$chapterApiParamLogic = new ChapterApiParamLogic();
+		return generate_label('请求类型', $chapterApiParamLogic->getLocationLabel());
 	}
 
 	/**
@@ -102,7 +105,8 @@ class ChapterApiController extends BaseController
 	 */
 	public function rawContentType(Request $request)
 	{
-		return generate_label('RAW请求头', ChapterApiParam::rawContentType());
+		$chapterApiParamLogic = new ChapterApiParamLogic();
+		return generate_label('RAW请求头', $chapterApiParamLogic->rawContentType());
 	}
 
 	/**

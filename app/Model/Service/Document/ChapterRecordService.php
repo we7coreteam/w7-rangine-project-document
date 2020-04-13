@@ -17,6 +17,7 @@ use W7\App\Model\Entity\Document\ChapterApi;
 use W7\App\Model\Entity\Document\ChapterApiExtend;
 use W7\App\Model\Entity\Document\ChapterApiParam;
 use W7\App\Model\Logic\Document\ChapterApiLogic;
+use W7\App\Model\Logic\Document\ChapterApiParamLogic;
 
 /**
  * 数据存储与转markdown
@@ -138,7 +139,8 @@ class ChapterRecordService
 
 	public function getLocatinonText($location)
 	{
-		$typeLabel = ChapterApiParam::getLocationLabel();
+		$chapterApiParamLogic = new ChapterApiParamLogic();
+		$typeLabel = $chapterApiParamLogic->getLocationLabel();
 		if (isset($typeLabel[$location])) {
 			return $typeLabel[$location];
 		}
@@ -147,7 +149,8 @@ class ChapterRecordService
 
 	public function getEnabledText($enabled)
 	{
-		$enabledLabel = ChapterApiParam::getEnabledLabel();
+		$chapterApiParamLogic = new ChapterApiParamLogic();
+		$enabledLabel = $chapterApiParamLogic->getEnabledLabel();
 		if (isset($enabledLabel[$enabled])) {
 			return $enabledLabel[$enabled];
 		}
@@ -298,7 +301,8 @@ class ChapterRecordService
 
 	public function getTypeText($type)
 	{
-		$typeLabel = ChapterApiParam::getTypeLabel();
+		$chapterApiParamLogic = new ChapterApiParamLogic();
+		$typeLabel = $chapterApiParamLogic->getTypeLabel();
 		if (isset($typeLabel[$type])) {
 			return $typeLabel[$type];
 		}

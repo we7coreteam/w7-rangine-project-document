@@ -19,6 +19,7 @@ use W7\App\Model\Entity\Document\ChapterContent;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\ChapterLogic;
+use W7\App\Model\Logic\Document\ChapterContentLogic;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\App\Model\Logic\DocumentPermissionLogic;
 use W7\App\Model\Logic\UserOperateLogic;
@@ -353,11 +354,12 @@ class ChapterController extends BaseController
 	 */
 	public function save(Request $request)
 	{
-		$LayoutLabel = array_keys(ChapterContent::getLayoutLabel());
+		$chapterContentLogic = new ChapterContentLogic();
+		$layoutLabel = array_keys($chapterContentLogic->getLayoutLabel());
 		$this->validate($request, [
 			'chapter_id' => 'required|integer|min:1',
 			'document_id' => 'required|integer',
-			'layout' => 'in:' . implode(',', $LayoutLabel),
+			'layout' => 'in:' . implode(',', $layoutLabel),
 		], [
 			'chapter_id.required' => '文档id必填',
 			'document_id.required' => '文档id必填',

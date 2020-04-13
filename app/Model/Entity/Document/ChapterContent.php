@@ -23,12 +23,4 @@ class ChapterContent extends BaseModel
 	// 数据来源类型
 	const LAYOUT_MARKDOWM = 0;//MARKDOWN
 	const LAYOUT_HTTP = 1;//HTTP请求
-
-	public static function getLayoutLabel()
-	{
-		return [
-			self::LAYOUT_MARKDOWM => 'MARKDOWN',
-			self::LAYOUT_HTTP => 'HTTP'
-		];
-	}
 }
