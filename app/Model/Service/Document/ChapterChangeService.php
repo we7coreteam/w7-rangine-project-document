@@ -72,7 +72,7 @@ class ChapterChangeService extends ChapterCommonService
 	}
 
 	//数组转列表数据
-	public function arrayToData($inputData)
+	public function arrayToData($inputData, $descriptionData)
 	{
 		if (!$inputData) {
 			return [];
@@ -80,15 +80,15 @@ class ChapterChangeService extends ChapterCommonService
 		if ((!$this->is_assoc($inputData)) && (count($inputData) != count($inputData, 1))) {
 			//不是对象，并且不是一维数组
 			$n = 0;
-			$data = $this->getArrayToDataChildrenMany($inputData, $n);
+			$data = $this->getArrayToDataChildrenMany($inputData, $n, $descriptionData);
 		} else {
-			$data = $this->getArrayToDataChildren($inputData);
+			$data = $this->getArrayToDataChildren($inputData, 0, $descriptionData);
 		}
 		return $data;
 	}
 
 	//多维数组转换[{"a":"1","b":"2"},{"c":"3"}]
-	public function getArrayToDataChildrenMany($inputData, &$n)
+	public function getArrayToDataChildrenMany($inputData, &$n, $descriptionData = [])
 	{
 		$dataRow = [];
 		foreach ($inputData as $key => $val) {
@@ -110,26 +110,35 @@ class ChapterChangeService extends ChapterCommonService
 			}
 			$n++;
 		}
-		$data = $this->getArrayToDataChildren($dataRow, 1);
+		$data = $this->getArrayToDataChildren($dataRow, 1, $descriptionData);
 		return $data;
 	}
 
 	//普通转换many=0默认=1多维数组=2单数组无键值
-	public function getArrayToDataChildren($inputData, $many = 0)
+	public function getArrayToDataChildren($inputData, $many = 0, $descriptionData = [])
 	{
 		$data = [];
 		foreach ($inputData as $key => $val) {
+			$description = '';
+			$descriptionRow = [];
+			if (isset($descriptionData[$key])) {
+				if (is_array($descriptionData[$key])) {
+					$descriptionRow = $descriptionData[$key];
+				} else {
+					$description = $descriptionData[$key];
+				}
+			}
 			if (is_array($val)) {
 				if ($this->is_assoc($val)) {
 					//判断键值对-非数组-对象{"0":"b","b":"4"}
 					$data[] = [
 						'name' => $key,
 						'type' => 4,
-						'description' => '',
+						'description' => $description,
 						'enabled' => 1,
 						'default_value' => '',
 						'rule' => '',
-						'children' => $this->getArrayToDataChildren($val)
+						'children' => $this->getArrayToDataChildren($val, 0, $descriptionRow)
 					];
 				} else {
 					//判断键值对-数组["1","a"]
@@ -138,13 +147,13 @@ class ChapterChangeService extends ChapterCommonService
 						$oneArray = [
 							'name' => $key,
 							'type' => 5,
-							'description' => '',
+							'description' => $description,
 							'enabled' => 1,
 							'default_value' => $val,
 							'rule' => ''
 						];
 						if (count($val) > 1) {
-							$oneArray['children'] = $this->getArrayToDataChildren($val, 2);
+							$oneArray['children'] = $this->getArrayToDataChildren($val, 2, $descriptionRow);
 						}
 						$data[] = $oneArray;
 					} else {
@@ -153,11 +162,11 @@ class ChapterChangeService extends ChapterCommonService
 						$manyArray = [
 							'name' => $key,
 							'type' => 5,
-							'description' => '',
+							'description' => $description,
 							'enabled' => 1,
 							'default_value' => '',
 							'rule' => '',
-							'children' => $this->getArrayToDataChildrenMany($val, $n)
+							'children' => $this->getArrayToDataChildrenMany($val, $n, $descriptionRow)
 						];
 						if ($n > 0) {
 							$manyArray['rule'] = $n;
@@ -190,7 +199,7 @@ class ChapterChangeService extends ChapterCommonService
 				$data[] = [
 					'name' => $key,
 					'type' => $type,
-					'description' => '',
+					'description' => $description,
 					'enabled' => 1,
 					'default_value' => $val,
 					'rule' => $rule

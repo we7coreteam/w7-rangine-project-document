@@ -25,6 +25,8 @@ use W7\App\Model\Service\Document\ChapterRecordService;
 
 class PostManVersion2Service extends PostManCommonService
 {
+	protected $descriptionData = [];
+
 	//POSTMENJSON导入目录
 	public function importToDocument($userId, $json)
 	{
@@ -105,6 +107,7 @@ class PostManVersion2Service extends PostManCommonService
 	{
 		//键值对数组
 		$reply = [];
+		$descriptionData = [];
 		foreach ($info1 as $key => $val) {
 			if (isset($val['key'])) {
 				$name = $val['key'];
@@ -112,12 +115,22 @@ class PostManVersion2Service extends PostManCommonService
 				if (isset($val['value'])) {
 					$value = $val['value'];
 				}
+				if (isset($val['description'])) {
+					$description = $val['description'];
+				}
 				$reply[$key] = urlencode($name) . '=' . urlencode($value);
+				$descriptionData[$key] = urlencode($name) . '=' . urlencode($description);
 			}
 		}
 		//http参数
 		$newStr = implode('&', $reply);
 		parse_str($newStr, $result);
+
+		//http参数描述
+		$newStr2 = implode('&', $descriptionData);
+		parse_str($newStr2, $result2);
+
+		$this->descriptionData = $result2;
 		return $result;
 	}
 
@@ -138,7 +151,7 @@ class PostManVersion2Service extends PostManCommonService
 		if (is_array($info)) {
 			//键值对数组转换为键值对文本
 			$obj = new ChapterChangeService();
-			$infoData = $obj->arrayToData($info);
+			$infoData = $obj->arrayToData($info, $this->descriptionData);
 			//补齐描述
 			return $infoData;
 		}
