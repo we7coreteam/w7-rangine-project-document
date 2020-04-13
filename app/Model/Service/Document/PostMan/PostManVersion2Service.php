@@ -99,8 +99,9 @@ class PostManVersion2Service extends PostManCommonService
 		]);
 		$request = $data['request'];
 		if ($request && is_array($request)) {
-			$this->importRequest($documentId, $request, $chapter);
+			$this->importRequest($documentId, $request, $chapter, $data);
 		}
+
 		return $chapter;
 	}
 
@@ -160,7 +161,7 @@ class PostManVersion2Service extends PostManCommonService
 		return false;
 	}
 
-	public function importRequest($documentId, $request, $chapter)
+	public function importRequest($documentId, $request, $chapter, $data)
 	{
 		//导入内容
 
@@ -212,6 +213,10 @@ class PostManVersion2Service extends PostManCommonService
 						$body_param_location = ChapterApiParam::LOCATION_REQUEST_BODY_BINARY;
 					}
 				}
+			}
+
+			if (isset($data['response'][0]['body']) && $data['response'][0]['body']) {
+				$body[ChapterApiParam::LOCATION_REPONSE_BODY_RAW] = $this->changeFormat($data['response'][0]['body'], 1);
 			}
 
 			if ($url) {
