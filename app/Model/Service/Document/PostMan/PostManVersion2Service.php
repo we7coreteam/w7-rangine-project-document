@@ -113,6 +113,7 @@ class PostManVersion2Service extends PostManCommonService
 			if (isset($val['key'])) {
 				$name = $val['key'];
 				$value = '';
+				$description = '';
 				if (isset($val['value'])) {
 					$value = $val['value'];
 				}

@@ -92,13 +92,14 @@ class ChapterChangeService extends ChapterCommonService
 	{
 		$dataRow = [];
 		$descriptionRow = [];
-		ilogger()->channel('test')->debug(json_encode($inputData) . json_encode($descriptionData));
+
 		foreach ($inputData as $key => $val) {
 			//每行数据
 			foreach ($val as $k => $v) {
-//				@todo 导入多维数据的时候 描述匹配不上
-				if (isset($descriptionData[$key][$k])) {
-					$descriptionRow[$k] = $descriptionData[$key][$k];
+				if (isset($descriptionData[$key][$k]) && $descriptionData[$key][$k]) {
+					if (!isset($descriptionRow[$k])) {
+						$descriptionRow[$k] = $descriptionData[$key][$k];
+					}
 				}
 				if (is_array($v)) {
 					$dataRow[$k] = $v;
@@ -127,7 +128,7 @@ class ChapterChangeService extends ChapterCommonService
 		foreach ($inputData as $key => $val) {
 			$description = '';
 			$descriptionRow = [];
-			if (isset($descriptionData[$key])) {
+			if (isset($descriptionData[$key]) && $descriptionData[$key]) {
 				if (is_array($descriptionData[$key])) {
 					$descriptionRow = $descriptionData[$key];
 				} else {
