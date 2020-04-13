@@ -18,6 +18,7 @@ use W7\App\Model\Entity\Document\Chapter;
 use W7\App\Model\Entity\Document\ChapterApi;
 use W7\App\Model\Entity\Document\ChapterApiParam;
 use W7\App\Model\Entity\Document\ChapterContent;
+use W7\App\Model\Logic\Document\ChapterApiLogic;
 use W7\App\Model\Service\AES;
 use W7\App\Model\Service\Document\ChapterChangeService;
 use W7\App\Model\Service\Document\ChapterDemoService;
@@ -252,7 +253,8 @@ class PostManVersion2Service extends PostManCommonService
 
 	public function getMethodId($method)
 	{
-		$methodList = ChapterApi::getMethodLabel();
+		$chapterApiLogic = new ChapterApiLogic();
+		$methodList = $chapterApiLogic->getMethodLabel();
 		foreach ($methodList as $key => $val) {
 			if ($val == $method) {
 				return $key;
@@ -351,7 +353,8 @@ class PostManVersion2Service extends PostManCommonService
 			$method = $chapterApi->method;
 			$description = $chapterApi->description;
 		}
-		$methodLabel = ChapterApi::getMethodLabel();
+		$chapterApiLogic = new ChapterApiLogic();
+		$methodLabel = $chapterApiLogic->getMethodLabel();
 		$chapter = [
 			'name' => $chapter->name,
 			'request' => [

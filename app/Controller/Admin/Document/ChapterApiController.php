@@ -17,6 +17,7 @@ use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document\ChapterApi;
 use W7\App\Model\Entity\Document\ChapterApiParam;
 use W7\App\Model\Logic\ChapterLogic;
+use W7\App\Model\Logic\Document\ChapterApiLogic;
 use W7\App\Model\Service\Document\ChapterDemoService;
 use W7\App\Model\Service\Document\ChapterRuleDemoService;
 use W7\App\Model\Service\Document\ChapterChangeService;
@@ -34,7 +35,8 @@ class ChapterApiController extends BaseController
 	 */
 	public function getStatusCode(Request $request)
 	{
-		return ChapterApi::getStatusCode();
+		$chapterApiLogic = new ChapterApiLogic();
+		return $chapterApiLogic->getStatusCode();
 	}
 
 	/**
@@ -47,7 +49,8 @@ class ChapterApiController extends BaseController
 	 */
 	public function getMethodLabel(Request $request)
 	{
-		return generate_label('请求方式', ChapterApi::getMethodLabel());
+		$chapterApiLogic = new ChapterApiLogic();
+		return generate_label('请求方式', $chapterApiLogic->getMethodLabel());
 	}
 
 	/**

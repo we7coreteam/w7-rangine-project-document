@@ -16,6 +16,7 @@ use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document\ChapterApi;
 use W7\App\Model\Entity\Document\ChapterApiExtend;
 use W7\App\Model\Entity\Document\ChapterApiParam;
+use W7\App\Model\Logic\Document\ChapterApiLogic;
 
 /**
  * 数据存储与转markdown
@@ -232,7 +233,8 @@ class ChapterRecordService
 		if (isset($data['method'])) {
 			$method = $data['method'];
 		}
-		$methodLabel = ChapterApi::getMethodLabel();
+		$chapterApiLogic = new ChapterApiLogic();
+		$methodLabel = $chapterApiLogic->getMethodLabel();
 		if (!isset($methodLabel[$method])) {
 			throw new ErrorHttpException('请求方式错误');
 		}
@@ -248,7 +250,8 @@ class ChapterRecordService
 		}
 		if (isset($data['status_code'])) {
 			$statusCode = $data['status_code'];
-			$statusCodeLists = ChapterApi::getStatusCode();
+			$chapterApiLogic = new ChapterApiLogic();
+			$statusCodeLists = $chapterApiLogic->getStatusCode();
 			if (!in_array($statusCode, $statusCodeLists)) {
 				throw new ErrorHttpException('状态码错误');
 			}
