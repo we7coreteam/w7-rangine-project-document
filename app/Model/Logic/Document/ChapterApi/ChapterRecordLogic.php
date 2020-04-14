@@ -93,14 +93,28 @@ class ChapterRecordLogic
 		return $data;
 	}
 
+	//文档排序
+	public function bodySort($data){
+		//按getLocationLabel 顺序排序返回生成markdown
+		$newData=[];
+		$locationLabel = ChapterApiParamLogic::instance()->getLocationLabel();
+		foreach ($locationLabel as $key =>$val){
+			if(isset($data[$key])){
+				$newData[$key]=$data[$key];
+			}
+		}
+		return $newData;
+	}
+
 	public function buildBody($data, $sqlType)
 	{
-		ksort($data);
+		//初始化顺序
+		$data=$this->bodySort($data);
 		$text = '';
 		foreach ($data as $k => $v) {
 			if (in_array($k, [ChapterApiParam::LOCATION_REQUEST_HEADER, ChapterApiParam::LOCATION_REPONSE_HEADER])) {
 				$text .= $this->buildApiBody($k, $v, $sqlType);
-			} elseif (in_array($k, [ChapterApiParam::LOCATION_REQUEST_QUERY_STRING])) {
+			} elseif (in_array($k, [ChapterApiParam::LOCATION_REQUEST_QUERY_PATH,ChapterApiParam::LOCATION_REQUEST_QUERY_STRING])) {
 				$text .= $this->buildApiBody($k, $v, $sqlType);
 			} elseif ($k == $this->bodyParamLocation) {
 				$text .= $this->buildApiBody($k, $v, $sqlType);
@@ -139,9 +153,9 @@ class ChapterRecordLogic
 
 	public function getLocatinonText($location)
 	{
-		$typeLabel = ChapterApiParamLogic::instance()->getLocationLabel();
-		if (isset($typeLabel[$location])) {
-			return $typeLabel[$location];
+		$locationLabel = ChapterApiParamLogic::instance()->getLocationLabel();
+		if (isset($locationLabel[$location])) {
+			return $locationLabel[$location];
 		}
 		throw new ErrorHttpException('响应类型错误');
 	}
@@ -364,16 +378,17 @@ class ChapterRecordLogic
 
 			$id = $parentId;
 
+			$hasRow=0;
 			if (isset($data['id']) && $data['id']) {
-				$ids[count($ids)] = $data['id'];
 				$id = $data['id'];
 				$chapterApiParam = ChapterApiParam::query()->find($data['id']);
 				if ($chapterApiParam && $chapterApiParam->chapter_id == $chapterId && $chapterApiParam->location == $location) {
 					$chapterApiParam->update($saveData);
-				} else {
-					throw new ErrorHttpException('当前保存的数据项已不存在！' . $data['id'] . '-' . $chapterId);
+					$hasRow=1;
+					$ids[count($ids)] = $data['id'];
 				}
-			} else {
+			}
+			if($hasRow==0){
 				$chapterApiParam = ChapterApiParam::query()->create($saveData);
 				if ($chapterApiParam) {
 					$ids[count($ids)] = $chapterApiParam->id;
