@@ -55,6 +55,7 @@ class AppAuthMiddleware extends MiddlewareAbstract
 		$request->session->set('user', [
 			'uid' => $user->id,
 			'username' => $user->username,
+			'login_from_app' => 1
 		]);
 
 		return $handler->handle($request);
