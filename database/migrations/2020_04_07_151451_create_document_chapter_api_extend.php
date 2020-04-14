@@ -26,8 +26,6 @@ class CreateDocumentChapterApiExtend extends Migration
 			$table->increments('id');
 			$table->integer('chapter_id')->default(0)->comment('章节ID');
 			$table->longText('extend')->default('')->comment('扩展markdown格式数据');
-			$table->integer('created_at')->default(0);
-			$table->integer('updated_at')->default(0);
 			$table->index('chapter_id');
 		});
 	}

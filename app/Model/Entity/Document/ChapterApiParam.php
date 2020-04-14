@@ -16,6 +16,7 @@ use W7\App\Model\Entity\BaseModel;
 
 class ChapterApiParam extends BaseModel
 {
+	public $timestamps = false;
 	protected $table = 'document_chapter_api_param';
 	protected $fillable = ['chapter_id', 'parent_id', 'location', 'type', 'name', 'description', 'enabled', 'default_value', 'rule'];
 

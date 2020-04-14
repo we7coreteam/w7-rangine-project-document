@@ -16,6 +16,7 @@ use W7\App\Model\Entity\BaseModel;
 
 class ChapterApiExtend extends BaseModel
 {
+	public $timestamps = false;
 	protected $table = 'document_chapter_api_extend';
 	protected $fillable = ['chapter_id', 'extend'];
 }

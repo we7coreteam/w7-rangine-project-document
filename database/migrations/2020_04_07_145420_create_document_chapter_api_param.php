@@ -33,8 +33,6 @@ class CreateDocumentChapterApiParam extends Migration
 			$table->tinyInteger('enabled')->default(1)->comment('是否必填1否2是');
 			$table->string('default_value', 255)->default('')->comment('初始值');
 			$table->string('rule', 255)->default('')->comment('生成规则');
-			$table->integer('created_at')->default(0);
-			$table->integer('updated_at')->default(0);
 			$table->index('chapter_id');
 		});
 	}
