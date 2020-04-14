@@ -244,7 +244,7 @@ class ChapterRecordLogic
 		$url = '';
 		$description = '';
 		$statusCode = 0;
-		$bodyParamLocation = 3;
+		$bodyParamLocation = 3;$tabLocation=1;
 		if (isset($data['method'])) {
 			$method = $data['method'];
 		}
@@ -258,6 +258,9 @@ class ChapterRecordLogic
 		}
 		if (isset($data['description'])) {
 			$description = $data['description'];
+		}
+		if (isset($data['tab_location'])) {
+			$tabLocation = $data['tab_location'];
 		}
 		if (isset($data['body_param_location'])) {
 			$bodyParamLocation = $data['body_param_location'];
@@ -283,6 +286,7 @@ class ChapterRecordLogic
 			'url' => $url,
 			'method' => $method,
 			'description' => $description,
+			'tab_location'=>$tabLocation,
 			'body_param_location' => $bodyParamLocation
 		];
 		if ($sqlType == 2) {

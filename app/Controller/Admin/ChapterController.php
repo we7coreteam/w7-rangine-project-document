@@ -429,6 +429,7 @@ class ChapterController extends BaseController
 	 * @apiSuccess {String} record.api.method 请求方式
 	 * @apiSuccess {String} record.api.url 地址
 	 * @apiSuccess {String} record.api.description 描述
+	 * @apiSuccess {String} record.api.tab_location tab页上次指定记录head,query,body
 	 * @apiSuccess {String} record.api.body_param_location body_param默认类型
 	 * @apiSuccess {Array} record.body 请求
 	 * @apiSuccess {Array} record.body.location 请求类型1-11参考getLocationLabel，bodyparam请求参数默认3返回参数默认10

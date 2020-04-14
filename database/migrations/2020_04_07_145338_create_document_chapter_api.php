@@ -29,6 +29,7 @@ class CreateDocumentChapterApi extends Migration
 			$table->tinyInteger('method')->comment('请求方法:1、GET,2、POST,3、PUT,4、OPTIONS,5、DELETE');
 			$table->integer('status_code')->default(200)->comment('状态码');
 			$table->string('description', 255)->default('')->comment('接口描述');
+			$table->tinyInteger('tab_location')->default(1)->comment('tab页上次指定记录head,query,body');
 			$table->tinyInteger('body_param_location')->default(3)->comment('body_param默认请求方式');
 			$table->index('chapter_id');
 		});
