@@ -263,8 +263,16 @@ class ChapterRecordLogic
 			$tabLocation = $data['tab_location'];
 		}
 		if (isset($data['body_param_location'])) {
-			$bodyParamLocation = $data['body_param_location'];
-			$this->bodyParamLocation = $bodyParamLocation;
+			$bodyParamLocationList=[
+				ChapterApiParam::LOCATION_REQUEST_QUERY_STRING => 'Request.Query.String',
+				ChapterApiParam::LOCATION_REQUEST_BODY_FROM => 'Request.Body.form-data',
+				ChapterApiParam::LOCATION_REQUEST_BODY_URLENCODED => 'Request.Body.urlencoded',
+				ChapterApiParam::LOCATION_REQUEST_BODY_RAW => 'Request.Body.raw',
+			];
+			if(in_array($data['body_param_location'],array_keys($bodyParamLocationList))){
+				$bodyParamLocation = $data['body_param_location'];
+				$this->bodyParamLocation = $bodyParamLocation;
+			}
 		}
 		if (isset($data['status_code'])) {
 			$statusCode = $data['status_code'];
