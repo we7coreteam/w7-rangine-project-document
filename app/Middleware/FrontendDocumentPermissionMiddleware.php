@@ -39,12 +39,12 @@ class FrontendDocumentPermissionMiddleware extends MiddlewareAbstract
 		$user->isReader = $user->isFounder;
 		if ($document->isPublicDoc) {
 			$user->isReader = true;
-		} elseif ($document->is_public == Document::PRIVATE_DOCUMENT && !empty($user->id)) {
+		} elseif ($document->isPrivateDoc && !empty($user->id)) {
 			$documentPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($documentId, $user->id);
 			if ($documentPermission) {
 				$user->isReader = $documentPermission->isReader;
 			}
-		} elseif ($document->is_public == Document::LOGIN_PREVIEW_DOCUMENT) {
+		} elseif ($document->isLoginPreviewDoc) {
 			$user->isReader = empty($user->id) ? false : true;
 		}
 
