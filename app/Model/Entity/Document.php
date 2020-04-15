@@ -48,4 +48,14 @@ class Document extends BaseModel
 	{
 		return $this->is_public == self::PUBLIC_DOCUMENT;
 	}
+
+	public function getIsPrivateDocAttribute()
+	{
+		return $this->is_public == self::PRIVATE_DOCUMENT;
+	}
+
+	public function getIsLoginPreviewDocAttribute()
+	{
+		return $this->is_public == self::LOGIN_PREVIEW_DOCUMENT;
+	}
 }
