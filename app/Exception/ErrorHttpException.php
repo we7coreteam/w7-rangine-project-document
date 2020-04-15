@@ -12,29 +12,21 @@
 
 namespace W7\App\Exception;
 
-use Psr\Http\Message\ResponseInterface;
 use W7\Core\Exception\ResponseExceptionAbstract;
 
 class ErrorHttpException extends ResponseExceptionAbstract
 {
-	protected $data;
-
 	public function __construct($message = '', $data = [], $code = 0, \Throwable $previous = null)
 	{
 		if (empty($code)) {
 			$code = '500';
 		}
-		$this->data = $data;
-		parent::__construct($message, $code, $previous);
-	}
-
-	public function render(): ResponseInterface
-	{
-		return $this->response->withStatus(200)->withContent(json_encode([
+		$message = json_encode([
 			'status' => false,
-			'code' => $this->getCode(),
-			'data' => $this->data,
-			'message' => $this->getMessage(),
-		]));
+			'code' => $code,
+			'data' => $data,
+			'message' => $message,
+		]);
+		parent::__construct($message, 200, $previous);
 	}
 }
