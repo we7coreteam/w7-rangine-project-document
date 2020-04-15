@@ -30,7 +30,7 @@ class DbHandler extends HandlerAbstract
 		return $session->data;
 	}
 
-	public function destroy($session_id, $flag = SESSION_DESTROY)
+	public function destroy($session_id)
 	{
 		SessionLogic::instance()->deleteBySessionId($session_id);
 		return true;
