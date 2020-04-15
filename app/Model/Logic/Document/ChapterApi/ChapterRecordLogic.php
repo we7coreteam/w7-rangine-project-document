@@ -315,10 +315,13 @@ class ChapterRecordLogic
 		$text = '';
 		if ($data && is_array($data)) {
 			$title = $this->getLocatinonText($location);
-			$text = '### ' . $title . "\n\n";
-			$text = $text . $this->bodyTableTop();
+			$textTop = '### ' . $title . "\n\n";
+			$textTop = $textTop . $this->bodyTableTop();
 			foreach ($data as $k => $val) {
 				$text .= $this->buildBodyChildren($location, $val, 0, 0, $sqlType);
+			}
+			if ($text) {
+				$text = $textTop . $text;
 			}
 		}
 		return $text;
@@ -373,7 +376,10 @@ class ChapterRecordLogic
 
 		$enabledText = $this->getEnabledText($enabled);
 		$typeText = $this->getTypeText($type);
-		if ($name) {
+		if ($name || $description) {
+			if (!$name) {
+				$name = ' ';
+			}
 			$text = $this->strLengthAdaptation($childrenTop . $name, ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($typeText, ChapterApiParam::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation($enabledText, ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($defaultValue, ChapterApiParam::TABLE_VALUE_LENGTH) . '|' . $this->strLengthAdaptation($rule, ChapterApiParam::TABLE_RULE_LENGTH) . "\n";
 		}
 		//存储
