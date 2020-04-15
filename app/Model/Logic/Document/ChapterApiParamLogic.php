@@ -30,18 +30,18 @@ class ChapterApiParamLogic extends BaseLogic
 	public function getLocationLabel()
 	{
 		return [
-			ChapterApiParam::LOCATION_REQUEST_QUERY_PATH => 'Request.Query.Path',
-			ChapterApiParam::LOCATION_REQUEST_HEADER => 'Request.Header',
-			ChapterApiParam::LOCATION_REQUEST_QUERY_STRING => 'Request.Query.String',
-			ChapterApiParam::LOCATION_REQUEST_BODY_FROM => 'Request.Body.form-data',
-			ChapterApiParam::LOCATION_REQUEST_BODY_URLENCODED => 'Request.Body.urlencoded',
-			ChapterApiParam::LOCATION_REQUEST_BODY_RAW => 'Request.Body.raw',
-			ChapterApiParam::LOCATION_REQUEST_BODY_BINARY => 'Request.Body.binary',
-			ChapterApiParam::LOCATION_REPONSE_HEADER => 'Reponse.Header',
-			ChapterApiParam::LOCATION_REPONSE_BODY_FROM => 'Reponse.Body.form-data',
-			ChapterApiParam::LOCATION_REPONSE_BODY_URLENCODED => 'Reponse.Body.urlencoded',
-			ChapterApiParam::LOCATION_REPONSE_BODY_RAW => 'Reponse.Body.raw',
-			ChapterApiParam::LOCATION_REPONSE_BODY_BINARY => 'Reponse.Body.binary',
+			ChapterApiParam::LOCATION_REQUEST_QUERY_PATH => 'Path',
+			ChapterApiParam::LOCATION_REQUEST_HEADER => 'Head',
+			ChapterApiParam::LOCATION_REQUEST_QUERY_STRING => 'Query',
+			ChapterApiParam::LOCATION_REQUEST_BODY_FROM => 'Body',
+			ChapterApiParam::LOCATION_REQUEST_BODY_URLENCODED => 'Body',
+			ChapterApiParam::LOCATION_REQUEST_BODY_RAW => 'Body',
+			ChapterApiParam::LOCATION_REQUEST_BODY_BINARY => 'Body',
+			ChapterApiParam::LOCATION_REPONSE_HEADER => 'Reponse',
+			ChapterApiParam::LOCATION_REPONSE_BODY_FROM => 'Reponse',
+			ChapterApiParam::LOCATION_REPONSE_BODY_URLENCODED => 'Reponse',
+			ChapterApiParam::LOCATION_REPONSE_BODY_RAW => 'Reponse',
+			ChapterApiParam::LOCATION_REPONSE_BODY_BINARY => 'Reponse',
 		];
 	}
 
