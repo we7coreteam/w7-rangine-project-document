@@ -5,19 +5,20 @@ namespace W7\App\Handler\Exception;
 use function GuzzleHttp\Psr7\build_query;
 use Overtrue\Socialite\Config;
 use Overtrue\Socialite\SocialiteManager;
-use Psr\Http\Message\ResponseInterface;
 use W7\App;
 use W7\App\Model\Logic\ThirdPartyLoginLogic;
-use W7\Core\Exception\ResponseExceptionAbstract;
+use W7\Core\Exception\Handler\HandlerAbstract;
 use W7\Core\Exception\RouteNotAllowException;
 use W7\Core\Exception\RouteNotFoundException;
 use W7\Core\Exception\ValidatorException;
 use W7\Core\Session\Session;
 use W7\Core\View\View;
-use W7\Core\Exception\Handler\ExceptionHandler as ExceptionHandlerAbstract;
+use W7\Http\Message\Server\Response;
 
-class ExceptionHandler extends ExceptionHandlerAbstract {
-	public function handle(ResponseExceptionAbstract $e) : ResponseInterface {
+class ExceptionHandler extends HandlerAbstract
+{
+	public function handle(\Throwable $e) : Response
+	{
 		if ($e instanceof RouteNotFoundException || $e instanceof RouteNotAllowException) {
 			$route = icontext()->getRequest()->getUri()->getPath();
 			if (icontext()->getRequest()->getQueryParams()) {
@@ -25,13 +26,13 @@ class ExceptionHandler extends ExceptionHandlerAbstract {
 			}
 			//如果访问的是admin下的路由，先检测是否登录
 			if (substr($route, 0, 12) == '/admin-login') {
-				return App::getApp()->getContext()->getResponse()->html(iloader()->singleton(View::class)->render('@public/index'));
+				return App::getApp()->getContext()->getResponse()->withHeader('Content-Type', 'text/html')->withContent(iloader()->singleton(View::class)->render('@public/index'));
 			}
 			if (substr($route, 0, 6) == '/admin') {
 				$session = new Session();
 				$session->start(icontext()->getRequest());
 				if (!$session->get('user')) {
-					return icontext()->getResponse()->redirect($this->getLoginUrl());
+					icontext()->getResponse()->withAddedHeader('Location', (string)$this->getLoginUrl())->withStatus(302);
 				}
 			}
 			//如果是访问预览的连接，判断该文档是否需要登录后预览
@@ -44,15 +45,15 @@ class ExceptionHandler extends ExceptionHandlerAbstract {
 					$document = App\Model\Logic\DocumentLogic::instance()->getById($documentId);
 					//非公有文档，自动跳转登录
 					if ($document && $document->is_public != App\Model\Entity\Document::PUBLIC_DOCUMENT) {
-						return icontext()->getResponse()->redirect($this->getLoginUrl(ienv('API_HOST') . ltrim($route, '/')));
+						icontext()->getResponse()->withAddedHeader('Location', $this->getLoginUrl(ienv('API_HOST') . ltrim($route, '/')))->withStatus(302);
 					}
 				}
 			}
-			return App::getApp()->getContext()->getResponse()->html(iloader()->singleton(View::class)->render('@public/index'));
+			return App::getApp()->getContext()->getResponse()->withHeader('Content-Type', 'text/html')->withContent(iloader()->singleton(View::class)->render('@public/index'));
 		}
 
 		if ($e instanceof ValidatorException) {
-			return (new App\Exception\ErrorHttpException($e->getMessage(), [], $e->getCode()))->render();
+			$e = new App\Exception\ErrorHttpException($e->getMessage(), [], $e->getCode());
 		}
 		return parent::handle($e);
 	}
@@ -79,4 +80,6 @@ class ExceptionHandler extends ExceptionHandlerAbstract {
 			}
 		}
 	}
+
+
 }
