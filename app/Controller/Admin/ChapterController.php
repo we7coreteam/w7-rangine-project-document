@@ -392,6 +392,10 @@ class ChapterController extends BaseController
 			$chapter->content->content = $content;
 			$chapter->content->save();
 		} else {
+			if ($layout) {
+				//默认0
+				throw new ErrorHttpException('文档类型不可更改');
+			}
 			ChapterContent::query()->create([
 				'chapter_id' => $chapter->id,
 				'content' => $content,
