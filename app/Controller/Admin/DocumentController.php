@@ -16,6 +16,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document;
+use W7\App\Model\Entity\Document\Chapter;
 use W7\App\Model\Entity\DocumentPermission;
 use W7\App\Model\Entity\Star;
 use W7\App\Model\Entity\User;
@@ -200,7 +201,7 @@ class DocumentController extends BaseController
 				'id' => $row->id,
 				'name' => $row->name,
 				'description' => $row->descriptionShort,
-				'is_public' => $row->isPublicDoc ,
+				'is_public' => $row->isPublicDoc,
 				'cur_role' => $documentPermission ? $documentPermission->permission : 0,
 				'role_list' => $roleList
 			];
@@ -377,6 +378,14 @@ class DocumentController extends BaseController
 		]);
 
 		DocumentLogic::instance()->createCreatorPermission($document);
+		//创建默认目录
+		Chapter::query()->create([
+			'name' => '默认目录',
+			'sort' => 1,
+			'is_dir' => 1,
+			'document_id' => $document->id,
+			'parent_id' => 0
+		]);
 
 		UserOperateLog::query()->create([
 			'user_id' => $user->id,
