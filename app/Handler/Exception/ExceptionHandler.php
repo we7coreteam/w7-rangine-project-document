@@ -22,36 +22,37 @@ class ExceptionHandler extends HandlerAbstract
 	public function handle(\Throwable $e) : Response
 	{
 		if ($e instanceof RouteNotFoundException || $e instanceof RouteNotAllowException) {
-			$route = icontext()->getRequest()->getUri()->getPath();
-			if (icontext()->getRequest()->getQueryParams()) {
-				$route .= '?' . build_query(icontext()->getRequest()->getQueryParams());
+			$request = icontext()->getRequest();
+			$route = $request->getUri()->getPath();
+			if ($request->getQueryParams()) {
+				$route .= '?' . build_query($request->getQueryParams());
 			}
 			//如果访问的是admin下的路由，先检测是否登录
 			if (substr($route, 0, 12) == '/admin-login') {
-				return icontext()->getResponse()->html(iloader()->singleton(View::class)->render('@public/index'));
+				return $this->getResponse()->html(iloader()->singleton(View::class)->render('@public/index'));
 			}
 			if (substr($route, 0, 6) == '/admin') {
 				$session = new Session();
-				$session->start(icontext()->getRequest());
+				$session->start($request);
 				if (!$session->get('user')) {
-					icontext()->getResponse()->redirect((string)$this->getLoginUrl());
+					$this->getResponse()->redirect((string)$this->getLoginUrl());
 				}
 			}
 			//如果是访问预览的连接，判断该文档是否需要登录后预览
 			if (substr($route, 0, 8) === '/chapter') {
 				$session = new Session();
-				$session->start(icontext()->getRequest());
+				$session->start($request);
 				if (!$session->get('user')) {
 					$documentId = explode('/', $route)[2] ?? '';
 					$documentId = explode('?', $documentId)[0];
 					$document = DocumentLogic::instance()->getById($documentId);
 					//非公有文档，自动跳转登录
 					if ($document && $document->is_public != Document::PUBLIC_DOCUMENT) {
-						icontext()->getResponse()->redirect($this->getLoginUrl(ienv('API_HOST') . ltrim($route, '/')));
+						$this->getResponse()->redirect($this->getLoginUrl(ienv('API_HOST') . ltrim($route, '/')));
 					}
 				}
 			}
-			return icontext()->getResponse()->html(iloader()->singleton(View::class)->render('@public/index'));
+			return $this->getResponse()->html(iloader()->singleton(View::class)->render('@public/index'));
 		}
 
 		if ($e instanceof ValidatorException) {
