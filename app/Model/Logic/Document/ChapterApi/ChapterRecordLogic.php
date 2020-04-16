@@ -215,12 +215,13 @@ class ChapterRecordLogic
 				throw new ErrorHttpException('状态码错误');
 			}
 		}
-		if ($description) {
-			$text = '- **接口说明：** ' . $description . "\n";
-		}
-		$text .= '- **请求方式：** ' . $methodLabel[$method] . "\n- **接口地址：** " . $url . "\n";
+
+		$text = '- **请求方式：** ' . $methodLabel[$method] . "\n- **接口地址：** " . $url . "\n";
 		if ($statusCode) {
 			$text .= '- **状态码：** ' . $statusCode . "\n";
+		}
+		if ($description) {
+			$text .= '- **接口说明：** ' . $description . "\n";
 		}
 		//存储
 		$saveData = [
