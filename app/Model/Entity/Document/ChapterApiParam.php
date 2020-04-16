@@ -18,14 +18,13 @@ class ChapterApiParam extends BaseModel
 {
 	public $timestamps = false;
 	protected $table = 'document_chapter_api_param';
-	protected $fillable = ['chapter_id', 'parent_id', 'location', 'type', 'name', 'description', 'enabled', 'default_value', 'rule'];
+	protected $fillable = ['chapter_id', 'parent_id', 'location', 'type', 'name', 'description', 'enabled', 'default_value'];
 
 	const TABLE_NAME_LENGTH = 20;//参数名称默认宽度
 	const TABLE_TYPE_LENGTH = 8;//类型默认宽度
 	const TABLE_ENABLED_LENGTH = 5;//类型必填宽度
 	const TABLE_DESCRIPTION_LENGTH = 20;//描述默认宽度
 	const TABLE_VALUE_LENGTH = 20;//示例值默认宽度
-	const TABLE_RULE_LENGTH = 20;//生成规则默认宽度
 
 	const ENABLED_NO = 1;
 	const ENABLED_YES = 2;
