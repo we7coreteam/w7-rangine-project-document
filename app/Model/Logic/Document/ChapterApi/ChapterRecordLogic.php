@@ -53,11 +53,11 @@ class ChapterRecordLogic
 						$markdown['api'] = $this->buildApi($val, $sqlType);
 					} elseif ($key == 'body') {
 						$body = $val;
-						if (isset($record['api']['body_param_location'])) {
+						if (isset($record['api']['body_param_location'])&&isset($body['request_body'])) {
 							//指定存储body_param_location类型
 							$body[$record['api']['body_param_location']] = $body['request_body'];
 						} else {
-							throw new ErrorHttpException('没有body_param_location');
+							throw new ErrorHttpException('没有body_param_location或request_body');
 						}
 						if (isset($body['reponse_body'])) {
 							//指定存储request_body类型
