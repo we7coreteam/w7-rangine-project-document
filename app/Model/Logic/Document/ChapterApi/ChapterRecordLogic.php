@@ -47,15 +47,14 @@ class ChapterRecordLogic
 		];
 		idb()->beginTransaction();
 		try {
-			ksort($record);
 			foreach ($record as $key => $val) {
 				if (is_array($val)) {
 					if ($key == 'api') {
 						$markdown['api'] = $this->buildApi($val, $sqlType);
 					} elseif ($key == 'body') {
 						$body = $val;
-						if (isset($markdown['api']['body_param_location'])) {
-							$body[$markdown['api']['body_param_location']] = $body['request_body'];
+						if (isset($record['api']['body_param_location'])) {
+							$body[$record['api']['body_param_location']] = $body['request_body'];
 						} else {
 							throw new ErrorHttpException('没有body_param_location');
 						}
