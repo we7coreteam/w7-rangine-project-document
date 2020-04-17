@@ -438,8 +438,6 @@ class ChapterRecordLogic
 						$record['body'][$val->location][] = $val;
 					}
 				}
-//				ksort($body);
-//				$record['body'] = $body;
 			}
 			$chapterApiExtend = ChapterApiExtend::query()->where('chapter_id', $chapterId)->first();
 			if ($chapterApiExtend) {
