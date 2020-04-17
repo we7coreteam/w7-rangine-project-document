@@ -431,7 +431,7 @@ class ChapterRecordLogic
 						//如果当前列是request_body
 						$record['body']['request_body'][] = $val;
 					}
-					if ($val->location == ChapterApiParam::LOCATION_REPONSE_BODY_RAW) {
+					else if ($val->location == ChapterApiParam::LOCATION_REPONSE_BODY_RAW) {
 						//如果当前列是reponse_body
 						$record['body']['reponse_body'][] = $val;
 					} else {
