@@ -310,42 +310,42 @@ class ChapterRecordLogic
 				$name = ' ';
 			}
 			$text = $this->strLengthAdaptation($childrenTop . $name, ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($typeText, ChapterApiParam::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation($enabledText, ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($defaultValue, ChapterApiParam::TABLE_VALUE_LENGTH) . "\n";
-		}
-		//存储
-		if ($sqlType == 2) {
-			$ids = $this->ids;
-			$chapterId = $this->chapterId;
-			$saveData = [
-				'chapter_id' => $chapterId,
-				'parent_id' => $parentId,
-				'location' => $location,
-				'type' => $type,
-				'name' => $name,
-				'description' => $description,
-				'enabled' => $enabled,
-				'default_value' => $defaultValue,
-			];
+			//存储
+			if ($sqlType == 2) {
+				$ids = $this->ids;
+				$chapterId = $this->chapterId;
+				$saveData = [
+					'chapter_id' => $chapterId,
+					'parent_id' => $parentId,
+					'location' => $location,
+					'type' => $type,
+					'name' => $name,
+					'description' => $description,
+					'enabled' => $enabled,
+					'default_value' => $defaultValue,
+				];
 
-			$id = $parentId;
+				$id = $parentId;
 
-			$hasRow = 0;
-			if (isset($data['id']) && $data['id']) {
-				$id = $data['id'];
-				$chapterApiParam = ChapterApiParam::query()->find($data['id']);
-				if ($chapterApiParam && $chapterApiParam->chapter_id == $chapterId && $chapterApiParam->location == $location) {
-					$chapterApiParam->update($saveData);
-					$hasRow = 1;
-					$ids[count($ids)] = $data['id'];
+				$hasRow = 0;
+				if (isset($data['id']) && $data['id']) {
+					$id = $data['id'];
+					$chapterApiParam = ChapterApiParam::query()->find($data['id']);
+					if ($chapterApiParam && $chapterApiParam->chapter_id == $chapterId && $chapterApiParam->location == $location) {
+						$chapterApiParam->update($saveData);
+						$hasRow = 1;
+						$ids[count($ids)] = $data['id'];
+					}
 				}
-			}
-			if ($hasRow == 0) {
-				$chapterApiParam = ChapterApiParam::query()->create($saveData);
-				if ($chapterApiParam) {
-					$ids[count($ids)] = $chapterApiParam->id;
-					$id = $chapterApiParam->id;
+				if ($hasRow == 0) {
+					$chapterApiParam = ChapterApiParam::query()->create($saveData);
+					if ($chapterApiParam) {
+						$ids[count($ids)] = $chapterApiParam->id;
+						$id = $chapterApiParam->id;
+					}
 				}
+				$this->ids = $ids;
 			}
-			$this->ids = $ids;
 		}
 
 		if (isset($data['children']) && (!empty($data['children'])) && is_array($data['children'])) {
