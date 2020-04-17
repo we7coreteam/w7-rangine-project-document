@@ -47,11 +47,21 @@ class ChapterRecordLogic
 		];
 		idb()->beginTransaction();
 		try {
+			ksort($record);
 			foreach ($record as $key => $val) {
 				if (is_array($val)) {
 					if ($key == 'api') {
 						$markdown['api'] = $this->buildApi($val, $sqlType);
 					} elseif ($key == 'body') {
+						$body = $val;
+						if (isset($markdown['api']['body_param_location'])) {
+							$body[$markdown['api']['body_param_location']] = $body['request_body'];
+						} else {
+							throw new ErrorHttpException('没有body_param_location');
+						}
+						if (isset($val['request_body'])) {
+							$body[ChapterApiParam::LOCATION_REPONSE_BODY_RAW] = $val['request_body'];
+						}
 						$markdown['body'] = $this->buildBody($val, $sqlType);
 					}
 				} else {
@@ -400,7 +410,12 @@ class ChapterRecordLogic
 		$chapterId = $this->chapterId;
 		$record = [
 			'api' => [],
-			'body' => [],
+			'body' => [
+				'1' => [],
+				'2' => [],
+				'request_body' => [],
+				'reponse_body' => [],
+			],
 			'extend' => ''
 		];
 		$body = [];
@@ -411,9 +426,18 @@ class ChapterRecordLogic
 			if ($chapterApiParam) {
 				foreach ($chapterApiParam as $key => $val) {
 					$val->children = $this->getBodyChildren($chapterId, $val->id);
-					$body[$val->location][] = $val;
+					if ($val->location == $chapterApi->body_param_location) {
+						//如果当前列是body_param
+						$body['request_body'] = $val;
+					}
+					if ($val->location == ChapterApiParam::LOCATION_REPONSE_BODY_RAW) {
+						//如果当前列是body_param
+						$body['reponse_body'] = $val;
+					} else {
+						$body[$val->location] = $val;
+					}
 				}
-				ksort($body);
+//				ksort($body);
 				$record['body'] = $body;
 			}
 			$chapterApiExtend = ChapterApiExtend::query()->where('chapter_id', $chapterId)->first();
