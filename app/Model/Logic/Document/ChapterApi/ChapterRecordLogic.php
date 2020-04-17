@@ -427,7 +427,7 @@ class ChapterRecordLogic
 				foreach ($chapterApiParam as $key => $val) {
 					$val->children = $this->getBodyChildren($chapterId, $val->id);
 					if ($val->location == $chapterApi->body_param_location) {
-						//如果当前列是body_param
+						//如果当前列是request_body
 						$body['request_body'] = $val;
 					}
 					if ($val->location == ChapterApiParam::LOCATION_REPONSE_BODY_RAW) {
