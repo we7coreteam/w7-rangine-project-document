@@ -429,13 +429,13 @@ class ChapterRecordLogic
 					$val->children = $this->getBodyChildren($chapterId, $val->id);
 					if ($val->location == $chapterApi->body_param_location) {
 						//如果当前列是request_body
-						$record['body']['request_body'] = $val;
+						$record['body']['request_body'][] = $val;
 					}
 					if ($val->location == ChapterApiParam::LOCATION_REPONSE_BODY_RAW) {
 						//如果当前列是reponse_body
-						$record['body']['reponse_body'] = $val;
+						$record['body']['reponse_body'][] = $val;
 					} else {
-						$record['body'][$val->location] = $val;
+						$record['body'][$val->location][] = $val;
 					}
 				}
 //				ksort($body);
