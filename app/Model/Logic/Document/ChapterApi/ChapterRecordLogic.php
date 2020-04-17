@@ -59,9 +59,9 @@ class ChapterRecordLogic
 						} else {
 							throw new ErrorHttpException('没有body_param_location');
 						}
-						if (isset($body['request_body'])) {
+						if (isset($body['reponse_body'])) {
 							//指定存储request_body类型
-							$body[ChapterApiParam::LOCATION_REPONSE_BODY_RAW] = $body['request_body'];
+							$body[ChapterApiParam::LOCATION_REPONSE_BODY_RAW] = $body['reponse_body'];
 						}
 						$markdown['body'] = $this->buildBody($val, $sqlType);
 					}
