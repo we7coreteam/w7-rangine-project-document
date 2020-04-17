@@ -63,7 +63,7 @@ class ChapterRecordLogic
 							//指定存储request_body类型
 							$body[ChapterApiParam::LOCATION_REPONSE_BODY_RAW] = $body['reponse_body'];
 						}
-						$markdown['body'] = $this->buildBody($val, $sqlType);
+						$markdown['body'] = $this->buildBody($body, $sqlType);
 					}
 				} else {
 					if ($key == 'extend') {
