@@ -488,6 +488,7 @@ class ChapterController extends BaseController
 			'updated_at' => $chapter->updated_at->toDateTimeString()
 		];
 		if ($chapter->content->layout == 1) {
+			$result['content']='';
 			$obj = new ChapterRecordLogic($chapter->id);
 			$result['record'] = $obj->showRecord();
 		}
