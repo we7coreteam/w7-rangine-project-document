@@ -403,6 +403,12 @@ class ChapterRecordLogic
 		return [];
 	}
 
+	public function chapterApiParamData($chapterId){
+		//全部数据
+		$chapterApiParam = ChapterApiParam::query()->where('chapter_id', $chapterId)->get();
+		return $chapterApiParam;
+	}
+
 	public function showRecord()
 	{
 		$chapterId = $this->chapterId;
@@ -417,20 +423,23 @@ class ChapterRecordLogic
 			'extend' => ''
 		];
 		$body = [];
+
 		$chapterApi = ChapterApi::query()->where('chapter_id', $chapterId)->first();
 		if ($chapterApi) {
-			$chapterApiParam = ChapterApiParam::query()->where('chapter_id', $chapterId)->where('parent_id', 0)->get();
-			if ($chapterApiParam) {
-				foreach ($chapterApiParam as $key => $val) {
-					$val->children = $this->getBodyChildren($chapterId, $val->id);
-					if ($val->location == $chapterApi->body_param_location) {
-						//如果当前列是request_body
-						$record['body']['request_body'][] = $val;
-					} elseif ($val->location == ChapterApiParam::LOCATION_REPONSE_BODY_RAW) {
-						//如果当前列是reponse_body
-						$record['body']['reponse_body'][] = $val;
-					} else {
-						$record['body'][$val->location][] = $val;
+			$chapterApiParamData=$this->chapterApiParamData($chapterId);
+			if ($chapterApiParamData) {
+				foreach ($chapterApiParamData as $key => $val) {
+					if($val->parent_id==0){
+						$val->children = $this->getBodyChildren($chapterApiParamData, $val->id);
+						if ($val->location == $chapterApi->body_param_location) {
+							//如果当前列是request_body
+							$record['body']['request_body'][] = $val;
+						} elseif ($val->location == ChapterApiParam::LOCATION_REPONSE_BODY_RAW) {
+							//如果当前列是reponse_body
+							$record['body']['reponse_body'][] = $val;
+						} else {
+							$record['body'][$val->location][] = $val;
+						}
 					}
 				}
 			}
@@ -454,13 +463,15 @@ class ChapterRecordLogic
 		return $record;
 	}
 
-	public function getBodyChildren($chapterId, $parentId)
+	public function getBodyChildren($chapterApiParamData, $parentId)
 	{
-		$chapterApiParam = ChapterApiParam::query()->where('chapter_id', $chapterId)->where('parent_id', $parentId)->get();
-		if ($chapterApiParam) {
-			foreach ($chapterApiParam as $key => $val) {
-				$val->children = $this->getBodyChildren($chapterId, $val->id);
-				$body[$val->location][] = $val;
+		$chapterApiParam=[];
+		if ($chapterApiParamData) {
+			foreach ($chapterApiParamData as $key => $val) {
+				if($val->parent_id==$parentId){
+					$val->children = $this->getBodyChildren($chapterApiParamData, $val->id);
+					$chapterApiParam[]=$val;
+				}
 			}
 			return $chapterApiParam;
 		}
