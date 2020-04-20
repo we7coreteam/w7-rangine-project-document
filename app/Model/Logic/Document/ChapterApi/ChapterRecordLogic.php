@@ -53,7 +53,7 @@ class ChapterRecordLogic
 						$markdown['api'] = $this->buildApi($val, $sqlType);
 					} elseif ($key == 'body') {
 						$body = $val;
-						if (isset($record['api']['body_param_location'])&&isset($body['request_body'])) {
+						if (isset($record['api']['body_param_location']) && isset($body['request_body'])) {
 							//指定存储body_param_location类型
 							$body[$record['api']['body_param_location']] = $body['request_body'];
 						} else {
@@ -189,7 +189,7 @@ class ChapterRecordLogic
 		$description = '';
 		$statusCode = 0;
 		$bodyParamLocation = 3;
-		$tabLocation = 1;
+
 		if (isset($data['method'])) {
 			$method = $data['method'];
 		}
@@ -204,9 +204,7 @@ class ChapterRecordLogic
 		if (isset($data['description'])) {
 			$description = $data['description'];
 		}
-		if (isset($data['tab_location'])) {
-			$tabLocation = $data['tab_location'];
-		}
+
 		if (isset($data['body_param_location'])) {
 			$bodyParamLocationList = [
 				ChapterApiParam::LOCATION_REQUEST_QUERY_STRING => 'Request.Query.String',
@@ -240,7 +238,6 @@ class ChapterRecordLogic
 			'url' => $url,
 			'method' => $method,
 			'description' => $description,
-			'tab_location' => $tabLocation,
 			'body_param_location' => $bodyParamLocation
 		];
 		if ($sqlType == 2) {
@@ -422,7 +419,6 @@ class ChapterRecordLogic
 		$body = [];
 		$chapterApi = ChapterApi::query()->where('chapter_id', $chapterId)->first();
 		if ($chapterApi) {
-			$record['api'] = $chapterApi;
 			$chapterApiParam = ChapterApiParam::query()->where('chapter_id', $chapterId)->where('parent_id', 0)->get();
 			if ($chapterApiParam) {
 				foreach ($chapterApiParam as $key => $val) {
@@ -430,8 +426,7 @@ class ChapterRecordLogic
 					if ($val->location == $chapterApi->body_param_location) {
 						//如果当前列是request_body
 						$record['body']['request_body'][] = $val;
-					}
-					else if ($val->location == ChapterApiParam::LOCATION_REPONSE_BODY_RAW) {
+					} elseif ($val->location == ChapterApiParam::LOCATION_REPONSE_BODY_RAW) {
 						//如果当前列是reponse_body
 						$record['body']['reponse_body'][] = $val;
 					} else {
@@ -443,7 +438,19 @@ class ChapterRecordLogic
 			if ($chapterApiExtend) {
 				$record['extend'] = $chapterApiExtend->extend;
 			}
+			//返回tab_location
+			$tab_location = 1;
+			if ($record['body']['1']) {
+				$tab_location = 1;
+			} elseif ($record['body']['2']) {
+				$tab_location = 2;
+			} elseif ($record['body']['request_body']) {
+				$tab_location = 3;
+			}
+			$chapterApi->tab_location = $tab_location;
+			$record['api'] = $chapterApi;
 		}
+
 		return $record;
 	}
 
