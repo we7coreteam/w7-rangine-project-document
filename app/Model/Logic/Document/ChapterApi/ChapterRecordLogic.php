@@ -429,12 +429,12 @@ class ChapterRecordLogic
 		}
 
 		$record = [
-			'api' => [],
+			'api' => '',
 			'body' => [
-				'1' => [],
-				'2' => [],
-				'request_body' => [],
-				'reponse_body' => [],
+				'1' => '',
+				'2' => '',
+				'request_body' => '',
+				'reponse_body' => '',
 			],
 			'extend' => ''
 		];
