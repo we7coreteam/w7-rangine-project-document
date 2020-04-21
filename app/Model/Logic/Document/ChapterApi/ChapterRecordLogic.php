@@ -429,7 +429,7 @@ class ChapterRecordLogic
 		}
 
 		$record = [
-			'api' => [],
+			'api' => '',
 			'body' => [
 				'1' => [],
 				'2' => [],
@@ -473,7 +473,7 @@ class ChapterRecordLogic
 				$tab_location = 3;
 			}
 			$chapterApi->tab_location = $tab_location;
-			$record['api'] = $chapterApi->toArray();
+			$record['api'] = $chapterApi;
 		}
 		icache()->set($cacheIndex, json_encode($record), 3600 * 24);
 		return $record;
