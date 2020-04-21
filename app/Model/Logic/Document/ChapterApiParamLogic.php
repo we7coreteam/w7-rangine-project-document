@@ -31,17 +31,17 @@ class ChapterApiParamLogic extends BaseLogic
 	{
 		return [
 			ChapterApiParam::LOCATION_REQUEST_QUERY_PATH => 'Path',
-			ChapterApiParam::LOCATION_REQUEST_HEADER => 'Head',
+			ChapterApiParam::LOCATION_REQUEST_HEADER => 'Header',
 			ChapterApiParam::LOCATION_REQUEST_QUERY_STRING => 'Query',
-			ChapterApiParam::LOCATION_REQUEST_BODY_FROM => 'Body',
-			ChapterApiParam::LOCATION_REQUEST_BODY_URLENCODED => 'Body',
-			ChapterApiParam::LOCATION_REQUEST_BODY_RAW => 'Body',
-			ChapterApiParam::LOCATION_REQUEST_BODY_BINARY => 'Body',
-			ChapterApiParam::LOCATION_REPONSE_HEADER => 'Reponse',
-			ChapterApiParam::LOCATION_REPONSE_BODY_FROM => 'Reponse',
-			ChapterApiParam::LOCATION_REPONSE_BODY_URLENCODED => 'Reponse',
-			ChapterApiParam::LOCATION_REPONSE_BODY_RAW => 'Reponse',
-			ChapterApiParam::LOCATION_REPONSE_BODY_BINARY => 'Reponse',
+			ChapterApiParam::LOCATION_REQUEST_BODY_FROM => 'Form 参数',
+			ChapterApiParam::LOCATION_REQUEST_BODY_URLENCODED => 'Form 参数',
+			ChapterApiParam::LOCATION_REQUEST_BODY_RAW => 'Body 参数',
+			ChapterApiParam::LOCATION_REQUEST_BODY_BINARY => 'Binary 参数',
+			ChapterApiParam::LOCATION_REPONSE_HEADER => 'Header',
+			ChapterApiParam::LOCATION_REPONSE_BODY_FROM => 'Data',
+			ChapterApiParam::LOCATION_REPONSE_BODY_URLENCODED => 'Data',
+			ChapterApiParam::LOCATION_REPONSE_BODY_RAW => 'Data',
+			ChapterApiParam::LOCATION_REPONSE_BODY_BINARY => 'Data',
 		];
 	}
 
