@@ -47,6 +47,14 @@ class ChapterRecordLogic
 		];
 		idb()->beginTransaction();
 		try {
+			$chapterId = $this->chapterId;
+
+			$cacheIndex = $this->getChapterIdRecordIndex($chapterId);
+			$recordCache = icache()->get($cacheIndex);
+			if ($recordCache) {
+				//清除缓存
+				icache()->delete($cacheIndex);
+			}
 			foreach ($record as $key => $val) {
 				if (is_array($val)) {
 					if ($key == 'api') {
@@ -403,7 +411,8 @@ class ChapterRecordLogic
 		return [];
 	}
 
-	public function chapterApiParamData($chapterId){
+	public function chapterApiParamData($chapterId)
+	{
 		//全部数据
 		$chapterApiParam = ChapterApiParam::query()->where('chapter_id', $chapterId)->get();
 		return $chapterApiParam;
@@ -415,8 +424,8 @@ class ChapterRecordLogic
 
 		$cacheIndex = $this->getChapterIdRecordIndex($chapterId);
 		$recordCache = icache()->get($cacheIndex);
-		if($recordCache){
-			return json_decode($recordCache,true);
+		if ($recordCache) {
+			return json_decode($recordCache, true);
 		}
 
 		$record = [
@@ -433,10 +442,10 @@ class ChapterRecordLogic
 
 		$chapterApi = ChapterApi::query()->where('chapter_id', $chapterId)->first();
 		if ($chapterApi) {
-			$chapterApiParamData=$this->chapterApiParamData($chapterId);
+			$chapterApiParamData = $this->chapterApiParamData($chapterId);
 			if ($chapterApiParamData) {
 				foreach ($chapterApiParamData as $key => $val) {
-					if($val->parent_id==0){
+					if ($val->parent_id == 0) {
 						$val->children = $this->getBodyChildren($chapterApiParamData, $val->id);
 						if ($val->location == $chapterApi->body_param_location) {
 							//如果当前列是request_body
@@ -466,22 +475,23 @@ class ChapterRecordLogic
 			$chapterApi->tab_location = $tab_location;
 			$record['api'] = $chapterApi;
 		}
-		icache()->set($cacheIndex, json_encode($record), 3600*24);
+		icache()->set($cacheIndex, json_encode($record), 3600 * 24);
 		return $record;
 	}
 
-	public function getChapterIdRecordIndex($chapterId){
-		return 'ChapterIdRecordIndex:'.$chapterId;
+	public function getChapterIdRecordIndex($chapterId)
+	{
+		return 'ChapterIdRecordIndex:' . $chapterId;
 	}
 
 	public function getBodyChildren($chapterApiParamData, $parentId)
 	{
-		$chapterApiParam=[];
+		$chapterApiParam = [];
 		if ($chapterApiParamData) {
 			foreach ($chapterApiParamData as $key => $val) {
-				if($val->parent_id==$parentId){
+				if ($val->parent_id == $parentId) {
 					$val->children = $this->getBodyChildren($chapterApiParamData, $val->id);
-					$chapterApiParam[]=$val;
+					$chapterApiParam[] = $val;
 				}
 			}
 			return $chapterApiParam;
