@@ -131,14 +131,35 @@ class ChapterRecordLogic
 		//初始化顺序
 		$data = $this->bodySort($data);
 		$text = '';
+		$hasRequest = 0;
+		$hasReponse = 0;
+		$requestTop = '### 请求';
+		$reponseTop = '### 响应';
 		foreach ($data as $k => $v) {
-			if (in_array($k, [ChapterApiParam::LOCATION_REQUEST_HEADER, ChapterApiParam::LOCATION_REPONSE_HEADER])) {
+			if (in_array($k, [ChapterApiParam::LOCATION_REPONSE_HEADER])) {
+				if (!$hasReponse) {
+					$text .= $reponseTop;
+					$hasReponse = 1;
+				}
 				$text .= $this->buildApiBody($k, $v, $sqlType);
-			} elseif (in_array($k, [ChapterApiParam::LOCATION_REQUEST_QUERY_PATH, ChapterApiParam::LOCATION_REQUEST_QUERY_STRING])) {
+			} elseif (in_array($k, [ChapterApiParam::LOCATION_REQUEST_HEADER, ChapterApiParam::LOCATION_REQUEST_QUERY_PATH, ChapterApiParam::LOCATION_REQUEST_QUERY_STRING])) {
+				//请求
+				if (!$hasRequest) {
+					$text .= $requestTop;
+					$hasRequest = 1;
+				}
 				$text .= $this->buildApiBody($k, $v, $sqlType);
 			} elseif ($k == $this->bodyParamLocation) {
+				if (!$hasRequest) {
+					$text .= $requestTop;
+					$hasRequest = 1;
+				}
 				$text .= $this->buildApiBody($k, $v, $sqlType);
 			} elseif ($k == $this->bodyReponseLocation) {
+				if (!$hasReponse) {
+					$text .= $reponseTop;
+					$hasReponse = 1;
+				}
 				$text .= $this->buildApiBody($k, $v, $sqlType);
 			}
 		}
@@ -325,7 +346,7 @@ class ChapterRecordLogic
 			if (!$name) {
 				$name = ' ';
 			}
-			$text = $this->strLengthAdaptation($childrenTop . $name, ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($typeText, ChapterApiParam::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation($enabledText, ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($defaultValue, ChapterApiParam::TABLE_VALUE_LENGTH) . "\n";
+			$text = $this->strLengthAdaptation($childrenTop . $name, ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($typeText, ChapterApiParam::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation($enabledText, ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($defaultValue, ChapterApiParam::TABLE_VALUE_LENGTH) . "\n\n";
 			//存储
 			if ($sqlType == 2) {
 				$ids = $this->ids;
