@@ -136,29 +136,17 @@ class ChapterRecordLogic
 		$requestTop = "### 请求\n";
 		$reponseTop = "### 响应\n";
 		foreach ($data as $k => $v) {
-			if (in_array($k, [ChapterApiParam::LOCATION_REPONSE_HEADER])) {
+			if (in_array($k, [$this->bodyReponseLocation, ChapterApiParam::LOCATION_REPONSE_HEADER])) {
 				if (!$hasReponse) {
 					$text .= $reponseTop;
 					$hasReponse = 1;
 				}
 				$text .= $this->buildApiBody($k, $v, $sqlType);
-			} elseif (in_array($k, [ChapterApiParam::LOCATION_REQUEST_HEADER, ChapterApiParam::LOCATION_REQUEST_QUERY_PATH, ChapterApiParam::LOCATION_REQUEST_QUERY_STRING])) {
+			} elseif (in_array($k, [$this->bodyParamLocation, ChapterApiParam::LOCATION_REQUEST_HEADER, ChapterApiParam::LOCATION_REQUEST_QUERY_PATH, ChapterApiParam::LOCATION_REQUEST_QUERY_STRING])) {
 				//请求
 				if (!$hasRequest) {
 					$text .= $requestTop;
 					$hasRequest = 1;
-				}
-				$text .= $this->buildApiBody($k, $v, $sqlType);
-			} elseif ($k == $this->bodyParamLocation) {
-				if (!$hasRequest) {
-					$text .= $requestTop;
-					$hasRequest = 1;
-				}
-				$text .= $this->buildApiBody($k, $v, $sqlType);
-			} elseif ($k == $this->bodyReponseLocation) {
-				if (!$hasReponse) {
-					$text .= $reponseTop;
-					$hasReponse = 1;
 				}
 				$text .= $this->buildApiBody($k, $v, $sqlType);
 			}
