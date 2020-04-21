@@ -58,7 +58,9 @@ class ChapterRecordLogic
 			foreach ($record as $key => $val) {
 				if (is_array($val)) {
 					if ($key == 'api') {
-						$markdown['api'] = $this->buildApi($val, $sqlType);
+						if($this->buildApi($val, $sqlType)){
+							$markdown['api'] = $this->buildApi($val, $sqlType);
+						}
 					} elseif ($key == 'body') {
 						$body = $val;
 						if (isset($record['api']['body_param_location']) && isset($body['request_body'])) {
