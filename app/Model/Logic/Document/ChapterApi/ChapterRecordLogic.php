@@ -429,12 +429,12 @@ class ChapterRecordLogic
 		}
 
 		$record = [
-			'api' => '',
+			'api' => [],
 			'body' => [
-				'1' => '',
-				'2' => '',
-				'request_body' => '',
-				'reponse_body' => '',
+				'1' => [],
+				'2' => [],
+				'request_body' => [],
+				'reponse_body' => [],
 			],
 			'extend' => ''
 		];
@@ -449,12 +449,12 @@ class ChapterRecordLogic
 						$val->children = $this->getBodyChildren($chapterApiParamData, $val->id);
 						if ($val->location == $chapterApi->body_param_location) {
 							//如果当前列是request_body
-							$record['body']['request_body'][] = $val;
+							$record['body']['request_body'][] = $val->toArray();
 						} elseif ($val->location == ChapterApiParam::LOCATION_REPONSE_BODY_RAW) {
 							//如果当前列是reponse_body
-							$record['body']['reponse_body'][] = $val;
+							$record['body']['reponse_body'][] = $val->toArray();
 						} else {
-							$record['body'][$val->location][] = $val;
+							$record['body'][$val->location][] = $val->toArray();
 						}
 					}
 				}
@@ -473,7 +473,7 @@ class ChapterRecordLogic
 				$tab_location = 3;
 			}
 			$chapterApi->tab_location = $tab_location;
-			$record['api'] = $chapterApi;
+			$record['api'] = $chapterApi->toArray();
 		}
 		icache()->set($cacheIndex, json_encode($record), 3600 * 24);
 		return $record;
