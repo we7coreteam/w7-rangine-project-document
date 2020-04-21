@@ -90,7 +90,7 @@ class ChapterRecordLogic
 			idb()->rollBack();
 			throw new ErrorHttpException($e->getMessage());
 		}
-		$markdownText = implode("\n", $markdown);
+		$markdownText = implode("\n\n", $markdown);
 		return $markdownText;
 	}
 
