@@ -476,10 +476,15 @@ class ChapterController extends BaseController
 			$author = $chapter->document->user;
 		}
 
+		$content='';
+		if (!$chapter->content->layout) {
+			$content=$chapter->content->content;
+		}
+
 		$result = [
 			'chapter_id' => $chapter->id,
 			'name' => $chapter->name,
-			'content' => $chapter->content->content,
+			'content' => $content,
 			'layout' => $chapter->content->layout,
 			'author' => [
 				'uid' => $author->id,
@@ -488,7 +493,6 @@ class ChapterController extends BaseController
 			'updated_at' => $chapter->updated_at->toDateTimeString()
 		];
 		if ($chapter->content->layout == 1) {
-			$result['content']='';
 			$obj = new ChapterRecordLogic($chapter->id);
 			$result['record'] = $obj->showRecord();
 		}

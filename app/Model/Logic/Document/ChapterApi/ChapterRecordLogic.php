@@ -412,6 +412,13 @@ class ChapterRecordLogic
 	public function showRecord()
 	{
 		$chapterId = $this->chapterId;
+
+		$cacheIndex = $this->getChapterIdRecordIndex($chapterId);
+		$recordCache = icache()->get($cacheIndex);
+		if($recordCache){
+			return json_decode($recordCache,true);
+		}
+
 		$record = [
 			'api' => [],
 			'body' => [
@@ -459,8 +466,12 @@ class ChapterRecordLogic
 			$chapterApi->tab_location = $tab_location;
 			$record['api'] = $chapterApi;
 		}
-
+		icache()->set($cacheIndex, json_encode($record), 3600*24);
 		return $record;
+	}
+
+	public function getChapterIdRecordIndex($chapterId){
+		return 'ChapterIdRecordIndex:'.$chapterId;
 	}
 
 	public function getBodyChildren($chapterApiParamData, $parentId)
