@@ -133,8 +133,8 @@ class ChapterRecordLogic
 		$text = '';
 		$hasRequest = 0;
 		$hasReponse = 0;
-		$requestTop = '### 请求';
-		$reponseTop = '### 响应';
+		$requestTop = "### 请求\n";
+		$reponseTop = "### 响应\n";
 		foreach ($data as $k => $v) {
 			if (in_array($k, [ChapterApiParam::LOCATION_REPONSE_HEADER])) {
 				if (!$hasReponse) {
