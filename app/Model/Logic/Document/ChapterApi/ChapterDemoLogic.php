@@ -36,7 +36,7 @@ class ChapterDemoLogic extends ChapterCommonLogic
 			$locationList = array_keys($this->requestIds());
 		}
 		$chapterList = ChapterApiParam::query()->where('chapter_id', $chapterId)->where('parent_id', 0)->whereIn('location', $locationList)->get();
-		$data = $this->getChapterDemoChildrenArray($chapterList, null);
+		$data = $this->getChapterDemoChildrenArray($chapterList, '');
 		if (in_array($type, [2, 3])) {
 			//需要转键值对
 			return [
@@ -70,7 +70,7 @@ class ChapterDemoLogic extends ChapterCommonLogic
 		}
 	}
 
-	public function getChapterDemoChildrenArray($listChildren, $defaultValue = null)
+	public function getChapterDemoChildrenArray($listChildren, $defaultValue = '')
 	{
 		if ($this->isJson($defaultValue)) {
 			//如果是json
@@ -98,11 +98,11 @@ class ChapterDemoLogic extends ChapterCommonLogic
 				if (count($listChildrenSun) > 0) {
 					if (is_numeric($val->rule) && ($val->rule > 1)) {
 						//如果是多维数组
-						$chapterDemoChildren = $this->getChapterDemoChildrenArray($listChildrenSun, null);
+						$chapterDemoChildren = $this->getChapterDemoChildrenArray($listChildrenSun, '');
 						$data[$val->name][] = $chapterDemoChildren['data'];
 						$descriptionData[$val->name][] = $chapterDemoChildren['descriptionData'];
 					} else {
-						$chapterDemoChildren = $this->getChapterDemoChildrenArray($listChildrenSun, null);
+						$chapterDemoChildren = $this->getChapterDemoChildrenArray($listChildrenSun, '');
 						$data[$val->name] = $chapterDemoChildren['data'];
 						$descriptionData[$val->name] = $chapterDemoChildren['descriptionData'];
 					}
@@ -128,6 +128,7 @@ class ChapterDemoLogic extends ChapterCommonLogic
 				}
 			}
 		}
+		dump('3' . json_encode($data));
 		return ['data' => $data, 'descriptionData' => $descriptionData];
 	}
 }
