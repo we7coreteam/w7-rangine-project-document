@@ -18,6 +18,7 @@ use W7\App\Model\Entity\Document\ChapterApiExtend;
 use W7\App\Model\Entity\Document\ChapterApiParam;
 use W7\App\Model\Logic\Document\ChapterApiLogic;
 use W7\App\Model\Logic\Document\ChapterApiParamLogic;
+use function GuzzleHttp\Psr7\build_query;
 
 /**
  * 数据存储与转markdown
@@ -45,6 +46,7 @@ class ChapterRecordLogic
 			'body' => '',
 			'extend' => '',
 		];
+		$api = '';
 		idb()->beginTransaction();
 		try {
 			$chapterId = $this->chapterId;
@@ -58,7 +60,7 @@ class ChapterRecordLogic
 			foreach ($record as $key => $val) {
 				if (is_array($val)) {
 					if ($key == 'api') {
-						$markdown['api'] = $this->buildApi($val, $sqlType);
+						$api = $this->buildApi($val, $sqlType);
 					} elseif ($key == 'body') {
 						$body = $val;
 						if (isset($record['api']['body_param_location']) && isset($body['request_body'])) {
@@ -85,6 +87,10 @@ class ChapterRecordLogic
 			if ($ids) {
 				ChapterApiParam::query()->where('chapter_id', $chapterId)->whereNotIn('id', $ids)->delete();
 			}
+			if ($api) {
+				$markdown['api'] = $this->buildApiText($api, $chapterId);
+			}
+			//替换API的URL
 			idb()->commit();
 		} catch (\Throwable $e) {
 			idb()->rollBack();
@@ -242,25 +248,43 @@ class ChapterRecordLogic
 			}
 		}
 
-		$text = '> ' . $methodLabel[$method] . ' /' . $url . "\n\n";
-		if ($description) {
-			$text .= $description . "\n";
-		}
 		//存储
-		$saveData = [
-			'chapter_id' => $chapterId,
-			'url' => $url,
-			'method' => $method,
-			'description' => $description,
-			'body_param_location' => $bodyParamLocation
-		];
 		if ($sqlType == 2) {
+			$saveData = [
+				'chapter_id' => $chapterId,
+				'url' => $url,
+				'method' => $method,
+				'description' => $description,
+				'body_param_location' => $bodyParamLocation
+			];
+
 			$chapterApi = ChapterApi::query()->where('chapter_id', $chapterId)->first();
 			if ($chapterApi) {
 				$chapterApi->update($saveData);
 			} else {
 				ChapterApi::query()->create($saveData);
 			}
+		}
+		return [
+			'methodLabel' => $methodLabel[$method],
+			'url' => $url,
+			'description' => $description
+		];
+	}
+
+	public function buildApiText($data, $chapterId)
+	{
+		$url = $data['url'];
+		//获取QUERY参数样例
+		$chapterDemoLogic = new ChapterDemoLogic($chapterId);
+		$query = $chapterDemoLogic->getChapterDemo(0, 1, ChapterApiParam::LOCATION_REQUEST_QUERY_STRING);
+		if ($query) {
+			$urlStr = build_query($query);
+			$url = $url . '?' . $urlStr;
+		}
+		$text = '> ' . $data['methodLabel'] . ' /' . $url . "\n\n";
+		if ($data['description']) {
+			$text .= $data['description'] . "\n";
 		}
 		return $text;
 	}
