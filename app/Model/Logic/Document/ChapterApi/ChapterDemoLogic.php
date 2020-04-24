@@ -128,7 +128,6 @@ class ChapterDemoLogic extends ChapterCommonLogic
 				}
 			}
 		}
-		dump('3' . json_encode($data));
 		return ['data' => $data, 'descriptionData' => $descriptionData];
 	}
 }
