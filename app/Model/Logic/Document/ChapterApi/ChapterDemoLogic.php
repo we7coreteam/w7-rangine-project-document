@@ -44,6 +44,7 @@ class ChapterDemoLogic extends ChapterCommonLogic
 				'descriptionData' => $this->getArrayToKeyValue($data['descriptionData'], $type),
 			];
 		}
+		//data数组结构，descriptionData数据结构对应描述
 		return $data;
 	}
 
