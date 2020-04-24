@@ -228,7 +228,6 @@ class DocumentController extends BaseController
 			'cover' => $document->cover,
 			'description' => $document->description,
 			'is_public' => $document->is_public,
-			'login_preview' => $document->is_public == Document::LOGIN_PREVIEW_DOCUMENT,
 			'acl' => [
 				'has_manage' => $user->isManager,
 				'has_edit' => $user->isOperator,
