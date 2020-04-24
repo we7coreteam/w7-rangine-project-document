@@ -414,10 +414,6 @@ class DocumentController extends BaseController
 			$document->is_public = intval($request->input('is_public'));
 		}
 
-		if (!empty($request->input('login_preview'))) {
-			$document->is_public = $request->input('login_preview') == 2 ? Document::LOGIN_PREVIEW_DOCUMENT : Document::PRIVATE_DOCUMENT;
-		}
-
 		$cover = $request->input('cover');
 		if (isset($cover)) {
 			$document->cover = $cover;
