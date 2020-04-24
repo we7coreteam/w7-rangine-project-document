@@ -82,6 +82,7 @@ class ChapterDemoLogic extends ChapterCommonLogic
 		$descriptionData = [];
 		$i = 0;
 		foreach ($listChildren as $key => $val) {
+			$defaultValue = '';
 			if ($val->default_value) {
 				$defaultValue = $val->default_value;
 			} else {
