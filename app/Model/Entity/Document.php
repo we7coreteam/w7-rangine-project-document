@@ -16,9 +16,9 @@ use Illuminate\Support\Str;
 
 class Document extends BaseModel
 {
-	const PRIVATE_DOCUMENT = 2;
-	const PUBLIC_DOCUMENT = 1;
-	const LOGIN_PREVIEW_DOCUMENT = 3;
+	const PRIVATE_DOCUMENT = 2;//公开项目-仅有权限查看|私有-仅有权限查看
+	const PUBLIC_DOCUMENT = 1;//默认-打开即可查看
+	const LOGIN_PREVIEW_DOCUMENT = 3;//公开项目-点击链接登录后查看|私有-点击链接登录后查看
 
 	protected $table = 'document';
 
