@@ -44,7 +44,7 @@ class ChapterController extends BaseController
 
 			$user = $request->getAttribute('user');
 			if (empty($user->isReader)) {
-				throw new ErrorHttpException('无权限阅读该文档', 445);
+				throw new ErrorHttpException('当前账户无权限阅读该文档', 445);
 			}
 			if ($user && !empty($user->id)) {
 				UserOperateLog::query()->create([
@@ -83,7 +83,7 @@ class ChapterController extends BaseController
 
 			$user = $request->getAttribute('user');
 			if (empty($user->isReader)) {
-				throw new ErrorHttpException('无权限阅读该文档', 445);
+				throw new ErrorHttpException('当前账户无权限阅读该文档', 445);
 			}
 			if (!empty($user->id)) {
 				UserOperateLog::query()->create([
