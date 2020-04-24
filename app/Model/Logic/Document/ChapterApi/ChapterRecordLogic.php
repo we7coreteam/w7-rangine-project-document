@@ -277,7 +277,7 @@ class ChapterRecordLogic
 		$url = $data['url'];
 		//获取QUERY参数样例
 		$chapterDemoLogic = new ChapterDemoLogic($chapterId);
-		$query = $chapterDemoLogic->getChapterDemo(0, 1, ChapterApiParam::LOCATION_REQUEST_QUERY_STRING);
+		$query = $chapterDemoLogic->getChapterDemo(0, 1, [ChapterApiParam::LOCATION_REQUEST_QUERY_STRING]);
 		if ($query) {
 			$urlStr = build_query($query);
 			$url = $url . '?' . $urlStr;
