@@ -494,6 +494,7 @@ class ChapterController extends BaseController
 		];
 		if ($chapter->content->layout == 1) {
 			$obj = new ChapterRecordLogic($chapter->id);
+			$result['content']="record";
 			$result['record'] = $obj->showRecord();
 		}
 
