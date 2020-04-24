@@ -227,7 +227,7 @@ class DocumentController extends BaseController
 			'name' => $document->name,
 			'cover' => $document->cover,
 			'description' => $document->description,
-			'is_public' => $document->isPublicDoc,
+			'is_public' => $document->is_public,
 			'login_preview' => $document->is_public == Document::LOGIN_PREVIEW_DOCUMENT,
 			'acl' => [
 				'has_manage' => $user->isManager,
@@ -413,6 +413,10 @@ class DocumentController extends BaseController
 		if (!empty($request->input('is_public'))) {
 			$document->is_public = intval($request->input('is_public'));
 		}
+
+//		if (!empty($request->input('login_preview'))) {
+//			$document->is_public = $request->input('login_preview') == 2 ? Document::LOGIN_PREVIEW_DOCUMENT : Document::PRIVATE_DOCUMENT;
+//		}
 
 		$cover = $request->input('cover');
 		if (isset($cover)) {
