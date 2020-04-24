@@ -278,8 +278,8 @@ class ChapterRecordLogic
 		//获取QUERY参数样例
 		$chapterDemoLogic = new ChapterDemoLogic($chapterId);
 		$query = $chapterDemoLogic->getChapterDemo(0, 1, [ChapterApiParam::LOCATION_REQUEST_QUERY_STRING]);
-		if ($query) {
-			$urlStr = build_query($query);
+		if (isset($query['data']) && $query['data']) {
+			$urlStr = build_query($query['data']);
 			$url = $url . '?' . $urlStr;
 		}
 		$text = '> ' . $data['methodLabel'] . ' /' . $url . "\n\n";
