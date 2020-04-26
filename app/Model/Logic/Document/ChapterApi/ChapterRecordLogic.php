@@ -67,7 +67,9 @@ class ChapterRecordLogic
 							//指定存储body_param_location类型
 							$body[$record['api']['body_param_location']] = $body['request_body'];
 						} else {
-							throw new ErrorHttpException('没有body_param_location或request_body');
+							if($sqlType==2){
+								throw new ErrorHttpException('没有body_param_location或request_body');
+							}
 						}
 						if (isset($body['reponse_body'])) {
 							//指定存储request_body类型
