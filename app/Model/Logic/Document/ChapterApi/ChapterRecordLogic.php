@@ -145,14 +145,14 @@ class ChapterRecordLogic
 		$reponseTop = "### 响应\n";
 		foreach ($data as $k => $v) {
 			if (in_array($k, [$this->bodyReponseLocation, ChapterApiParam::LOCATION_REPONSE_HEADER])) {
-				if (!$hasReponse) {
+				if (!$hasReponse&&$v) {
 					$text .= $reponseTop;
 					$hasReponse = 1;
 				}
 				$text .= $this->buildApiBody($k, $v, $sqlType);
 			} elseif (in_array($k, [$this->bodyParamLocation, ChapterApiParam::LOCATION_REQUEST_HEADER, ChapterApiParam::LOCATION_REQUEST_QUERY_PATH, ChapterApiParam::LOCATION_REQUEST_QUERY_STRING])) {
 				//请求
-				if (!$hasRequest) {
+				if (!$hasRequest&&$v) {
 					$text .= $requestTop;
 					$hasRequest = 1;
 				}
