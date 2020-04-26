@@ -14,9 +14,11 @@ namespace W7\App\Controller\Document;
 
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
+use W7\App\Model\Entity\Document\ChapterContent;
 use W7\App\Model\Entity\Star;
 use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\ChapterLogic;
+use W7\App\Model\Logic\Document\ChapterApi\ChapterRecordLogic;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\App\Model\Logic\UserLogic;
 use W7\App\Model\Logic\UserOperateLogic;
@@ -127,6 +129,21 @@ class ChapterController extends BaseController
 		if (!empty($user->id)) {
 			$star = Star::query()->where('user_id', '=', $user->id)->where('chapter_id', '=', $chapter->id)->first();
 		}
+		if(!$chapter->content->content){
+			if($chapter->content->layout==ChapterContent::LAYOUT_HTTP){
+				$markdownText="#";
+				//如果是导入的，没有生成文档的数据，进行生成文档并标记
+				$chapterRecordLogic=new ChapterRecordLogic($chapter->id);
+				$record=$chapterRecordLogic->showRecord();
+				if($record){
+					$chapterRecordLogic=new ChapterRecordLogic($chapter->id);
+					$markdownText=$chapterRecordLogic->recordToMarkdown($record,1);
+				}
+				$chapter->content->content=$markdownText;
+				$chapter->content->save();
+			}
+		}
+
 		$result = [
 			'id' => $chapter->id,
 			'parent_id' => $chapter->parent_id,
