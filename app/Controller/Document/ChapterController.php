@@ -129,17 +129,20 @@ class ChapterController extends BaseController
 		if (!empty($user->id)) {
 			$star = Star::query()->where('user_id', '=', $user->id)->where('chapter_id', '=', $chapter->id)->first();
 		}
-		if(!$chapter->content->content){
-			if($chapter->content->layout==ChapterContent::LAYOUT_HTTP){
-				$markdownText="#";
+		if (!$chapter->content->content) {
+			if ($chapter->content->layout == ChapterContent::LAYOUT_HTTP) {
+				$markdownText = '#';
 				//如果是导入的，没有生成文档的数据，进行生成文档并标记
-				$chapterRecordLogic=new ChapterRecordLogic($chapter->id);
-				$record=$chapterRecordLogic->showRecord();
-				if($record){
-					$chapterRecordLogic=new ChapterRecordLogic($chapter->id);
-					$markdownText=$chapterRecordLogic->recordToMarkdown($record,1);
+				$chapterRecordLogic = new ChapterRecordLogic($chapter->id);
+				$record = $chapterRecordLogic->showRecord();
+				if ($record) {
+					$chapterRecordLogic = new ChapterRecordLogic($chapter->id);
+					$markdownTextReplay = $chapterRecordLogic->recordToMarkdown($record, 1);
+					if ($markdownTextReplay) {
+						$markdownText = $markdownTextReplay;
+					}
 				}
-				$chapter->content->content=$markdownText;
+				$chapter->content->content = $markdownText;
 				$chapter->content->save();
 			}
 		}
