@@ -155,7 +155,7 @@ class AuthController extends BaseController
 				throw new ErrorHttpException($e->getMessage());
 			}
 		}
-		
+
 		return $this->data('');
 	}
 
@@ -248,7 +248,7 @@ class AuthController extends BaseController
 			return $this->data('success');
 		}
 	}
-	
+
 	public function thirdPartyLoginBind(Request $request)
 	{
 		$data = $this->validate($request, [
@@ -307,7 +307,8 @@ class AuthController extends BaseController
 				'client_secret' => $setting['setting']['secret_key']
 			]))->driver($sourceApp)->logout($this->response());
 		} else {
-			return $this->response()->redirect(ienv('API_HOST') . 'login');
+			return $this->data('success');
+//			return $this->response()->redirect(ienv('API_HOST') . 'login');
 		}
 	}
 
