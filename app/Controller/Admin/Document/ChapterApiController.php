@@ -20,6 +20,7 @@ class ChapterApiController extends BaseController
 {
 	/**
 	 * @api {get} /document/chapterapi/getApiLabel 获取参数类型列表
+	 *
 	 * @apiName getApiLabel
 	 * @apiGroup ChapterApi
 	 *
