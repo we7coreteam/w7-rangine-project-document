@@ -46,7 +46,7 @@ class UploadController extends BaseController
 
 		$fileName = sprintf('/%s/%s/%s.%s', $chapter->document_id, $chapterId, irandom(32), pathinfo($file->getClientFilename(), PATHINFO_EXTENSION));
 		try {
-			$url = CdnLogic::instance()->channel(SettingLogic::KEY_COS)->uploadFile($fileName, $file->getTmpFile());
+			$url = CdnLogic::instance()->channel(SettingLogic::KEY_COS)->uploadFile($fileName, $file->getRealPath());
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());
 		}

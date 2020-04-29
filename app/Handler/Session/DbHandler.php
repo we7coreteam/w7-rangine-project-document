@@ -32,7 +32,8 @@ class DbHandler extends HandlerAbstract
 
 	public function destroy($session_id)
 	{
-		return SessionLogic::instance()->deleteBySessionId($session_id);
+		SessionLogic::instance()->deleteBySessionId($session_id);
+		return true;
 	}
 
 	public function write($session_id, $session_data)
@@ -49,6 +50,12 @@ class DbHandler extends HandlerAbstract
 			$session->expired_at = time() + $this->getExpires();
 			$session->save();
 		}
+		return true;
+	}
+
+	public function gc($maxlifetime)
+	{
+		Session::query()->where('expired_at', '<', time() - $maxlifetime)->delete();
 		return true;
 	}
 }
