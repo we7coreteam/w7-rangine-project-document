@@ -9,7 +9,7 @@ use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\App\Model\Logic\ThirdPartyLoginLogic;
-use W7\Core\Exception\Handler\HandlerAbstract;
+use W7\Core\Exception\Handler\ExceptionHandler as ExceptionHandlerAbstract;
 use W7\Core\Exception\RouteNotAllowException;
 use W7\Core\Exception\RouteNotFoundException;
 use W7\Core\Exception\ValidatorException;
@@ -17,7 +17,7 @@ use W7\Core\Session\Session;
 use W7\Core\View\View;
 use W7\Http\Message\Server\Response;
 
-class ExceptionHandler extends HandlerAbstract
+class ExceptionHandler extends ExceptionHandlerAbstract
 {
 	public function handle(\Throwable $e) : Response
 	{
