@@ -77,14 +77,14 @@ class ChapterController extends BaseController
 	public function create(Request $request)
 	{
 		$this->validate($request, [
-			'name' => 'string|required|max:30',
+			'name' => 'string|required|max:60',
 			'document_id' => 'required|integer|min:1',
 			'parent_id' => 'required|integer|min:0',
 			'is_dir' => 'required|boolean',
 			'layout' => 'integer'
 		], [
 			'name.required' => '章节名称必填',
-			'name.max' => '章节名最大３０个字符',
+			'name.max' => '章节名最大60个字符',
 			'document_id.required' => '文档id必填',
 			'document_id.min' => '文档id最小为0',
 			'parent_id.required' => '父id必填',
@@ -151,12 +151,12 @@ class ChapterController extends BaseController
 	public function update(Request $request)
 	{
 		$this->validate($request, [
-			'name' => 'string|required|max:30',
+			'name' => 'string|required|max:60',
 			'chapter_id' => 'required|integer|min:1',
 			'document_id' => 'required|integer',
 		], [
 			'name.required' => '章节名称必填',
-			'name.max' => '章节名最大３０个字符',
+			'name.max' => '章节名最大60个字符',
 			'chapter_id.required' => '文档id必填',
 			'chapter_id.min' => '文档id最小为0',
 			'document_id.required' => '文档id必填',
