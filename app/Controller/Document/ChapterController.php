@@ -131,7 +131,7 @@ class ChapterController extends BaseController
 		}
 		if (!$chapter->content->content) {
 			if ($chapter->content->layout == ChapterContent::LAYOUT_HTTP) {
-				$markdownText = "#";
+				$markdownText = '#';
 				//如果是导入的，没有生成文档的数据，进行生成文档并标记
 				$chapterRecordLogic = new ChapterRecordLogic($chapter->id);
 				$record = $chapterRecordLogic->showRecord();
@@ -167,7 +167,8 @@ class ChapterController extends BaseController
 			'author' => [
 				'uid' => $author->id,
 				'username' => $author->username,
-			]
+			],
+			'document' => $document
 		];
 
 		return $this->data($result);
