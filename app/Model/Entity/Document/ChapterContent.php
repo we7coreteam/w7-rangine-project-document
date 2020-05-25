@@ -19,4 +19,8 @@ class ChapterContent extends BaseModel
 	public $timestamps = false;
 	protected $table = 'document_chapter_content';
 	protected $primaryKey = 'chapter_id';
+
+	// 数据来源类型
+	const LAYOUT_MARKDOWM = 0;//MARKDOWN
+	const LAYOUT_HTTP = 1;//HTTP请求
 }

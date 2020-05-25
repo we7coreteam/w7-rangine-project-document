@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * WeEngine Document System
+ *
+ * (c) We7Team 2019 <https://www.w7.cc>
+ *
+ * This is not a free software
+ * Using it under the license terms
+ * visited https://www.w7.cc for more details
+ */
+
 namespace W7\App\Handler\Exception;
 
 use function GuzzleHttp\Psr7\build_query;
@@ -9,17 +19,17 @@ use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\App\Model\Logic\ThirdPartyLoginLogic;
-use W7\Core\Exception\Handler\ExceptionHandler as ExceptionHandlerAbstract;
 use W7\Core\Exception\RouteNotAllowException;
 use W7\Core\Exception\RouteNotFoundException;
 use W7\Core\Exception\ValidatorException;
 use W7\Core\Session\Session;
 use W7\Core\View\View;
 use W7\Http\Message\Server\Response;
+use W7\Core\Exception\Handler\ExceptionHandler as ExceptionHandlerAbstract;
 
 class ExceptionHandler extends ExceptionHandlerAbstract
 {
-	public function handle(\Throwable $e) : Response
+	public function handle(\Throwable $e): Response
 	{
 		if ($e instanceof RouteNotFoundException || $e instanceof RouteNotAllowException) {
 			$request = icontext()->getRequest();
@@ -83,6 +93,4 @@ class ExceptionHandler extends ExceptionHandlerAbstract
 			}
 		}
 	}
-
-
 }

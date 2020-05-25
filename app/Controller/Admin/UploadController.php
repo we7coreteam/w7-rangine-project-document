@@ -14,7 +14,6 @@ namespace W7\App\Controller\Admin;
 
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
-use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Logic\SettingLogic;
 use W7\App\Model\Service\CdnLogic;
 use W7\Http\Message\Server\Request;

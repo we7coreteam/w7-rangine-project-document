@@ -58,3 +58,16 @@ function authcode($string, $operation = 'DECODE', $key = '', $expiry = 0)
 		return $keyc . str_replace('=', '', base64_encode($result));
 	}
 }
+
+function generate_label($name, $value, $isFormat = true)
+{
+	if ($isFormat) {
+		$option = [];
+		foreach ($value as $key => $val) {
+			$option[] = ['label' => $val, 'value' => $key];
+		}
+	} else {
+		$option = $value;
+	}
+	return ['label' => $name, 'option' => $option];
+}

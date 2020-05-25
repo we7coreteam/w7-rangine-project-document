@@ -26,7 +26,7 @@ class ErrorHttpException extends ResponseExceptionAbstract
 			'code' => $code,
 			'data' => $data,
 			'message' => $message,
-		]);
+		], JSON_UNESCAPED_UNICODE);
 		parent::__construct($message, 200, $previous);
 	}
 }

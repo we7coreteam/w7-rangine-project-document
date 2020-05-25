@@ -16,6 +16,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document;
+use W7\App\Model\Entity\Document\Chapter;
 use W7\App\Model\Entity\DocumentPermission;
 use W7\App\Model\Entity\Star;
 use W7\App\Model\Entity\User;
@@ -200,7 +201,7 @@ class DocumentController extends BaseController
 				'id' => $row->id,
 				'name' => $row->name,
 				'description' => $row->descriptionShort,
-				'is_public' => $row->isPublicDoc ,
+				'is_public' => $row->isPublicDoc,
 				'cur_role' => $documentPermission ? $documentPermission->permission : 0,
 				'role_list' => $roleList
 			];
@@ -226,8 +227,7 @@ class DocumentController extends BaseController
 			'name' => $document->name,
 			'cover' => $document->cover,
 			'description' => $document->description,
-			'is_public' => $document->isPublicDoc,
-			'login_preview' => $document->is_public == Document::LOGIN_PREVIEW_DOCUMENT,
+			'is_public' => $document->is_public,
 			'acl' => [
 				'has_manage' => $user->isManager,
 				'has_edit' => $user->isOperator,
@@ -377,6 +377,14 @@ class DocumentController extends BaseController
 		]);
 
 		DocumentLogic::instance()->createCreatorPermission($document);
+		//创建默认目录
+		Chapter::query()->create([
+			'name' => '默认目录',
+			'sort' => 1,
+			'is_dir' => 1,
+			'document_id' => $document->id,
+			'parent_id' => 0
+		]);
 
 		UserOperateLog::query()->create([
 			'user_id' => $user->id,
@@ -405,9 +413,9 @@ class DocumentController extends BaseController
 			$document->is_public = intval($request->input('is_public'));
 		}
 
-		if (!empty($request->input('login_preview'))) {
-			$document->is_public = $request->input('login_preview') == 2 ? Document::LOGIN_PREVIEW_DOCUMENT : Document::PRIVATE_DOCUMENT;
-		}
+//		if (!empty($request->input('login_preview'))) {
+//			$document->is_public = $request->input('login_preview') == 2 ? Document::LOGIN_PREVIEW_DOCUMENT : Document::PRIVATE_DOCUMENT;
+//		}
 
 		$cover = $request->input('cover');
 		if (isset($cover)) {
