@@ -486,11 +486,10 @@ class ChapterRecordLogic
 		$chapterId = $this->chapterId;
 
 		$cacheIndex = $this->getChapterIdRecordIndex($chapterId);
-		//@todo 恢复缓存
-//		$recordCache = icache()->get($cacheIndex);
-//		if ($recordCache) {
-//			return json_decode($recordCache, true);
-//		}
+		$recordCache = icache()->get($cacheIndex);
+		if ($recordCache) {
+			return json_decode($recordCache, true);
+		}
 
 		$record = [
 			'api' => '',
