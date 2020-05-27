@@ -110,6 +110,7 @@ class ChapterRecordLogic
 	public function buildReponse($reponse, $sqlType)
 	{
 		$text = '';
+		$reponseIds = [];
 		if ($reponse) {
 			foreach ($reponse as $key => $val) {
 				if ($val['id']) {
@@ -122,8 +123,12 @@ class ChapterRecordLogic
 						'description' => $val['description']
 					]);
 				}
+				$reponseIds[count($reponseIds)] = $chapterApiReponse->id;
 				$text .= '### 响应:' . $val['description'] . "\n";
 				$text .= $this->buildApiBody(ChapterApiParam::LOCATION_REPONSE_BODY_RAW, $val['data'], $sqlType, $chapterApiReponse);
+			}
+			if ($reponseIds) {
+				ChapterApiReponse::query()->where('chapter_id', $chapterApiReponse->chapter_id)->whereNotIn('id', $reponseIds)->delete();
 			}
 		}
 		return $text;
