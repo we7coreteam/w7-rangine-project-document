@@ -16,6 +16,7 @@ use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document\ChapterApi;
 use W7\App\Model\Entity\Document\ChapterApiExtend;
 use W7\App\Model\Entity\Document\ChapterApiParam;
+use W7\App\Model\Entity\Document\ChapterApiReponse;
 use W7\App\Model\Logic\Document\ChapterApiLogic;
 use W7\App\Model\Logic\Document\ChapterApiParamLogic;
 use function GuzzleHttp\Psr7\build_query;
@@ -44,6 +45,7 @@ class ChapterRecordLogic
 		$markdown = [
 			'api' => '',
 			'body' => '',
+			'reponse' => '',
 			'extend' => '',
 		];
 		$api = '';
@@ -72,10 +74,13 @@ class ChapterRecordLogic
 							}
 						}
 						if (isset($body['reponse_body'])) {
-							//指定存储request_body类型
+							//指定存储request_body类型-兼容老版本，先不删除
 							$body[ChapterApiParam::LOCATION_REPONSE_BODY_RAW] = $body['reponse_body'];
 						}
 						$markdown['body'] = $this->buildBody($body, $sqlType);
+					} elseif ($key == 'reponse') {
+						$reponse = $val;
+						$markdown['reponse'] = $this->buildReponse($reponse, $sqlType);
 					}
 				} else {
 					if ($key == 'extend') {
@@ -100,6 +105,62 @@ class ChapterRecordLogic
 		}
 		$markdownText = implode("\n\n", $markdown);
 		return $markdownText;
+	}
+
+	public function buildReponse($reponse, $sqlType)
+	{
+		$text = '';
+		$reponseIds = [];
+		$chapterId = $this->chapterId;
+		if ($reponse) {
+			foreach ($reponse as $key => $val) {
+				if ($val['id']) {
+					//修改
+					$chapterApiReponse = ChapterApiReponse::query()->find($val['id']);
+				} else {
+					//新增
+					$chapterApiReponse = ChapterApiReponse::query()->create([
+						'chapter_id' => $chapterId,
+						'description' => $val['description']
+					]);
+				}
+				$reponseIds[count($reponseIds)] = $chapterApiReponse->id;
+				$text .= '### 响应:' . $val['description'] . "\n";
+				$text .= $this->buildApiBody(ChapterApiParam::LOCATION_REPONSE_BODY_RAW, $val['data'], $sqlType, $chapterApiReponse);
+			}
+			if ($reponseIds) {
+				ChapterApiReponse::query()->where('chapter_id', $chapterApiReponse->chapter_id)->whereNotIn('id', $reponseIds)->delete();
+			}
+		}
+		return $text;
+	}
+
+	public function buildBody($data, $sqlType, $chapterApiReponse = '')
+	{
+		//初始化顺序
+		$data = $this->bodySort($data);
+		$text = '';
+		$hasRequest = 0;
+		$hasReponse = 0;
+		$requestTop = "### 请求\n";
+		$reponseTop = "### 响应\n";
+		foreach ($data as $k => $v) {
+			if (in_array($k, [$this->bodyReponseLocation, ChapterApiParam::LOCATION_REPONSE_HEADER])) {
+				if (!$hasReponse && $v) {
+					$text .= $reponseTop;
+					$hasReponse = 1;
+				}
+				$text .= $this->buildApiBody($k, $v, $sqlType, $chapterApiReponse);
+			} elseif (in_array($k, [$this->bodyParamLocation, ChapterApiParam::LOCATION_REQUEST_HEADER, ChapterApiParam::LOCATION_REQUEST_QUERY_PATH, ChapterApiParam::LOCATION_REQUEST_QUERY_STRING])) {
+				//请求
+				if (!$hasRequest && $v) {
+					$text .= $requestTop;
+					$hasRequest = 1;
+				}
+				$text .= $this->buildApiBody($k, $v, $sqlType);
+			}
+		}
+		return $text;
 	}
 
 	public function buildExtend($data, $sqlType)
@@ -132,34 +193,6 @@ class ChapterRecordLogic
 			}
 		}
 		return $newData;
-	}
-
-	public function buildBody($data, $sqlType)
-	{
-		//初始化顺序
-		$data = $this->bodySort($data);
-		$text = '';
-		$hasRequest = 0;
-		$hasReponse = 0;
-		$requestTop = "### 请求\n";
-		$reponseTop = "### 响应\n";
-		foreach ($data as $k => $v) {
-			if (in_array($k, [$this->bodyReponseLocation, ChapterApiParam::LOCATION_REPONSE_HEADER])) {
-				if (!$hasReponse && $v) {
-					$text .= $reponseTop;
-					$hasReponse = 1;
-				}
-				$text .= $this->buildApiBody($k, $v, $sqlType);
-			} elseif (in_array($k, [$this->bodyParamLocation, ChapterApiParam::LOCATION_REQUEST_HEADER, ChapterApiParam::LOCATION_REQUEST_QUERY_PATH, ChapterApiParam::LOCATION_REQUEST_QUERY_STRING])) {
-				//请求
-				if (!$hasRequest && $v) {
-					$text .= $requestTop;
-					$hasRequest = 1;
-				}
-				$text .= $this->buildApiBody($k, $v, $sqlType);
-			}
-		}
-		return $text;
 	}
 
 	public function strLengthAdaptation($str, $defaultLength = 20)
@@ -291,7 +324,7 @@ class ChapterRecordLogic
 		return $text;
 	}
 
-	public function buildApiBody($location, $data, $sqlType)
+	public function buildApiBody($location, $data, $sqlType, $chapterApiReponse = '')
 	{
 		$text = '';
 		if ($data && is_array($data)) {
@@ -299,7 +332,7 @@ class ChapterRecordLogic
 			$textTop = '### ' . $title . "\n\n";
 			$textTop = $textTop . $this->bodyTableTop();
 			foreach ($data as $k => $val) {
-				$text .= $this->buildBodyChildren($location, $val, 0, 0, $sqlType);
+				$text .= $this->buildBodyChildren($location, $val, 0, 0, $sqlType, $chapterApiReponse);
 			}
 			if ($text) {
 				$text = $textTop . $text;
@@ -323,7 +356,7 @@ class ChapterRecordLogic
 		return str_repeat('&emsp;', $level);
 	}
 
-	public function buildBodyChildren($location, $data, $level = 0, $parentId = 0, $sqlType = 2)
+	public function buildBodyChildren($location, $data, $level = 0, $parentId = 0, $sqlType = 2, $chapterApiReponse = '')
 	{
 		$childrenTop = $this->getChildrenTop($level);
 		$name = '';
@@ -373,6 +406,9 @@ class ChapterRecordLogic
 					'enabled' => $enabled,
 					'default_value' => $defaultValue,
 				];
+				if ($chapterApiReponse) {
+					$saveData['reponse_id'] = $chapterApiReponse->id;
+				}
 
 				$id = $parentId;
 
@@ -399,7 +435,7 @@ class ChapterRecordLogic
 
 		if (isset($data['children']) && (!empty($data['children'])) && is_array($data['children'])) {
 			foreach ($data['children'] as $k => $val) {
-				$text .= $this->buildBodyChildren($location, $val, $level + 1, $id, $sqlType = 2);
+				$text .= $this->buildBodyChildren($location, $val, $level + 1, $id, $sqlType = 2, $chapterApiReponse);
 			}
 		}
 		return $text;
@@ -444,11 +480,11 @@ class ChapterRecordLogic
 		return [];
 	}
 
-	public function chapterApiParamData($chapterId)
+	public function chapterApiParamData($chapterId, $location, $reponseId = 0)
 	{
 		//全部数据
-		$chapterApiParam = ChapterApiParam::query()->where('chapter_id', $chapterId)->get();
-		return $chapterApiParam;
+		return ChapterApiParam::query()
+			->where('location', $location)->where('chapter_id', $chapterId)->where('reponse_id', $reponseId)->get();
 	}
 
 	public function showRecord()
@@ -456,42 +492,27 @@ class ChapterRecordLogic
 		$chapterId = $this->chapterId;
 
 		$cacheIndex = $this->getChapterIdRecordIndex($chapterId);
-		$recordCache = icache()->get($cacheIndex);
-		if ($recordCache) {
-			return json_decode($recordCache, true);
-		}
+//		$recordCache = icache()->get($cacheIndex);
+//		if ($recordCache) {
+//			return json_decode($recordCache, true);
+//		}
 
 		$record = [
 			'api' => '',
 			'body' => [
 				'1' => [],
 				'2' => [],
-				'request_body' => [],
-				'reponse_body' => [],
+				'request_body' => []
 			],
+			'reponse' => [],
 			'extend' => ''
 		];
 		$body = [];
 
 		$chapterApi = ChapterApi::query()->where('chapter_id', $chapterId)->first();
 		if ($chapterApi) {
-			$chapterApiParamData = $this->chapterApiParamData($chapterId);
-			if ($chapterApiParamData) {
-				foreach ($chapterApiParamData as $key => $val) {
-					if ($val->parent_id == 0) {
-						$val->children = $this->getBodyChildren($chapterApiParamData, $val->id);
-						if ($val->location == $chapterApi->body_param_location) {
-							//如果当前列是request_body
-							$record['body']['request_body'][] = $val->toArray();
-						} elseif ($val->location == ChapterApiParam::LOCATION_REPONSE_BODY_RAW) {
-							//如果当前列是reponse_body
-							$record['body']['reponse_body'][] = $val->toArray();
-						} else {
-							$record['body'][$val->location][] = $val->toArray();
-						}
-					}
-				}
-			}
+			$record['body'] = $this->getBody($chapterId, $chapterApi);
+			$record['reponse'] = $this->getReponse($chapterId);
 			$chapterApiExtend = ChapterApiExtend::query()->where('chapter_id', $chapterId)->first();
 			if ($chapterApiExtend) {
 				$record['extend'] = $chapterApiExtend->extend;
@@ -512,6 +533,59 @@ class ChapterRecordLogic
 		return $record;
 	}
 
+	public function getBodyInfo($chapterId, $location, $reponseId = 0)
+	{
+		$data = [];
+		$chapterApiParamData = $this->chapterApiParamData($chapterId, $location, $reponseId);
+
+		if ($chapterApiParamData) {
+			foreach ($chapterApiParamData as $key => $val) {
+				if ($val->parent_id == 0) {
+					$val->children = $this->getBodyChildren($chapterApiParamData, $val->id);
+					$data[] = $val->toArray();
+				}
+			}
+		}
+		return $data;
+	}
+
+	public function getReponse($chapterId)
+	{
+		$data = [];
+		$list = ChapterApiReponse::query()->where('chapter_id', $chapterId)->get()->toArray();
+		if (count($list)) {
+			//兼容之前的
+			foreach ($list as $key => $val) {
+				$data[] = [
+					'id' => $val['id'],
+					'chapter_id' => $chapterId,
+					'description' => '',
+					'data' => $this->getBodyInfo($chapterId, ChapterApiParam::LOCATION_REPONSE_BODY_RAW, $val['id'])
+				];
+			}
+			//删除旧的
+		} else {
+			//兼容之前的
+			$data[] = [
+				'id' => 0,
+				'chapter_id' => $chapterId,
+				'description' => '',
+				'data' => $this->getBodyInfo($chapterId, ChapterApiParam::LOCATION_REPONSE_BODY_RAW)
+			];
+		}
+		return $data;
+	}
+
+	public function getBody($chapterId, $chapterApi)
+	{
+		$body = [
+			'1' => $this->getBodyInfo($chapterId, 1),
+			'2' => $this->getBodyInfo($chapterId, 2),
+			'request_body' => $this->getBodyInfo($chapterId, $chapterApi->body_param_location)
+		];
+		return $body;
+	}
+
 	public function getChapterIdRecordIndex($chapterId)
 	{
 		return 'ChapterIdRecordIndex:' . $chapterId;
@@ -520,7 +594,7 @@ class ChapterRecordLogic
 	public function getBodyChildren($chapterApiParamData, $parentId)
 	{
 		$chapterApiParam = [];
-		if ($chapterApiParamData) {
+		if (count($chapterApiParamData)) {
 			foreach ($chapterApiParamData as $key => $val) {
 				if ($val->parent_id == $parentId) {
 					$val->children = $this->getBodyChildren($chapterApiParamData, $val->id);
