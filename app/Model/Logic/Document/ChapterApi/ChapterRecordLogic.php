@@ -124,14 +124,16 @@ class ChapterRecordLogic
 						'description' => $val['description']
 					]);
 				}
-				if($chapterApiReponse){
+				if ($chapterApiReponse) {
 					$reponseIds[count($reponseIds)] = $chapterApiReponse->id;
 					$text .= '### 响应:' . $val['description'] . "\n";
 					$text .= $this->buildApiBody(ChapterApiParam::LOCATION_REPONSE_BODY_RAW, $val['data'], $sqlType, $chapterApiReponse);
 				}
 			}
 			if ($reponseIds) {
-				ChapterApiReponse::query()->where('chapter_id', $chapterApiReponse->chapter_id)->whereNotIn('id', $reponseIds)->delete();
+				ChapterApiReponse::query()->where('chapter_id', $chapterId)->whereNotIn('id', $reponseIds)->delete();
+			} else {
+				ChapterApiReponse::query()->where('chapter_id', $chapterId)->delete();
 			}
 		}
 		return $text;
