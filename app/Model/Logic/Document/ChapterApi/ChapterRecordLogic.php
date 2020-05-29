@@ -569,7 +569,7 @@ class ChapterRecordLogic
 				$data[] = [
 					'id' => $val['id'],
 					'chapter_id' => $chapterId,
-					'description' => '',
+					'description' => $val['description'],
 					'data' => $this->getBodyInfo($chapterId, ChapterApiParam::LOCATION_REPONSE_BODY_RAW, $val['id'])
 				];
 			}
