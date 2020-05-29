@@ -398,8 +398,10 @@ class ChapterRecordLogic
 		$enabledText = $this->getEnabledText($enabled);
 		$typeText = $this->getTypeText($type);
 		if ($name || $description) {
-			if (in_array($type, [ChapterApiParam::TYPE_OBJECT, ChapterApiParam::TYPE_ARRAY])) {
+			if ($type === ChapterApiParam::TYPE_ARRAY) {
 				$name .= '[]';
+			} elseif ($type === ChapterApiParam::TYPE_OBJECT) {
+				$name .= '{}';
 			}
 			if (!$name) {
 				$name = ' ';
