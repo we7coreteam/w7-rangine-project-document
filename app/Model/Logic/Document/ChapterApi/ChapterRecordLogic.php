@@ -111,6 +111,7 @@ class ChapterRecordLogic
 	{
 		$text = '';
 		$reponseIds = [];
+		$chapterId = $this->chapterId;
 		if ($reponse) {
 			foreach ($reponse as $key => $val) {
 				if ($val['id']) {
@@ -119,7 +120,7 @@ class ChapterRecordLogic
 				} else {
 					//新增
 					$chapterApiReponse = ChapterApiReponse::query()->create([
-						'chapter_id' => 1518,
+						'chapter_id' => $chapterId,
 						'description' => $val['description']
 					]);
 				}
