@@ -119,6 +119,10 @@ class ChapterRecordLogic
 				if ($val['id']) {
 					//修改
 					$chapterApiReponse = ChapterApiReponse::query()->find($val['id']);
+					if ($chapterApiReponse) {
+						$chapterApiReponse->description = $val['description'];
+						$chapterApiReponse->save();
+					}
 				} else {
 					//新增
 					$chapterApiReponse = ChapterApiReponse::query()->create([
