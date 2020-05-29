@@ -93,6 +93,8 @@ class ChapterRecordLogic
 			$chapterId = $this->chapterId;
 			if ($ids) {
 				ChapterApiParam::query()->where('chapter_id', $chapterId)->whereNotIn('id', $ids)->delete();
+			} else {
+				ChapterApiParam::query()->where('chapter_id', $chapterId)->delete();
 			}
 			if ($api) {
 				$markdown['api'] = $this->buildApiText($api, $chapterId);
