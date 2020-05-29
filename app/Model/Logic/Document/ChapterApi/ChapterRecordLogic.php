@@ -398,9 +398,13 @@ class ChapterRecordLogic
 		$enabledText = $this->getEnabledText($enabled);
 		$typeText = $this->getTypeText($type);
 		if ($name || $description) {
+			if (in_array($type, [ChapterApiParam::TYPE_OBJECT, ChapterApiParam::TYPE_ARRAY])) {
+				$name .= '[]';
+			}
 			if (!$name) {
 				$name = ' ';
 			}
+
 			$text = $this->strLengthAdaptation($childrenTop . $name, ChapterApiParam::TABLE_NAME_LENGTH) . '|' . $this->strLengthAdaptation($typeText, ChapterApiParam::TABLE_TYPE_LENGTH) . '|' . $this->strLengthAdaptation($enabledText, ChapterApiParam::TABLE_ENABLED_LENGTH) . '|' . $this->strLengthAdaptation($description, ChapterApiParam::TABLE_DESCRIPTION_LENGTH) . '|' . $this->strLengthAdaptation($defaultValue, ChapterApiParam::TABLE_VALUE_LENGTH) . "\n";
 			//存储
 			if ($sqlType == 2) {
