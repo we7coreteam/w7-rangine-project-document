@@ -132,7 +132,7 @@ class ChapterRecordLogic
 				}
 				if ($chapterApiReponse) {
 					$reponseIds[count($reponseIds)] = $chapterApiReponse->id;
-					$text .= '### 响应:' . $val['description'] . "\n";
+					$text .= '### 响应：' . $val['description'] . "\n";
 					$text .= $this->buildApiBody(ChapterApiParam::LOCATION_REPONSE_BODY_RAW, $val['data'], $sqlType, $chapterApiReponse);
 				}
 			}
