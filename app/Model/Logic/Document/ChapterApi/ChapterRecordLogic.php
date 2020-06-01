@@ -279,6 +279,7 @@ class ChapterRecordLogic
 				ChapterApiParam::LOCATION_REQUEST_BODY_FROM => 'Request.Body.form-data',
 				ChapterApiParam::LOCATION_REQUEST_BODY_URLENCODED => 'Request.Body.urlencoded',
 				ChapterApiParam::LOCATION_REQUEST_BODY_RAW => 'Request.Body.raw',
+				ChapterApiParam::LOCATION_REQUEST_BODY_BINARY => 'Request.Body.binary',
 			];
 			if (in_array($data['body_param_location'], array_keys($bodyParamLocationList))) {
 				$bodyParamLocation = $data['body_param_location'];
