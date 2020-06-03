@@ -607,7 +607,7 @@ class ChapterRecordLogic
 
 	public function getChapterIdRecordIndex($chapterId)
 	{
-		return 'ChapterIdRecordIndex:' . $chapterId;
+		return 'ChapterIdRecordIndexV1:' . $chapterId;
 	}
 
 	public function getBodyChildren($chapterApiParamData, $parentId)
