@@ -353,15 +353,15 @@ class ChapterRecordLogic
 		if ($data && is_array($data)) {
 			$title = $this->getLocatinonText($location);
 			$textTop = '### ' . $title . "\n\n";
-			$textTop = $textTop . $this->bodyTableTop($chapterApiReponse);
+			$textTableTop = $this->bodyTableTop($chapterApiReponse);
 			foreach ($data as $k => $val) {
 				$text .= $this->buildBodyChildren($location, $val, 0, 0, $sqlType, $chapterApiReponse);
 			}
 			if ($text) {
 				if ($chapterApiReponse) {
-					$text = $text . "\n\n";
+					$text = $textTableTop . $text . "\n\n";
 				} else {
-					$text = $textTop . $text . "\n\n";
+					$text = $textTop . $textTableTop . $text . "\n\n";
 				}
 			}
 		}
