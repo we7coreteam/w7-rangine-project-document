@@ -48,8 +48,8 @@ class ChapterApiParamLogic extends BaseLogic
 	public function getEnabledLabel()
 	{
 		return [
-			ChapterApiParam::ENABLED_NO => 'False',
-			ChapterApiParam::ENABLED_YES => 'Ture',
+			ChapterApiParam::ENABLED_NO => 'false',
+			ChapterApiParam::ENABLED_YES => 'true',
 		];
 	}
 

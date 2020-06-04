@@ -65,13 +65,13 @@ return [
 		'database' => [
 			'default' => [
 				'enable' => ienv('POOL_DATABASE_DEFAULT_ENABLE', true),
-				'max' => ienv('POOL_DATABASE_DEFAULT_MAX', '1000'),
+				'max' => ienv('POOL_DATABASE_DEFAULT_MAX', 100),
 			],
 		],
 		'cache' => [
 			'default' => [
 				'enable' => ienv('POOL_CACHE_DEFAULT_ENABLE', false),
-				'max' => ienv('POOL_CACHE_DEFAULT_MAX', '1000'),
+				'max' => ienv('POOL_CACHE_DEFAULT_MAX', 100),
 			],
 		]
 	],
