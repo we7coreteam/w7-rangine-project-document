@@ -358,7 +358,11 @@ class ChapterRecordLogic
 				$text .= $this->buildBodyChildren($location, $val, 0, 0, $sqlType, $chapterApiReponse);
 			}
 			if ($text) {
-				$text = $textTop . $text . "\n\n";
+				if ($chapterApiReponse) {
+					$text = $text . "\n\n";
+				} else {
+					$text = $textTop . $text . "\n\n";
+				}
 			}
 		}
 		return $text;
