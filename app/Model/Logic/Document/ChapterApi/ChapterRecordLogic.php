@@ -147,6 +147,10 @@ class ChapterRecordLogic
 
 	public function buildBody($data, $sqlType, $chapterApiReponse = '')
 	{
+		if(!$data){
+			//没有数据
+			return '';
+		}
 		//初始化顺序
 		$data = $this->bodySort($data);
 		$text = '';
