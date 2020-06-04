@@ -39,7 +39,7 @@ CREATE TABLE `ims_cache` (
 DROP TABLE IF EXISTS `ims_document`;
 CREATE TABLE `ims_document` (
   `id` int(11) NOT NULL,
-  `name` varchar(30) NOT NULL DEFAULT '',
+  `name` varchar(60) NOT NULL DEFAULT '',
   `description` varchar(255) DEFAULT '' COMMENT '描述',
   `creator_id` int(11) NOT NULL DEFAULT '0' COMMENT '创建者id',
   `is_public` tinyint(1) NOT NULL DEFAULT '2' COMMENT '文档是否为公有文档 1:公有,2:私有',
@@ -57,7 +57,7 @@ DROP TABLE IF EXISTS `ims_document_chapter`;
 CREATE TABLE `ims_document_chapter` (
   `id` int(11) NOT NULL,
   `parent_id` int(11) NOT NULL DEFAULT '0',
-  `name` varchar(30) NOT NULL DEFAULT '' COMMENT '文档名称',
+  `name` varchar(60) NOT NULL DEFAULT '' COMMENT '文档名称',
   `document_id` int(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '壳id',
   `sort` int(11) NOT NULL DEFAULT '0' COMMENT '排序，越大越靠前',
   `is_dir` tinyint(1) DEFAULT '0' COMMENT '当前章节是否是目录(1：是，0：否)',
