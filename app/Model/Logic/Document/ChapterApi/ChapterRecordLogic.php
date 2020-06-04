@@ -132,8 +132,11 @@ class ChapterRecordLogic
 				}
 				if ($chapterApiReponse && $val['data']) {
 					$reponseIds[count($reponseIds)] = $chapterApiReponse->id;
-					$text .= '### 响应：' . $val['description'] . "\n";
-					$text .= $this->buildApiBody(ChapterApiParam::LOCATION_REPONSE_BODY_RAW, $val['data'], $sqlType, $chapterApiReponse);
+					$reponseTop = '### 响应：' . $val['description'] . "\n";
+					$reponseText = $this->buildApiBody(ChapterApiParam::LOCATION_REPONSE_BODY_RAW, $val['data'], $sqlType, $chapterApiReponse);
+					if ($reponseText) {
+						$text .= $reponseTop . $reponseText;
+					}
 				}
 			}
 			if ($reponseIds) {
@@ -147,7 +150,7 @@ class ChapterRecordLogic
 
 	public function buildBody($data, $sqlType, $chapterApiReponse = '')
 	{
-		if(!$data){
+		if (!$data) {
 			//没有数据
 			return '';
 		}
@@ -355,9 +358,8 @@ class ChapterRecordLogic
 				$text .= $this->buildBodyChildren($location, $val, 0, 0, $sqlType, $chapterApiReponse);
 			}
 			if ($text) {
-				$text = $textTop . $text;
+				$text = $textTop . $text . "\n\n";
 			}
-			$text .= "\n\n";
 		}
 		return $text;
 	}
