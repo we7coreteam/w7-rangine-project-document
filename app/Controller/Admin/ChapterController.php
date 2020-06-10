@@ -16,6 +16,7 @@ use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document\Chapter;
 use W7\App\Model\Entity\Document\ChapterContent;
+use W7\App\Model\Entity\Setting;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\ChapterLogic;
@@ -92,7 +93,7 @@ class ChapterController extends BaseController
 
 		$user = $request->getAttribute('user');
 		if (!$user->isOperator) {
-			throw new ErrorHttpException('您没有权限管理该文档',[],446);
+			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
 		}
 
 		$parentId = intval($request->post('parent_id'));
@@ -164,7 +165,7 @@ class ChapterController extends BaseController
 
 		$user = $request->getAttribute('user');
 		if (!$user->isOperator) {
-			throw new ErrorHttpException('您没有权限管理该文档');
+			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
 		}
 
 		$chapter = ChapterLogic::instance()->getById($request->post('chapter_id'));
@@ -207,7 +208,7 @@ class ChapterController extends BaseController
 
 		$user = $request->getAttribute('user');
 		if (!$user->isOperator) {
-			throw new ErrorHttpException('您没有权限管理该文档');
+			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
 		}
 
 		$chapter = ChapterLogic::instance()->getById($request->post('chapter_id'));
@@ -222,7 +223,7 @@ class ChapterController extends BaseController
 			$targetDocumentId = $request->post('target')['document_id'];
 			$documentPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($targetDocumentId, $user->id);
 			if (!$user->isFounder && !$documentPermission->isManager && !$documentPermission->isOperator) {
-				throw new ErrorHttpException('您没有权限管理该文档');
+				throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
 			}
 
 			$chapter->document_id = $targetDocumentId;
@@ -285,7 +286,7 @@ class ChapterController extends BaseController
 
 		$user = $request->getAttribute('user');
 		if (!$user->isOperator) {
-			throw new ErrorHttpException('您没有权限管理该文档');
+			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
 		}
 
 		if (!is_array($request->post('chapter_id'))) {
@@ -366,7 +367,7 @@ class ChapterController extends BaseController
 
 		$user = $request->getAttribute('user');
 		if (!$user->isOperator) {
-			throw new ErrorHttpException('您没有权限管理该文档');
+			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
 		}
 
 		$chapter = ChapterLogic::instance()->getById(intval($request->post('chapter_id')));
@@ -461,7 +462,7 @@ class ChapterController extends BaseController
 		]);
 		$user = $request->getAttribute('user');
 		if (!$user->isOperator) {
-			throw new ErrorHttpException('您没有权限管理该文档');
+			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
 		}
 
 		$chapter = ChapterLogic::instance()->getById(intval($request->post('chapter_id')));
@@ -515,7 +516,7 @@ class ChapterController extends BaseController
 
 		$user = $request->getAttribute('user');
 		if (!$user->isOperator) {
-			throw new ErrorHttpException('您没有权限管理该文档');
+			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
 		}
 
 		$chapterId = intval($request->post('chapter_id'));
@@ -591,7 +592,7 @@ class ChapterController extends BaseController
 
 		$user = $request->getAttribute('user');
 		if (!$user->isOperator) {
-			throw new ErrorHttpException('您没有权限管理该文档');
+			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
 		}
 		$parentChapter = null;
 		if ($params['parent_id']) {
