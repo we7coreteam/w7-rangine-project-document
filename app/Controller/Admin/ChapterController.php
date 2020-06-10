@@ -92,7 +92,7 @@ class ChapterController extends BaseController
 
 		$user = $request->getAttribute('user');
 		if (!$user->isOperator) {
-			throw new ErrorHttpException('您没有权限管理该文档');
+			throw new ErrorHttpException('您没有权限管理该文档',[],446);
 		}
 
 		$parentId = intval($request->post('parent_id'));

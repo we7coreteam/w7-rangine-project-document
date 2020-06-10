@@ -18,6 +18,9 @@ class Setting extends BaseModel
 	protected $table = 'setting';
 	protected $primaryKey = 'key';
 
+	const ERROR_NO_POWER=446;
+	const ERROR_NO_LOGIN=444;
+
 	public function getSettingAttribute() {
 		if (empty($this->value)) {
 			return [];
