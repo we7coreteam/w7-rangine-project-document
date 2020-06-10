@@ -15,6 +15,7 @@ namespace W7\App\Controller\Document;
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document\ChapterContent;
+use W7\App\Model\Entity\Setting;
 use W7\App\Model\Entity\Star;
 use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\ChapterLogic;
@@ -46,7 +47,7 @@ class ChapterController extends BaseController
 
 			$user = $request->getAttribute('user');
 			if (empty($user->isReader)) {
-				throw new ErrorHttpException('当前账户无权限阅读该文档', 445);
+				throw new ErrorHttpException('当前账户无权限阅读该文档', Setting::ERROR_NO_POWER);
 			}
 			if ($user && !empty($user->id)) {
 				UserOperateLog::query()->create([
@@ -85,7 +86,7 @@ class ChapterController extends BaseController
 
 			$user = $request->getAttribute('user');
 			if (empty($user->isReader)) {
-				throw new ErrorHttpException('当前账户无权限阅读该文档', 445);
+				throw new ErrorHttpException('当前账户无权限阅读该文档', [], Setting::ERROR_NO_POWER);
 			}
 			if (!empty($user->id)) {
 				UserOperateLog::query()->create([

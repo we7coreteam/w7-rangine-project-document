@@ -17,6 +17,7 @@ use Overtrue\Socialite\SocialiteManager;
 use Throwable;
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
+use W7\App\Model\Entity\Setting;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserThirdParty;
 use W7\App\Model\Logic\ThirdPartyLoginLogic;
@@ -35,7 +36,7 @@ class AuthController extends BaseController
 		$user = UserLogic::instance()->getByUid($userSession['uid']);
 		if (!$user) {
 			$request->session->destroy();
-			throw new ErrorHttpException('请先登录', [], 444);
+			throw new ErrorHttpException('请先登录', [], Setting::ERROR_NO_LOGIN);
 		}
 
 		$source = [
