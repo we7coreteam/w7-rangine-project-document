@@ -120,7 +120,7 @@ class AuthController extends BaseController
 					$redirect = $socialite->config(new Config([
 						'client_id' => $item['setting']['app_id'],
 						'client_secret' => $item['setting']['secret_key'],
-						'redirect_url' => ienv('API_HOST') . 'login?app_id=' . $key . '&redirect_url=' . $redirectUrl
+						'redirect_url' => ienv('API_HOST') . 'login?app_id=' . $key . '&redirect_url=' . urlencode($redirectUrl)
 					]))->driver($key)->stateless()->redirect()->getTargetUrl();
 				} catch (Throwable $e) {
 					null;
