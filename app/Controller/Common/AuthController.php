@@ -123,14 +123,14 @@ class AuthController extends BaseController
 						'redirect_url' => ienv('API_HOST') . 'login?app_id=' . $key . '&redirect_url=' . urlencode($redirectUrl)
 					]))->driver($key)->stateless()->redirect()->getTargetUrl();
 				} catch (Throwable $e) {
-					null;
+					$redirect = null;
 				}
 
 				$data[] = [
 					'id' => $key,
 					'name' => $item['setting']['name'],
 					'logo' => $item['setting']['logo'],
-					'redirect_url' => urlencode($redirectUrl)
+					'redirect_url' => $redirect
 				];
 			}
 		}
