@@ -130,7 +130,7 @@ class AuthController extends BaseController
 					'id' => $key,
 					'name' => $item['setting']['name'],
 					'logo' => $item['setting']['logo'],
-					'redirect_url' => $redirect
+					'redirect_url' => urlencode($redirectUrl)
 				];
 			}
 		}
