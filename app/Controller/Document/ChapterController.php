@@ -116,7 +116,7 @@ class ChapterController extends BaseController
 		}
 
 		if (!$chapter) {
-			throw new ErrorHttpException('该章节不存在！', [], Setting::ERROR_NO_POWER);
+			throw new ErrorHttpException('该章节不存在！', [], Setting::ERROR_NO_FIND);
 		}
 
 		$document = DocumentLogic::instance()->getById($params['document_id']);
