@@ -308,7 +308,7 @@ class AuthController extends BaseController
 			]))->driver($sourceApp)->logout($this->response());
 		} else {
 //			return $this->data('success');
-			header('Location: '.ienv('API_HOST') . 'login');
+			header('Location: '.ienv('API_HOST') . 'admin-login');
 			exit();
 		}
 	}
