@@ -302,26 +302,13 @@ class AuthController extends BaseController
 			 * @var SocialiteManager $socialite
 			 */
 			$socialite = iloader()->get(SocialiteManager::class);
-			$outUrl = $socialite->config(new Config([
+			return $socialite->config(new Config([
 				'client_id' => $setting['setting']['app_id'],
 				'client_secret' => $setting['setting']['secret_key']
 			]))->driver($sourceApp)->logout($this->response());
-			$host = $request->getUri()->getHost();
-			$url = '//' . $host . '/common/auth/logouturl?logouturl=' . urlencode($outUrl);
-			return $url;
 		} else {
 			return $this->data('success');
 		}
-	}
-
-	public function logouturl(Request $request)
-	{
-		$logouturl = $request->query('logouturl', '');
-		if ($logouturl) {
-			Header("Location: $logouturl");
-			exit();
-		}
-		return $this->data('地址错误');
 	}
 
 	private function saveUserInfo(Session $session, $user)
