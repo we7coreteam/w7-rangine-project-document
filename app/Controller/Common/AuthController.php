@@ -307,7 +307,6 @@ class AuthController extends BaseController
 				'client_secret' => $setting['setting']['secret_key']
 			]))->driver($sourceApp)->logout($this->response());
 		} else {
-			$host = $request->getUri()->getHost();
 			$utl = ienv('API_HOST'). 'admin-login';
 			return $this->response()->redirect($utl);
 		}
