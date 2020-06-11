@@ -308,7 +308,7 @@ class AuthController extends BaseController
 			]))->driver($sourceApp)->logout($this->response());
 		} else {
 			$host = $request->getUri()->getHost();
-			$utl = '//' . $host . '/admin-login';
+			$utl = ienv('API_HOST'). 'admin-login';
 			return $this->response()->redirect($utl);
 		}
 	}
