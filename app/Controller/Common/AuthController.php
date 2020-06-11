@@ -315,7 +315,7 @@ class AuthController extends BaseController
 	public function getlogouturl(Request $request)
 	{
 		$utl = ienv('API_HOST') . 'common/auth/logout';
-		return $utl;
+		return $this->data($utl);
 	}
 
 	private function saveUserInfo(Session $session, $user)
