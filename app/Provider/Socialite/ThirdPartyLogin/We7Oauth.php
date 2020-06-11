@@ -99,7 +99,7 @@ class We7Oauth extends AbstractProvider implements ProviderInterface
 	public function logout(Response $psrResponse): Response
 	{
 		$data = [
-			'redirect_url' => ienv('API_HOST') . 'admin-login'
+			'redirect_url' => ienv('API_HOST') . 'login'
 		];
 
 		$headers = [];
