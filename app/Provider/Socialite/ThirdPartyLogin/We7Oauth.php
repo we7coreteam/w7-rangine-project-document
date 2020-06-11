@@ -119,6 +119,7 @@ class We7Oauth extends AbstractProvider implements ProviderInterface
 			throw new \RuntimeException($result['url']);
 		}
 
+
 		$result = json_decode($result, true);
 		if (!empty($result['error'])) {
 			throw new \RuntimeException($result['error']);
