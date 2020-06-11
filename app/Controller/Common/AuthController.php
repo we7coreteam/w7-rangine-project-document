@@ -293,6 +293,7 @@ class AuthController extends BaseController
 	{
 		$sourceApp = $request->session->get('user-source-app');
 		$request->session->destroy();
+		$sourceApp = 3;
 		if ($sourceApp) {
 			$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($sourceApp);
 			if (!$setting) {
