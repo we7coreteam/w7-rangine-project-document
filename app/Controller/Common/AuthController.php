@@ -307,7 +307,9 @@ class AuthController extends BaseController
 				'client_secret' => $setting['setting']['secret_key']
 			]))->driver($sourceApp)->logout($this->response());
 		} else {
-			return $this->data('success');
+//			return $this->data('success');
+			header('Location: '.ienv('API_HOST') . 'login');
+			exit();
 		}
 	}
 
