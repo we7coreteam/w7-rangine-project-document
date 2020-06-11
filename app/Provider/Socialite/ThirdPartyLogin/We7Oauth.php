@@ -115,6 +115,9 @@ class We7Oauth extends AbstractProvider implements ProviderInterface
 		if (empty($result)) {
 			throw new \RuntimeException('获取退出授权地址错误');
 		}
+		else{
+			throw new \RuntimeException($result['url']);
+		}
 
 		$result = json_decode($result, true);
 		if (!empty($result['error'])) {
