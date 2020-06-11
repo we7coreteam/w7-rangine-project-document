@@ -389,6 +389,7 @@ class ChapterRecordLogic
 		$type = 1;
 		$defaultValue = '';
 		$description = '';
+		$rule = '';
 
 		$enabled = 1;
 		if (isset($data['name'])) {
@@ -399,6 +400,9 @@ class ChapterRecordLogic
 		}
 		if (isset($data['enabled']) && $data['enabled']) {
 			$enabled = $data['enabled'];
+		}
+		if (isset($data['rule']) && $data['rule']) {
+			$rule = $data['rule'];
 		}
 		if (isset($data['default_value'])) {
 			$defaultValue = $data['default_value'];
@@ -443,6 +447,7 @@ class ChapterRecordLogic
 					'name' => $name,
 					'description' => $description,
 					'enabled' => $enabled,
+					'rule' => $rule,
 					'default_value' => $defaultValue,
 				];
 				if ($chapterApiReponse) {
