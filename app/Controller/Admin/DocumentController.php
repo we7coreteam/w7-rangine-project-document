@@ -378,14 +378,14 @@ class DocumentController extends BaseController
 		]);
 
 		DocumentLogic::instance()->createCreatorPermission($document);
-		//创建默认目录
-		Chapter::query()->create([
-			'name' => '默认目录',
-			'sort' => 1,
-			'is_dir' => 1,
-			'document_id' => $document->id,
-			'parent_id' => 0
-		]);
+//		//创建默认目录
+//		Chapter::query()->create([
+//			'name' => '默认目录',
+//			'sort' => 1,
+//			'is_dir' => 1,
+//			'document_id' => $document->id,
+//			'parent_id' => 0
+//		]);
 
 		UserOperateLog::query()->create([
 			'user_id' => $user->id,
