@@ -5,6 +5,7 @@ namespace W7\App\Controller\Admin;
 use Illuminate\Support\Facades\DB;
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
+use W7\App\Model\Entity\Setting;
 use W7\App\Model\Entity\Star;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserOperateLog;
@@ -92,7 +93,7 @@ class UserOperateLogController extends BaseController
 		 */
 		$user = $request->getAttribute('user');
 		if (!$user->isManager) {
-			throw new ErrorHttpException('您没有权限管理该文档');
+			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
 		}
 
 		$query = UserOperateLog::query()->where('document_id', '=', $params['document_id'])

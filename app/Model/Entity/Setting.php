@@ -18,7 +18,12 @@ class Setting extends BaseModel
 	protected $table = 'setting';
 	protected $primaryKey = 'key';
 
-	public function getSettingAttribute() {
+	const ERROR_NO_POWER = 446;//没权限
+	const ERROR_NO_FIND = 445;//文件不存在
+	const ERROR_NO_LOGIN = 444;//没登陆
+
+	public function getSettingAttribute()
+	{
 		if (empty($this->value)) {
 			return [];
 		}

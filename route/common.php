@@ -27,6 +27,8 @@ irouter()->post('/common/verifycode/image', 'Common\VerifyCodeController@image')
 irouter()->post('/common/auth/login', 'Common\AuthController@login');
 irouter()->post('/common/auth/method', 'Common\AuthController@method');
 
+irouter()->get('/common/auth/getlogouturl', 'Common\AuthController@getlogouturl');
+irouter()->get('/common/auth/logout', 'Common\AuthController@logout');
 irouter()->post('/common/auth/logout', 'Common\AuthController@logout');
 irouter()->middleware('CheckAuthMiddleware')
 	->post('/common/auth/user', 'Common\AuthController@user');
