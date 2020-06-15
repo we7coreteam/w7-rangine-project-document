@@ -20,6 +20,7 @@ use W7\App\Model\Entity\Star;
 use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Logic\Document\ChapterApi\ChapterRecordLogic;
+use W7\App\Model\Logic\Document\ChapterApi\ChapterRuleLogic;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\App\Model\Logic\UserLogic;
 use W7\App\Model\Logic\UserOperateLogic;
@@ -28,6 +29,33 @@ use W7\Http\Message\Server\Request;
 
 class ChapterController extends BaseController
 {
+	/**
+	 * @api {post} /document/chapter/ruleDemo 文档-mock规则数据
+	 * @apiName rule
+	 * @apiGroup Chapter
+	 *
+	 * @apiParam {Number} chapter_id 章节ID
+	 * @apiParam {Number} location_type 请求类型1请求2响应
+	 * @apiParam {Number} reponse_id 响应ID
+	 */
+	public function ruleDemo(Request $request)
+	{
+		$params = $this->validate($request, [
+			'chapter_id' => 'required|integer|min:1',
+			'location_type' => 'required|in:1,2',
+			'reponse_id' => 'integer'
+		], [
+			'chapter_id.required' => '文档id必填',
+			'location_type.integer' => '请求类型',
+			'reponse_id' => '响应ID',
+		]);
+		$reponseId = $params['reponse_id'] ? $params['reponse_id'] : 0;
+		//获取rule参数样例
+		$chapterDemoLogic = new ChapterRuleLogic($params['chapter_id']);
+		$query = $chapterDemoLogic->getChapterRule($params['location_type'], $reponseId);
+		return $query;
+	}
+
 	/**
 	 * 某一个文档的目录
 	 * @param Request $request

@@ -58,6 +58,10 @@ class ChapterRecordLogic
 			if ($recordCache) {
 				//清除缓存
 				icache()->delete($cacheIndex);
+				//清除请求规则缓存
+				$chapterRuleLogic = new ChapterRuleLogic($chapterId);
+				$cacheRequestIndex = $chapterRuleLogic->getChapterIdRequestIndex();
+				icache()->delete($cacheRequestIndex);
 			}
 			foreach ($record as $key => $val) {
 				if (is_array($val)) {
@@ -117,6 +121,10 @@ class ChapterRecordLogic
 		if ($reponse) {
 			foreach ($reponse as $key => $val) {
 				if ($val['id']) {
+					//清除请求规则缓存
+					$chapterRuleLogic = new ChapterRuleLogic($chapterId);
+					$cacheRequestIndex = $chapterRuleLogic->getChapterIdReponseIndex($val['id']);
+					icache()->delete($cacheRequestIndex);
 					//修改
 					$chapterApiReponse = ChapterApiReponse::query()->find($val['id']);
 					if ($chapterApiReponse) {

@@ -15,4 +15,5 @@ irouter()->middleware('FrontendDocumentPermissionMiddleware')->group(['prefix' =
 	$route->post('/chapter/list', 'Document\ChapterController@catalog');
 	$route->post('/chapter/detail', 'Document\ChapterController@detail');
 	$route->post('/chapter/search', 'Document\ChapterController@search');
+	$route->post('/chapter/ruleDemo', 'Document\ChapterController@ruleDemo');
 });
