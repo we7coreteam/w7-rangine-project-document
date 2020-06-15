@@ -17,6 +17,7 @@ use Overtrue\Socialite\SocialiteManager;
 use Throwable;
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
+use W7\App\Model\Entity\Setting;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserThirdParty;
 use W7\App\Model\Logic\ThirdPartyLoginLogic;
@@ -35,7 +36,7 @@ class AuthController extends BaseController
 		$user = UserLogic::instance()->getByUid($userSession['uid']);
 		if (!$user) {
 			$request->session->destroy();
-			throw new ErrorHttpException('请先登录', [], 444);
+			throw new ErrorHttpException('请先登录', [], Setting::ERROR_NO_LOGIN);
 		}
 
 		$source = [
@@ -119,10 +120,10 @@ class AuthController extends BaseController
 					$redirect = $socialite->config(new Config([
 						'client_id' => $item['setting']['app_id'],
 						'client_secret' => $item['setting']['secret_key'],
-						'redirect_url' => ienv('API_HOST') . 'login?app_id=' . $key . '&redirect_url=' . $redirectUrl
+						'redirect_url' => ienv('API_HOST') . 'login?app_id=' . $key . '&redirect_url=' . urlencode($redirectUrl)
 					]))->driver($key)->stateless()->redirect()->getTargetUrl();
 				} catch (Throwable $e) {
-					null;
+					$redirect = null;
 				}
 
 				$data[] = [
@@ -292,7 +293,6 @@ class AuthController extends BaseController
 	{
 		$sourceApp = $request->session->get('user-source-app');
 		$request->session->destroy();
-
 		if ($sourceApp) {
 			$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($sourceApp);
 			if (!$setting) {
@@ -307,9 +307,15 @@ class AuthController extends BaseController
 				'client_secret' => $setting['setting']['secret_key']
 			]))->driver($sourceApp)->logout($this->response());
 		} else {
-			return $this->data('success');
-//			return $this->response()->redirect(ienv('API_HOST') . 'login');
+			$utl = ienv('API_HOST') . 'admin-login';
+			return $this->response()->redirect($utl);
 		}
+	}
+
+	public function getlogouturl(Request $request)
+	{
+		$utl = ienv('API_HOST') . 'common/auth/logout';
+		return $this->data($utl);
 	}
 
 	private function saveUserInfo(Session $session, $user)

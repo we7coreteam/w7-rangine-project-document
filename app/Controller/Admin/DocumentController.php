@@ -18,6 +18,7 @@ use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\Document\Chapter;
 use W7\App\Model\Entity\DocumentPermission;
+use W7\App\Model\Entity\Setting;
 use W7\App\Model\Entity\Star;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserOperateLog;
@@ -283,7 +284,7 @@ class DocumentController extends BaseController
 
 		$user = $request->getAttribute('user');
 		if (!$user->isManager && !$user->isFounder) {
-			throw new ErrorHttpException('您没有权限管理该文档');
+			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
 		}
 
 		if (!$uid && $userName) {
@@ -377,14 +378,14 @@ class DocumentController extends BaseController
 		]);
 
 		DocumentLogic::instance()->createCreatorPermission($document);
-		//创建默认目录
-		Chapter::query()->create([
-			'name' => '默认目录',
-			'sort' => 1,
-			'is_dir' => 1,
-			'document_id' => $document->id,
-			'parent_id' => 0
-		]);
+//		//创建默认目录
+//		Chapter::query()->create([
+//			'name' => '默认目录',
+//			'sort' => 1,
+//			'is_dir' => 1,
+//			'document_id' => $document->id,
+//			'parent_id' => 0
+//		]);
 
 		UserOperateLog::query()->create([
 			'user_id' => $user->id,
@@ -471,7 +472,7 @@ class DocumentController extends BaseController
 
 		$user = $request->getAttribute('user');
 		if (!$user->isManager && !$user->isFounder) {
-			throw new ErrorHttpException('您没有权限管理该文档');
+			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
 		}
 
 		$document = DocumentLogic::instance()->getById($documentId);
@@ -491,7 +492,7 @@ class DocumentController extends BaseController
 
 		$user = $request->getAttribute('user');
 		if (!$user->isManager) {
-			throw new ErrorHttpException('您没有权限管理该文档');
+			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
 		}
 		if (!$targetUser = UserLogic::instance()->getByUserName($params['username'])) {
 			throw new ErrorHttpException('该用户不存在');

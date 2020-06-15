@@ -17,6 +17,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Document;
+use W7\App\Model\Entity\Setting;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\App\Model\Logic\DocumentPermissionLogic;
@@ -54,7 +55,7 @@ class FrontendDocumentPermissionMiddleware extends MiddlewareAbstract
 		} else {
 			if (empty($user->id)) {
 				//未登录
-				throw new ErrorHttpException('请先登录', [], 444);
+				throw new ErrorHttpException('请先登录', [], Setting::ERROR_NO_LOGIN);
 			}
 			//需要权限或者登录
 			if ($document->is_public == Document::PRIVATE_DOCUMENT && !empty($user->id)) {
