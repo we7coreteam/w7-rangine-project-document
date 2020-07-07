@@ -35,4 +35,24 @@ class ChapterApi extends BaseModel
 	const METHOD_UNLOCK = 13;
 	const METHOD_PROPFIND = 14;
 	const METHOD_VIEW = 15;
+
+	public function methodLabel()
+	{
+		return [
+			self::METHOD_GET => 'GET',
+			self:: METHOD_POST => 'POST',
+			self:: METHOD_PUT => 'PUT',
+			self:: METHOD_PATCH => 'PATCH',
+			self:: METHOD_DELETE => 'DELETE',
+			self:: METHOD_COPY => 'COPY',
+			self:: METHOD_HEAD => 'HEAD',
+			self:: METHOD_LINK => 'LINK',
+			self:: METHOD_UNLINK => 'UNLINK',
+			self:: METHOD_PURGE => 'PURGE',
+			self:: METHOD_LOCK => 'LOCK',
+			self:: METHOD_UNLOCK => 'UNLOCK',
+			self:: METHOD_PROPFIND => 'PROPFIND',
+			self:: METHOD_VIEW => 'VIEW'
+		];
+	}
 }
