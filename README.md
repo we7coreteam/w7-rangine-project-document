@@ -29,14 +29,6 @@ https://github.com/we7coreteam/w7-rangine-project-document/releases/ 下载最�
 composer install --no-dev
 ```
 
-#### 安装系统
-
-执行以下命令，根据提示完成文档安装
-
-```
-bin/gerent install:init
-```
-
 #### 运行系统
 
 > 如果您的80端口被其他应用占用，您需要手动修改.env文件中的 SERVER_HTTP_PORT 选项
@@ -44,9 +36,19 @@ bin/gerent install:init
 ```
 bin/server start
 ```
+#### 安装系统
 
+访问根目录/install.html,按照页面提示进行安装
+安装完成后重启服务
 
-
+关闭服务
+```
+bin/server stop
+```
+开启服务
+```
+bin/server start
+```
 
 
 
