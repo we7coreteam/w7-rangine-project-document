@@ -45,6 +45,28 @@ class IndexController extends BaseController
 		return $this->data($data);
 	}
 
+	/**
+	 * @api {post} /install/install 系统检测
+	 * @apiName install
+	 * @apiGroup install
+	 *
+	 * @apiParam {String} api_host 服务器地址
+	 * @apiParam {Number} server_port 服务器端口号
+	 * @apiParam {String} db_database 数据库名称
+	 * @apiParam {String} db_host 数据库地址
+	 * @apiParam {Number} db_port 数据库端口
+	 * @apiParam {String} db_username 数据库用户名
+	 * @apiParam {String} db_password 数据库密码
+	 * @apiParam {String} db_prefix 数据库表前缀
+	 * @apiParam {String} admin_username 管理员账户
+	 * @apiParam {String} admin_password 管理员密码
+	 * @apiParam {String} cache_driver 缓存驱动 选项：default、redis
+	 * @apiParam {String} cache_host 缓存服务器地址（redis时填写）
+	 * @apiParam {String} cache_port 缓存服务器端口号（redis时填写）
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":"安装已完成！提示：请按照文档配置，重启相关服务","message":"ok"}
+	 */
 	public function install(Request $request)
 	{
 		$params = $this->validate($request, [

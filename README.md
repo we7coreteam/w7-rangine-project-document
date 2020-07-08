@@ -25,13 +25,13 @@ https://github.com/we7coreteam/w7-rangine-project-document/releases/ 下载最�
 
 #### 安装扩展包
 
-```php
+```
 composer install --no-dev
 ```
 
 #### 运行系统
 
-> 如果您的80端口被其他应用占用，您需要手动修改.env文件中的 SERVER_HTTP_PORT 选项
+> 如果您的80端口被其他应用占用，您需要手动修改config/server文件中的 SERVER_HTTP_PORT 默认端口号
 
 ```
 bin/server start
