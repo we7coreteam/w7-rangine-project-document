@@ -31,7 +31,6 @@ class IndexController extends BaseController
 		$diskfreespace = diskfreespace(BASE_PATH);
 		$diskfreespaceG = (ceil($diskfreespace / 1000 / 1000 / 10) / 100);
 		$data = [
-			'composer_install' => ['name' => 'composer install', 'result' => file_exists(BASE_PATH . '/vendor') ? '已执行' : '执行 composer install 安装扩展包', 'enable' => file_exists(BASE_PATH . '/vendor') ? true : false],
 			'system' => ['name' => '服务器操作系统', 'result' => php_uname(), 'enable' => true],
 			'php_version' => ['name' => 'PHP版本', 'result' => PHP_VERSION >= 7.2 ? PHP_VERSION : 'PHP版本7.2及以上', 'enable' => PHP_VERSION >= 7.2 ? true : false],
 			'base_path' => ['name' => '安装程序目录可写', 'result' => is_writable(BASE_PATH) ? BASE_PATH : BASE_PATH . '不可写', 'enable' => is_writable(BASE_PATH) ? true : false],
