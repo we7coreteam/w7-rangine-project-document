@@ -200,6 +200,12 @@ class ChapterController extends BaseController
 			'document' => $document
 		];
 
+		$showRecord = $request->post('show_record', 0);
+		if ($showRecord && $chapter->content->layout == 1) {
+			$obj = new ChapterRecordLogic($chapter->id);
+			$result['record'] = $obj->showRecord();
+		}
+
 		return $this->data($result);
 	}
 

@@ -39,7 +39,7 @@ class ExceptionHandler extends ExceptionHandlerAbstract
 				$route .= '?' . build_query($request->getQueryParams());
 			}
 
-			if (!env('DATABASE_DEFAULT_DATABASE')) {//&& (substr($route, 0, 8) != '/install')
+			if (!env('DATABASE_DEFAULT_DATABASE')) {
 				//安装页
 				return $this->getResponse()->html(iloader()->singleton(View::class)->render('@public/install'));
 			}

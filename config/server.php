@@ -19,7 +19,7 @@ $serverSetting = [
 	],
 	'http' => [
 		'host' => '0.0.0.0',
-		'port' => ienv('SERVER_HTTP_PORT', '80')
+		'port' => ienv('SERVER_HTTP_PORT', '99')
 	],
 ];
 
