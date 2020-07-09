@@ -31,7 +31,7 @@ composer install --no-dev
 
 #### 运行系统
 
-> 如果您的80端口被其他应用占用，您需要手动修改config/server文件中的 SERVER_HTTP_PORT 默认端口号
+> 如果您的88端口被其他应用占用，您需要手动修改config/server文件中的 SERVER_HTTP_PORT 默认端口号
 
 ```
 bin/server start
