@@ -112,7 +112,7 @@ class ChapterController extends BaseController
 			'chapter_id.integer' => '章节id非法'
 		]);
 		$result = [
-			'record' => [],
+			'record' => null,
 		];
 		$chapter = ChapterLogic::instance()->getById($params['chapter_id'], $params['document_id']);
 		if ($chapter) {
