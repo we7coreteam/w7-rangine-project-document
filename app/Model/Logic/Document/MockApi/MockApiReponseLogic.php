@@ -14,6 +14,7 @@ namespace W7\App\Model\Logic\Document\MockApi;
 
 //返回演示数据demo
 use W7\App\Model\Entity\Document;
+use W7\App\Model\Entity\Document\ChapterApiParam;
 use W7\App\Model\Logic\Document\ChapterApi\ChapterRuleLogic;
 
 class MockApiReponseLogic
@@ -43,8 +44,9 @@ class MockApiReponseLogic
 								$reponseIds = array_column($ChapterApiReponse, 'id');
 								$reponseId = $reponseIds[rand(0,count($reponseIds)-1)];
 							}
+
 							$chapterDemoLogic = new ChapterRuleLogic($api->chapter_id);
-							return $chapterDemoLogic->getChapterRule(2, $reponseId);
+							return $chapterDemoLogic->getChapterRuleMock(2, $reponseId);
 						} else {
 							return ['code' => 401, 'msg' => '请求类型错误'];
 						}

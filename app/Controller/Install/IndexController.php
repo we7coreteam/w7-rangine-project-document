@@ -31,16 +31,16 @@ class IndexController extends BaseController
 		$diskfreespace = diskfreespace(BASE_PATH);
 		$diskfreespaceG = (ceil($diskfreespace / 1000 / 1000 / 10) / 100);
 		$data = [
-			'install_lock' => ['name' => '已有安装记录', 'result' => file_exists(RUNTIME_PATH . '/install.lock') ? '文档系统已经安装，如果需要重新安装请手动删除 runtime/install.lock 文件' : '未安装', 'enable' => file_exists(RUNTIME_PATH . '/install.lock') ? true : false],
-			'system' => ['name' => '服务器操作系统', 'result' => php_uname(), 'enable' => true],
-			'php_version' => ['name' => 'PHP版本', 'result' => PHP_VERSION >= 7.2 ? PHP_VERSION : 'PHP版本7.2及以上', 'enable' => PHP_VERSION >= 7.2 ? true : false],
-			'base_path' => ['name' => '安装程序目录可写', 'result' => is_writable(BASE_PATH) ? BASE_PATH : BASE_PATH . '不可写', 'enable' => is_writable(BASE_PATH) ? true : false],
-			'runtime_path' => ['name' => '安装程序运行目录可写', 'result' => is_writable(RUNTIME_PATH) ? RUNTIME_PATH : '不可写', 'enable' => is_writable(RUNTIME_PATH) ? true : false],
-			'swoole' => ['name' => 'swoole扩展', 'result' => (extension_loaded('swoole') & swoole_version() >= '4.3.0') ? 'swoole版本' . swoole_version() : 'swoole版本4.3.0及以上', 'enable' => (extension_loaded('swoole') & swoole_version() >= '4.3.0') ? true : false],
-			'pdo_mysql' => ['name' => 'mysql扩展', 'result' => extension_loaded('pdo_mysql') ? '已安装pdo_mysql扩展' : '未安装pdo_mysql扩展', 'enable' => extension_loaded('pdo_mysql') ? true : false],
-			'mbstring' => ['name' => 'mbstring扩展', 'result' => extension_loaded('mbstring') ? '已安装mbstring扩展' : '未安装mbstring扩展', 'enable' => extension_loaded('mbstring') ? true : false],
-			'exec' => ['name' => 'exec命令', 'result' => function_exists('exec') ? '支持' : '不支持', 'enable' => function_exists('exec') ? true : false],
-			'diskfreespace' => ['name' => '磁盘空间', 'result' => ($diskfreespace > 200000000) ? $diskfreespaceG . 'G' : '存储空间200M以上', 'enable' => ($diskfreespace > 200000000) ? true : false],
+			['name' => '已有安装记录', 'result' => file_exists(RUNTIME_PATH . '/install.lock') ? '文档系统已经安装，如果需要重新安装请手动删除 runtime/install.lock 文件' : '未安装', 'enable' => file_exists(RUNTIME_PATH . '/install.lock') ? true : false],
+			['name' => '服务器操作系统', 'result' => php_uname(), 'enable' => true],
+			['name' => 'PHP版本', 'result' => PHP_VERSION >= 7.2 ? PHP_VERSION : 'PHP版本7.2及以上', 'enable' => PHP_VERSION >= 7.2 ? true : false],
+			['name' => '安装程序目录可写', 'result' => is_writable(BASE_PATH) ? BASE_PATH : BASE_PATH . '不可写', 'enable' => is_writable(BASE_PATH) ? true : false],
+			['name' => '安装程序运行目录可写', 'result' => is_writable(RUNTIME_PATH) ? RUNTIME_PATH : '不可写', 'enable' => is_writable(RUNTIME_PATH) ? true : false],
+			['name' => 'swoole扩展', 'result' => (extension_loaded('swoole') & swoole_version() >= '4.3.0') ? 'swoole版本' . swoole_version() : 'swoole版本4.3.0及以上', 'enable' => (extension_loaded('swoole') & swoole_version() >= '4.3.0') ? true : false],
+			['name' => 'mysql扩展', 'result' => extension_loaded('pdo_mysql') ? '已安装pdo_mysql扩展' : '未安装pdo_mysql扩展', 'enable' => extension_loaded('pdo_mysql') ? true : false],
+			['name' => 'mbstring扩展', 'result' => extension_loaded('mbstring') ? '已安装mbstring扩展' : '未安装mbstring扩展', 'enable' => extension_loaded('mbstring') ? true : false],
+			['name' => 'exec命令', 'result' => function_exists('exec') ? '支持' : '不支持', 'enable' => function_exists('exec') ? true : false],
+			['name' => '磁盘空间', 'result' => ($diskfreespace > 200000000) ? $diskfreespaceG . 'G' : '存储空间200M以上', 'enable' => ($diskfreespace > 200000000) ? true : false],
 		];
 		return $this->data($data);
 	}

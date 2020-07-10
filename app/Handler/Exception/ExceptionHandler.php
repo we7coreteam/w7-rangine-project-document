@@ -76,7 +76,7 @@ class ExceptionHandler extends ExceptionHandlerAbstract
 					//如果是mockApi
 					$MockApiReponseLogic = new MockApiReponseLogic();
 					$ret = $MockApiReponseLogic->mackMockApiReponse($request, $route);
-					return $this->getResponse()->json($ret);
+					return $this->getResponse()->html(json_encode($ret));
 				}
 			}
 			//mockApi-e

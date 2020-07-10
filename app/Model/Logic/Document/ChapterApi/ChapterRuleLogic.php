@@ -24,6 +24,41 @@ class ChapterRuleLogic extends ChapterCommonLogic
 		$this->chapterId = $chapterId;
 	}
 
+	public function getChapterRuleMock($locationType, $reponseId)
+	{
+		$chapterId = $this->chapterId;
+		if ($locationType == 2) {
+			$locationList = array_keys($this->reponseIds());
+		} else {
+			$locationList = array_keys($this->requestIds());
+		}
+		$obj = ChapterApiParam::query()->where('chapter_id', $chapterId);
+		if ($locationType && $reponseId) {
+			$obj->where('reponse_id', $reponseId);
+		}
+		$data= $obj->whereIn('location', $locationList)->get()->toArray();
+		$url='http://192.168.168.31:3000/buildMock';
+		$json=$this->send_post($url,['record'=>$data]);
+		return $json;
+	}
+
+	public function send_post($url, $post_data) {
+
+		$postdata = http_build_query($post_data);
+		$options = array(
+			'http' => array(
+				'method' => 'POST',
+				'header' => 'Content-type:application/x-www-form-urlencoded',
+				'content' => $postdata,
+				'timeout' => 15 * 60 // 超时时间（单位:s）
+			)
+		);
+		$context = stream_context_create($options);
+		$result = file_get_contents($url, false, $context);
+
+		return $result;
+	}
+
 	public function getChapterIdRequestIndex()
 	{
 		return 'ChapterIdRequestIndexV1:' . $this->chapterId;
