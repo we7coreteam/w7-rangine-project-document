@@ -45,7 +45,7 @@ class IndexController extends BaseController
 	}
 
 	/**
-	 * @api {post} /install/install 系统检测
+	 * @api {post} /install/install 系统安装
 	 * @apiName install
 	 * @apiGroup install
 	 *
