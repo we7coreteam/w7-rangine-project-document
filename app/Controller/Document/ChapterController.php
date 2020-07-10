@@ -93,13 +93,45 @@ class ChapterController extends BaseController
 	}
 
 	/**
+	 * @api {post} /document/chapter/record 文档API-查看
+	 * @apiName detail
+	 * @apiGroup document.Chapter
+	 *
+	 * @apiParam {Number} chapter_id 章节ID
+	 * @apiParam {Number} document_id 文档ID
+	 */
+	public function record(Request $request)
+	{
+		$params = $this->validate($request, [
+			'document_id' => 'required|integer|min:1',
+			'chapter_id' => 'required|integer|min:1'
+		], [
+			'document_id.required' => '文档id必填',
+			'document_id.integer' => '文档id非法',
+			'chapter_id.required' => '章节id必填',
+			'chapter_id.integer' => '章节id非法'
+		]);
+		$result = [
+			'record' => [],
+		];
+		$chapter = ChapterLogic::instance()->getById($params['chapter_id'], $params['document_id']);
+		if ($chapter) {
+			$showRecord = $request->post('show_record', 0);
+			if ($showRecord && $chapter->content->layout == 1) {
+				$obj = new ChapterRecordLogic($chapter->id);
+				$result['record'] = $obj->showRecord();
+			}
+		}
+		return $this->data($result);
+	}
+
+	/**
 	 * @api {post} /document/chapter/detail 文档内容-前端查看
 	 * @apiName detail
 	 * @apiGroup document.Chapter
 	 *
 	 * @apiParam {Number} chapter_id 章节ID
 	 * @apiParam {Number} document_id 文档ID
-	 * @apiParam {Number} show_record 是否显示record0否1是 默认0
 	 */
 	public function detail(Request $request)
 	{

@@ -17,3 +17,6 @@ irouter()->middleware('FrontendDocumentPermissionMiddleware')->group(['prefix' =
 	$route->post('/chapter/search', 'Document\ChapterController@search');
 	$route->post('/chapter/ruleDemo', 'Document\ChapterController@ruleDemo');
 });
+irouter()->group(['prefix' => '/document'], function (\W7\Core\Route\Route $route) {
+	$route->post('/chapter/record', 'Document\ChapterController@record');
+});
