@@ -92,37 +92,39 @@ class ChapterController extends BaseController
 		}
 	}
 
+	public function record(Request $request)
+	{
+	}
+
 	/**
-	 * @api {post} /document/chapter/record 文档API-查看
+	 * @api {post} /document/chapter/record 文档API-响应反馈
 	 * @apiName record
 	 * @apiGroup document.Chapter
 	 *
 	 * @apiParam {Number} chapter_id 章节ID
 	 * @apiParam {Number} document_id 文档ID
+	 * @apiParam {Number} reponse_key 响应键值
 	 */
-	public function record(Request $request)
+	public function recordReponse(Request $request)
 	{
 		$params = $this->validate($request, [
 			'document_id' => 'required|integer|min:1',
-			'chapter_id' => 'required|integer|min:1'
+			'chapter_id' => 'required|integer|min:1',
+			'reponse_key' => 'required',
+			'reponse_data' => 'required',
 		], [
 			'document_id.required' => '文档id必填',
 			'document_id.integer' => '文档id非法',
 			'chapter_id.required' => '章节id必填',
-			'chapter_id.integer' => '章节id非法'
+			'chapter_id.integer' => '章节id非法',
+			'reponse_key.required' => '响应键值必填',
+			'reponse_data.required' => '响应数据必填',
 		]);
-		$result = [
-			'record' => null,
-		];
-		$chapter = ChapterLogic::instance()->getById($params['chapter_id'], $params['document_id']);
-		if ($chapter) {
-			$showRecord = $request->post('show_record', 0);
-			if ($showRecord && $chapter->content->layout == 1) {
-				$obj = new ChapterRecordLogic($chapter->id);
-				$result['record'] = $obj->showRecord();
-			}
-		}
-		return $this->data($result);
+
+		$info = $params['data'];
+		$cacheIndex = 'recordReponse_' . $params['document_id'] . '_' . $params['chapter_id'] . '_' . $params['reponse_key'];
+		icache()->set($cacheIndex, $info, 60 * 5);
+		return $this->data($info);
 	}
 
 	/**
