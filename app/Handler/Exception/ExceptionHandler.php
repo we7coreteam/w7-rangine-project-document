@@ -12,7 +12,7 @@
 
 namespace W7\App\Handler\Exception;
 
-use W7\App\Model\Logic\Document\ChapterApi\MockApiReponseLogic;
+use W7\App\Model\Logic\Document\MockApi\MockApiReponseLogic;
 use function GuzzleHttp\Psr7\build_query;
 use Overtrue\Socialite\Config;
 use Overtrue\Socialite\SocialiteManager;
