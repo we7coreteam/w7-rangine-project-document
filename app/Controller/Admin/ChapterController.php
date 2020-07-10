@@ -65,7 +65,7 @@ class ChapterController extends BaseController
 	}
 
 	/**
-	 * @api {post} /chapter/create 文档（目录）-新增
+	 * @api {post} /admin/chapter/create 文档（目录）-新增
 	 * @apiName create
 	 * @apiGroup Chapter
 	 *
@@ -324,7 +324,7 @@ class ChapterController extends BaseController
 	}
 
 	/**
-	 * @api {post} /chapter/save 文档内容-保存
+	 * @api {post} /admin/chapter/save 文档内容-保存
 	 * @apiName save
 	 * @apiGroup Chapter
 	 *
@@ -418,7 +418,7 @@ class ChapterController extends BaseController
 	}
 
 	/**
-	 * @api {post} /chapter/content 文档内容-查看
+	 * @api {post} /admin/chapter/content 文档内容-查看
 	 * @apiName content
 	 * @apiGroup Chapter
 	 *
