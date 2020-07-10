@@ -92,6 +92,15 @@ class ChapterController extends BaseController
 		}
 	}
 
+	/**
+	 * @api {post} /document/chapter/detail 文档内容-前端查看
+	 * @apiName detail
+	 * @apiGroup document.Chapter
+	 *
+	 * @apiParam {Number} chapter_id 章节ID
+	 * @apiParam {Number} document_id 文档ID
+	 * @apiParam {Number} show_record 是否显示record0否1是 默认0
+	 */
 	public function detail(Request $request)
 	{
 		$params = $this->validate($request, [
