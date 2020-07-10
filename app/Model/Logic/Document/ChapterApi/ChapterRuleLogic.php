@@ -39,7 +39,7 @@ class ChapterRuleLogic extends ChapterCommonLogic
 		$data= $obj->whereIn('location', $locationList)->get()->toArray();
 		$url='http://192.168.168.31:3000/buildMock';
 		$json=$this->send_post($url,['record'=>$data]);
-		return $json;
+		return json_decode($json);
 	}
 
 	public function send_post($url, $post_data) {
