@@ -14,6 +14,7 @@ namespace W7\App\Controller\Install;
 
 use W7\App\Controller\BaseController;
 use W7\App\Model\Logic\Install\InstallLogic;
+use W7\Core\View\View;
 use W7\Http\Message\Server\Request;
 
 class IndexController extends BaseController
@@ -22,7 +23,7 @@ class IndexController extends BaseController
 		ini_set('user_agent', 'Mozilla/5.0 (Linux; Android 4.2.1; en-us; Nexus 4 Build/JOP40D) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.166 Mobile Safari/535.19');
 		$url = 'http://wiki.we7888.cn/mock/185/1660?reponse=0';
 		$text = file_get_contents($url);
-		return $text;
+		return $this->response()->html($text);
 	}
 	/**
 	 * @api {post} /install/systemDetection 系统检测
