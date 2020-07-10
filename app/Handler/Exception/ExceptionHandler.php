@@ -72,7 +72,7 @@ class ExceptionHandler extends ExceptionHandlerAbstract
 			//mockApi-s
 			$routeArr = explode('/', $route);
 			if (count($routeArr) > 3) {
-				if ($routeArr[2] == 'mockApiReponse') {
+				if ($routeArr[1] == 'document' && $routeArr[2] == 'mockApiReponse') {
 					//如果是mockApi
 					$MockApiReponseLogic = new MockApiReponseLogic();
 					$ret = $MockApiReponseLogic->mackMockApiReponse($request, $route);
