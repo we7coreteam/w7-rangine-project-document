@@ -94,7 +94,7 @@ class ChapterController extends BaseController
 
 	/**
 	 * @api {post} /document/chapter/record 文档API-查看
-	 * @apiName detail
+	 * @apiName record
 	 * @apiGroup document.Chapter
 	 *
 	 * @apiParam {Number} chapter_id 章节ID
