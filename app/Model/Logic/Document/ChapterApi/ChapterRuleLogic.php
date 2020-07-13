@@ -38,17 +38,17 @@ class ChapterRuleLogic extends ChapterCommonLogic
 		}
 		$data= $obj->whereIn('location', $locationList)->get()->toArray();
 		$url='http://192.168.168.31:3000/buildMock';
-		$json=$this->send_post($url,['record'=>$data]);
+		$json=$this->send_post($url,json_encode($data));
 		return json_decode($json);
 	}
 
-	public function send_post($url, $post_data) {
+	public function send_post($url, $json) {
 
-		$postdata = http_build_query($post_data);
+		$postdata = $json;
 		$options = array(
 			'http' => array(
 				'method' => 'POST',
-				'header' => 'Content-type:application/x-www-form-urlencoded',
+				'header' => 'Content-type:application/json',
 				'content' => $postdata,
 				'timeout' => 15 * 60 // 超时时间（单位:s）
 			)

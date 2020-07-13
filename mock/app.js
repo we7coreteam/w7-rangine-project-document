@@ -2,21 +2,24 @@ const express = require('express')
 const app = express()
 const port = 3000
 
-const generateData = (data) => {
-	console.log(data);
-	// if(data.query&&data.query.record){
-	// 	var json=data.query.record;
-	// 	var obj = eval('(' + json + ')');
-	// 	var Mock = require('mockjs')
-	// 	var mockData = Mock.mock(obj)
-	// 	return mockData;
-	// }
-	return {query:data.query,body:data.body};
+//mock数据转化
+const makeMockData = (data) => {
+	if(data.body&&data.body){
+		var json=data.body;
+		var Mock = require('mockjs')
+		var mockData = Mock.mock(json)
+		return mockData;
+	}
+	return data.body;
 }
-var bodyp=require('body-parser');
-//post中间件接收数据
-app.use(bodyp.urlencoded({ extended: false,limit:20*1024})); //extended 拓展模式  limit 最大接收数据
 
-app.all('/buildMock', (req, res, next) => res.json(generateData(req)))
+//POST中间件
+const bodyParser = require('body-parser');
+app.use(bodyParser.json());//数据JSON类型
+app.use(bodyParser.urlencoded({ extended: false }));//解析post请求数据
 
+//路由
+app.all('/buildMock', (req, res, next) => res.json(makeMockData(req)))
+
+//启动服务
 app.listen(port, () => console.log(`app listening at http://localhost:${port}`))
