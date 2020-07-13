@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const port = 3000
+const port = 9529
 
 //mock数据转化
 const makeMockData = (data) => {
