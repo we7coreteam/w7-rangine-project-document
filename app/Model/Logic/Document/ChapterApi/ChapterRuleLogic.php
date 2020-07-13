@@ -37,7 +37,7 @@ class ChapterRuleLogic extends ChapterCommonLogic
 			$obj->where('reponse_id', $reponseId);
 		}
 		$data= $obj->whereIn('location', $locationList)->get()->toArray();
-		$url=ienv('MOCK_SERVER');
+		$url=ienv('MOCK_API');
 		$json=$this->send_post($url,json_encode($data));
 		return json_decode($json);
 	}
