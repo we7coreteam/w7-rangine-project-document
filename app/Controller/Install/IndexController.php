@@ -30,13 +30,14 @@ class IndexController extends BaseController
 	{
 		$diskfreespace = diskfreespace(BASE_PATH);
 		$diskfreespaceG = (ceil($diskfreespace / 1000 / 1000 / 10) / 100);
-		if (file_exists(RUNTIME_PATH . '/install.lock')) {
+		$isInstall=file_exists(RUNTIME_PATH . '/install.lock');
+		if ($isInstall) {
 			$data = [
-				['id' => 1, 'name' => '已有安装记录', 'result' => file_exists(RUNTIME_PATH . '/install.lock') ? '文档系统已经安装，如果需要重新安装请手动删除 runtime/install.lock 文件' : '未安装', 'enable' => file_exists(RUNTIME_PATH . '/install.lock') ? true : false],
+				['id' => 1, 'name' => '已有安装记录', 'result' =>$isInstall ? '文档系统已经安装，如果需要重新安装请手动删除 runtime/install.lock 文件' : '未安装', 'enable' => $isInstall ? true : false],
 			];
 		} else {
 			$data = [
-				['id' => 1, 'name' => '已有安装记录', 'result' => file_exists(RUNTIME_PATH . '/install.lock') ? '文档系统已经安装，如果需要重新安装请手动删除 runtime/install.lock 文件' : '未安装', 'enable' => file_exists(RUNTIME_PATH . '/install.lock') ? true : false],
+				['id' => 1, 'name' => '已有安装记录', 'result' => $isInstall ? '文档系统已经安装，如果需要重新安装请手动删除 runtime/install.lock 文件' : '未安装', 'enable' => $isInstall ? true : false],
 				['id' => 2, 'name' => '服务器操作系统', 'result' => php_uname(), 'enable' => true],
 				['id' => 3, 'name' => 'PHP版本', 'result' => PHP_VERSION >= 7.2 ? PHP_VERSION : 'PHP版本7.2及以上', 'enable' => PHP_VERSION >= 7.2 ? true : false],
 				['id' => 4, 'name' => '安装程序目录可写', 'result' => is_writable(BASE_PATH) ? BASE_PATH : BASE_PATH . '不可写', 'enable' => is_writable(BASE_PATH) ? true : false],
