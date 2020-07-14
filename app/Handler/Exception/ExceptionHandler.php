@@ -45,7 +45,7 @@ class ExceptionHandler extends ExceptionHandlerAbstract
 //			}
 
 			//如果访问的是admin下的路由，先检测是否登录
-			if (substr($route, 0, 12) == '/admin-login') {
+			if (substr($route, 0, 12) == '/admin-login'||substr($route, 0, 1) == '/') {
 				return $this->getResponse()->html(iloader()->singleton(View::class)->render('@public/index'));
 			}
 			if (substr($route, 0, 6) == '/admin') {
