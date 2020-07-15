@@ -33,7 +33,7 @@ class ChapterRuleLogic extends ChapterCommonLogic
 			$locationList = array_keys($this->requestIds());
 		}
 		$obj = ChapterApiParam::query()
-			->select(['chapter_id', 'reponse_id', 'parent_id', 'location', 'type', 'name', 'enabled', 'default_value', 'rule'])
+			->select(['id', 'chapter_id', 'reponse_id', 'parent_id', 'location', 'type', 'name', 'enabled', 'default_value', 'rule'])
 			->where('chapter_id', $chapterId);
 		if ($locationType && $reponseId) {
 			$obj->where('reponse_id', $reponseId);

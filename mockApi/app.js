@@ -64,18 +64,22 @@ function treeToTemplate(tree, num = 0) {
 						result[item.name + rule] = value
 						break
 					case 4:
-						// Object
-						if (value) {
-							// result[item.name + rule] = vm.run(`(${item.value})`)
-							result[item.name + rule] = {};
-							item.children.forEach((child) => {
-								parse(child, result[item.name + rule])
-							})
-						} else {
+						if(item.children) {
+							// Object
+							if (value) {
+								// result[item.name + rule] = vm.run(`(${item.value})`)
+								result[item.name + rule] = {};
+								item.children.forEach((child) => {
+									parse(child, result[item.name + rule])
+								})
+							} else {
+								result[item.name + rule] = {}
+								item.children.forEach((child) => {
+									parse(child, result[item.name + rule])
+								})
+							}
+						}else{
 							result[item.name + rule] = {}
-							item.children.forEach((child) => {
-								parse(child, result[item.name + rule])
-							})
 						}
 						break
 					case 5:
@@ -88,10 +92,14 @@ function treeToTemplate(tree, num = 0) {
 								result[item.name + rule] = item.value
 							}
 						} else {
-							result[item.name + rule] = item.children.length ? [{}] : []
-							item.children.forEach((child) => {
-								parse(child, result[item.name + rule][0])
-							})
+							if(item.children){
+								result[item.name + rule] = item.children.length ? [{}] : []
+								item.children.forEach((child) => {
+									parse(child, result[item.name + rule][0])
+								})
+							}else{
+								result[item.name + rule] = []
+							}
 						}
 						break
 					case 6:
