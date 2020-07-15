@@ -100,6 +100,7 @@ class IndexController extends BaseController
 		if (count($apiHost) < 2) {
 			throw new ErrorHttpException('请填写端口号');
 		}
+		$params['api_host'] = $apiHost[0].'/';
 		$params['server_port'] = $apiHost[1];
 
 		$dbHost = explode(':', $params['db_host']);
