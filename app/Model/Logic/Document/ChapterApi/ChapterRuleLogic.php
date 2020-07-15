@@ -24,21 +24,11 @@ class ChapterRuleLogic extends ChapterCommonLogic
 		$this->chapterId = $chapterId;
 	}
 
-	public function getChapterRuleMock($locationType, $reponseId)
+	public function getChapterRuleMock($reponseId)
 	{
 		$chapterId = $this->chapterId;
-		if ($locationType == 2) {
-			$locationList = array_keys($this->reponseIds());
-		} else {
-			$locationList = array_keys($this->requestIds());
-		}
-		$obj = ChapterApiParam::query()
-			->select(['id', 'chapter_id', 'reponse_id', 'parent_id', 'location', 'type', 'name', 'enabled', 'default_value', 'rule'])
-			->where('chapter_id', $chapterId);
-		if ($locationType && $reponseId) {
-			$obj->where('reponse_id', $reponseId);
-		}
-		$data = $obj->whereIn('location', $locationList)->get()->toArray();
+		$chapterRecordLogic = new ChapterRecordLogic($chapterId);
+		$data = $chapterRecordLogic->getBodyInfo($chapterId, ChapterApiParam::LOCATION_REPONSE_BODY_RAW, $reponseId);
 		$url = ienv('MOCK_API');
 		$json = $this->send_post($url, json_encode($data));
 		if ($this->isJson($json)) {

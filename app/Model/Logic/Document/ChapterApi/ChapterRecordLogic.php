@@ -592,7 +592,7 @@ class ChapterRecordLogic
 
 		if ($chapterApiParamData) {
 			foreach ($chapterApiParamData as $key => $val) {
-				if ($val->parent_id == 0) {
+				if ($val->parent_id == 0 && in_array($val->type, [ChapterApiParam::TYPE_OBJECT, ChapterApiParam::TYPE_ARRAY])) {
 					$val->children = $this->getBodyChildren($chapterApiParamData, $val->id);
 					$data[] = $val->toArray();
 				}
