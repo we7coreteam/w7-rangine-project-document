@@ -97,14 +97,14 @@ class IndexController extends BaseController
 			'cache_host' => '缓存服务器',
 		]);
 		$apiHost = explode(':', $params['api_host']);
-		if (count($apiHost) < 3) {
+		if (count($apiHost) < 3 || (!is_numeric($apiHost[2]))) {
 			throw new ErrorHttpException('请填写协议与端口号');
 		}
-		$params['api_host'] = $apiHost[0].':'.$apiHost[1].'/';
+		$params['api_host'] = $apiHost[0] . ':' . $apiHost[1] . '/';
 		$params['server_port'] = $apiHost[2];
 
 		$dbHost = explode(':', $params['db_host']);
-		if (count($dbHost) < 2) {
+		if (count($dbHost) < 2 || (!is_numeric($dbHost[1]))) {
 			throw new ErrorHttpException('请填写数据库端口号');
 		}
 		$params['db_host'] = $dbHost[0];
@@ -112,7 +112,7 @@ class IndexController extends BaseController
 
 		$params['cache_driver'] = 'redis';
 		$cacheHost = explode(':', $params['cache_host']);
-		if (count($cacheHost) < 2) {
+		if (count($cacheHost) < 2 || (!is_numeric($cacheHost[1]))) {
 			throw new ErrorHttpException('请填写redis端口号');
 		}
 		$params['cache_host'] = $cacheHost[0];
