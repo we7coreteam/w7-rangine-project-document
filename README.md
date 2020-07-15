@@ -31,8 +31,9 @@ composer install --no-dev
 
 #### 运行系统
 
-> 如果您的88端口被其他应用占用，您需要手动修改config/server文件中的 SERVER_HTTP_PORT 默认端口号
+> 如果您的99端口被其他应用占用，您需要手动修改config/server文件中的 SERVER_HTTP_PORT 默认端口号
 
+项目根目录下执行命令
 ```
 bin/server start
 ```
@@ -41,13 +42,9 @@ bin/server start
 访问根目录/install.html,按照页面提示进行安装
 安装完成后重启服务
 
-关闭服务
+重启服务：项目根目录下执行命令
 ```
-bin/server stop
-```
-开启服务
-```
-bin/server start
+sh restart.sh
 ```
 
 

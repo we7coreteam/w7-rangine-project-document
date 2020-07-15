@@ -15,7 +15,7 @@ $serverSetting = [
 	],
 	'tcp' => [
 		'host' => '0.0.0.0',
-		'port' => ienv('SERVER_TCP_PORT', '99')
+		'port' => ienv('SERVER_TCP_PORT', '9999')
 	],
 	'http' => [
 		'host' => '0.0.0.0',
