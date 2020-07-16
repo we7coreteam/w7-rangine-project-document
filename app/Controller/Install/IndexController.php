@@ -57,11 +57,12 @@ class IndexController extends BaseController
 		$hasEnv = $this->hasEnv();
 		if ($isInstall) {
 			$data = [
-				['id' => 1, 'name' => '安装记录', 'result' => $isInstall ? '请确认文档系统是否已安装，如需重装请手动删除runtime/install.lock文件' : '未安装', 'enable' => $isInstall ? true : false],
 				['id' => 12, 'name' => '服务重启', 'result' => $hasEnv ? '.env已生成' : '确认项目服务是否重启，重启请操作：sh restart.sh', 'enable' => $hasEnv ? false : true],
+				['id' => 1, 'name' => '安装记录', 'result' => $isInstall ? '请确认文档系统是否已安装，如需重装请手动删除runtime/install.lock文件' : '未安装', 'enable' => $isInstall ? true : false],
 			];
 		} else {
 			$data = [
+				['id' => 12, 'name' => '服务重启', 'result' => $hasEnv ? '.env已生成' : '确认项目服务是否重启，重启请操作：sh restart.sh', 'enable' => $hasEnv ? false : true],
 				['id' => 1, 'name' => '安装记录', 'result' => $isInstall ? '请确认文档系统是否已安装，如需重装请手动删除runtime/install.lock文件' : '未安装', 'enable' => $isInstall ? true : false],
 				['id' => 2, 'name' => '服务器操作系统', 'result' => php_uname(), 'enable' => true],
 				['id' => 3, 'name' => 'PHP版本', 'result' => PHP_VERSION >= 7.2 ? PHP_VERSION : 'PHP版本7.2及以上', 'enable' => PHP_VERSION >= 7.2 ? true : false],
@@ -73,7 +74,6 @@ class IndexController extends BaseController
 				['id' => 9, 'name' => 'exec命令', 'result' => function_exists('exec') ? '支持' : '不支持', 'enable' => function_exists('exec') ? true : false],
 				['id' => 10, 'name' => '磁盘空间', 'result' => ($diskfreespace > 200000000) ? $diskfreespaceG . 'G' : '存储空间200M以上', 'enable' => ($diskfreespace > 200000000) ? true : false],
 				['id' => 11, 'name' => 'redis扩展', 'result' => extension_loaded('redis') ? '已安装redis扩展' : '未安装redis扩展', 'enable' => extension_loaded('redis') ? true : false],
-				['id' => 12, 'name' => '服务重启', 'result' => $hasEnv ? '.env已生成' : '确认项目服务是否重启，重启请操作：sh restart.sh', 'enable' => $hasEnv ? false : true],
 			];
 		}
 		return $this->data($data);
