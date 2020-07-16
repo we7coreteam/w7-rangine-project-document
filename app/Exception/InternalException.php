@@ -18,6 +18,6 @@ class InternalException extends ResponseExceptionAbstract
 {
 	public function __construct($message = '', $code = 0, \Throwable $previous = null)
 	{
-		parent::__construct($message, 200, $previous);
+		parent::__construct($message, 500, $previous);
 	}
 }
