@@ -12,5 +12,3 @@
 
 irouter()->post('/install/systemDetection', 'Install\IndexController@systemDetection');
 irouter()->post('/install/install', 'Install\IndexController@install');
-irouter()->post('/install/config', 'Install\IndexController@config');
-
