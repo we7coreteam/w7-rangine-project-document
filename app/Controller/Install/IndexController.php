@@ -96,6 +96,7 @@ class IndexController extends BaseController
 			'admin_username' => 'required',
 			'admin_password' => 'required',
 			'cache_host' => 'string',
+			'option' => 'required',
 		], [
 			'api_host' => '服务器地址',
 			'db_database' => '数据库',

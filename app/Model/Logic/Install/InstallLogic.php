@@ -39,6 +39,20 @@ class InstallLogic
 				throw new ErrorHttpException($exception->getMessage());
 			}
 
+			//仅做验证，不进行安装操作
+			if ($config['option'] == 'check') {
+				//验证数据库
+				try {
+					$connect = new \PDO("mysql:host={$config['db_host']};port={$config['db_port']};charset=utf8", $config['db_username'], $config['db_password']);
+					if (!$connect) {
+						throw new ErrorHttpException('数据库链接失败');
+					}
+				} catch (\Throwable $exception) {
+					throw new ErrorHttpException($exception->getMessage());
+				}
+				return '验证通过';
+			}
+
 			// 生成配置文件
 			$this->generateConfig($config);
 
