@@ -47,9 +47,16 @@ class InstallLogic
 					if (!$connect) {
 						throw new InternalException('数据库链接失败');
 					}
+					$connect->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+					$statement = $connect->query("SHOW DATABASES LIKE '{$config['db_database']}';");
+					$hasDb = $statement->fetch();
+					if ($hasDb) {
+						throw new InternalException('数据库已存在');
+					}
 				} catch (\Throwable $exception) {
-					throw new InternalException('数据库链接失败：' . $exception->getMessage());
+					throw new InternalException($exception->getMessage());
 				}
+
 				return '验证通过';
 			}
 
