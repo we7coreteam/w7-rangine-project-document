@@ -47,6 +47,9 @@ bin/server start
 sh restart.sh
 ```
 
+如需重新安装
+请手动删除 runtime/install.lock 文件
+
 
 
 
