@@ -21,13 +21,24 @@ class IndexController extends BaseController
 {
 	public function config(Request $request)
 	{
-		$isInstall = file_exists(RUNTIME_PATH . '/install.lock');
 		$data = [
-			'is_install' => $isInstall,
+			'is_install' => $this->isInstall(),
 			'api_host' => ienv('API_HOST'),
 			'db_database' => ienv('DATABASE_DEFAULT_DATABASE'),
 		];
 		return $this->data($data);
+	}
+
+	public function isInstall()
+	{
+		$isInstall = file_exists(RUNTIME_PATH . '/install.lock');
+		if ($isInstall) {
+			//如果是已安装状态，但是把.env删了
+			if (!ienv('API_HOST')) {
+				$isInstall = false;
+			}
+		}
+		return $isInstall ? true : false;
 	}
 
 	/**
@@ -42,7 +53,7 @@ class IndexController extends BaseController
 	{
 		$diskfreespace = diskfreespace(BASE_PATH);
 		$diskfreespaceG = (ceil($diskfreespace / 1000 / 1000 / 10) / 100);
-		$isInstall = file_exists(RUNTIME_PATH . '/install.lock');
+		$isInstall = $this->isInstall();
 		if ($isInstall) {
 			$data = [
 				['id' => 1, 'name' => '已有安装记录', 'result' => $isInstall ? '文档系统已经安装，如果需要重新安装请手动删除 runtime/install.lock 文件' : '未安装', 'enable' => $isInstall ? true : false],
