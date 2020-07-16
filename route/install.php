@@ -12,4 +12,4 @@
 
 irouter()->post('/install/systemDetection', 'Install\IndexController@systemDetection');
 irouter()->post('/install/install', 'Install\IndexController@install');
-irouter()->post('/install/getConfig', 'Install\IndexController@getConfig');
+irouter()->post('/install/getConfig', 'Install\IndexController@config');

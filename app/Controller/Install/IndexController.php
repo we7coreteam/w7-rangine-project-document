@@ -19,7 +19,7 @@ use W7\Http\Message\Server\Request;
 
 class IndexController extends BaseController
 {
-	public function getConfig(Request $request)
+	public function config(Request $request)
 	{
 		$isInstall = file_exists(RUNTIME_PATH . '/install.lock');
 		$data = [
