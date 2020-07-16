@@ -29,6 +29,16 @@ class InstallLogic
 			// 版本检查
 			$this->checkExtension();
 
+			try {
+				$redis = new \Redis();
+				$connect = $redis->connect($config['cache_host'], $config['cache_port'], 15);
+				if (!$connect) {
+					throw new ErrorHttpException('redis链接失败');
+				}
+			} catch (\Throwable $exception) {
+				throw new ErrorHttpException($exception->getMessage());
+			}
+
 			// 生成配置文件
 			$this->generateConfig($config);
 
