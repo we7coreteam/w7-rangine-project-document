@@ -12,6 +12,7 @@
 
 namespace W7\App\Handler\Exception;
 
+use W7\App\Exception\InternalException;
 use W7\App\Model\Logic\Document\MockApi\MockApiReponseLogic;
 use function GuzzleHttp\Psr7\build_query;
 use Overtrue\Socialite\Config;
@@ -45,7 +46,7 @@ class ExceptionHandler extends ExceptionHandlerAbstract
 //			}
 
 			//如果访问的是admin下的路由，先检测是否登录
-			if (substr($route, 0, 12) == '/admin-login'||$route == '/') {
+			if (substr($route, 0, 12) == '/admin-login' || $route == '/') {
 				return $this->getResponse()->html(iloader()->singleton(View::class)->render('@public/index'));
 			}
 			if (substr($route, 0, 6) == '/admin') {
@@ -82,7 +83,15 @@ class ExceptionHandler extends ExceptionHandlerAbstract
 			//mockApi-e
 			return $this->getResponse()->html(iloader()->singleton(View::class)->render('@public/index'));
 		}
-
+		if ($e instanceof InternalException) {
+			$message = json_encode([
+				'status' => false,
+				'code' => $e->getCode(),
+				'data' => [],
+				'message' => $e->getMessage(),
+			], JSON_UNESCAPED_UNICODE);
+			return $this->getResponse()->withContent($message);
+		}
 		if ($e instanceof ValidatorException) {
 			$e = new ErrorHttpException($e->getMessage(), [], $e->getCode());
 		}

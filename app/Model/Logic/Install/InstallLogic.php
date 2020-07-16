@@ -12,7 +12,7 @@
 
 namespace W7\App\Model\Logic\Install;
 
-use W7\App\Exception\ErrorHttpException;
+use W7\App\Exception\InternalException;
 use W7\App\Model\Logic\UserLogic;
 
 class InstallLogic
@@ -23,7 +23,7 @@ class InstallLogic
 			// 是否已安装
 			$lockFile = RUNTIME_PATH . '/install.lock';
 			if (file_exists($lockFile)) {
-				throw new ErrorHttpException('文档系统已经安装，如果需要重新安装请手动删除 runtime/install.lock 文件');
+				throw new InternalException('文档系统已经安装，如果需要重新安装请手动删除 runtime/install.lock 文件');
 			}
 
 			// 版本检查
@@ -33,10 +33,10 @@ class InstallLogic
 				$redis = new \Redis();
 				$connect = $redis->connect($config['cache_host'], $config['cache_port'], 15);
 				if (!$connect) {
-					throw new ErrorHttpException('redis链接失败');
+					throw new InternalException('redis链接失败');
 				}
 			} catch (\Throwable $exception) {
-				throw new ErrorHttpException($exception->getMessage());
+				throw new InternalException('redis链接失败：' . $exception->getMessage());
 			}
 
 			//仅做验证，不进行安装操作
@@ -45,10 +45,10 @@ class InstallLogic
 				try {
 					$connect = new \PDO("mysql:host={$config['db_host']};port={$config['db_port']};charset=utf8", $config['db_username'], $config['db_password']);
 					if (!$connect) {
-						throw new ErrorHttpException('数据库链接失败');
+						throw new InternalException('数据库链接失败');
 					}
 				} catch (\Throwable $exception) {
-					throw new ErrorHttpException($exception->getMessage());
+					throw new InternalException('数据库链接失败：' . $exception->getMessage());
 				}
 				return '验证通过';
 			}
@@ -64,7 +64,7 @@ class InstallLogic
 
 			return '安装已完成！提示：配置文件重启后生效，请按照文档配置，重启相关服务';
 		} catch (\Exception $e) {
-			throw new ErrorHttpException($e->getMessage());
+			throw new InternalException($e->getMessage());
 		}
 	}
 
@@ -78,13 +78,13 @@ class InstallLogic
 			$connect->exec($sql);
 			$statement = $connect->query("SHOW DATABASES LIKE '{$config['db_database']}';");
 			if (empty($statement->fetch())) {
-				throw new ErrorHttpException('创建数据库失败！');
+				throw new InternalException('创建数据库失败！');
 			}
 
 			$connect->exec("USE {$config['db_database']};");
 			$statement = $connect->query("SHOW TABLES LIKE '{$config['db_prefix']}%';");
 			if (!empty($statement->fetch())) {
-				throw new ErrorHttpException('您的数据库不为空，请重新建立数据库或清空该数据库或更改表前缀！');
+				throw new InternalException('您的数据库不为空，请重新建立数据库或清空该数据库或更改表前缀！');
 			}
 
 			// 导入数据
@@ -98,7 +98,7 @@ class InstallLogic
 
 			return true;
 		} catch (\PDOException $e) {
-			throw new ErrorHttpException($e->getMessage());
+			throw new InternalException($e->getMessage());
 		}
 	}
 
@@ -124,11 +124,11 @@ class InstallLogic
 			$connect->exec($sql);
 			$statement = $connect->query("SELECT * FROM {$userTable} WHERE username = '{$username}'");
 			if (empty($statement->fetch())) {
-				throw new ErrorHttpException('创建系统管理员失败！');
+				throw new InternalException('创建系统管理员失败！');
 			}
 			$connect = null;
 		} catch (\PDOException $e) {
-			throw new ErrorHttpException($e->getMessage());
+			throw new InternalException($e->getMessage());
 		}
 	}
 
@@ -158,37 +158,37 @@ class InstallLogic
 		}
 
 		if (file_put_contents(BASE_PATH . '/.env', $env) === false) {
-			throw new ErrorHttpException('配置文件写入失败！');
+			throw new InternalException('配置文件写入失败！');
 		}
 	}
 
 	private function checkExtension()
 	{
 		if (version_compare(PHP_VERSION, '7.2.0', '<')) {
-			throw new ErrorHttpException('PHP 版本必须>= 7.2.0');
+			throw new InternalException('PHP 版本必须>= 7.2.0');
 		}
 
 		$extension = ['pdo_mysql', 'mbstring', 'swoole'];
 		foreach ($extension as $ext) {
 			if (!extension_loaded($ext)) {
-				throw new ErrorHttpException($ext . ' 扩展未安装');
+				throw new InternalException($ext . ' 扩展未安装');
 			}
 		}
 
 		if (version_compare(swoole_version(), '4.3.0', '<')) {
-			throw new ErrorHttpException('swoole 版本必须>= 4.3.0');
+			throw new InternalException('swoole 版本必须>= 4.3.0');
 		}
 
 		if (is_writable(BASE_PATH) === false) {
-			throw new ErrorHttpException('请保证' . BASE_PATH . '目录有写权限！');
+			throw new InternalException('请保证' . BASE_PATH . '目录有写权限！');
 		}
 
 		if (is_writable(RUNTIME_PATH) === false) {
-			throw new ErrorHttpException('请保证' . RUNTIME_PATH . '目录有写权限！');
+			throw new InternalException('请保证' . RUNTIME_PATH . '目录有写权限！');
 		}
 
 		if (!file_exists(BASE_PATH . '/composer.json')) {
-			throw new ErrorHttpException('请先执行 composer install --no-dev 安装扩展包');
+			throw new InternalException('请先执行 composer install --no-dev 安装扩展包');
 		}
 		return true;
 	}
