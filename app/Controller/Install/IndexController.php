@@ -25,7 +25,7 @@ class IndexController extends BaseController
 		$data = [
 			'is_install' => $isInstall,
 			'api_host' => ienv('API_HOST'),
-			'db_username' => ienv('DATABASE_DEFAULT_DATABASE'),
+			'db_database' => ienv('DATABASE_DEFAULT_DATABASE'),
 		];
 		return $this->data($data);
 	}
