@@ -20,6 +20,21 @@ use W7\Http\Message\Server\Request;
 class IndexController extends BaseController
 {
 	/**
+	 * @api {post} /install/config 获取系统配置
+	 * @apiName config
+	 * @apiGroup install
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"API_HOST":"http:\/\/192.168.168.31\/","DATABASE_DEFAULT_DATABASE":"document_test223"}
+	 */
+	public function config(Request $request)
+	{
+		return [
+			'API_HOST' => ienv('API_HOST'),
+			'DATABASE_DEFAULT_DATABASE' => ienv('DATABASE_DEFAULT_DATABASE')
+		];
+	}
+
+	/**
 	 * @api {post} /install/systemDetection 系统检测
 	 * @apiName systemDetection
 	 * @apiGroup install
