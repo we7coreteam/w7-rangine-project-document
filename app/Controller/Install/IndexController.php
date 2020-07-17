@@ -71,7 +71,7 @@ class IndexController extends BaseController
 				['id' => 6, 'name' => 'swoole扩展', 'result' => (extension_loaded('swoole') & swoole_version() >= '4.3.0') ? 'swoole版本' . swoole_version() : 'swoole版本4.3.0及以上', 'enable' => (extension_loaded('swoole') & swoole_version() >= '4.3.0') ? true : false],
 				['id' => 7, 'name' => 'mysql扩展', 'result' => extension_loaded('pdo_mysql') ? '已安装pdo_mysql扩展' : '未安装pdo_mysql扩展', 'enable' => extension_loaded('pdo_mysql') ? true : false],
 				['id' => 8, 'name' => 'mbstring扩展', 'result' => extension_loaded('mbstring') ? '已安装mbstring扩展' : '未安装mbstring扩展', 'enable' => extension_loaded('mbstring') ? true : false],
-				['id' => 9, 'name' => 'exec命令', 'result' => function_exists('exec') ? '支持' : '不支持', 'enable' => function_exists('exec') ? true : false],
+//				['id' => 9, 'name' => 'exec命令', 'result' => function_exists('exec') ? '支持' : '不支持', 'enable' => function_exists('exec') ? true : false],
 				['id' => 10, 'name' => '磁盘空间', 'result' => ($diskfreespace > 200000000) ? $diskfreespaceG . 'G' : '存储空间200M以上', 'enable' => ($diskfreespace > 200000000) ? true : false],
 				['id' => 11, 'name' => 'redis扩展', 'result' => extension_loaded('redis') ? '已安装redis扩展' : '未安装redis扩展', 'enable' => extension_loaded('redis') ? true : false],
 			];

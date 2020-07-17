@@ -48,7 +48,7 @@ sh restart.sh
 ```
 
 如需重新安装
-请手动删除 runtime/install.lock 文件
+请手动删除 runtime/install.lock 与.env文件 并且重启服务
 
 
 
