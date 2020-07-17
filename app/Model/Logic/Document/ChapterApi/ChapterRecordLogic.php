@@ -37,7 +37,7 @@ class ChapterRecordLogic
 	}
 
 	/*
-	 * type=1仅返回markdown2同时插入数据和返回markdown
+	 * type=1仅返回markdown（重新生成缓存） 2同时插入数据和返回markdown（编辑）
 	 * */
 	public function recordToMarkdown($record, $sqlType = 2)
 	{
