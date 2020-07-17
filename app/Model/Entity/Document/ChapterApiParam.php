@@ -25,6 +25,7 @@ class ChapterApiParam extends BaseModel
 	const TABLE_ENABLED_LENGTH = 5;//类型必填宽度
 	const TABLE_DESCRIPTION_LENGTH = 20;//描述默认宽度
 	const TABLE_VALUE_LENGTH = 20;//示例值默认宽度
+	const TABLE_RULE_LENGTH = 20;//示例值默认宽度
 
 	const ENABLED_NO = 1;
 	const ENABLED_YES = 2;
