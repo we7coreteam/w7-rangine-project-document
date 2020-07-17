@@ -130,6 +130,12 @@ class ChapterRecordLogic
 					if ($chapterApiReponse) {
 						$chapterApiReponse->description = $val['description'];
 						$chapterApiReponse->save();
+					} else {
+						//如果已经删除，重新新增
+						$chapterApiReponse = ChapterApiReponse::query()->create([
+							'chapter_id' => $chapterId,
+							'description' => $val['description']
+						]);
 					}
 				} else {
 					//新增
@@ -535,8 +541,12 @@ class ChapterRecordLogic
 	public function chapterApiParamData($chapterId, $location, $reponseId = 0)
 	{
 		//全部数据
-		return ChapterApiParam::query()
-			->where('location', $location)->where('chapter_id', $chapterId)->where('reponse_id', $reponseId)->get();
+		$obj = ChapterApiParam::query()
+			->where('location', $location)->where('chapter_id', $chapterId);
+		if ($reponseId) {
+			$obj->where('reponse_id', $reponseId);
+		}
+		return $obj->get();
 	}
 
 	public function showRecord()
