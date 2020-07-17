@@ -40,21 +40,23 @@ class MockApiReponseLogic
 			$jsonData = json_decode($jsonData, true);
 		}
 		foreach ($data as $key => $val) {
-			if ($val->location == ChapterApiParam::LOCATION_REQUEST_HEADER) {
-				if (!$request->hasHeader($val->name)) {
-					$msg .= 'header:' . $val->name . '必填 ';
-				}
-			} elseif ($val->location == ChapterApiParam::LOCATION_REQUEST_QUERY_STRING) {
-				if ($request->query($val->name) == null) {
-					$msg .= 'query:' . $val->name . '必填 ';
-				}
-			} elseif ($val->location == ChapterApiParam::LOCATION_REQUEST_BODY_RAW || $jsonData) {
-				if (!(isset($jsonData[$val->name]) && $jsonData[$val->name])) {
-					$msg .= 'params:' . $val->name . '必填 ';
-				}
-			} elseif (in_array($val->location, [ChapterApiParam::LOCATION_REQUEST_BODY_FROM, ChapterApiParam::LOCATION_REQUEST_BODY_URLENCODED])) {
-				if ($request->post($val->name) == null) {
-					$msg .= 'params:' . $val->name . '必填 ';
+			if ($val->enabled == ChapterApiParam::ENABLED_YES) {
+				if ($val->location == ChapterApiParam::LOCATION_REQUEST_HEADER) {
+					if (!$request->hasHeader($val->name)) {
+						$msg .= 'header:' . $val->name . '必填 ';
+					}
+				} elseif ($val->location == ChapterApiParam::LOCATION_REQUEST_QUERY_STRING) {
+					if ($request->query($val->name) == null) {
+						$msg .= 'query:' . $val->name . '必填 ';
+					}
+				} elseif ($val->location == ChapterApiParam::LOCATION_REQUEST_BODY_RAW || $jsonData) {
+					if (!(isset($jsonData[$val->name]) && $jsonData[$val->name])) {
+						$msg .= 'params:' . $val->name . '必填 ';
+					}
+				} elseif (in_array($val->location, [ChapterApiParam::LOCATION_REQUEST_BODY_FROM, ChapterApiParam::LOCATION_REQUEST_BODY_URLENCODED])) {
+					if ($request->post($val->name) == null) {
+						$msg .= 'params:' . $val->name . '必填 ';
+					}
 				}
 			}
 		}
