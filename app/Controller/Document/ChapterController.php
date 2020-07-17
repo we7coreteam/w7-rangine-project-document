@@ -14,6 +14,7 @@ namespace W7\App\Controller\Document;
 
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
+use W7\App\Model\Entity\Document\ChapterApi;
 use W7\App\Model\Entity\Document\ChapterContent;
 use W7\App\Model\Entity\Setting;
 use W7\App\Model\Entity\Star;
@@ -199,8 +200,11 @@ class ChapterController extends BaseController
 		if (!empty($user->id)) {
 			$star = Star::query()->where('user_id', '=', $user->id)->where('chapter_id', '=', $chapter->id)->first();
 		}
-		if (!$chapter->content->content) {
-			if ($chapter->content->layout == ChapterContent::LAYOUT_HTTP) {
+		$api = null;
+
+		if ($chapter->content->layout == ChapterContent::LAYOUT_HTTP) {
+			$api = ChapterApi::query()->where('chapter_id', $chapter->id)->first();
+			if (!$chapter->content->content) {
 				$markdownText = '#';
 				//如果是导入的，没有生成文档的数据，进行生成文档并标记
 				$chapterRecordLogic = new ChapterRecordLogic($chapter->id);
@@ -238,7 +242,8 @@ class ChapterController extends BaseController
 				'uid' => $author->id,
 				'username' => $author->username,
 			],
-			'document' => $document
+			'document' => $document,
+			'api' => $api
 		];
 
 		$showRecord = $request->post('show_record', 0);
