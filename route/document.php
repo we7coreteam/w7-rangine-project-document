@@ -19,4 +19,5 @@ irouter()->middleware('FrontendDocumentPermissionMiddleware')->group(['prefix' =
 });
 irouter()->group(['prefix' => '/document'], function (\W7\Core\Route\Route $route) {
 	$route->post('/chapter/record', 'Document\ChapterController@record');
+	$route->all('/mockApiReponse/{id}/{router:[\w/]+}', 'Document\MockApiReponseController@index');
 });

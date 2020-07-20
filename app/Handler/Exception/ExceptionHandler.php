@@ -13,7 +13,6 @@
 namespace W7\App\Handler\Exception;
 
 use W7\App\Exception\InternalException;
-use W7\App\Model\Logic\Document\MockApi\MockApiReponseLogic;
 use function GuzzleHttp\Psr7\build_query;
 use Overtrue\Socialite\Config;
 use Overtrue\Socialite\SocialiteManager;
@@ -70,17 +69,6 @@ class ExceptionHandler extends ExceptionHandlerAbstract
 					}
 				}
 			}
-			//mockApi-s
-			$routeArr = explode('/', $route);
-			if (count($routeArr) > 3) {
-				if ($routeArr[1] == 'document' && $routeArr[2] == 'mockApiReponse') {
-					//如果是mockApi
-					$MockApiReponseLogic = new MockApiReponseLogic();
-					$ret = $MockApiReponseLogic->mackMockApiReponse($request, $route);
-					return $this->getResponse()->json($ret);
-				}
-			}
-			//mockApi-e
 			return $this->getResponse()->html(iloader()->singleton(View::class)->render('@public/index'));
 		}
 		if ($e instanceof InternalException) {
