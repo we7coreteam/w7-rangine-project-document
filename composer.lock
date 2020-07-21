@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0d99e18cbd6921071687da545f983f37",
+    "content-hash": "d717c28b8fc60a398e1a7a536424902b",
     "packages": [
         {
             "name": "caouecs/laravel-lang",
@@ -7659,6 +7659,60 @@
             ],
             "description": "A small library for converting tokenized PHP source code into XML and potentially other formats",
             "time": "2020-07-12T23:59:07+00:00"
+        },
+        {
+            "name": "w7/rangine-debugger",
+            "version": "v1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/we7coreteam/w7-rangine-debugger.git",
+                "reference": "65ff788ac4ef805f8e9b30e0b2f8fde0d5ee98c8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/we7coreteam/w7-rangine-debugger/zipball/65ff788ac4ef805f8e9b30e0b2f8fde0d5ee98c8",
+                "reference": "65ff788ac4ef805f8e9b30e0b2f8fde0d5ee98c8",
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "require": {
+                "php": ">=7.1.0",
+                "w7/rangine": "~2.0"
+            },
+            "require-dev": {
+                "w7/php-cs-fixer": "^1.0"
+            },
+            "type": "library",
+            "extra": {
+                "rangine": {
+                    "providers": [
+                        "W7\\Debugger\\ServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "W7\\Debugger\\": "src/"
+                },
+                "files": [
+                    "src/Helper/Functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "description": " Rangine Debugger.",
+            "keywords": [
+                "debugger",
+                "rangine"
+            ],
+            "time": "2020-04-21T14:12:39+00:00"
         },
         {
             "name": "webmozart/assert",
