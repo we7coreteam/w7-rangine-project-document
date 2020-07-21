@@ -26,7 +26,7 @@ https://github.com/we7coreteam/w7-rangine-project-document/releases/ 下载最�
 #### 安装扩展包
 
 ```
-composer install --no-dev
+composer install
 ```
 
 #### 运行系统

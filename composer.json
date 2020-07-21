@@ -30,7 +30,14 @@
 		]
 	},
 	"require": {
-		"w7/rangine": "*",
+		"w7/rangine": "2.2.5",
+		"w7/rangine-crontab": "1.0.7",
+		"w7/rangine-command": "2.0.17",
+		"w7/rangine-http-message": "2.1.2",
+		"w7/rangine-database-tool": "1.0.7",
+		"w7/rangine-package-plugin": "1.0.5",
+		"w7/rangine-lang": "1.0.2",
+		"w7/rangine-cache-model": "2.0.3",
 		"ext-json": "*",
 		"gregwar/captcha": "^1.1",
 		"qcloud/cos-sdk-v5": "^1.3",
