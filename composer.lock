@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ca4d45561b09af065b86903cf789009a",
+    "content-hash": "0d99e18cbd6921071687da545f983f37",
     "packages": [
         {
             "name": "caouecs/laravel-lang",
@@ -4969,16 +4969,16 @@
         },
         {
             "name": "symfony/var-dumper",
-            "version": "v4.4.10",
+            "version": "v5.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/var-dumper.git",
-                "reference": "56b3aa5eab0ac6720dcd559fd1d590ce301594ac"
+                "reference": "46a942903059b0b05e601f00eb64179e05578c0f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/56b3aa5eab0ac6720dcd559fd1d590ce301594ac",
-                "reference": "56b3aa5eab0ac6720dcd559fd1d590ce301594ac",
+                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/46a942903059b0b05e601f00eb64179e05578c0f",
+                "reference": "46a942903059b0b05e601f00eb64179e05578c0f",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -4988,20 +4988,19 @@
                 ]
             },
             "require": {
-                "php": ">=7.1.3",
+                "php": ">=7.2.5",
                 "symfony/polyfill-mbstring": "~1.0",
-                "symfony/polyfill-php72": "~1.5",
                 "symfony/polyfill-php80": "^1.15"
             },
             "conflict": {
-                "phpunit/phpunit": "<4.8.35|<5.4.3,>=5.0",
-                "symfony/console": "<3.4"
+                "phpunit/phpunit": "<5.4.3",
+                "symfony/console": "<4.4"
             },
             "require-dev": {
                 "ext-iconv": "*",
-                "symfony/console": "^3.4|^4.0|^5.0",
+                "symfony/console": "^4.4|^5.0",
                 "symfony/process": "^4.4|^5.0",
-                "twig/twig": "^1.34|^2.4|^3.0"
+                "twig/twig": "^2.4|^3.0"
             },
             "suggest": {
                 "ext-iconv": "To convert non-UTF-8 strings to UTF-8 (or symfony/polyfill-iconv in case ext-iconv cannot be used).",
@@ -5014,7 +5013,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "4.4-dev"
+                    "dev-master": "5.1-dev"
                 }
             },
             "autoload": {
@@ -5048,7 +5047,7 @@
                 "debug",
                 "dump"
             ],
-            "time": "2020-05-30T20:06:45+00:00"
+            "time": "2020-05-30T20:35:19+00:00"
         },
         {
             "name": "twig/twig",
@@ -7660,61 +7659,6 @@
             ],
             "description": "A small library for converting tokenized PHP source code into XML and potentially other formats",
             "time": "2020-07-12T23:59:07+00:00"
-        },
-        {
-            "name": "w7/rangine-debugger",
-            "version": "v1.0.7",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/we7coreteam/w7-rangine-debugger.git",
-                "reference": "7816af5138e9149d6e849ab31cdb597c30005d11"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/we7coreteam/w7-rangine-debugger/zipball/7816af5138e9149d6e849ab31cdb597c30005d11",
-                "reference": "7816af5138e9149d6e849ab31cdb597c30005d11",
-                "shasum": "",
-                "mirrors": [
-                    {
-                        "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
-                        "preferred": true
-                    }
-                ]
-            },
-            "require": {
-                "php": ">=7.1.0",
-                "symfony/var-dumper": "^4.1"
-            },
-            "require-dev": {
-                "w7/php-cs-fixer": "^1.0",
-                "w7/rangine": "~2.0"
-            },
-            "type": "library",
-            "extra": {
-                "rangine": {
-                    "providers": [
-                        "W7\\Debugger\\ServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "W7\\Debugger\\": "src/"
-                },
-                "files": [
-                    "src/Helper/Functions.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "description": " Rangine Debugger.",
-            "keywords": [
-                "debugger",
-                "rangine"
-            ],
-            "time": "2020-07-10T10:45:49+00:00"
         },
         {
             "name": "webmozart/assert",
