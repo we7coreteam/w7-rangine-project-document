@@ -40,7 +40,7 @@ class CorsApiMiddleware implements MiddlewareInterface
 
 		$response = $response->withHeader('Access-Control-Allow-Origin', $headerHost);
 		$response = $response->withHeader('Access-Control-Allow-Credentials', 'true');
-		$response = $response->withHeader('Access-Control-Allow-Headers', implode(',', $this->allowHeaders));
+		$response = $response->withHeader('Access-Control-Allow-Headers', implode(',', $allowHeaders));
 		$response = $response->withHeader('Access-Control-Allow-Methods', 'POST, GET, DELETE, PUT, PATCH, OPTIONS');
 		if ($request->getMethod() == 'OPTIONS') {
 			return $response->json('success');
