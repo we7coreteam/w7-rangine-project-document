@@ -22,13 +22,14 @@ class CorsApiMiddleware implements MiddlewareInterface
 {
 	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
 	{
-		$headerHost = $request->getHeader('origin');
-		if (!$headerHost) {
-			$headerHost = $request->getHeader('referer');
-		}
-		$headerHost = current($headerHost);
-		$urlInfo = parse_url($headerHost);
-		$headerHost = ($urlInfo['scheme'] ?? '') . '://' . ($urlInfo['host'] ?? '');
+		$headerHost='*';
+//		$headerHost = $request->getHeader('origin');
+//		if (!$headerHost) {
+//			$headerHost = $request->getHeader('referer');
+//		}
+//		$headerHost = current($headerHost);
+//		$urlInfo = parse_url($headerHost);
+//		$headerHost = ($urlInfo['scheme'] ?? '') . '://' . ($urlInfo['host'] ?? '');
 
 		$response = App::getApp()->getContext()->getResponse();
 
