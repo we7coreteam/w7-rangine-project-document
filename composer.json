@@ -26,16 +26,21 @@
 		]
 	},
 	"require": {
-		"w7/rangine": "2.2.3",
+		"w7/rangine": "2.2.5",
+		"w7/rangine-command": "2.0.17",
+		"w7/rangine-http-message": "2.1.2",
+		"w7/rangine-database-tool": "1.0.7",
+		"w7/rangine-package-plugin": "1.0.5",
+		"w7/rangine-lang": "1.0.2",
+		"w7/rangine-cache-model": "2.0.3",
 		"ext-json": "*",
 		"gregwar/captcha": "^1.1",
 		"qcloud/cos-sdk-v5": "^1.3"
 	},
 	"require-dev": {
-		"eaglewu/swoole-ide-helper": "dev-master",
 		"phpunit/phpunit": "^7.0",
 		"squizlabs/php_codesniffer": "*",
 		"friendsofphp/php-cs-fixer": "^2.15",
-		"w7/rangine-debugger": "^1.0"
+		"w7/rangine-debugger": "1.0.4"
 	}
 }
