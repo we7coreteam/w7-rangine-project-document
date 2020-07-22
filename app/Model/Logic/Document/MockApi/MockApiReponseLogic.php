@@ -43,7 +43,7 @@ class MockApiReponseLogic
 			if ($val->enabled == ChapterApiParam::ENABLED_YES) {
 				if ($val->location == ChapterApiParam::LOCATION_REQUEST_HEADER) {
 					if (!$request->hasHeader($val->name)) {
-						$msg .= 'header:' . $val->name . '必填 '.json_encode($request->header());
+						$msg .= 'header:' . $val->name . '必填 ';
 					}
 				} elseif ($val->location == ChapterApiParam::LOCATION_REQUEST_QUERY_STRING) {
 					if ($request->query($val->name) == null) {
