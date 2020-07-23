@@ -117,11 +117,12 @@ class AuthController extends BaseController
 		foreach ($setting['channel'] as $key => $item) {
 			if (!empty($item['setting']['enable'])) {
 				try {
+					$socialite = clone $socialite;
+					$url = ienv('API_HOST') . 'login?app_id=' . $key . '&redirect_url=' . urlencode($redirectUrl);
 					$redirect = $socialite->config(new Config([
 						'client_id' => $item['setting']['app_id'],
-						'client_secret' => $item['setting']['secret_key'],
-						'redirect_url' => ienv('API_HOST') . 'login?app_id=' . $key . '&redirect_url=' . urlencode($redirectUrl)
-					]))->driver($key)->stateless()->redirect()->getTargetUrl();
+						'client_secret' => $item['setting']['secret_key']
+					]))->driver($key)->stateless()->redirect($url)->getTargetUrl();
 				} catch (Throwable $e) {
 					$redirect = null;
 				}
@@ -146,12 +147,13 @@ class AuthController extends BaseController
 			 * @var SocialiteManager $socialite
 			 */
 			$socialite = iloader()->get(SocialiteManager::class);
+			$socialite = clone $socialite;
+			$url = ienv('API_HOST') . 'login?app_id=' . $defaultSetting['default_login_channel'] . '&redirect_url=' . $redirectUrl;
 			try {
 				return $this->data($socialite->config(new Config([
 					'client_id' => $setting['setting']['app_id'],
-					'client_secret' => $setting['setting']['secret_key'],
-					'redirect_url' => ienv('API_HOST') . 'login?app_id=' . $defaultSetting['default_login_channel'] . '&redirect_url=' . $redirectUrl
-				]))->driver($defaultSetting['default_login_channel'])->stateless()->redirect()->getTargetUrl());
+					'client_secret' => $setting['setting']['secret_key']
+				]))->driver($defaultSetting['default_login_channel'])->stateless()->redirect($url)->getTargetUrl());
 			} catch (Throwable $e) {
 				throw new ErrorHttpException($e->getMessage());
 			}
