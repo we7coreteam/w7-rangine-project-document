@@ -15,6 +15,7 @@ namespace W7\App\Controller\Admin;
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Logic\SettingLogic;
+use W7\App\Model\Service\CdnLogic;
 use W7\Http\Message\Server\Request;
 
 class SettingController extends BaseController
@@ -53,7 +54,19 @@ class SettingController extends BaseController
 			$value = $request->post('setting');
 		}
 
-		SettingLogic::instance()->save($key, $value);
+		try {
+			idb()->beginTransaction();
+			SettingLogic::instance()->save($key, $value);
+			CdnLogic::instance()->channel(SettingLogic::KEY_COS)->headBucket($value['bucket']);
+			idb()->commit();
+		} catch (\Throwable $e) {
+			idb()->rollBack();
+			if ($key == SettingLogic::KEY_COS) {
+				throw new ErrorHttpException('云存储链接失败，请检查配置是否正确');
+			}
+			throw new ErrorHttpException($e->getMessage());
+		}
+
 		return $this->data('success');
 	}
 
@@ -65,7 +78,7 @@ class SettingController extends BaseController
 			'setting.secret_key' => 'required',
 			'setting.bucket' => 'required',
 			'setting.region' => 'required',
-			'setting.url' => 'sometimes|url',
+			'setting.url' => '',
 			'setting.path' => 'sometimes|regex:/^\/[a-zA-Z\-_0-9]+$/i'
 		], [
 			'setting.app_id.required' => 'app_id必填',
@@ -73,7 +86,7 @@ class SettingController extends BaseController
 			'setting.secret_key.required' => 'secret_key必填',
 			'setting.bucket.required' => 'bucket必填',
 			'setting.region.required' => '所属地址必填',
-			'setting.url.url' => '附件访问域名格式错误',
+			'setting.url' => '附件访问域名',
 			'setting.path.regex' => '保存目录填写错误，格式例如：/savepath '
 		]);
 

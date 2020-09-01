@@ -93,6 +93,7 @@ class CdnLogic extends LogicAbstract
 			'region' => $cosSetting['region'],
 			'rootPath' => $cosSetting['path'],
 		];
+		dump($cosSetting);
 
 		if (empty($channel) || empty($this->bucketSpace[$channel])) {
 			throw new \RuntimeException('Invalid bucket name');
@@ -120,10 +121,22 @@ class CdnLogic extends LogicAbstract
 		return $this;
 	}
 
+	public function headBucket($bucket)
+	{
+		try {
+			$isExistsBucket = $this->connection()->headBucket([
+				'Bucket' => $bucket,
+			]);
+		} catch (\Throwable $e) {
+			throw new \RuntimeException($e->getMessage(), $e->getCode());
+		}
+		return (array)$isExistsBucket;
+	}
+
 	/**
 	 * 上传一个文件
 	 * @param 上传到COS的路径，以/开头 $uploadPath
-	 * @param  文件在本地的物理绝对路径 $realPath
+	 * @param 文件在本地的物理绝对路径 $realPath
 	 * @return string 文件在COS上的URL
 	 */
 	public function uploadFile($uploadPath, $realPath)
@@ -146,7 +159,7 @@ class CdnLogic extends LogicAbstract
 	 * @param $dir
 	 * @return array
 	 */
-	public function getDirFiles($dir = '') : array
+	public function getDirFiles($dir = ''): array
 	{
 		try {
 			$dir = $this->replacePublicRootPath($dir);
