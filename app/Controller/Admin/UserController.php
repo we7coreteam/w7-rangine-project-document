@@ -24,6 +24,29 @@ use W7\App\Model\Logic\UserLogic;
 
 class UserController extends BaseController
 {
+	/**
+	 * @api {get} /admin/user/all 所有用户
+	 *
+	 * @apiName all
+	 * @apiGroup user
+	 *
+	 * @apiParam {String} username 用户名
+	 *
+	 */
+	public function all(Request $request)
+	{
+		$username = trim($request->post('username'));
+
+		$obj = User::query()->select(['id','username','group_id','created_at']);
+		if($username){
+			$obj->where('username', 'LIKE', "%$username%");
+		}
+		$user=$obj->get();
+		$result = $user->toArray();
+
+		return $this->data($result);
+	}
+
 	public function search(Request $request)
 	{
 		$username = trim($request->post('username'));
