@@ -93,7 +93,6 @@ class CdnLogic extends LogicAbstract
 			'region' => $cosSetting['region'],
 			'rootPath' => $cosSetting['path'],
 		];
-		dump($cosSetting);
 
 		if (empty($channel) || empty($this->bucketSpace[$channel])) {
 			throw new \RuntimeException('Invalid bucket name');
