@@ -35,13 +35,20 @@ class UserController extends BaseController
 	 */
 	public function all(Request $request)
 	{
-		$username = trim($request->post('username'));
+		$username = trim($request->input('username'));
+		$noSelf = trim($request->input('no_self', 0));
 
-		$obj = User::query()->select(['id','username','group_id','created_at']);
-		if($username){
+		$obj = User::query()->select(['id', 'username', 'group_id', 'created_at']);
+		if ($username) {
 			$obj->where('username', 'LIKE', "%$username%");
 		}
-		$user=$obj->get();
+		if ($noSelf) {
+			$user = $request->getAttribute('user');
+			if ($user) {
+				$obj->where('id', '!=', $user->id);
+			}
+		}
+		$user = $obj->get();
 		$result = $user->toArray();
 
 		return $this->data($result);
@@ -244,7 +251,7 @@ class UserController extends BaseController
 		 */
 		$user = $request->getAttribute('user');
 		if (!$user->isFounder) {
-			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
+			throw new ErrorHttpException('您没有权限管理该文档', [], Setting::ERROR_NO_POWER);
 		}
 
 		$params = $this->validate($request, [
