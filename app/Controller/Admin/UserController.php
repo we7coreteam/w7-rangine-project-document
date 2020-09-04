@@ -25,7 +25,7 @@ use W7\App\Model\Logic\UserLogic;
 class UserController extends BaseController
 {
 	/**
-	 * @api {get} /admin/user/all 所有用户
+	 * @api {post} /admin/user/all 所有用户
 	 *
 	 * @apiName all
 	 * @apiGroup user
