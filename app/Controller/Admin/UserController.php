@@ -36,18 +36,12 @@ class UserController extends BaseController
 	public function all(Request $request)
 	{
 		$username = trim($request->input('username'));
-		$noSelf = trim($request->input('no_self', 0));
 
 		$obj = User::query()->select(['id', 'username', 'group_id', 'created_at']);
 		if ($username) {
 			$obj->where('username', 'LIKE', "%$username%");
 		}
-		if ($noSelf) {
-			$user = $request->getAttribute('user');
-			if ($user) {
-				$obj->where('id', '!=', $user->id);
-			}
-		}
+
 		$user = $obj->get();
 		$result = $user->toArray();
 
