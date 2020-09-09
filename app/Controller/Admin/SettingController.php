@@ -29,7 +29,6 @@ class SettingController extends BaseController
 		$this->check($request);
 
 		$setting = SettingLogic::instance()->getByKey(SettingLogic::KEY_COS);
-		dump($setting->setting);
 		$settingData = $setting->setting;
 		if ((!$settingData['url']) && $settingData['region'] && $settingData['bucket']) {
 			$settingData['url'] = 'https://' . $settingData['bucket'] . '.cos.' . $settingData['region'] . '.myqcloud.com';
