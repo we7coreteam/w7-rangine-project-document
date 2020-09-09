@@ -120,18 +120,6 @@ class CdnLogic extends LogicAbstract
 		return $this;
 	}
 
-	public function headBucket($bucket)
-	{
-		try {
-			$isExistsBucket = $this->connection()->headBucket([
-				'Bucket' => $bucket,
-			]);
-		} catch (\Throwable $e) {
-			throw new \RuntimeException($e->getMessage(), $e->getCode());
-		}
-		return (array)$isExistsBucket;
-	}
-
 	/**
 	 * 上传一个文件
 	 * @param 上传到COS的路径，以/开头 $uploadPath
