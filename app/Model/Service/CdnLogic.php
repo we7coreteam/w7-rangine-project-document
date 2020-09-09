@@ -107,6 +107,7 @@ class CdnLogic extends LogicAbstract
 
 		if ($runTestBucket) {
 			try {
+				//重置缓存，重新加载
 				$this->client = [];
 				$isExistsBucket = $this->connection($channel)->headBucket([
 					'Bucket' => $this->bucketSpace[$channel]['bucket'],
