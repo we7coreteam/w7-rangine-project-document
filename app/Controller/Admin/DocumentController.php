@@ -41,6 +41,7 @@ class DocumentController extends BaseController
 
 		$user = $request->getAttribute('user');
 
+		//管路员不搜索制度类型和创建类型查看全部
 		if ($user->isFounder && !$onlyRead && !$role) {
 			$query = Document::query()->with('user')->orderByDesc('id');
 			if (!empty($keyword)) {
