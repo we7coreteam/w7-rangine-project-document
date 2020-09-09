@@ -313,8 +313,13 @@ class ChapterController extends BaseController
 		return $this->data($chapterList);
 	}
 
-	public function buildNavigationSun($chapterId, $str = '')
+	public function buildNavigationSun($chapterId, $str = '', $i = 0)
 	{
+		$i++;
+		if ($i > 50) {
+			//循环大于100，不再处理
+			return $str;
+		}
 		$chapter = Chapter::query()->find($chapterId);
 		if ($chapter) {
 			if (!$str) {
@@ -322,7 +327,7 @@ class ChapterController extends BaseController
 				$str = $chapter->name;
 			} else {
 				//如果是上级
-				$str = $chapter->name . '>';
+				$str = $chapter->name . '>' . $str;
 			}
 			if ($chapter->parent_id) {
 				$str = $this->buildNavigationSun($chapter->parent_id, $str);
