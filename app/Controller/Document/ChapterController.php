@@ -292,10 +292,42 @@ class ChapterController extends BaseController
 
 		$chapterList = Chapter::query()
 			->leftJoin('document_chapter_content', 'document_chapter_content.chapter_id', 'document_chapter.id')
-			->where('document_chapter.document_id', $documentId)
-			->where('content', 'like', '%' . $keyword . '%')
+			->where([
+				['document_chapter.document_id', $documentId],
+				['document_chapter_content.content', 'like', '%' . $keyword . '%'],
+			])
+			->orWhere([
+				['document_chapter.document_id', $documentId],
+				['document_chapter.name', 'like', '%' . $keyword . '%'],
+			])
 			->select(['document_chapter.name', 'document_chapter_content.*'])
-			->paginate($pageSize, '*', 'page', $page);
+			->paginate($pageSize, '*', 'page', $page)->toArray();
+
+		if (count($chapterList['data'])) {
+			foreach ($chapterList['data'] as $key => $val) {
+				//导航
+				$chapterList['data'][$key]['navigation'] = $this->buildNavigationSun($val['chapter_id']);
+			}
+		}
+
 		return $this->data($chapterList);
+	}
+
+	public function buildNavigationSun($chapterId, $str = '')
+	{
+		$chapter = Chapter::query()->find($chapterId);
+		if ($chapter) {
+			if (!$str) {
+				//如果是根级
+				$str = $chapter->name;
+			} else {
+				//如果是上级
+				$str = $chapter->name . '>';
+			}
+			if ($chapter->parent_id) {
+				$str = $this->buildNavigationSun($chapter->parent_id, $str);
+			}
+		}
+		return $str;
 	}
 }
