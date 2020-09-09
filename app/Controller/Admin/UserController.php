@@ -25,7 +25,7 @@ use W7\App\Model\Logic\UserLogic;
 class UserController extends BaseController
 {
 	/**
-	 * @api {get} /admin/user/all 所有用户
+	 * @api {post} /admin/user/all 所有用户
 	 *
 	 * @apiName all
 	 * @apiGroup user
@@ -35,13 +35,17 @@ class UserController extends BaseController
 	 */
 	public function all(Request $request)
 	{
-		$username = trim($request->post('username'));
+		$username = trim($request->input('username'));
+		$noId = $request->input('no_id', '');
 
-		$obj = User::query()->select(['id','username','group_id','created_at']);
-		if($username){
+		$obj = User::query()->select(['id', 'username', 'group_id', 'created_at']);
+		if ($username) {
 			$obj->where('username', 'LIKE', "%$username%");
 		}
-		$user=$obj->get();
+		if ($noId) {
+			$obj->whereNotIn('id', explode(',', $noId));
+		}
+		$user = $obj->get();
 		$result = $user->toArray();
 
 		return $this->data($result);
@@ -244,7 +248,7 @@ class UserController extends BaseController
 		 */
 		$user = $request->getAttribute('user');
 		if (!$user->isFounder) {
-			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
+			throw new ErrorHttpException('您没有权限管理该文档', [], Setting::ERROR_NO_POWER);
 		}
 
 		$params = $this->validate($request, [

@@ -56,7 +56,7 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 
 	$route->group(['prefix' => '/user'], function (\W7\Core\Route\Route $route) {
 		//文档管理设置
-		$route->get('/all', 'Admin\UserController@all');
+		$route->post('/all', 'Admin\UserController@all');
 		$route->post('/search', 'Admin\UserController@search');
 		$route->post('/add', 'Admin\UserController@add');
 		$route->post('/detail-by-id', 'Admin\UserController@detailById');
