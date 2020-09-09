@@ -107,6 +107,7 @@ class CdnLogic extends LogicAbstract
 
 		if ($runTestBucket) {
 			try {
+				$this->client = [];
 				$isExistsBucket = $this->connection($channel)->headBucket([
 					'Bucket' => $this->bucketSpace[$channel]['bucket'],
 				]);
