@@ -322,7 +322,7 @@ class ChapterController extends BaseController
 				$str = $chapter->name;
 			} else {
 				//如果是上级
-				$str = $chapter->name . '>';
+				$str = $chapter->name . '>' . $str;
 			}
 			if ($chapter->parent_id) {
 				$str = $this->buildNavigationSun($chapter->parent_id, $str);
