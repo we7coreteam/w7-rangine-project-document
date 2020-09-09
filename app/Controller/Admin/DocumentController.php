@@ -41,7 +41,7 @@ class DocumentController extends BaseController
 
 		$user = $request->getAttribute('user');
 
-		if ($user->isFounder && !$onlyRead) {
+		if ($user->isFounder && !$onlyRead && !$role) {
 			$query = Document::query()->with('user')->orderByDesc('id');
 			if (!empty($keyword)) {
 				$query->where('name', 'LIKE', "%{$keyword}%");
@@ -90,16 +90,19 @@ class DocumentController extends BaseController
 			if ($onlyRead) {
 				$permissions = [DocumentPermission::READER_PERMISSION];
 			}
-			$query = DocumentPermission::query()->where('user_id', '=', $user->id)
-				->whereIn('permission', $permissions)
-				->orderByDesc('id')->with('document');
+			$query = DocumentPermission::query()->where('document_permission.user_id', '=', $user->id)
+				->leftJoin('document', 'document.id', 'document_permission.document_id')
+				->select('document_permission.*')
+				->where('document.id', '>', 0)//清理删除不干净的文档ID
+				->whereIn('document_permission.permission', $permissions)
+				->orderByDesc('document_permission.id')->with('document');
 			if (!empty($keyword)) {
-				$query->whereHas('document', function ($query) use ($keyword) {
+				$query->whereHas('document_permission.document', function ($query) use ($keyword) {
 					return $query->where('name', 'LIKE', "%{$keyword}%");
 				});
 			}
 			if (!empty($isPublic)) {
-				$query->whereHas('document', function ($query) use ($isPublic) {
+				$query->whereHas('document_permission.document', function ($query) use ($isPublic) {
 					return $query->where('is_public', '=', $isPublic);
 				});
 			}
@@ -284,7 +287,7 @@ class DocumentController extends BaseController
 
 		$user = $request->getAttribute('user');
 		if (!$user->isManager && !$user->isFounder) {
-			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
+			throw new ErrorHttpException('您没有权限管理该文档', [], Setting::ERROR_NO_POWER);
 		}
 
 		if (!$uid && $userName) {
@@ -472,7 +475,7 @@ class DocumentController extends BaseController
 
 		$user = $request->getAttribute('user');
 		if (!$user->isManager && !$user->isFounder) {
-			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
+			throw new ErrorHttpException('您没有权限管理该文档', [], Setting::ERROR_NO_POWER);
 		}
 
 		$document = DocumentLogic::instance()->getById($documentId);
@@ -492,7 +495,7 @@ class DocumentController extends BaseController
 
 		$user = $request->getAttribute('user');
 		if (!$user->isManager) {
-			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
+			throw new ErrorHttpException('您没有权限管理该文档', [], Setting::ERROR_NO_POWER);
 		}
 		if (!$targetUser = UserLogic::instance()->getByUserName($params['username'])) {
 			throw new ErrorHttpException('该用户不存在');
