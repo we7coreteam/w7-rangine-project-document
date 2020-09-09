@@ -91,19 +91,16 @@ class DocumentController extends BaseController
 			if ($onlyRead) {
 				$permissions = [DocumentPermission::READER_PERMISSION];
 			}
-			$query = DocumentPermission::query()->where('document_permission.user_id', '=', $user->id)
-				->leftJoin('document', 'document.id', 'document_permission.document_id')
-				->select('document_permission.*')
-				->where('document.id', '>', 0)//清理删除不干净的文档ID
-				->whereIn('document_permission.permission', $permissions)
-				->orderByDesc('document_permission.id')->with('document');
+			$query = DocumentPermission::query()->where('user_id', '=', $user->id)
+				->whereIn('permission', $permissions)
+				->orderByDesc('id')->with('document')->whereHas('document');
 			if (!empty($keyword)) {
-				$query->whereHas('document_permission.document', function ($query) use ($keyword) {
+				$query->whereHas('document', function ($query) use ($keyword) {
 					return $query->where('name', 'LIKE', "%{$keyword}%");
 				});
 			}
 			if (!empty($isPublic)) {
-				$query->whereHas('document_permission.document', function ($query) use ($isPublic) {
+				$query->whereHas('document', function ($query) use ($isPublic) {
 					return $query->where('is_public', '=', $isPublic);
 				});
 			}
