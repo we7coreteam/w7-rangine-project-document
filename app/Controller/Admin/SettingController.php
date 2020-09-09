@@ -63,7 +63,7 @@ class SettingController extends BaseController
 			idb()->rollBack();
 			if ($key == SettingLogic::KEY_COS) {
 				ilogger()->channel('error')->error('云存储链接失败，请检查配置是否正确' . $e->getMessage());
-				throw new ErrorHttpException('云存储链接失败，请检查配置是否正确');
+				throw new ErrorHttpException('云存储链接失败，请检查配置是否正确' . $e->getMessage());
 			}
 			throw new ErrorHttpException($e->getMessage());
 		}
