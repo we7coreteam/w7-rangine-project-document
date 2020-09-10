@@ -14,6 +14,7 @@ namespace W7\App\Controller\Document;
 
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
+use W7\App\Model\Entity\Document\Chapter;
 use W7\App\Model\Entity\Document\ChapterApi;
 use W7\App\Model\Entity\Document\ChapterContent;
 use W7\App\Model\Entity\Setting;
@@ -255,15 +256,84 @@ class ChapterController extends BaseController
 		return $this->data($result);
 	}
 
+	/**
+	 * @api {get} /document/chapter/search 文档搜索
+	 *
+	 * @apiName search
+	 * @apiGroup chapter
+	 *
+	 * @apiParam {Array} data
+	 * @apiParam {Array} data.data 文档搜索列表
+	 * @apiParam {String} data.data.name 文档标题
+	 * @apiParam {String} data.data.content 文档内容
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":{"current_page":1,"data":[{"name":"aaa","id":1130,"chapter_id":2030,"content":"> GET \/222\n\n\n\n### 请求\n\n\n\n\naasd23","layout":1}],"first_page_url":"\/?page=1","from":1,"last_page":1,"last_page_url":"\/?page=1","next_page_url":null,"path":"\/","per_page":10,"prev_page_url":null,"to":1,"total":1},"message":"ok"}
+	 */
 	public function search(Request $request)
 	{
 		$this->validate($request, [
+			'document_id' => 'required|integer|min:1',
 			'keywords' => 'required',
 		], [
+			'document_id.required' => '文档id必填',
+			'document_id.integer' => '文档id非法',
 			'keywords.required' => '关键字必填',
 		]);
 
+		$page = intval($request->input('page', 1));
+		$pageSize = intval($request->input('page_size', 10));
 		$keyword = $request->input('keywords');
 		$documentId = intval($request->input('document_id'));
+
+		if (!$keyword) {
+			throw new ErrorHttpException('没有关键词');
+		}
+
+		$chapterList = Chapter::query()
+			->leftJoin('document_chapter_content', 'document_chapter_content.chapter_id', 'document_chapter.id')
+			->where([
+				['document_chapter.document_id', $documentId],
+				['document_chapter_content.content', 'like', '%' . $keyword . '%'],
+			])
+			->orWhere([
+				['document_chapter.document_id', $documentId],
+				['document_chapter.is_dir', 0],
+				['document_chapter.name', 'like', '%' . $keyword . '%'],
+			])
+			->select(['document_chapter.name', 'document_chapter_content.*'])
+			->paginate($pageSize, '*', 'page', $page)->toArray();
+
+		if (count($chapterList['data'])) {
+			foreach ($chapterList['data'] as $key => $val) {
+				//导航
+				$chapterList['data'][$key]['navigation'] = $this->buildNavigationSun($val['chapter_id']);
+			}
+		}
+
+		return $this->data($chapterList);
+	}
+
+	public function buildNavigationSun($chapterId, $str = '', $i = 0)
+	{
+		$i++;
+		if ($i > 50) {
+			//循环大于100，不再处理
+			return $str;
+		}
+		$chapter = Chapter::query()->find($chapterId);
+		if ($chapter) {
+			if (!$str) {
+				//如果是根级
+				$str = $chapter->name;
+			} else {
+				//如果是上级
+				$str = $chapter->name . '>' . $str;
+			}
+			if ($chapter->parent_id) {
+				$str = $this->buildNavigationSun($chapter->parent_id, $str);
+			}
+		}
+		return $str;
 	}
 }

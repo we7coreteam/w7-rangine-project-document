@@ -107,6 +107,8 @@ class CdnLogic extends LogicAbstract
 
 		if ($runTestBucket) {
 			try {
+				//重置缓存，重新加载
+				$this->client = [];
 				$isExistsBucket = $this->connection($channel)->headBucket([
 					'Bucket' => $this->bucketSpace[$channel]['bucket'],
 				]);
@@ -123,7 +125,7 @@ class CdnLogic extends LogicAbstract
 	/**
 	 * 上传一个文件
 	 * @param 上传到COS的路径，以/开头 $uploadPath
-	 * @param  文件在本地的物理绝对路径 $realPath
+	 * @param 文件在本地的物理绝对路径 $realPath
 	 * @return string 文件在COS上的URL
 	 */
 	public function uploadFile($uploadPath, $realPath)
@@ -146,7 +148,7 @@ class CdnLogic extends LogicAbstract
 	 * @param $dir
 	 * @return array
 	 */
-	public function getDirFiles($dir = '') : array
+	public function getDirFiles($dir = ''): array
 	{
 		try {
 			$dir = $this->replacePublicRootPath($dir);

@@ -24,6 +24,33 @@ use W7\App\Model\Logic\UserLogic;
 
 class UserController extends BaseController
 {
+	/**
+	 * @api {post} /admin/user/all 所有用户
+	 *
+	 * @apiName all
+	 * @apiGroup user
+	 *
+	 * @apiParam {String} username 用户名
+	 *
+	 */
+	public function all(Request $request)
+	{
+		$username = trim($request->input('username'));
+		$noId = $request->input('no_id', '');
+
+		$obj = User::query()->select(['id', 'username', 'group_id', 'created_at']);
+		if ($username) {
+			$obj->where('username', 'LIKE', "%$username%");
+		}
+		if ($noId) {
+			$obj->whereNotIn('id', explode(',', $noId));
+		}
+		$user = $obj->get();
+		$result = $user->toArray();
+
+		return $this->data($result);
+	}
+
 	public function search(Request $request)
 	{
 		$username = trim($request->post('username'));
@@ -221,7 +248,7 @@ class UserController extends BaseController
 		 */
 		$user = $request->getAttribute('user');
 		if (!$user->isFounder) {
-			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
+			throw new ErrorHttpException('您没有权限管理该文档', [], Setting::ERROR_NO_POWER);
 		}
 
 		$params = $this->validate($request, [
