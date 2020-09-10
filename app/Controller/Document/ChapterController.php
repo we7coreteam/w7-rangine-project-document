@@ -298,6 +298,7 @@ class ChapterController extends BaseController
 			])
 			->orWhere([
 				['document_chapter.document_id', $documentId],
+				['document_chapter.is_dir', 0],
 				['document_chapter.name', 'like', '%' . $keyword . '%'],
 			])
 			->select(['document_chapter.name', 'document_chapter_content.*'])
