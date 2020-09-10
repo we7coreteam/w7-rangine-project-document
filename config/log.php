@@ -1,23 +1,13 @@
 <?php
+
 /**
- * 配置日志
+ * WeEngine Document System
  *
- * handler
- *      stack 用于创建「多通道」通道的聚合器
- *      stream
- *      daily 基于 stream
- *      syslog
- *      errorlog
- *      nativemailer 利用php mail()函数发送邮件
- * level
- *      debug
- *      info
- *      notice
- *      warning
- *      error
- *      critical
- *      alert
- *      emergency
+ * (c) We7Team 2019 <https://www.w7.cc>
+ *
+ * This is not a free software
+ * Using it under the license terms
+ * visited https://www.w7.cc for more details
  */
 
 return [
@@ -30,13 +20,19 @@ return [
 		],
 		'single' => [
 			'driver' => 'daily',
-			'path' => RUNTIME_PATH . DS. 'logs'. DS. 'w7.log',
+			'path' => RUNTIME_PATH . DS . 'logs' . DS . 'w7.log',
 			'level' => ienv('LOG_CHANNEL_SINGLE_LEVEL', 'debug'),
 			'days' => '1',
 		],
 		'test' => [
 			'driver' => 'daily',
 			'path' => RUNTIME_PATH . DS . 'logs' . DS . 'test.log',
+			'level' => 'debug',
+			'days' => 7,
+		],
+		'error' => [
+			'driver' => 'daily',
+			'path' => RUNTIME_PATH . DS . 'logs' . DS . 'error.log',
 			'level' => 'debug',
 			'days' => 7,
 		]

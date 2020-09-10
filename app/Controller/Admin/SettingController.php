@@ -29,9 +29,13 @@ class SettingController extends BaseController
 		$this->check($request);
 
 		$setting = SettingLogic::instance()->getByKey(SettingLogic::KEY_COS);
+		$settingData = $setting->setting;
+		if ((!$settingData['url']) && $settingData['region'] && $settingData['bucket']) {
+			$settingData['url'] = 'https://' . $settingData['bucket'] . '.cos.' . $settingData['region'] . '.myqcloud.com';
+		}
 		return $this->data([
 			'key' => SettingLogic::KEY_COS,
-			'setting' => $setting->setting,
+			'setting' => $settingData,
 		]);
 	}
 
@@ -56,12 +60,17 @@ class SettingController extends BaseController
 
 		try {
 			idb()->beginTransaction();
+			if (empty($value['url']) || !$value['url']) {
+				$value['url'] = 'https://' . $value['bucket'] . '.cos.' . $value['region'] . '.myqcloud.com';
+			}
 			SettingLogic::instance()->save($key, $value);
-			CdnLogic::instance()->channel(SettingLogic::KEY_COS)->headBucket($value['bucket']);
+			//验证票据
+			CdnLogic::instance()->channel(SettingLogic::KEY_COS, true);
 			idb()->commit();
 		} catch (\Throwable $e) {
 			idb()->rollBack();
 			if ($key == SettingLogic::KEY_COS) {
+				ilogger()->channel('error')->error('云存储链接失败，请检查配置是否正确' . $e->getMessage());
 				throw new ErrorHttpException('云存储链接失败，请检查配置是否正确');
 			}
 			throw new ErrorHttpException($e->getMessage());
