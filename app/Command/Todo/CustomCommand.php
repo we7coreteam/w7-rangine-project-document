@@ -13,6 +13,7 @@
 namespace W7\App\Command\Todo;
 
 use W7\App\Model\Entity\Document;
+use W7\App\Model\Entity\DocumentPermission;
 use W7\App\Model\Entity\UserThirdParty;
 use W7\Console\Command\CommandAbstract;
 
@@ -108,7 +109,24 @@ class CustomCommand extends CommandAbstract
 					if ($oldUser == 37 && $newUser) {
 						$row->creator_id = $newUser;
 						$row->save();
-						$this->output->writeln('《'.$row->name.'》:用户归属已调整');
+						//权限没有调
+						$documentPermission = DocumentPermission::query()->where('document_id', $row->id)->first();
+						if ($documentPermission) {
+							if ($documentPermission->user_id == 37) {
+								$documentPermission->user_id = $newUser;
+								$documentPermission->save();
+							}
+						}
+						$this->output->writeln('《' . $row->name . '》:用户归属已调整');
+					} else {
+						//权限没有调
+						$documentPermission = DocumentPermission::query()->where('document_id', $row->id)->first();
+						if ($documentPermission) {
+							if ($documentPermission->user_id == 37) {
+								$documentPermission->user_id = $newUser;
+								$documentPermission->save();
+							}
+						}
 					}
 				}
 			}
