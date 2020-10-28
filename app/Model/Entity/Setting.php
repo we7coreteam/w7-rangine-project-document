@@ -21,6 +21,7 @@ class Setting extends BaseModel
 	const ERROR_NO_POWER = 446;//没权限
 	const ERROR_NO_FIND = 445;//文件不存在
 	const ERROR_NO_LOGIN = 444;//没登陆
+	const ERROR_CHANGE_USER = 447;//是否切换用户
 
 	public function getSettingAttribute()
 	{
