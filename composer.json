@@ -48,5 +48,11 @@
 		"squizlabs/php_codesniffer": "*",
 		"friendsofphp/php-cs-fixer": "^2.15",
 		"w7/rangine-debugger": "1.0.4"
+	},
+	"repositories": {
+		"packagist": {
+			"type": "composer",
+			"url": "https://mirrors.aliyun.com/composer/"
+		}
 	}
 }

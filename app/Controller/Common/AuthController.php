@@ -162,6 +162,20 @@ class AuthController extends BaseController
 		return $this->data('');
 	}
 
+	/**
+	 * @api {post} /common/auth/third-party-login 获取参数类型列表
+	 *
+	 * @apiName third-party-login
+	 * @apiGroup auth
+	 *
+	 * @apiParam {string} code
+	 * @apiParam {string} app_id
+	 *
+	 * @apiSuccess {string} success
+	 * @apiSuccess {string} is_need_bind 需要绑定用户 true
+	 * @apiSuccess {string} has_login    已登录，需要确认是否切换 true
+	 * @apiSuccess {string} change_token 已登录，切换token
+	 */
 	public function thirdPartyLogin(Request $request)
 	{
 		$code = $request->input('code');
@@ -226,9 +240,53 @@ class AuthController extends BaseController
 				$thirdPartyUser->uid = 0;
 			}
 		}
+		//已登陆的用户校验是否需要切换用户S
+		$user = $request->session->get('user');
+		if ($user) {
+			if ($thirdPartyUser->uid != $user['uid']) {
+				//如果登陆用户和当前访问用户不一致
+				$changeToken = 'temp_user_info' . date('YmdHis') . round(1000, 9999);
+				icache()->set($changeToken, ['third_party_user_id' => $thirdPartyUser->id], 60 * 15);
+				return $this->data(['has_login' => true, 'change_token' => $changeToken]);
+			}
+		}
+		//已登陆的用户校验是否需要切换用户E
+		return $this->data($this->setThirdPartySession($request, $thirdPartyUser));
+	}
 
+	/**
+	 * @api {post} /common/auth/changeThirdPartyUser 获取参数类型列表
+	 *
+	 * @apiName changeThirdPartyUser
+	 * @apiGroup auth
+	 *
+	 * @apiParam {string} change_token 用于切换的change_token
+	 */
+	public function changeThirdPartyUser(Request $request)
+	{
+		$user = $request->session->get('user');
+		if (!$user) {
+			throw new ErrorHttpException('当前账户未登陆');
+		}
+		$changeToken = $request->input('change_token');
+		if (empty($changeToken)) {
+			throw new ErrorHttpException('change_token错误');
+		}
+		$data = icache()->get($changeToken);
+		if (isset($data['third_party_user_id'])) {
+			$thirdPartyUser = UserThirdParty::query()->find($data['third_party_user_id']);
+			if ($thirdPartyUser) {
+				return $this->data($this->setThirdPartySession($request, $thirdPartyUser));
+			}
+		}
+		throw new ErrorHttpException('change_token已过期');
+	}
+
+	public function setThirdPartySession(Request $request, $thirdPartyUser)
+	{
+		$username = $thirdPartyUser->username;
 		$localUser = [
-			'app_id' => $appId,
+			'app_id' => $thirdPartyUser->source,
 			'uid' => $thirdPartyUser->uid,
 			'third-party-uid' => $thirdPartyUser->id,
 			'username' => $username,
@@ -236,28 +294,30 @@ class AuthController extends BaseController
 
 		$request->session->destroy();
 		//记录第三方登录app_id
-		$request->session->set('user-source-app', $appId);
+		$request->session->set('user-source-app', $thirdPartyUser->source);
 
 		//需要绑定已有账户
 		if (!empty($loginSetting['is_need_bind']) && empty($thirdPartyUser->uid)) {
 			//保存第三方用户信息，触发用户绑定
 			$request->session->set('third-party-user', $localUser);
-			return $this->data([
+			return [
 				'is_need_bind' => true
-			]);
+			];
 		} else {
-			$request->session->set('user-source-app', $appId);
+			$request->session->set('user-source-app', $thirdPartyUser->source);
 			$this->saveUserInfo($request->session, $thirdPartyUser->bindUser);
-			return $this->data('success');
+			return 'success';
 		}
 	}
 
 	public function thirdPartyLoginBind(Request $request)
 	{
 		$data = $this->validate($request, [
+			'handle' => 'required',
 			'username' => 'required',
 			'userpass' => 'required'
 		], [
+			'handle.required' => '操作不能为空',
 			'username.required' => '用户名不能为空',
 			'userpass.required' => '密码不能为空'
 		]);
@@ -266,17 +326,36 @@ class AuthController extends BaseController
 			throw new ErrorHttpException('非法请求');
 		}
 
-		$user = UserLogic::instance()->getByUserName($data['username']);
-		if (empty($user)) {
-			throw new ErrorHttpException('用户名或密码错误，请检查');
-		}
+		$handle = $request->input('handle', 'bind');
 
-		if ($user->userpass != UserLogic::instance()->userPwdEncryption($user->username, $data['userpass'])) {
-			throw new ErrorHttpException('用户名或密码错误，请检查');
-		}
+		if ($handle == 'bind') {
+			//绑定已有用户
+			$user = UserLogic::instance()->getByUserName($data['username']);
+			if (empty($user)) {
+				throw new ErrorHttpException('用户名或密码错误，请检查');
+			}
 
-		if (!empty($user->is_ban)) {
-			throw new ErrorHttpException('您使用的用户已经被禁用，请联系管理员');
+			if ($user->userpass != UserLogic::instance()->userPwdEncryption($user->username, $data['userpass'])) {
+				throw new ErrorHttpException('用户名或密码错误，请检查');
+			}
+
+			if (!empty($user->is_ban)) {
+				throw new ErrorHttpException('您使用的用户已经被禁用，请联系管理员');
+			}
+		} else {//'reg'
+			//新增
+			$data = [
+				'username' => trim($data['username']),
+				'userpass' => trim($data['userpass']),
+			];
+			$data['remark'] = $request->input('remark', '');
+
+			try {
+				$userId = UserLogic::instance()->createUser($data);
+				$user = User::query()->find($userId);
+			} catch (\Throwable $e) {
+				throw new ErrorHttpException($e->getMessage());
+			}
 		}
 
 		UserThirdParty::query()->where('id', '=', $thirdPartyUser['third-party-uid'])->update([
