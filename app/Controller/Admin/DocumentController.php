@@ -84,10 +84,16 @@ class DocumentController extends BaseController
 			if ($role == 1) {
 				$permissions = [DocumentPermission::MANAGER_PERMISSION];
 			}
-			//$role为2代表为参与者
+
+			//$role为2代表为参与者（参与与创建）
 			if ($role == 2) {
+				$permissions = [DocumentPermission::MANAGER_PERMISSION, DocumentPermission::OPERATOR_PERMISSION];
+			}
+			//$role为3代表为仅参与
+			if ($role == 3) {
 				$permissions = [DocumentPermission::OPERATOR_PERMISSION];
 			}
+
 			if ($onlyRead) {
 				$permissions = [DocumentPermission::READER_PERMISSION];
 			}
