@@ -451,7 +451,15 @@ class DocumentController extends BaseController
 
 	public function delete(Request $request)
 	{
+		$data = $this->validate($request, [
+			'name' => 'required',
+		], [
+			'name.required' => '文档名称',
+		]);
 		$document = $this->checkPermissionAndGetDocument($request);
+		if ($document->name != $data['name']) {
+			throw new ErrorHttpException('文档名称错误');
+		}
 		try {
 			$user = $request->getAttribute('user');
 			DocumentLogic::instance()->deleteByDocument($document);
