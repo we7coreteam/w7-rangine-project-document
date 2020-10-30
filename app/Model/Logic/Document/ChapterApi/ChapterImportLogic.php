@@ -48,13 +48,13 @@ class ChapterImportLogic extends ChapterCommonLogic
 					}
 				}
 
-				if ($key > 4) {
+				if ($key > 0) {
 					break;
 				}
 			}
 		}
 		if ($str) {
-			$data = parse_str($str);
+			parse_str($str,$data);
 		}
 		return $data;
 	}
