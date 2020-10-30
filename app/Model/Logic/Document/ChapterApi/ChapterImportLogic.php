@@ -47,10 +47,6 @@ class ChapterImportLogic extends ChapterCommonLogic
 						$str = $item;
 					}
 				}
-
-				if ($key > 0) {
-					break;
-				}
 			}
 		}
 		if ($str) {
