@@ -71,7 +71,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 					//多维数组先合并子类
 					$sun = [];
 					foreach ($val as $k => $v) {
-						dump($v);
+
 						if ($this->is_assoc($val)) {
 							//对象
 							$sun[$k][] = $v;
@@ -80,7 +80,6 @@ class ChapterImportLogic extends ChapterCommonLogic
 							$sun[$k][] = $v;
 						}
 					}
-					dump(json_encode($sun));
 					$record[] = [
 						'type' => ChapterApiParam::TYPE_ARRAY,
 						'name' => $key,
