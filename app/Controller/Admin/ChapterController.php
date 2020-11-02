@@ -20,6 +20,7 @@ use W7\App\Model\Entity\Setting;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\ChapterLogic;
+use W7\App\Model\Logic\Document\ChapterApi\ChapterImportLogic;
 use W7\App\Model\Logic\Document\ChapterContentLogic;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\App\Model\Logic\DocumentPermissionLogic;
@@ -646,5 +647,17 @@ class ChapterController extends BaseController
 			idb()->rollBack();
 			throw new ErrorHttpException($e->getMessage(), $e->getCode());
 		}
+	}
+
+	/**
+	 * 导入
+	 */
+	public function import(Request $request){
+		$data = $this->validate($request, [
+			'data' => 'required|json',
+		]);
+		$Capter = new ChapterImportLogic();
+		$res 	= $Capter->getApiparam($data['data'],1,'json');
+		return $this->data($res);
 	}
 }

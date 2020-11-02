@@ -54,12 +54,13 @@ class ChapterLogic extends BaseLogic
 		return $this->getTree($result, 0);
 	}
 
-	private function getTree($data, $pid = 0)
+	private function getTree($data, $pid = 0, $i = 1)
 	{
 		$tree = [];
 		foreach ($data as $k => $v) {
+			$v['level'] = $i;
 			if ($v['parent_id'] == $pid) {
-				$v['children'] = $this->getTree($data, $v['id']);
+				$v['children'] = $this->getTree($data, $v['id'], ++$i);
 				$tree[] = $v;
 				unset($data[$k]);
 			}

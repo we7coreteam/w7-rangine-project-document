@@ -76,6 +76,7 @@ class ChapterController extends BaseController
 			$result = ChapterLogic::instance()->getCatalog($params['document_id']);
 
 			$user = $request->getAttribute('user');
+
 			if (empty($user->isReader)) {
 				throw new ErrorHttpException('当前账户无权限阅读该文档', Setting::ERROR_NO_POWER);
 			}
