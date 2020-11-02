@@ -19,9 +19,6 @@ irouter()->any('/oauth/login', function () {
 
 	return App::getApp()->getContext()->getResponse()->redirect(ienv('API_HOST') . 'login?' . build_query($query));
 });
-irouter()->post('/test/edf', 'TestController@aaaa');
-irouter()->post('/test/login', 'TestController@login');
-
 
 //获取验证码
 irouter()->post('/common/verifycode/image', 'Common\VerifyCodeController@image');
