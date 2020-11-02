@@ -16,7 +16,7 @@ use W7\App\Model\Entity\Document\ChapterApiParam;
 
 class ChapterCommonLogic
 {
-	//是否为纯数组（非对象）
+	//是否为对象（非数组）
 	public function is_assoc($arr)
 	{
 		//array(1, 2, 3, 4, 5, 6, 7);// 输出false

@@ -15,6 +15,7 @@ namespace W7\App\Model\Logic\Document\ChapterApi;
 //返回演示数据demo
 
 use W7\App\Exception\ErrorHttpException;
+use W7\App\Model\Entity\Document\ChapterApiParam;
 
 class ChapterImportLogic extends ChapterCommonLogic
 {
@@ -27,16 +28,89 @@ class ChapterImportLogic extends ChapterCommonLogic
 		} else {
 			$array = $data;
 		}
-
-		$record=[];
-		if (is_array($array)){
+		if (is_array($array)) {
 			//生成Apiparam数据
-			foreach ($array as $key =>$val){
-
-			}
+			$record = $this->buildApiparamData($array);
 			return $record;
 		}
 		throw new ErrorHttpException('导入数据不符合要求');
+	}
+
+	public function buildApiparamData($data)
+	{
+		$record = [];
+		foreach ($data as $key => $val) {
+			if (is_array($val)) {
+				//多维数组还是单维度数组
+				if (count($val) == count($val, 1)) {
+					if ($this->is_assoc($val)) {
+						//对象
+						$record[] = [
+							'type' => ChapterApiParam::TYPE_OBJECT,
+							'name' => $key,
+							'description' => '',
+							'enabled' => ChapterApiParam::ENABLED_YES,
+							'default_value' => '',
+							'rule' => '',
+							'children' => $this->buildApiparamData($val)
+						];
+					} else {
+						//纯数组
+						$record[] = [
+							'type' => ChapterApiParam::TYPE_ARRAY,
+							'name' => $key,
+							'description' => '',
+							'enabled' => ChapterApiParam::ENABLED_YES,
+							'default_value' => json_encode($val),
+							'rule' => '',
+							'children' => []
+						];
+					}
+				} else {
+					//多维数组
+					//多维数组先合并子类
+					$sun = [];
+					foreach ($val as $k => $v) {
+						dump($v);
+						if ($this->is_assoc($val)) {
+							//对象
+							$sun[$k][] = $v;
+						} else {
+							//数组
+							$sun[$k][] = $v;
+						}
+					}
+					dump(json_encode($sun));
+					$record[] = [
+						'type' => ChapterApiParam::TYPE_ARRAY,
+						'name' => $key,
+						'description' => '',
+						'enabled' => ChapterApiParam::ENABLED_YES,
+						'default_value' => '',
+						'rule' => '+1',
+						'children' => $this->buildApiparamData($val)
+					];
+				}
+			} else {
+				//键值
+				$type = ChapterApiParam::TYPE_STRING;
+				if (is_numeric($val)) {
+					$type = ChapterApiParam::TYPE_NUMBER;
+				} elseif ($val == 'true' || $val == 'false') {
+					$type = ChapterApiParam::TYPE_BOOLEAN;
+				}
+				$record[] = [
+					'type' => $type,
+					'name' => $key,
+					'description' => '',
+					'enabled' => ChapterApiParam::ENABLED_YES,
+					'default_value' => $val,
+					'rule' => '',
+					'children' => []
+				];
+			}
+		}
+		return $record;
 	}
 
 	public function keyWordToData($keyWord)
