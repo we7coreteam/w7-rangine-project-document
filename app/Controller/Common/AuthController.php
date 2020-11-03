@@ -352,13 +352,13 @@ class AuthController extends BaseController
 						//4如果登陆用户和当前访问用户不一致
 						$changeToken = 'temp_user_info_4' . date('YmdHis') . round(1000, 9999);
 						icache()->set($changeToken, ['third_party_user_id' => $thirdPartyUser->id], 60 * 15);
-						return $this->data(['has_login' => 1, 'change_token' => $changeToken]);
+						return $this->data(['has_login' => 1, 'change_token' => $changeToken, 'msg' => '当前登录账号非微擎账户绑定账号，是否继续登录？']);
 					}
 				} elseif (!$thirdPartyUser->uid) {
 					//3文档绑了商城，商城没有绑文档-去登陆
 					$sourceToken = 'temp_user_info_3_source' . date('YmdHis') . round(1000, 9999);
 					icache()->set($sourceToken, ['third_party_user_id' => $thirdPartyUser->id, 'source' => $appId], 60 * 15);
-					return $this->data(['has_login' => 3, 'source_token' => $sourceToken]);
+					return $this->data(['has_login' => 3, 'source_token' => $sourceToken, 'msg' => '当前登录账号非微擎账户绑定账号，是否继续登录？']);
 				}
 			} else {
 				//1当前登陆账户，没有绑定第三方-登陆账户也没有绑定第三方。商城没有绑文档，文档没有绑商城
@@ -366,12 +366,12 @@ class AuthController extends BaseController
 					//1文档没有绑商城，商城没有绑文档，如果切入用户，没有绑定账户，当前用户也没有绑定
 					$bindToken = 'temp_user_info_1_unbind_two' . date('YmdHis') . round(1000, 9999);
 					icache()->set($bindToken, ['third_party_user_id' => $thirdPartyUser->id], 60 * 15);
-					return $this->data(['has_login' => 2, 'bind_token' => $bindToken]);
+					return $this->data(['has_login' => 2, 'bind_token' => $bindToken, 'msg' => '是否绑定当前微擎账户于该登录账户？']);
 				} else {
 					//2文档没有绑商城，商城绑了文档-去切换
 					$changeToken = 'temp_user_info_2' . date('YmdHis') . round(1000, 9999);
 					icache()->set($changeToken, ['third_party_user_id' => $thirdPartyUser->id], 60 * 15);
-					return $this->data(['has_login' => 1, 'change_token' => $changeToken]);
+					return $this->data(['has_login' => 1, 'change_token' => $changeToken, 'msg' => '当前登录账号非微擎账户绑定账号，是否继续登录？']);
 				}
 			}
 		}
