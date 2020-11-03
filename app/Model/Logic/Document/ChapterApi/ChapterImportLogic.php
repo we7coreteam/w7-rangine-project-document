@@ -86,7 +86,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 						'description' => '',
 						'enabled' => ChapterApiParam::ENABLED_YES,
 						'default_value' => '',
-						'rule' => '+1',
+						'rule' => '+'.count($val),
 						'children' => $this->buildApiparamData($val)
 					];
 				}

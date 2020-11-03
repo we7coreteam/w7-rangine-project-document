@@ -650,7 +650,14 @@ class ChapterController extends BaseController
 	}
 
 	/**
-	 * 导入
+	 * @api {post} /admin/chapter/import 参数导入
+	 * @apiName import
+	 * @apiGroup Chapter
+	 *
+	 * @apiParam {Number} data 导入参数
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":[{"type":3,"name":"status","description":"","enabled":2,"default_value":true,"rule":"","children":[]},{"type":2,"name":"code","description":"","enabled":2,"default_value":200,"rule":"","children":[]},{"type":1,"name":"msg","description":"","enabled":2,"default_value":"success","rule":"","children":[]},{"type":5,"name":"array","description":"","enabled":2,"default_value":"[1,2,3]","rule":"","children":[]},{"type":5,"name":"marray","description":"","enabled":2,"default_value":"","rule":"+2","children":[{"type":5,"name":0,"description":"","enabled":2,"default_value":"[1,2]","rule":"","children":[]},{"type":5,"name":1,"description":"","enabled":2,"default_value":"[3,4]","rule":"","children":[]}]},{"type":4,"name":"object","description":"","enabled":2,"default_value":"","rule":"","children":[{"type":2,"name":"id","description":"","enabled":2,"default_value":1,"rule":"","children":[]},{"type":1,"name":"name","description":"","enabled":2,"default_value":"name","rule":"","children":[]}]}],"message":"ok"}
 	 */
 	public function import(Request $request){
 		$data = $this->validate($request, [
