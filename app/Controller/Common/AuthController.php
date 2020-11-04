@@ -569,8 +569,8 @@ class AuthController extends BaseController
 				throw new ErrorHttpException('用户名或密码错误，请检查');
 			}
 			//如果已有账户已经绑定了三方
-			$userThirdParty = UserThirdParty::query()->where('user_id', $user->id)->first();
-			if ($userThirdParty) {
+			$userThirdPartyHas = UserThirdParty::query()->where('user_id', $user->id)->first();
+			if ($userThirdPartyHas) {
 				//如果当前用户
 				throw new ErrorHttpException('当前账户已绑定了其他商城账户');
 			}
