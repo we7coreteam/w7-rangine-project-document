@@ -164,8 +164,12 @@ class AuthController extends BaseController
 
 	public function thirdPartyLogintest(Request $request)
 	{
-		return $this->data('success');
-		$openduser = UserThirdParty::query()->find(140);//切入用户
+		$thirdPartyUser = UserThirdParty::query()->find(140);
+		$appId = 3;
+		$sourceToken = 'temp_user_info_3_source' . date('YmdHis') . round(1000, 9999);
+		icache()->set($sourceToken, ['third_party_user_id' => $thirdPartyUser->id, 'source' => $appId], 60 * 15);
+		return $this->data(['has_login' => 3, 'source_token' => $sourceToken]);
+
 		$sesuser = User::query()->find(1);//登陆用户
 		$appId = 3;
 		$this->saveUserInfo($request->session, $sesuser);
@@ -568,8 +572,8 @@ class AuthController extends BaseController
 			if ($user->userpass != UserLogic::instance()->userPwdEncryption($user->username, $data['userpass'])) {
 				throw new ErrorHttpException('用户名或密码错误，请检查');
 			}
-			//如果已有账户已经绑定了三方
-			$userThirdPartyHas = UserThirdParty::query()->where('user_id', $user->id)->first();
+
+			$userThirdPartyHas = UserThirdParty::query()->where('uid', $user->id)->first();
 			if ($userThirdPartyHas) {
 				//如果当前用户
 				throw new ErrorHttpException('当前账户已绑定了其他商城账户');
