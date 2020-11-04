@@ -310,6 +310,16 @@ class AuthController extends BaseController
 		}
 	}
 
+	/**
+	 * @api {post} /common/auth/thirdPartyLoginBind 绑定用户
+	 *
+	 * @apiName thirdPartyLoginBind
+	 * @apiGroup auth
+	 *
+	 * @apiParam {string} handle 操作类型bind：绑定 reg:注册
+	 * @apiParam {string} username 用户名
+	 * @apiParam {string} userpass 密码
+	 */
 	public function thirdPartyLoginBind(Request $request)
 	{
 		$data = $this->validate($request, [
