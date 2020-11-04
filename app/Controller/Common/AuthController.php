@@ -478,6 +478,7 @@ class AuthController extends BaseController
 		if (empty($changeToken)) {
 			throw new ErrorHttpException('bind_token错误');
 		}
+
 		$data = icache()->get($changeToken);
 		if (isset($data['third_party_user_id'])) {
 			$thirdPartyUser = UserThirdParty::query()->find($data['third_party_user_id']);
@@ -566,6 +567,12 @@ class AuthController extends BaseController
 
 			if ($user->userpass != UserLogic::instance()->userPwdEncryption($user->username, $data['userpass'])) {
 				throw new ErrorHttpException('用户名或密码错误，请检查');
+			}
+			//如果已有账户已经绑定了三方
+			$userThirdParty = UserThirdParty::query()->where('user_id', $user->id)->first();
+			if ($userThirdParty) {
+				//如果当前用户
+				throw new ErrorHttpException('当前账户已绑定了其他商城账户');
 			}
 
 			if (!empty($user->is_ban)) {
