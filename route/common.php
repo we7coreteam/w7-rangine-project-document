@@ -36,7 +36,7 @@ irouter()->middleware('CheckAuthMiddleware')
 irouter()->post('/common/auth/third-party-login', 'Common\AuthController@thirdPartyLogin');
 irouter()->post('/common/auth/changeThirdPartyUser', 'Common\AuthController@changeThirdPartyUser');
 irouter()->post('/common/auth/bindThirdPartyUser', 'Common\AuthController@bindThirdPartyUser');
-irouter()->post('/common/auth/ThirdPartyUserCache', 'Common\AuthController@ThirdPartyUserCache');
+irouter()->post('/common/auth/ThirdPartyUserCacheIn', 'Common\AuthController@ThirdPartyUserCacheIn');
 irouter()->post('/common/auth/third-party-login-bind', 'Common\AuthController@thirdPartyLoginBind');
 irouter()->post('/common/auth/default-login-url', 'Common\AuthController@defaultLoginUrl');
 

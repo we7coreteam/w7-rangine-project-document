@@ -187,8 +187,6 @@ class AuthController extends BaseController
 			throw new ErrorHttpException('app_id错误');
 		}
 
-
-
 		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($appId);
 		if (!$setting) {
 			throw new ErrorHttpException('不支持该授权方式');
@@ -258,7 +256,7 @@ class AuthController extends BaseController
 						return $this->data(['has_login' => 1, 'change_token' => $changeToken]);
 					}
 				} elseif (!$thirdPartyUser->uid) {
-					//文档绑了商城，商城没有绑文档-去登陆
+					//3文档绑了商城，商城没有绑文档-去登陆
 					$sourceToken = 'temp_user_info_source' . date('YmdHis') . round(1000, 9999);
 					icache()->set($sourceToken, ['third_party_user_id' => $thirdPartyUser->id, 'source' => $appId], 60 * 15);
 					return $this->data(['has_login' => 3, 'source_token' => $sourceToken]);
@@ -271,41 +269,41 @@ class AuthController extends BaseController
 					icache()->set($bindToken, ['third_party_user_id' => $thirdPartyUser->id], 60 * 15);
 					return $this->data(['has_login' => 2, 'bind_token' => $bindToken]);
 				} else {
-					//3文档没有绑商城，商城绑了文档-去切换
+					//2文档没有绑商城，商城绑了文档-去切换
 					$changeToken = 'temp_user_info' . date('YmdHis') . round(1000, 9999);
 					icache()->set($changeToken, ['third_party_user_id' => $thirdPartyUser->id], 60 * 15);
 					return $this->data(['has_login' => 1, 'change_token' => $changeToken]);
 				}
 			}
 		}
-		/*0如果没有登陆，没有绑账户去绑定、
+		/*0如果文档没有登陆，没有绑账户去绑定
 		---如果登陆了
 		 *1文档没有绑商城，商城没有绑文档-去绑定
-		 *3文档没有绑商城，商城绑了文档-去切换
-		 *2文档绑了商城，商城没有绑文档-去登陆
-		 *4文档绑了商城，商城绑了文档，用户不一致-去切换-一致登陆
+		 *2文档没有绑商城，商城绑了文档-去切换
+		 *3文档绑了商城，商城没有绑文档-去切换-去登陆
+		 *4文档绑了商城，商城绑了文档，用户不一致-去切换-致登陆
 		 **/
 		//2已登陆的用户校验是否需要切换用户E
 		return $this->data($this->setThirdPartySession($request, $thirdPartyUser));
 	}
 
 	/**
-	 * @api {post} /common/auth/ThirdPartyUserCache 文档绑了商城，商城没有绑文档切用户
+	 * @api {post} /common/auth/ThirdPartyUserCacheIn 文档绑了商城，商城没有绑文档切用户
 	 *
-	 * @apiName ThirdPartyUserCache
+	 * @apiName ThirdPartyUserCacheIn
 	 * @apiGroup auth
 	 *
 	 * @apiParam {string} bind_token 用于绑定的bind_token
 	 */
-	public function ThirdPartyUserCache(Request $request)
+	public function ThirdPartyUserCacheIn(Request $request)
 	{
 		$user = $request->session->get('user');
 		if (!$user) {
 			throw new ErrorHttpException('当前账户未登陆');
 		}
-		$changeToken = $request->input('bind_token');
+		$changeToken = $request->input('source_token');
 		if (empty($changeToken)) {
-			throw new ErrorHttpException('bind_token错误');
+			throw new ErrorHttpException('source_token错误');
 		}
 
 		$data = icache()->get($changeToken);
