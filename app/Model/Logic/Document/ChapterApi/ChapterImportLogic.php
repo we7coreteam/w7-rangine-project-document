@@ -30,10 +30,45 @@ class ChapterImportLogic extends ChapterCommonLogic
 		}
 		if (is_array($array)) {
 			//生成Apiparam数据
-			$record = $this->buildApiparamData($array);
+			$record = $this->formartToMock($array);
 			return $record;
 		}
 		throw new ErrorHttpException('导入数据不符合要求');
+	}
+
+	/**
+	 * 导入参数格式化成mock
+	 */
+	public function formartToMock(array $arr){
+		$data = [];
+		foreach ($arr as $k => $v){
+			if (is_numeric($v)){ //数字
+				$type = ChapterApiParam::TYPE_NUMBER;
+			}elseif (is_bool($v)){ //布尔
+				$type = ChapterApiParam::TYPE_BOOLEAN;
+			}elseif (is_string($v)) { //字符串
+				$type = ChapterApiParam::TYPE_STRING;
+			}elseif (is_null($v)) {
+				$type = ChapterApiParam::TYPE_NULL;
+			}elseif (is_array($v)){ //数组或对象
+				if (count($v) == count($v, 1)){ //数组
+					$type = ChapterApiParam::TYPE_ARRAY;
+				}else{ //对象
+					$type = ChapterApiParam::TYPE_OBJECT;
+					$children = $this->_formart($v);
+				}
+			}
+			$data[] = [
+				'type'          => $type,
+				'name'          => $k,
+				'description'   => '',
+				'enabled'       => ChapterApiParam::ENABLED_YES,
+				'default_value' => isset($children) ? '' : $v,
+				'rule'          => '',
+				'children'      => $children ?? []
+			];
+		}
+		return $data;
 	}
 
 	public function buildApiparamData($data)
