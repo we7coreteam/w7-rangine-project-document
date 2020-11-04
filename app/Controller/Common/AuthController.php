@@ -163,7 +163,7 @@ class AuthController extends BaseController
 	}
 
 	/**
-	 * @api {post} /common/auth/third-party-login 获取参数类型列表
+	 * @api {post} /common/auth/third-party-login 三方登陆
 	 *
 	 * @apiName third-party-login
 	 * @apiGroup auth
@@ -255,7 +255,7 @@ class AuthController extends BaseController
 	}
 
 	/**
-	 * @api {post} /common/auth/changeThirdPartyUser 获取参数类型列表
+	 * @api {post} /common/auth/changeThirdPartyUser 切换用户
 	 *
 	 * @apiName changeThirdPartyUser
 	 * @apiGroup auth
