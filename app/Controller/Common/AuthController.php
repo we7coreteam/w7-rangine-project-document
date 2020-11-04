@@ -118,7 +118,7 @@ class AuthController extends BaseController
 			if (!empty($item['setting']['enable'])) {
 				try {
 					$socialite = clone $socialite;
-					$url = ienv('API_HOST') . 'admin-login?app_id=' . $key . '&redirect_url=' . urlencode($redirectUrl);
+					$url = ienv('API_HOST') . 'login?app_id=' . $key . '&redirect_url=' . urlencode($redirectUrl);
 					$redirect = $socialite->config(new Config([
 						'client_id' => $item['setting']['app_id'],
 						'client_secret' => $item['setting']['secret_key']
