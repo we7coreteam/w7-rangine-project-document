@@ -118,7 +118,7 @@ class AuthController extends BaseController
 			if (!empty($item['setting']['enable'])) {
 				try {
 					$socialite = clone $socialite;
-					$url = ienv('API_HOST') . 'login?app_id=' . $key . '&redirect_url=' . urlencode($redirectUrl);
+					$url = ienv('API_HOST') . 'admin-login?app_id=' . $key . '&redirect_url=' . urlencode($redirectUrl);
 					$redirect = $socialite->config(new Config([
 						'client_id' => $item['setting']['app_id'],
 						'client_secret' => $item['setting']['secret_key']
@@ -280,45 +280,6 @@ class AuthController extends BaseController
 		if (empty($appId)) {
 			throw new ErrorHttpException('app_id错误');
 		}
-
-		//test
-		$user = $request->session->get('user');
-		dump($user);
-		//需要绑定的情况
-		$thirdPartyUser = UserThirdParty::query()->find(7);
-
-		//		$username = $thirdPartyUser->username;
-		//		$localUser = [
-		//			'app_id' => $thirdPartyUser->source,
-		//			'uid' => $thirdPartyUser->uid,
-		//			'third-party-uid' => $thirdPartyUser->id,
-		//			'username' => $username,
-		//		];
-		//		$request->session->destroy();
-		//		//记录第三方登录app_id
-		//		$request->session->set('user-source-app', $thirdPartyUser->source);
-		//		//需要绑定已有账户
-		//		$request->session->set('third-party-user', $localUser);
-		//		return $this->data(['is_need_bind' => true]);
-		//验证是否需要切换
-		//已登陆的用户校验是否需要切换用户S
-		//如果登陆用户和当前访问用户不一致
-		$changeToken = 'temp_user_info_4' . date('YmdHis') . round(1000, 9999);
-		icache()->set($changeToken, ['third_party_user_id' => $thirdPartyUser->id], 60 * 15);
-		return $this->data(['has_login' => 1, 'change_token' => $changeToken]);
-
-		$sourceToken = 'temp_user_info_source' . date('YmdHis') . round(1000, 9999);
-		icache()->set($sourceToken, ['third_party_user_id' => $thirdPartyUser->id, 'source' => $appId], 60 * 15);
-		return $this->data(['has_login' => 3, 'source_token' => $sourceToken]);
-
-		$bindToken = 'temp_user_info_unbind_two' . date('YmdHis') . round(1000, 9999);
-		icache()->set($bindToken, ['third_party_user_id' => $thirdPartyUser->id], 60 * 15);
-		return $this->data(['has_login' => 2, 'bind_token' => $bindToken]);
-
-		$changeToken = 'temp_user_info' . date('YmdHis') . round(1000, 9999);
-		//		icache()->set($changeToken, ['third_party_user_id' => $thirdPartyUser->id], 60 * 15);
-		//		return $this->data(['has_login' => true, 'change_token' => $changeToken]);
-		//testend
 
 		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($appId);
 		if (!$setting) {
