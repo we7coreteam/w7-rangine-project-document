@@ -118,7 +118,7 @@ class AuthController extends BaseController
 			if (!empty($item['setting']['enable'])) {
 				try {
 					$socialite = clone $socialite;
-					$url = ienv('API_HOST') . 'login?app_id=' . $key . '&redirect_url=' . urlencode($redirectUrl);
+					$url = ienv('API_HOST') . 'admin-login?app_id=' . $key . '&redirect_url=' . urlencode($redirectUrl);
 					$redirect = $socialite->config(new Config([
 						'client_id' => $item['setting']['app_id'],
 						'client_secret' => $item['setting']['secret_key']
@@ -164,6 +164,7 @@ class AuthController extends BaseController
 
 	public function thirdPartyLogintest(Request $request)
 	{
+		return $this->data('success');
 		$openduser = UserThirdParty::query()->find(140);//切入用户
 		$sesuser = User::query()->find(1);//登陆用户
 		$appId = 3;
