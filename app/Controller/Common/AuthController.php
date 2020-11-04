@@ -329,6 +329,8 @@ class AuthController extends BaseController
 					return [
 						'is_need_bind' => true
 					];
+				}else{
+					throw new ErrorHttpException('当前可以直接登陆');
 				}
 			}
 		}
