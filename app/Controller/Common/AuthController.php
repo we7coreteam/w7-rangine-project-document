@@ -311,9 +311,9 @@ class AuthController extends BaseController
 	}
 
 	/**
-	 * @api {post} /common/auth/thirdPartyLoginBind 绑定用户
+	 * @api {post} /common/auth/third-party-login-bind 绑定用户
 	 *
-	 * @apiName thirdPartyLoginBind
+	 * @apiName third-party-login-bind
 	 * @apiGroup auth
 	 *
 	 * @apiParam {string} handle 操作类型bind：绑定 reg:注册
@@ -333,10 +333,19 @@ class AuthController extends BaseController
 		]);
 		$thirdPartyUser = $request->session->get('third-party-user');
 		if (!$thirdPartyUser) {
-			throw new ErrorHttpException('非法请求');
+			throw new ErrorHttpException('用户信息已过期请重新登陆', [], Setting::ERROR_NO_LOGIN);
 		}
 
 		$handle = $request->input('handle', 'bind');
+
+		$UserThirdParty = UserThirdParty::query()->find($thirdPartyUser['third-party-uid']);
+		if (!$UserThirdParty) {
+			throw new ErrorHttpException('请先授权');
+		}
+
+		if ($UserThirdParty->uid) {
+			throw new ErrorHttpException('用户信息已过期请重新登陆', [], Setting::ERROR_NO_LOGIN);
+		}
 
 		if ($handle == 'bind') {
 			//绑定已有用户
@@ -368,7 +377,7 @@ class AuthController extends BaseController
 			}
 		}
 
-		UserThirdParty::query()->where('id', '=', $thirdPartyUser['third-party-uid'])->update([
+		$UserThirdParty->update([
 			'uid' => $user->id,
 		]);
 
