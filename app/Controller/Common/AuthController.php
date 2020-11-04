@@ -571,7 +571,9 @@ class AuthController extends BaseController
 			throw new ErrorHttpException('用户信息已过期请重新登陆', [], Setting::ERROR_NO_LOGIN);
 		}
 
+		$msg='当前账户已注册成功';
 		if ($handle == 'bind') {
+			$msg='当前账户已绑定成功';
 			//绑定已有用户
 			$user = UserLogic::instance()->getByUserName($data['username']);
 			if (empty($user)) {
@@ -616,7 +618,7 @@ class AuthController extends BaseController
 		$request->session->set('user-source-app', $thirdPartyUser['app_id']);
 		$this->saveUserInfo($request->session, $user);
 
-		return $this->data('success');
+		return $this->data($msg);
 	}
 
 	public function logout(Request $request)
