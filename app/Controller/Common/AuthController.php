@@ -164,11 +164,11 @@ class AuthController extends BaseController
 
 	public function thirdPartyLogintest(Request $request)
 	{
-		$thirdPartyUser = UserThirdParty::query()->find(140);
-		$appId = 3;
-		$sourceToken = 'temp_user_info_3_source' . date('YmdHis') . round(1000, 9999);
-		icache()->set($sourceToken, ['third_party_user_id' => $thirdPartyUser->id, 'source' => $appId], 60 * 15);
-		return $this->data(['has_login' => 3, 'source_token' => $sourceToken]);
+		$openduser = $thirdPartyUser = UserThirdParty::query()->find(140);
+//		$appId = 3;
+//		$sourceToken = 'temp_user_info_3_source' . date('YmdHis') . round(1000, 9999);
+//		icache()->set($sourceToken, ['third_party_user_id' => $thirdPartyUser->id, 'source' => $appId], 60 * 15);
+//		return $this->data(['has_login' => 3, 'source_token' => $sourceToken]);
 
 		$sesuser = User::query()->find(1);//登陆用户
 		$appId = 3;
@@ -179,7 +179,6 @@ class AuthController extends BaseController
 			'uid' => $openduser->openid,
 			'username' => $openduser->username
 		];
-		dump($user);
 		if (empty($userInfo['username']) || empty($userInfo['uid'])) {
 			throw new ErrorHttpException('登录用户数据错误，请重试');
 		}
@@ -305,6 +304,8 @@ class AuthController extends BaseController
 			'uid' => $user->uid,
 			'username' => $user->username
 		];
+
+		ilogger()->channel('test')->debug('thirdPartyLogin', $userInfo);
 		if (empty($userInfo['username']) || empty($userInfo['uid'])) {
 			throw new ErrorHttpException('登录用户数据错误，请重试');
 		}
