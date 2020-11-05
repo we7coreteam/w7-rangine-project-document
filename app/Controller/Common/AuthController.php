@@ -385,7 +385,13 @@ class AuthController extends BaseController
 		//2已登陆的用户校验是否需要切换用户E
 
 		$ret = $this->data($this->setThirdPartySession($request, $thirdPartyUser));
-		ilogger()->channel('test')->debug('thirdPartyLogin', ['userinfo' => $userInfo, 'therd' => $thirdPartyUser]);
+		ilogger()->channel('test')->debug(
+			'thirdPartyLogin',
+			[
+				'userinfo' => $userInfo, 'therd' => $thirdPartyUser,
+				'ret' => $ret,
+			]
+		);
 		return $ret;
 	}
 
@@ -513,7 +519,7 @@ class AuthController extends BaseController
 		$request->session->destroy();
 		//记录第三方登录app_id
 		$request->session->set('user-source-app', $thirdPartyUser->source);
-
+		$loginSetting = ThirdPartyLoginLogic::instance()->getDefaultLoginSetting();
 		//需要绑定已有账户
 		if (!empty($loginSetting['is_need_bind']) && empty($thirdPartyUser->uid)) {
 			//保存第三方用户信息，触发用户绑定
