@@ -172,7 +172,7 @@ class AuthController extends BaseController
 
 		$sesuser = User::query()->find(1);//登陆用户
 		$appId = 3;
-		$this->saveUserInfo($request->session, $sesuser);
+//		$this->saveUserInfo($request->session, $sesuser);
 //		-----------------------
 		//获取第三方数据
 		$userInfo = [
@@ -305,7 +305,6 @@ class AuthController extends BaseController
 			'username' => $user->username
 		];
 
-		ilogger()->channel('test')->debug('thirdPartyLogin', $userInfo);
 		if (empty($userInfo['username']) || empty($userInfo['uid'])) {
 			throw new ErrorHttpException('登录用户数据错误，请重试');
 		}
@@ -384,7 +383,10 @@ class AuthController extends BaseController
 		 *4文档绑了商城，商城绑了文档，用户不一致-去切换-致登陆
 		 **/
 		//2已登陆的用户校验是否需要切换用户E
-		return $this->data($this->setThirdPartySession($request, $thirdPartyUser));
+
+		$ret = $this->data($this->setThirdPartySession($request, $thirdPartyUser));
+		ilogger()->channel('test')->debug('thirdPartyLogin', ['userinfo' => $userInfo, 'therd' => $thirdPartyUser]);
+		return $ret;
 	}
 
 	/**
