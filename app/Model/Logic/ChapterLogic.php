@@ -179,12 +179,37 @@ class ChapterLogic extends BaseLogic
 		if (!$target->is_dir) {
 			throw new \RuntimeException('移动的目标不是目录，不能移动');
 		}
-
+		$documentChange = 0;
+		if ($source->document_id != $target->document_id) {
+			$documentChange = 1;
+		}
+		$source->document_id = $target->document_id;
 		$source->parent_id = $target->id;
 		$source->sort = ChapterLogic::instance()->getMaxSort($target->parent_id);
 		$source->save();
-
+		//下级目录修改
+		if ($source->is_dir) {
+			//移动的是一个目录
+			$this->moveSunChapter($source, $source->document_id);
+		}
 		return true;
+	}
+
+	public function moveSunChapter($source, $documentId)
+	{
+		if ($source->is_dir) {
+			//是目录
+			$list = Chapter::query()->where('parent_id', $source->id)->get();
+			if (count($list)) {
+				foreach ($list as $key => $val) {
+					$val->document_id = $documentId;
+					$val->save();
+					if ($val->is_dir) {
+						$this->moveSunChapter($val, $documentId);
+					}
+				}
+			}
+		}
 	}
 
 	public function searchDocument($id, $keyword)

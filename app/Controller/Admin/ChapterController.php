@@ -94,7 +94,7 @@ class ChapterController extends BaseController
 
 		$user = $request->getAttribute('user');
 		if (!$user->isOperator) {
-			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
+			throw new ErrorHttpException('您没有权限管理该文档', [], Setting::ERROR_NO_POWER);
 		}
 
 		$parentId = intval($request->post('parent_id'));
@@ -166,7 +166,7 @@ class ChapterController extends BaseController
 
 		$user = $request->getAttribute('user');
 		if (!$user->isOperator) {
-			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
+			throw new ErrorHttpException('您没有权限管理该文档', [], Setting::ERROR_NO_POWER);
 		}
 
 		$chapter = ChapterLogic::instance()->getById($request->post('chapter_id'));
@@ -209,7 +209,7 @@ class ChapterController extends BaseController
 
 		$user = $request->getAttribute('user');
 		if (!$user->isOperator) {
-			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
+			throw new ErrorHttpException('您没有权限管理该文档', [], Setting::ERROR_NO_POWER);
 		}
 
 		$chapter = ChapterLogic::instance()->getById($request->post('chapter_id'));
@@ -219,59 +219,77 @@ class ChapterController extends BaseController
 
 		$position = $request->post('target')['position'];
 		$targetChapter = ChapterLogic::instance()->getById($request->post('target')['chapter_id']);
-
-		if ($position == 'move') {
-			$targetDocumentId = $request->post('target')['document_id'];
-			$documentPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($targetDocumentId, $user->id);
-			if (!$user->isFounder && !$documentPermission->isManager && !$documentPermission->isOperator) {
-				throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
-			}
-
-			$chapter->document_id = $targetDocumentId;
-			$chapter->save();
-		} else {
-			if ($targetChapter->document_id != $request->post('document_id')) {
-				throw new ErrorHttpException('只能移动到当前文档中的其它目录');
-			}
+		if ($targetChapter && ($targetChapter->is_dir != Chapter::IS_DIR)) {
+			//移动对象不是目录
+			throw new ErrorHttpException('只能移动到目录下面');
 		}
 
-		//放入到目录节点中，但不存在排序
-		if ($position == 'inner' || $position == 'move') {
-			try {
-				if (empty($targetChapter)) {
-					//找到该文档的根节点中的其中一个章节
-					$targetChapter = Chapter::query()->where('document_id', $chapter->document_id)->where('parent_id', '=', 0)->first();
+		idb()->beginTransaction();
+		try {
+			if ($position == 'move') {
+				//移动当前文章/目录
+				$targetDocumentId = $request->post('target')['document_id'];
+				$documentPermission = DocumentPermissionLogic::instance()->getByDocIdAndUid($targetDocumentId, $user->id);
+				if (!$user->isFounder && !$documentPermission->isManager && !$documentPermission->isOperator) {
+					throw new ErrorHttpException('您没有权限管理该文档', [], Setting::ERROR_NO_POWER);
 				}
-				$targetChapter && ChapterLogic::instance()->moveByChapter($chapter, $targetChapter);
-			} catch (\Throwable $e) {
-				throw new ErrorHttpException($e->getMessage());
-			}
-		} else {
-			if (empty($targetChapter)) {
-				throw new ErrorHttpException('要移到的章节不存在');
+//				$chapter->document_id = $targetDocumentId;
+//				$chapter->save();
+
+			} else {
+				if ($targetChapter->document_id != $request->post('document_id')) {
+					throw new ErrorHttpException('只能移动到当前文档中的其它目录');
+				}
 			}
 
-			$chapter->parent_id = $targetChapter->parent_id;
-			$chapter->save();
+			//放入到目录节点中，但不存在排序
+			if ($position == 'inner' || $position == 'move') {
+				try {
+					if (empty($targetChapter)) {
+						//目标节点不存在-移动到根目录下
+						//找到该文档的根节点中的其中一个章节
+//					$targetChapter = Chapter::query()->where('document_id', $chapter->document_id)->where('parent_id', '=', 0)->first();
+						//如果目标节点不存在-移动到根目录
+						$chapter->document_id = $targetDocumentId;
+						$chapter->parent_id = 0;
+						$chapter->save();
+					}
+					//目标节点存在-移动到目标节点下
+					$targetChapter && ChapterLogic::instance()->moveByChapter($chapter, $targetChapter);
+				} catch (\Throwable $e) {
+					throw new ErrorHttpException($e->getMessage());
+				}
+			} else {
+				//同项目上下级排序
+				if (empty($targetChapter)) {
+					throw new ErrorHttpException('要移到的章节不存在');
+				}
 
-			try {
-				ChapterLogic::instance()->sortByChapter($chapter, $targetChapter, $position);
-			} catch (\Throwable $e) {
-				throw new ErrorHttpException($e->getMessage());
+				$chapter->parent_id = $targetChapter->parent_id;
+				$chapter->save();
+
+				try {
+					ChapterLogic::instance()->sortByChapter($chapter, $targetChapter, $position);
+				} catch (\Throwable $e) {
+					throw new ErrorHttpException($e->getMessage());
+				}
 			}
+
+			if ($position != 'move') {
+				$targetChapter && $targetChapter = ChapterLogic::instance()->getById($targetChapter->parent_id);
+			}
+			UserOperateLog::query()->create([
+				'user_id' => $user->id,
+				'document_id' => $chapter->document_id,
+				'chapter_id' => $chapter->id,
+				'operate' => UserOperateLog::CHAPTER_MOVE,
+				'remark' => $user->username . '移动章节' . $chapter->name . '到' . !empty($targetChapter) ? $targetChapter->name : '根节点'
+			]);
+			idb()->commit();
+		} catch (\Throwable $e) {
+			idb()->rollBack();
+			throw new ErrorHttpException($e->getMessage());
 		}
-
-		if ($position != 'move') {
-			$targetChapter && $targetChapter = ChapterLogic::instance()->getById($targetChapter->parent_id);
-		}
-		UserOperateLog::query()->create([
-			'user_id' => $user->id,
-			'document_id' => $chapter->document_id,
-			'chapter_id' => $chapter->id,
-			'operate' => UserOperateLog::CHAPTER_MOVE,
-			'remark' => $user->username . '移动章节' . $chapter->name . '到' . !empty($targetChapter) ? $targetChapter->name : '根节点'
-		]);
-
 		return $this->data('success');
 	}
 
@@ -287,7 +305,7 @@ class ChapterController extends BaseController
 
 		$user = $request->getAttribute('user');
 		if (!$user->isOperator) {
-			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
+			throw new ErrorHttpException('您没有权限管理该文档', [], Setting::ERROR_NO_POWER);
 		}
 
 		if (!is_array($request->post('chapter_id'))) {
@@ -368,7 +386,7 @@ class ChapterController extends BaseController
 
 		$user = $request->getAttribute('user');
 		if (!$user->isOperator) {
-			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
+			throw new ErrorHttpException('您没有权限管理该文档', [], Setting::ERROR_NO_POWER);
 		}
 
 		$chapter = ChapterLogic::instance()->getById(intval($request->post('chapter_id')));
@@ -463,7 +481,7 @@ class ChapterController extends BaseController
 		]);
 		$user = $request->getAttribute('user');
 		if (!$user->isOperator) {
-			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
+			throw new ErrorHttpException('您没有权限管理该文档', [], Setting::ERROR_NO_POWER);
 		}
 
 		$chapter = ChapterLogic::instance()->getById(intval($request->post('chapter_id')));
@@ -478,9 +496,9 @@ class ChapterController extends BaseController
 			$author = $chapter->document->user;
 		}
 
-		$content='';
+		$content = '';
 		if (!$chapter->content->layout) {
-			$content=$chapter->content->content;
+			$content = $chapter->content->content;
 		}
 
 		$result = [
@@ -496,7 +514,7 @@ class ChapterController extends BaseController
 		];
 		if ($chapter->content->layout == 1) {
 			$obj = new ChapterRecordLogic($chapter->id);
-			$result['content']="record";
+			$result['content'] = 'record';
 			$result['record'] = $obj->showRecord();
 		}
 
@@ -517,7 +535,7 @@ class ChapterController extends BaseController
 
 		$user = $request->getAttribute('user');
 		if (!$user->isOperator) {
-			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
+			throw new ErrorHttpException('您没有权限管理该文档', [], Setting::ERROR_NO_POWER);
 		}
 
 		$chapterId = intval($request->post('chapter_id'));
@@ -593,7 +611,7 @@ class ChapterController extends BaseController
 
 		$user = $request->getAttribute('user');
 		if (!$user->isOperator) {
-			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
+			throw new ErrorHttpException('您没有权限管理该文档', [], Setting::ERROR_NO_POWER);
 		}
 		$parentChapter = null;
 		if ($params['parent_id']) {
@@ -659,12 +677,13 @@ class ChapterController extends BaseController
 	 * @apiSuccessExample {json} Success-Response:
 	 * {"status":true,"code":200,"data":[{"type":3,"name":"status","description":"","enabled":2,"default_value":true,"rule":"","children":[]},{"type":2,"name":"code","description":"","enabled":2,"default_value":200,"rule":"","children":[]},{"type":1,"name":"msg","description":"","enabled":2,"default_value":"success","rule":"","children":[]},{"type":5,"name":"array","description":"","enabled":2,"default_value":"[1,2,3]","rule":"","children":[]},{"type":5,"name":"marray","description":"","enabled":2,"default_value":"","rule":"+2","children":[{"type":5,"name":0,"description":"","enabled":2,"default_value":"[1,2]","rule":"","children":[]},{"type":5,"name":1,"description":"","enabled":2,"default_value":"[3,4]","rule":"","children":[]}]},{"type":4,"name":"object","description":"","enabled":2,"default_value":"","rule":"","children":[{"type":2,"name":"id","description":"","enabled":2,"default_value":1,"rule":"","children":[]},{"type":1,"name":"name","description":"","enabled":2,"default_value":"name","rule":"","children":[]}]}],"message":"ok"}
 	 */
-	public function import(Request $request){
+	public function import(Request $request)
+	{
 		$data = $this->validate($request, [
 			'data' => 'required|json',
 		]);
 		$Capter = new ChapterImportLogic();
-		$res 	= $Capter->getApiparam($data['data'],1,'json');
+		$res = $Capter->getApiparam($data['data'], 1, 'json');
 		return $this->data($res);
 	}
 }
