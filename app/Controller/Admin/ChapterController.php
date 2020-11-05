@@ -235,7 +235,6 @@ class ChapterController extends BaseController
 				}
 //				$chapter->document_id = $targetDocumentId;
 //				$chapter->save();
-
 			} else {
 				if ($targetChapter->document_id != $request->post('document_id')) {
 					throw new ErrorHttpException('只能移动到当前文档中的其它目录');
@@ -253,6 +252,10 @@ class ChapterController extends BaseController
 						$chapter->document_id = $targetDocumentId;
 						$chapter->parent_id = 0;
 						$chapter->save();
+						if ($chapter->document_id) {
+							$chapterLogic = new ChapterLogic();
+							$chapterLogic->moveSunChapter($chapter, $chapter->document_id);
+						}
 					}
 					//目标节点存在-移动到目标节点下
 					$targetChapter && ChapterLogic::instance()->moveByChapter($chapter, $targetChapter);
