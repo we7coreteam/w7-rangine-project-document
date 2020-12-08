@@ -39,7 +39,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 	/**
 	 * 导入参数格式化成mock
 	 */
-	public function formartToMock(array $arr){
+	public function formartToMock(array $arr, $step = false){
 		$data = [];
 		foreach ($arr as $k => $v){
 			$children	= [];
@@ -55,9 +55,13 @@ class ChapterImportLogic extends ChapterCommonLogic
 			}elseif (is_array($v)){ //数组或对象
 				if (count($v) == count($v, 1)){ //数组
 					$type = ChapterApiParam::TYPE_ARRAY;
-					if ($this->is_assoc($v)){ //单个对象
+					if($step){ //纯数字数组
+						$default = $v === array_filter($v,'is_int') ? current($v) : $v ;
+						$rule = '+1';
+					}elseif (!($v === array_filter($v,'is_int'))) { //单个对象
 						$children = $this->formartToMock($v);
 						$default = '';
+						$rule = $step ? '+1' : '';
 					}
 				}else{ //对象集合
 					$type	= ChapterApiParam::TYPE_OBJECT;
@@ -65,10 +69,13 @@ class ChapterImportLogic extends ChapterCommonLogic
 					foreach ($v as $v1){
 						$merge	= array_merge_recursive($merge, $v1);
 					}
+					foreach ($merge as &$v1){
+						$v1 = array_pad(is_array($v1) ? $v1 : [$v1], count($v),null);
+					}
 					if (!$this->is_assoc($merge)){
-						$rule = count($v);
+						$rule	= count($v);
 					}else{
-						$children	= $this->formartToMock($merge);
+						$children	= $this->formartToMock($merge, true);
 					}
 					$default	= '';
 				}
