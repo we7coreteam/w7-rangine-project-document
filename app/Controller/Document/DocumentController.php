@@ -29,6 +29,10 @@ class DocumentController extends BaseController
 			'document_id.required' => '文档id必填',
 			'document_id.integer' => '文档id非法'
 		]);
+		$res = DocumentLogic::instance()->getById($params['document_id']);
+		if (!$res) {
+			throw new ErrorHttpException('当前文档不存在', [],Setting::ERROR_NO_POWER);
+		}
 
 		$user = $request->getAttribute('user');
 		if (empty($user->isReader)) {
