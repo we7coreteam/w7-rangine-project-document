@@ -245,7 +245,8 @@ class ChapterController extends BaseController
 				'username' => $author->username,
 			],
 			'document' => $document,
-			'api' => $api
+			'api' => $api,
+			'navigation' => $this->buildNavigationSun($params['chapter_id'])
 		];
 
 		$showRecord = $request->post('show_record', 0);
