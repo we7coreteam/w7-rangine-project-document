@@ -517,6 +517,22 @@ class AuthController extends BaseController
 		return $this->data($msg);
 	}
 
+	/**
+	 * 解绑
+	 */
+	public function unbind(Request $request){
+		$userSession = $request->session->get('user');
+		$userSourceAppId = $request->session->get('user-source-app');
+		$res = UserThirdParty::query()
+			->where('source', '=', $userSourceAppId)
+			->where('uid', '=', $userSession['uid'])
+			->update(['uid' => 0]);
+		if ($res){
+			return $this->data($res);
+		}
+		throw new ErrorHttpException('解绑失败');
+	}
+
 	public function logout(Request $request)
 	{
 		$sourceApp = $request->session->get('user-source-app');
