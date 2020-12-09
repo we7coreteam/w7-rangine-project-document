@@ -154,7 +154,7 @@ class ChapterRecordLogic
 				}
 				if ($chapterApiReponse && $val['data']) {
 					$reponseIds[count($reponseIds)] = $chapterApiReponse->id;
-					$reponseTop = '### 响应：' . $val['description'] . "\n";
+					$reponseTop = '### 响应' . $val['description'] . "\n";
 					$reponseText = $this->buildApiBody(ChapterApiParam::LOCATION_REPONSE_BODY_RAW, $val['data'], $sqlType, $chapterApiReponse);
 					if ($reponseText) {
 						$text .= $reponseTop . $reponseText;
@@ -179,29 +179,23 @@ class ChapterRecordLogic
 			return '';
 		}
 		//初始化顺序
-		$data = $this->bodySort($data);
-		$text = '';
-		$hasRequest = 0;
-		$hasReponse = 0;
+		$data 	= $this->bodySort($data);
+		$body 	= '';
+		$reqBody = '';
+		$resBody = '';
 		$requestTop = "### 请求\n";
 		$reponseTop = "### 响应\n";
 		foreach ($data as $k => $v) {
 			if (in_array($k, [$this->bodyReponseLocation, ChapterApiParam::LOCATION_REPONSE_HEADER])) {
-				if (!$hasReponse && $v) {
-					$text .= $reponseTop;
-					$hasReponse = 1;
-				}
-				$text .= $this->buildApiBody($k, $v, $sqlType, $chapterApiReponse);
+				$resBody .= $this->buildApiBody($k, $v, $sqlType, $chapterApiReponse);
 			} elseif (in_array($k, [$this->bodyParamLocation, ChapterApiParam::LOCATION_REQUEST_HEADER, ChapterApiParam::LOCATION_REQUEST_QUERY_PATH, ChapterApiParam::LOCATION_REQUEST_QUERY_STRING])) {
-				//请求
-				if (!$hasRequest && $v) {
-					$text .= $requestTop;
-					$hasRequest = 1;
-				}
-				$text .= $this->buildApiBody($k, $v, $sqlType);
+				$reqBody .= $this->buildApiBody($k, $v, $sqlType);
 			}
 		}
-		return $text;
+		$body	.= $requestTop;
+		$body	.= !empty($reqBody) ? $reqBody : '无';
+		if(!empty($resBody)) $body .= $reponseTop.$resBody;
+		return $body;
 	}
 
 	public function buildExtend($data, $sqlType)
@@ -465,10 +459,11 @@ class ChapterRecordLogic
 
 		$enabledText = $this->getEnabledText($enabled);
 		$typeText = $this->getTypeText($type);
-		if ($name || $description) {
-			if (!$name) {
+		dump($data);
+		if (strlen($name) || $description) {
+			/*if (!$name) {
 				$name = ' ';
-			}
+			}*/
 
 			$textName = $name;
 			if ($type == ChapterApiParam::TYPE_ARRAY) {
