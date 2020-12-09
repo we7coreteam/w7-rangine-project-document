@@ -32,6 +32,8 @@ irouter()->get('/common/auth/logout', 'Common\AuthController@logout');
 irouter()->post('/common/auth/logout', 'Common\AuthController@logout');
 irouter()->middleware('CheckAuthMiddleware')
 	->post('/common/auth/user', 'Common\AuthController@user');
+irouter()->middleware('CheckAuthMiddleware')
+	->post('/common/auth/unbind', 'Common\AuthController@unbind'); //解绑
 
 irouter()->post('/common/auth/third-party-login', 'Common\AuthController@thirdPartyLogin');
 irouter()->post('/common/auth/changeThirdPartyUser', 'Common\AuthController@changeThirdPartyUser');
