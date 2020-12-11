@@ -83,7 +83,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 					$type = ChapterApiParam::TYPE_OBJECT;
 					$merge = [];
 					foreach ($v as $v1) {
-						$merge = array_merge_recursive($merge, $v1);
+						$merge = array_merge_recursive($merge, is_array($v1) ? $v1 : [$v1]);
 					}
 					foreach ($merge as &$v1) {
 						$v1 = array_pad(is_array($v1) ? $v1 : [$v1], count($v), null);
