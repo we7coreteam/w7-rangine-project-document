@@ -22,7 +22,11 @@ class ChapterImportLogic extends ChapterCommonLogic
 	public function getApiparam($data, $reponseId, $type = 'key_word')
 	{
 		if ($type == 'key_word') {
-			$array = $this->keyWordToData($data);
+			if (!is_array($data)) {
+				$array = $this->keyWordToData($data);
+			} else {
+				throw new ErrorHttpException('导入数据不是标准的数据格式');
+			}
 		} elseif ($type == 'json') {
 			if ($this->isJson($data)) {
 				$array = json_decode($data, true);
