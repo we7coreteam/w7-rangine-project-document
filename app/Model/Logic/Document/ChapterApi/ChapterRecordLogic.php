@@ -459,7 +459,6 @@ class ChapterRecordLogic
 
 		$enabledText = $this->getEnabledText($enabled);
 		$typeText = $this->getTypeText($type);
-		dump($data);
 		if (strlen($name) || $description) {
 			/*if (!$name) {
 				$name = ' ';

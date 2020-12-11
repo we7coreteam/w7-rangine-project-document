@@ -66,6 +66,10 @@ class ChapterImportLogic extends ChapterCommonLogic
 					$type = ChapterApiParam::TYPE_ARRAY;
 					if ($step) { //纯数字数组
 						$default = $v === array_filter($v, 'is_int') ? current($v) : $v;
+						if (is_array($default)) {
+							//如果是数组转JSON
+							$default = $this->dataToJson($default);
+						}
 						$rule = '+1';
 					} elseif (!($v === array_filter($v, 'is_int'))) { //单个对象
 						$children = $this->formartToMock($v, $location);
@@ -101,6 +105,16 @@ class ChapterImportLogic extends ChapterCommonLogic
 			];
 		}
 		return $data;
+	}
+
+	public function dataToJson($arr)
+	{
+		foreach ($arr as $key => $val) {
+			if (is_numeric($val)) {
+				$arr[$key] = (int)$val;
+			}
+		}
+		return json_encode($arr);
 	}
 
 	public function buildApiparamData($data)
