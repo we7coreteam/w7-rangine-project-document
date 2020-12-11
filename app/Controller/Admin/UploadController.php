@@ -13,6 +13,7 @@
 namespace W7\App\Controller\Admin;
 
 use W7\App\Controller\BaseController;
+use W7\App\Exception\BadRequestException;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Logic\SettingLogic;
 use W7\App\Model\Service\CdnLogic;
@@ -23,13 +24,20 @@ class UploadController extends BaseController
 	public function image(Request $request)
 	{
 		$this->validate($request, [
-			'file' => 'required|file|mimes:bmp,png,jpeg,jpg,gif'
+			'file' => 'required|file'
 		]);
 
 		$file = $request->file('file');
 		$size = $file->getSize();
+
+		$mimeType = $file->getMimeType();
+		$mimeTypeData = explode('/', $mimeType);
+		//返回图片路径
+		if ($mimeTypeData[0] != 'image') {
+			throw new ErrorHttpException('上传的文件不是图片');
+		}
 		if ($size > 2048 * 2048 * 5) {
-			throw new ErrorHttpException('文件大小不能大于5M');
+			throw new ErrorHttpException('请上传不大于5M的文件');
 		}
 
 		$fileName = sprintf('/%s.%s', irandom(32), pathinfo($file->getClientFilename(), PATHINFO_EXTENSION));
