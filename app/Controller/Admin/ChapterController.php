@@ -685,7 +685,7 @@ class ChapterController extends BaseController
 	public function import(Request $request)
 	{
 		$data = $this->validate($request, [
-			'data' => 'required|json',
+			'data' => 'required',
 			'reponse_id' => 'required|integer',
 			'type' => 'required'
 		]);

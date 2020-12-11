@@ -24,8 +24,12 @@ class ChapterImportLogic extends ChapterCommonLogic
 		if ($type == 'key_word') {
 			$array = $this->keyWordToData($data);
 		} elseif ($type == 'json') {
-			$array = json_decode($data, true);
-		} else {
+			if ($this->isJson($data)) {
+				$array = json_decode($data, true);
+			} else {
+				throw new ErrorHttpException('导入数据不是标准的JSON格式');
+			}
+		} else if (is_array($data)) {
 			$array = $data;
 		}
 		if (is_array($array)) {
