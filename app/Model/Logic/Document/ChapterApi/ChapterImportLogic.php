@@ -37,6 +37,9 @@ class ChapterImportLogic extends ChapterCommonLogic
 			$array = $data;
 		}
 		if (is_array($array)) {
+			if (count($array) == 0) {
+				throw new ErrorHttpException('导入数据不能为空');
+			}
 			//生成Apiparam数据
 			$record = $this->formartToMock($array, $location);
 			return $record;
