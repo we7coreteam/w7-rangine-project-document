@@ -690,7 +690,7 @@ class ChapterController extends BaseController
 			'type' => 'required'
 		]);
 		$Capter = new ChapterImportLogic();
-		$res = $Capter->getApiparam($data['data'], $data['location'], 'json');
+		$res = $Capter->getApiparam($data['data'], $data['location'], $data['type']);
 		return $this->data($res);
 	}
 }
