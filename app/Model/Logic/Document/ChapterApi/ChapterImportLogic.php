@@ -19,7 +19,7 @@ use W7\App\Model\Entity\Document\ChapterApiParam;
 
 class ChapterImportLogic extends ChapterCommonLogic
 {
-	public function getApiparam($data, $reponseId, $type = 'key_word')
+	public function getApiparam($data, $location, $type = 'key_word')
 	{
 		if ($type == 'key_word') {
 			if (!is_array($data)) {
@@ -38,7 +38,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 		}
 		if (is_array($array)) {
 			//生成Apiparam数据
-			$record = $this->formartToMock($array, $reponseId);
+			$record = $this->formartToMock($array, $location);
 			return $record;
 		}
 		throw new ErrorHttpException('导入数据不符合要求');
@@ -47,7 +47,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 	/**
 	 * 导入参数格式化成mock
 	 */
-	public function formartToMock(array $arr, $reponseId, $step = false)
+	public function formartToMock(array $arr, $location, $step = false)
 	{
 		$data = [];
 		foreach ($arr as $k => $v) {
@@ -68,7 +68,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 						$default = $v === array_filter($v, 'is_int') ? current($v) : $v;
 						$rule = '+1';
 					} elseif (!($v === array_filter($v, 'is_int'))) { //单个对象
-						$children = $this->formartToMock($v, $reponseId);
+						$children = $this->formartToMock($v, $location);
 						$default = '';
 						$rule = $step ? '+1' : '';
 					}
@@ -84,7 +84,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 					if (!$this->is_assoc($merge)) {
 						$rule = count($v);
 					} else {
-						$children = $this->formartToMock($merge, $reponseId, true);
+						$children = $this->formartToMock($merge, $location, true);
 					}
 					$default = '';
 				}
@@ -94,7 +94,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 				'name' => $k,
 				'description' => '',
 				'enabled' => ChapterApiParam::ENABLED_YES,
-				'reponse_id' => $reponseId,
+				'location' => $location,
 				'default_value' => $default,
 				'rule' => $rule ?? '',
 				'children' => $children ?? []

@@ -686,11 +686,11 @@ class ChapterController extends BaseController
 	{
 		$data = $this->validate($request, [
 			'data' => 'required',
-			'reponse_id' => 'required|integer',
+			'location' => 'required|integer',
 			'type' => 'required'
 		]);
 		$Capter = new ChapterImportLogic();
-		$res = $Capter->getApiparam($data['data'], $data['reponse_id'], 'json');
+		$res = $Capter->getApiparam($data['data'], $data['location'], 'json');
 		return $this->data($res);
 	}
 }
