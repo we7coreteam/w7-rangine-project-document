@@ -23,10 +23,14 @@ class UploadController extends BaseController
 	public function image(Request $request)
 	{
 		$this->validate($request, [
-			'file' => 'required|file|mimes:bmp,png,jpeg,jpg|max:2048'
+			'file' => 'required|file|mimes:bmp,png,jpeg,jpg,gif'
 		]);
 
 		$file = $request->file('file');
+		$size = $file->getSize();
+		if ($size > 2048 * 2048 * 5) {
+			throw new ErrorHttpException('文件大小不能大于5M');
+		}
 
 		$fileName = sprintf('/%s.%s', irandom(32), pathinfo($file->getClientFilename(), PATHINFO_EXTENSION));
 		try {
