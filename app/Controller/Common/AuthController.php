@@ -528,7 +528,7 @@ class AuthController extends BaseController
 			->where('uid', '=', $userSession['uid'])
 			->update(['uid' => 0]);
 		if ($res){
-			$this->logout($request);
+			//$this->logout($request);
 			return $this->data($res);
 		}
 		throw new ErrorHttpException('解绑失败');
