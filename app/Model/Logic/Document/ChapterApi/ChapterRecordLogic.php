@@ -91,6 +91,10 @@ class ChapterRecordLogic
 						$markdown['extend'] = $this->buildExtend($val, $sqlType);
 					}
 				}
+				if(!$markdown['reponse']){
+					//如果没有相应
+					$this->deleteAllReponse($chapterId);
+				}
 			}
 			//存储
 			if ($sqlType == 2) {
@@ -165,11 +169,15 @@ class ChapterRecordLogic
 				if ($reponseIds) {
 					ChapterApiReponse::query()->where('chapter_id', $chapterId)->whereNotIn('id', $reponseIds)->delete();
 				} else {
-					ChapterApiReponse::query()->where('chapter_id', $chapterId)->delete();
+					$this->deleteAllReponse($chapterId);
 				}
 			}
 		}
 		return $text;
+	}
+
+	public function deleteAllReponse($chapterId){
+		ChapterApiReponse::query()->where('chapter_id', $chapterId)->delete();
 	}
 
 	public function buildBody($data, $sqlType, $chapterApiReponse = '')
