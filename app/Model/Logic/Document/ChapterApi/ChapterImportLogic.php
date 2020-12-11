@@ -55,7 +55,13 @@ class ChapterImportLogic extends ChapterCommonLogic
 		$data = [];
 		foreach ($arr as $k => $v) {
 			$children = [];
-			$default = $v;
+			if (is_array($v) && $v === array_filter($v, 'is_int')) {
+				//如果是一位数组
+				$default = $this->dataToJson($v);
+			} else {
+				$default = $v;
+			}
+
 			if (is_numeric($v)) { //数字
 				$type = ChapterApiParam::TYPE_NUMBER;
 			} elseif (is_bool($v)) { //布尔
@@ -73,11 +79,9 @@ class ChapterImportLogic extends ChapterCommonLogic
 							//如果是数组转JSON
 							$default = $this->dataToJson($default);
 						}
-						$rule = '+1';
 					} elseif (!($v === array_filter($v, 'is_int'))) { //单个对象
 						$children = $this->formartToMock($v, $location);
 						$default = '';
-						$rule = $step ? '+1' : '';
 					}
 				} else { //对象集合
 					$type = ChapterApiParam::TYPE_OBJECT;
