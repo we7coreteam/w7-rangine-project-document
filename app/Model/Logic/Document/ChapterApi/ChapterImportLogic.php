@@ -30,7 +30,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 		}
 		if (is_array($array)) {
 			//生成Apiparam数据
-			$record = $this->formartToMock($array);
+			$record = $this->formartToMock($array, $reponseId);
 			return $record;
 		}
 		throw new ErrorHttpException('导入数据不符合要求');
@@ -39,55 +39,57 @@ class ChapterImportLogic extends ChapterCommonLogic
 	/**
 	 * 导入参数格式化成mock
 	 */
-	public function formartToMock(array $arr, $step = false){
+	public function formartToMock(array $arr, $reponseId, $step = false)
+	{
 		$data = [];
-		foreach ($arr as $k => $v){
-			$children	= [];
-			$default	= $v;
-			if (is_numeric($v)){ //数字
-				$type	= ChapterApiParam::TYPE_NUMBER;
-			}elseif (is_bool($v)){ //布尔
-				$type	= ChapterApiParam::TYPE_BOOLEAN;
-			}elseif (is_string($v)) { //字符串
-				$type	= ChapterApiParam::TYPE_STRING;
-			}elseif (is_null($v)) {
-				$type	= ChapterApiParam::TYPE_NULL;
-			}elseif (is_array($v)){ //数组或对象
-				if (count($v) == count($v, 1)){ //数组
+		foreach ($arr as $k => $v) {
+			$children = [];
+			$default = $v;
+			if (is_numeric($v)) { //数字
+				$type = ChapterApiParam::TYPE_NUMBER;
+			} elseif (is_bool($v)) { //布尔
+				$type = ChapterApiParam::TYPE_BOOLEAN;
+			} elseif (is_string($v)) { //字符串
+				$type = ChapterApiParam::TYPE_STRING;
+			} elseif (is_null($v)) {
+				$type = ChapterApiParam::TYPE_NULL;
+			} elseif (is_array($v)) { //数组或对象
+				if (count($v) == count($v, 1)) { //数组
 					$type = ChapterApiParam::TYPE_ARRAY;
-					if($step){ //纯数字数组
-						$default = $v === array_filter($v,'is_int') ? current($v) : $v ;
+					if ($step) { //纯数字数组
+						$default = $v === array_filter($v, 'is_int') ? current($v) : $v;
 						$rule = '+1';
-					}elseif (!($v === array_filter($v,'is_int'))) { //单个对象
-						$children = $this->formartToMock($v);
+					} elseif (!($v === array_filter($v, 'is_int'))) { //单个对象
+						$children = $this->formartToMock($v, $reponseId);
 						$default = '';
 						$rule = $step ? '+1' : '';
 					}
-				}else{ //对象集合
-					$type	= ChapterApiParam::TYPE_OBJECT;
-					$merge	= [];
-					foreach ($v as $v1){
-						$merge	= array_merge_recursive($merge, $v1);
+				} else { //对象集合
+					$type = ChapterApiParam::TYPE_OBJECT;
+					$merge = [];
+					foreach ($v as $v1) {
+						$merge = array_merge_recursive($merge, $v1);
 					}
-					foreach ($merge as &$v1){
-						$v1 = array_pad(is_array($v1) ? $v1 : [$v1], count($v),null);
+					foreach ($merge as &$v1) {
+						$v1 = array_pad(is_array($v1) ? $v1 : [$v1], count($v), null);
 					}
-					if (!$this->is_assoc($merge)){
-						$rule	= count($v);
-					}else{
-						$children	= $this->formartToMock($merge, true);
+					if (!$this->is_assoc($merge)) {
+						$rule = count($v);
+					} else {
+						$children = $this->formartToMock($merge, $reponseId, true);
 					}
-					$default	= '';
+					$default = '';
 				}
 			}
 			$data[] = [
-				'type'          => $type,
-				'name'          => $k,
-				'description'   => '',
-				'enabled'       => ChapterApiParam::ENABLED_YES,
+				'type' => $type,
+				'name' => $k,
+				'description' => '',
+				'enabled' => ChapterApiParam::ENABLED_YES,
+				'reponse_id' => $reponseId,
 				'default_value' => $default,
-				'rule'          => $rule ?? '',
-				'children'      => $children ?? []
+				'rule' => $rule ?? '',
+				'children' => $children ?? []
 			];
 		}
 		return $data;
@@ -143,7 +145,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 						'description' => '',
 						'enabled' => ChapterApiParam::ENABLED_YES,
 						'default_value' => '',
-						'rule' => '+'.count($val),
+						'rule' => '+' . count($val),
 						'children' => $this->buildApiparamData($val)
 					];
 				}
