@@ -36,7 +36,7 @@ class UploadController extends BaseController
 		if ($mimeTypeData[0] != 'image') {
 			throw new ErrorHttpException('上传的文件不是图片');
 		}
-		if ($size > 2048 * 2048 * 5) {
+		if ($size > 5242880) {
 			throw new ErrorHttpException('请上传不大于5M的文件');
 		}
 
