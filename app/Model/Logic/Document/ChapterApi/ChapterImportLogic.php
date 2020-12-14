@@ -40,7 +40,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 			if ($this->isJson($data)) {
 				$array = json_decode($data, true);
 			} else {
-				throw new ErrorHttpException('json格式错误');
+				throw new ErrorHttpException('导入数据不是标准的JSON格式');
 			}
 		} else if (is_array($data)) {
 			$array = $data;
