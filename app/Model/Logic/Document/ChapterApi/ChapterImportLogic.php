@@ -150,7 +150,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 				'rule' => '',
 				'children' => $this->formartToMock($val, $location)
 			];
-		} else if ($rule > 1) {
+		} else if ($rule > 0) {
 			//如果是多维数组
 			return [
 				'type' => ChapterApiParam::TYPE_ARRAY,
@@ -160,16 +160,6 @@ class ChapterImportLogic extends ChapterCommonLogic
 				'default_value' => '+' . $rule,
 				'rule' => '',
 				'children' => $this->formartToMock($sunArray, $location, $mergeRecursive)
-			];
-		} else if ($rule == 1) {
-			return [
-				'type' => ChapterApiParam::TYPE_ARRAY,
-				'name' => $key,
-				'description' => '',
-				'enabled' => ChapterApiParam::ENABLED_YES,
-				'default_value' => '+' . $rule,
-				'rule' => '',
-				'children' => $this->formartToMock($val, $location)
 			];
 		} else {
 			//单数组或者对象
