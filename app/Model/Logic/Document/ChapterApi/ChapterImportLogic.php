@@ -156,23 +156,34 @@ class ChapterImportLogic extends ChapterCommonLogic
 				'children' => $this->formartToMock($sunArray, $location, $mergeRecursive)
 			];
 		}
-//		else if ($rule ==1) {
-//			//如果不是多维数组
-//		}
 		else {
-			//如果是纯数组，默认值返回整个数组
-			if (array_unique($val)) {
-				$default = $this->dataToJson(array_unique($val));
+			//单数组或者对象
+			if ($this->is_assoc($val)) {
+				//如果是对象
+				return [
+					'type' => ChapterApiParam::TYPE_OBJECT,
+					'name' => $key,
+					'description' => '',
+					'enabled' => ChapterApiParam::ENABLED_YES,
+					'default_value' => $default,
+					'rule' => '',
+					'children' => $this->formartToMock($val, $location)
+				];
+			}else{
+				//如果是纯数组，默认值返回整个数组
+				if (array_unique($val)) {
+					$default = $this->dataToJson(array_unique($val));
+				}
+				return [
+					'type' => ChapterApiParam::TYPE_ARRAY,
+					'name' => $key,
+					'description' => '',
+					'enabled' => ChapterApiParam::ENABLED_YES,
+					'default_value' => $default,
+					'rule' => '',
+					'children' => []
+				];
 			}
-			return [
-				'type' => ChapterApiParam::TYPE_ARRAY,
-				'name' => $key,
-				'description' => '',
-				'enabled' => ChapterApiParam::ENABLED_YES,
-				'default_value' => $default,
-				'rule' => '',
-				'children' => []
-			];
 		}
 	}
 
