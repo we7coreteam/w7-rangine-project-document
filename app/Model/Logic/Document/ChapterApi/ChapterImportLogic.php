@@ -157,6 +157,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 			];
 		}
 		else {
+			//单数组或者对象
 			if ($this->is_assoc($val)) {
 				//如果是对象
 				return [
