@@ -119,13 +119,16 @@ class ChapterImportLogic extends ChapterCommonLogic
 		$i = 0;
 		$sunArray = [];
 		$mergeRecursive = [];
+		$hasArray = 0;
 		foreach ($val as $k => $v) {
 			if ($k != $i) {
 				$type = ChapterApiParam::TYPE_OBJECT;
+				break;
 			}
 			$i++;
 			//如果不是对象，是多维数组
 			if (is_array($v) && $type == ChapterApiParam::TYPE_ARRAY) {
+				$hasArray = 1;
 				//如果子数组是个数组
 				$rule = $rule + 1;
 				if ($rule == 1) {
@@ -137,6 +140,11 @@ class ChapterImportLogic extends ChapterCommonLogic
 					//合并的时候，值合并到一起(按数组)
 					$mergeRecursive = array_merge_recursive($mergeRecursive, $v);
 				}
+			}
+			if (!is_array($v) && $hasArray == 1) {
+				$type = ChapterApiParam::TYPE_OBJECT;
+				//如果都是数组（多维数组）当前有一个不是数组->是对象
+				break;
 			}
 		}
 		if ($type == ChapterApiParam::TYPE_OBJECT) {
@@ -233,7 +241,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 				$arr[$key] = (int)$val;
 			}
 		}
-		return json_encode($arr);
+		return json_encode($arr, JSON_UNESCAPED_UNICODE);
 	}
 
 //	public function buildApiparamData($data)
