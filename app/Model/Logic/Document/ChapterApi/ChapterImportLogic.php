@@ -107,7 +107,6 @@ class ChapterImportLogic extends ChapterCommonLogic
 				//如果子数组是个数组
 				$rule = $rule + 1;
 				$sunArray = array_merge_recursive($sunArray, $v);
-				dump(json_encode($sunArray));
 			}
 		}
 		if ($type == ChapterApiParam::TYPE_OBJECT) {
