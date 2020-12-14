@@ -26,12 +26,15 @@ class ChapterImportLogic extends ChapterCommonLogic
 				$array = $this->keyWordToData($data);
 				if ($data && count($array) == 0) {
 					//兼容文本长内容，必须要用:隔开
-					throw new ErrorHttpException('键值对格式，请按key:value格式填写');
+					throw new ErrorHttpException('键值对错误，请按照key:value格式填写');
 				}
 			} else {
 				throw new ErrorHttpException('导入数据不是标准的数据格式');
 			}
 		} elseif ($type == 'json') {
+			if (!$data) {
+				throw new ErrorHttpException('导入数据不能为空');
+			}
 			if ($this->isJson($data)) {
 				$array = json_decode($data, true);
 			} else {
@@ -54,13 +57,14 @@ class ChapterImportLogic extends ChapterCommonLogic
 	/**
 	 * 导入参数格式化成mock
 	 */
-	public function formartToMock(array $arr, $location)
+	public function formartToMock(array $arr, $location, $mergeRecursive = [])
 	{
 		$data = [];
 		foreach ($arr as $k => $v) {
 			$children = [];
 			$arrayData = [];
 			$default = $v;
+
 			if (is_numeric($v)) { //数字
 				$type = ChapterApiParam::TYPE_NUMBER;
 			} elseif (is_bool($v)) { //布尔
@@ -72,6 +76,17 @@ class ChapterImportLogic extends ChapterCommonLogic
 			} elseif (is_array($v)) { //数组或对象
 				$arrayData = $this->buildArrayData($k, $v, $location);
 			}
+
+			if ($mergeRecursive && isset($mergeRecursive[$k])) {
+				//去重
+				$uniqueMergeRecursive = array_unique($mergeRecursive[$k]);
+				if (count($uniqueMergeRecursive) > 1) {
+					$default = json_encode($uniqueMergeRecursive, true);
+				} else {
+					$default = $uniqueMergeRecursive[0];
+				}
+			}
+
 			if ($arrayData) {
 				$data[] = $arrayData;
 			} else {
@@ -97,6 +112,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 		$type = ChapterApiParam::TYPE_ARRAY;
 		$i = 0;
 		$sunArray = [];
+		$mergeRecursive = [];
 		foreach ($val as $k => $v) {
 			if ($k != $i) {
 				$type = ChapterApiParam::TYPE_OBJECT;
@@ -106,7 +122,15 @@ class ChapterImportLogic extends ChapterCommonLogic
 			if (is_array($v) && $type == ChapterApiParam::TYPE_ARRAY) {
 				//如果子数组是个数组
 				$rule = $rule + 1;
-				$sunArray = array_merge_recursive($sunArray, $v);
+				if ($rule == 1) {
+					$sunArray = $v;
+					$mergeRecursive = $v;
+				} else {
+					//值和键值分开
+					$sunArray = array_merge($sunArray, $v);
+					//合并的时候，值合并到一起(按数组)
+					$mergeRecursive = array_merge_recursive($mergeRecursive, $v);
+				}
 			}
 		}
 		if ($type == ChapterApiParam::TYPE_OBJECT) {
@@ -120,18 +144,22 @@ class ChapterImportLogic extends ChapterCommonLogic
 				'rule' => '',
 				'children' => $this->formartToMock($val, $location)
 			];
-		} else if ($rule > 0) {
+		} else if ($rule > 1) {
 			//如果是多维数组
 			return [
 				'type' => ChapterApiParam::TYPE_ARRAY,
 				'name' => $key,
 				'description' => '',
 				'enabled' => ChapterApiParam::ENABLED_YES,
-				'default_value' => '',
+				'default_value' => '+' . $rule,
 				'rule' => '',
-				'children' => $this->formartToMock($sunArray, $location)
+				'children' => $this->formartToMock($sunArray, $location, $mergeRecursive)
 			];
-		} else {
+		}
+//		else if ($rule ==1) {
+//			//如果不是多维数组
+//		}
+		else {
 			//如果是纯数组，默认值返回整个数组
 			if (array_unique($val)) {
 				$default = $this->dataToJson(array_unique($val));
