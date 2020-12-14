@@ -26,7 +26,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 				$array = $this->keyWordToData($data);
 				if ($data && count($array) == 0) {
 					//兼容文本长内容，必须要用:隔开
-					throw new ErrorHttpException('键值对格式，请按key:value格式填写');
+					throw new ErrorHttpException('键值对错误，请按照key:value格式填写');
 				}
 			} else {
 				throw new ErrorHttpException('导入数据不是标准的数据格式');
