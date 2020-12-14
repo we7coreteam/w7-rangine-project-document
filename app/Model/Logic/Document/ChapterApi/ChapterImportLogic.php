@@ -25,7 +25,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 			if (!is_array($data)) {
 				$array = $this->keyWordToData($data);
 				if ($data && count($array) == 0) {
-					//兼容文本长内容，必须要用,隔开
+					//兼容文本长内容，必须要用:隔开
 					throw new ErrorHttpException('单行数据，请用:隔开');
 				}
 			} else {
