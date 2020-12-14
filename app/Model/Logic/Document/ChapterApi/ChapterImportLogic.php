@@ -79,11 +79,15 @@ class ChapterImportLogic extends ChapterCommonLogic
 
 			if ($mergeRecursive && isset($mergeRecursive[$k])) {
 				//去重
-				$uniqueMergeRecursive = array_unique($mergeRecursive[$k]);
-				if (count($uniqueMergeRecursive) > 1) {
-					$default = json_encode($uniqueMergeRecursive, true);
+				if (is_array($mergeRecursive[$k])) {
+					$uniqueMergeRecursive = array_unique($mergeRecursive[$k]);
+					if (count($uniqueMergeRecursive) > 1) {
+						$default = json_encode($uniqueMergeRecursive, true);
+					} else {
+						$default = $uniqueMergeRecursive[0];
+					}
 				} else {
-					$default = $uniqueMergeRecursive[0];
+					$default = $mergeRecursive[$k];
 				}
 			}
 
@@ -155,8 +159,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 				'rule' => '',
 				'children' => $this->formartToMock($sunArray, $location, $mergeRecursive)
 			];
-		}
-		else {
+		} else {
 			//单数组或者对象
 			if ($this->is_assoc($val)) {
 				//如果是对象
@@ -169,7 +172,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 					'rule' => '',
 					'children' => $this->formartToMock($val, $location)
 				];
-			}else{
+			} else {
 				//如果是纯数组，默认值返回整个数组
 				if (array_unique($val)) {
 					$default = $this->dataToJson(array_unique($val));
