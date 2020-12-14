@@ -19,6 +19,8 @@ use W7\App\Model\Entity\Document\ChapterApiParam;
 
 class ChapterImportLogic extends ChapterCommonLogic
 {
+	private $errNullMsg = '导入数据不能为空';
+
 	public function getApiparam($data, $location, $type = 'key_word')
 	{
 		if ($type == 'key_word') {
@@ -26,14 +28,14 @@ class ChapterImportLogic extends ChapterCommonLogic
 				$array = $this->keyWordToData($data);
 				if ($data && count($array) == 0) {
 					//兼容文本长内容，必须要用:隔开
-					throw new ErrorHttpException('键值对错误，请按照key:value格式填写');
+					throw new ErrorHttpException('键值对格式错误，请按照key:value格式填写');
 				}
 			} else {
 				throw new ErrorHttpException('导入数据不是标准的数据格式');
 			}
 		} elseif ($type == 'json') {
 			if (!$data) {
-				throw new ErrorHttpException('导入数据不能为空');
+				throw new ErrorHttpException($this->errNullMsg);
 			}
 			if ($this->isJson($data)) {
 				$array = json_decode($data, true);
@@ -45,7 +47,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 		}
 		if (is_array($array)) {
 			if (count($array) == 0) {
-				throw new ErrorHttpException('导入数据不能为空');
+				throw new ErrorHttpException($this->errNullMsg);
 			}
 			//生成Apiparam数据
 			$record = $this->formartToMock($array, $location);
@@ -79,11 +81,15 @@ class ChapterImportLogic extends ChapterCommonLogic
 
 			if ($mergeRecursive && isset($mergeRecursive[$k])) {
 				//去重
-				$uniqueMergeRecursive = array_unique($mergeRecursive[$k]);
-				if (count($uniqueMergeRecursive) > 1) {
-					$default = json_encode($uniqueMergeRecursive, true);
+				if (is_array($mergeRecursive[$k])) {
+					$uniqueMergeRecursive = array_unique($mergeRecursive[$k]);
+					if (count($uniqueMergeRecursive) > 1) {
+						$default = json_encode($uniqueMergeRecursive, true);
+					} else {
+						$default = $uniqueMergeRecursive[0];
+					}
 				} else {
-					$default = $uniqueMergeRecursive[0];
+					$default = $mergeRecursive[$k];
 				}
 			}
 
@@ -155,8 +161,17 @@ class ChapterImportLogic extends ChapterCommonLogic
 				'rule' => '',
 				'children' => $this->formartToMock($sunArray, $location, $mergeRecursive)
 			];
-		}
-		else {
+		} else if ($rule == 1) {
+			return [
+				'type' => ChapterApiParam::TYPE_ARRAY,
+				'name' => $key,
+				'description' => '',
+				'enabled' => ChapterApiParam::ENABLED_YES,
+				'default_value' => '+' . $rule,
+				'rule' => '',
+				'children' => $this->formartToMock($val, $location)
+			];
+		} else {
 			//单数组或者对象
 			if ($this->is_assoc($val)) {
 				//如果是对象
@@ -169,7 +184,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 					'rule' => '',
 					'children' => $this->formartToMock($val, $location)
 				];
-			}else{
+			} else {
 				//如果是纯数组，默认值返回整个数组
 				if (array_unique($val)) {
 					$default = $this->dataToJson(array_unique($val));
