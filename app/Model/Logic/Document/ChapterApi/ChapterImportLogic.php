@@ -127,7 +127,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 				'name' => $key,
 				'description' => '',
 				'enabled' => ChapterApiParam::ENABLED_YES,
-				'default_value' => '',
+				'default_value' => '+'.$rule,
 				'rule' => '',
 				'children' => $this->formartToMock($sunArray, $location)
 			];
