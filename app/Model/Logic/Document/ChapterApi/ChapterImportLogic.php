@@ -106,7 +106,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 			if (is_array($v) && $type == ChapterApiParam::TYPE_ARRAY) {
 				//如果子数组是个数组
 				$rule = $rule + 1;
-				$sunArray = array_unique(array_merge_recursive($sunArray, $v));
+				$sunArray = array_merge_recursive($sunArray, $v);
 			}
 		}
 		if ($type == ChapterApiParam::TYPE_OBJECT) {
@@ -133,7 +133,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 			];
 		} else {
 			//如果是纯数组，默认值返回整个数组
-			$default = $this->dataToJson($val);
+			$default = $this->dataToJson(array_unique($val));
 			return [
 				'type' => ChapterApiParam::TYPE_ARRAY,
 				'name' => $key,
