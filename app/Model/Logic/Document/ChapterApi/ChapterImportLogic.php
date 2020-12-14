@@ -60,7 +60,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 		foreach ($arr as $k => $v) {
 			$children = [];
 			$arrayData = [];
-			$default = '';
+			$default = $v;
 			if (is_numeric($v)) { //数字
 				$type = ChapterApiParam::TYPE_NUMBER;
 			} elseif (is_bool($v)) { //布尔
@@ -133,7 +133,9 @@ class ChapterImportLogic extends ChapterCommonLogic
 			];
 		} else {
 			//如果是纯数组，默认值返回整个数组
-			$default = $this->dataToJson(array_unique($val));
+			if (array_unique($val)) {
+				$default = $this->dataToJson(array_unique($val));
+			}
 			return [
 				'type' => ChapterApiParam::TYPE_ARRAY,
 				'name' => $key,
