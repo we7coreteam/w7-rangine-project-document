@@ -25,6 +25,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 			if (!is_array($data)) {
 				$array = $this->keyWordToData($data);
 				if ($data && count($array) == 0) {
+					//兼容文本长内容，必须要用:隔开
 					throw new ErrorHttpException('单行数据，请用:隔开');
 				}
 			} else {
@@ -105,7 +106,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 			if (is_array($v) && $type == ChapterApiParam::TYPE_ARRAY) {
 				//如果子数组是个数组
 				$rule = $rule + 1;
-				$sunArray = array_merge_recursive($sunArray, $v);
+				$sunArray = array_unique(array_merge_recursive($sunArray, $v));
 			}
 		}
 		if ($type == ChapterApiParam::TYPE_OBJECT) {
