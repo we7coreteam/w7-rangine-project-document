@@ -24,6 +24,9 @@ class ChapterImportLogic extends ChapterCommonLogic
 		if ($type == 'key_word') {
 			if (!is_array($data)) {
 				$array = $this->keyWordToData($data);
+				if ($data && count($array) == 0) {
+					throw new ErrorHttpException('单行数据，请用:隔开');
+				}
 			} else {
 				throw new ErrorHttpException('导入数据不是标准的数据格式');
 			}
