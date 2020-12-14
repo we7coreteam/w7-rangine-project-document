@@ -31,7 +31,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 					throw new ErrorHttpException('键值对格式错误，请按照key:value格式填写');
 				}
 			} else {
-				throw new ErrorHttpException('导入数据不是标准的数据格式');
+				throw new ErrorHttpException('键值对格式错误，请按照key:value格式填写');
 			}
 		} elseif ($type == 'json') {
 			if (!$data) {
