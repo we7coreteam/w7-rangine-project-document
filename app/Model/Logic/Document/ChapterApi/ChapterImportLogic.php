@@ -128,6 +128,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 				'children' => $this->formartToMock($sunArray, $location)
 			];
 		} else {
+			//如果是纯数组，默认值返回整个数组
 			$default = $this->dataToJson($val);
 			return [
 				'type' => ChapterApiParam::TYPE_ARRAY,
