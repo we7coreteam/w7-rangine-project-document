@@ -66,7 +66,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 			$children = [];
 			$arrayData = [];
 			$default = $v;
-
+			$type = ChapterApiParam::TYPE_STRING;
 			if (is_numeric($v)) { //数字
 				$type = ChapterApiParam::TYPE_NUMBER;
 			} elseif (is_bool($v)) { //布尔
@@ -84,6 +84,10 @@ class ChapterImportLogic extends ChapterCommonLogic
 				if (is_array($mergeRecursive[$k])) {
 					$uniqueMergeRecursive = array_unique($mergeRecursive[$k]);
 					if (count($uniqueMergeRecursive) > 1) {
+						if ($type !== ChapterApiParam::TYPE_STRING) {
+							//如果
+							$type = $this->checkType($type, $uniqueMergeRecursive);
+						}
 						$default = json_encode($uniqueMergeRecursive, true);
 					} else {
 						$default = $uniqueMergeRecursive[0];
@@ -109,6 +113,28 @@ class ChapterImportLogic extends ChapterCommonLogic
 			}
 		}
 		return $data;
+	}
+
+	public function checkType($oldtype, $uniqueMergeRecursive)
+	{
+		foreach ($uniqueMergeRecursive as $k => $v) {
+			if (is_numeric($v)) { //数字
+				$type = ChapterApiParam::TYPE_NUMBER;
+			} elseif (is_bool($v)) { //布尔
+				$type = ChapterApiParam::TYPE_BOOLEAN;
+			} elseif (is_string($v)) { //字符串
+				$type = ChapterApiParam::TYPE_STRING;
+			} elseif (is_null($v)) {
+				$type = ChapterApiParam::TYPE_NULL;
+			} else {
+				$type = $oldtype;
+			}
+			if ($type != $oldtype) {
+				//如果出现两种以上类型->直接返回字符串
+				return ChapterApiParam::TYPE_STRING;
+			}
+		}
+		return $oldtype;
 	}
 
 	public function buildArrayData($key, $val, $location)
