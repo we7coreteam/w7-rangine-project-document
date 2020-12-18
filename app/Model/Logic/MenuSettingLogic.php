@@ -7,6 +7,7 @@ use W7\Core\Helper\Traiter\InstanceTraiter;
 class MenuSettingLogic extends BaseLogic
 {
 	use InstanceTraiter;
+
 	const MENU_SETTING_KEY = 'menu_setting';
 
 	public function all()
@@ -24,7 +25,7 @@ class MenuSettingLogic extends BaseLogic
 	{
 		$setting = SettingLogic::instance()->getByKey(self::MENU_SETTING_KEY);
 		if (!$setting) {
-			return [];
+			return ['theme' => "white"];
 		}
 
 		return $setting->setting;
