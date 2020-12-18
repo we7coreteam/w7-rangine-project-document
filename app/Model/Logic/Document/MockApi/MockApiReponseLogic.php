@@ -15,10 +15,11 @@ namespace W7\App\Model\Logic\Document\MockApi;
 //返回演示数据demo
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\Document\ChapterApiParam;
+use W7\App\Model\Logic\Document\ChapterApi\ChapterCommonLogic;
 use W7\App\Model\Logic\Document\ChapterApi\ChapterRuleLogic;
 use W7\Http\Message\Server\Request;
 
-class MockApiReponseLogic
+class MockApiReponseLogic extends ChapterCommonLogic
 {
 	public function checkRequest(Request $request, $api)
 	{
@@ -93,8 +94,12 @@ class MockApiReponseLogic
 
 					$chapterDemoLogic = new ChapterRuleLogic($api->chapter_id);
 					$result = $chapterDemoLogic->getChapterRuleMock($reponseId);
-					if (isset($result['__root__'])) {
-						$result = count($result['__root__']) == 1 ? [$result['__root__']] : $result['__root__'];
+					if (isset($result['__root__']) && $result['__root__']) {
+						if ($this->is_assoc($result['__root__'])) {
+							$result = [$result['__root__']];
+						} else {
+							$result = $result['__root__'];
+						}
 					}
 					return $result;
 				} else {
