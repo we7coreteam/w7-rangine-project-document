@@ -92,7 +92,11 @@ class MockApiReponseLogic
 					}
 
 					$chapterDemoLogic = new ChapterRuleLogic($api->chapter_id);
-					return $chapterDemoLogic->getChapterRuleMock($reponseId);
+					$result = $chapterDemoLogic->getChapterRuleMock($reponseId);
+					if (isset($result['__root__'])) {
+						$result = count($result['__root__']) == 1 ? [$result['__root__']] : $result['__root__'];
+					}
+					return $result;
 				} else {
 					return ['code' => 401, 'msg' => '请求类型错误'];
 				}
