@@ -52,7 +52,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 			//生成Apiparam数据
 			if ((count($array) != count($array, 1))&&(!$this->is_assoc($array))) {
 				//如果是多维数组
-				$arrayData = $this->buildArrayData('--root--', $array, $location);
+				$arrayData = $this->buildArrayData('__root__', $array, $location);
 				$record = [$arrayData];
 			} else {
 				$record = $this->formartToMock($array, $location);
