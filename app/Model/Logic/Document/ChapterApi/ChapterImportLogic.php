@@ -50,7 +50,13 @@ class ChapterImportLogic extends ChapterCommonLogic
 				throw new ErrorHttpException($this->errNullMsg);
 			}
 			//生成Apiparam数据
-			$record = $this->formartToMock($array, $location);
+			if ((count($array) != count($array, 1))&&(!$this->is_assoc($array))) {
+				//如果是多维数组
+				$arrayData = $this->buildArrayData('--root--', $array, $location);
+				$record = [$arrayData];
+			} else {
+				$record = $this->formartToMock($array, $location);
+			}
 			return $record;
 		}
 		throw new ErrorHttpException('导入数据不符合要求');
@@ -63,7 +69,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 	{
 		$data = [];
 		foreach ($arr as $k => $v) {
-			$rule='';
+			$rule = '';
 			$children = [];
 			$arrayData = [];
 			$default = $v;
@@ -90,8 +96,8 @@ class ChapterImportLogic extends ChapterCommonLogic
 							$type = $this->checkType($type, $uniqueMergeRecursive);
 						}
 						$default = json_encode($uniqueMergeRecursive, true);
-						if($default){
-							$rule='+1';
+						if ($default) {
+							$rule = '+1';
 						}
 					} else {
 						$default = $uniqueMergeRecursive[0];
