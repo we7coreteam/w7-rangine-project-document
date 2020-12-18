@@ -95,7 +95,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 							//如果
 							$type = $this->checkType($type, $uniqueMergeRecursive);
 						}
-						$default = json_encode($uniqueMergeRecursive, true);
+						$default = json_encode($uniqueMergeRecursive, JSON_UNESCAPED_UNICODE);
 						if ($default) {
 							$rule = '+1';
 						}
