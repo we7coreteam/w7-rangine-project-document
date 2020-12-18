@@ -12,6 +12,7 @@ const makeMockData = (data) => {
 	return data.body;
 }
 
+//pm2 start  node -- app.js
 //POST中间件
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());//数据JSON类型
