@@ -63,6 +63,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 	{
 		$data = [];
 		foreach ($arr as $k => $v) {
+			$rule='';
 			$children = [];
 			$arrayData = [];
 			$default = $v;
@@ -89,6 +90,9 @@ class ChapterImportLogic extends ChapterCommonLogic
 							$type = $this->checkType($type, $uniqueMergeRecursive);
 						}
 						$default = json_encode($uniqueMergeRecursive, true);
+						if($default){
+							$rule='+1';
+						}
 					} else {
 						$default = $uniqueMergeRecursive[0];
 					}
@@ -191,8 +195,8 @@ class ChapterImportLogic extends ChapterCommonLogic
 				'name' => $key,
 				'description' => '',
 				'enabled' => ChapterApiParam::ENABLED_YES,
-				'default_value' => $rule,
-				'rule' => '',
+				'default_value' => '',
+				'rule' => $rule,
 				'children' => $this->formartToMock($sunArray, $location, $mergeRecursive)
 			];
 		} else {
@@ -219,7 +223,7 @@ class ChapterImportLogic extends ChapterCommonLogic
 					'description' => '',
 					'enabled' => ChapterApiParam::ENABLED_YES,
 					'default_value' => $default,
-					'rule' => '',
+					'rule' => $default ? '+1' : '',
 					'children' => []
 				];
 			}
