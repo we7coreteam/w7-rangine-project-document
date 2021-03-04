@@ -96,6 +96,10 @@ class ChapterController extends BaseController
 		if (!$user->isOperator) {
 			throw new ErrorHttpException('您没有权限管理该文档', [], Setting::ERROR_NO_POWER);
 		}
+		//频繁操作时间限制
+		if (icache()->get('creat_lock_time')){
+			throw new ErrorHttpException('操作过于频繁');
+		}
 
 		$parentId = intval($request->post('parent_id'));
 		if (!empty($parentId)) {
@@ -122,6 +126,8 @@ class ChapterController extends BaseController
 		if (!$chapter) {
 			throw new ErrorHttpException('章节添加失败');
 		}
+		//记录操作锁
+		icache()->set('creat_lock_time',1,3);
 
 		$layout = $request->post('layout', 0);
 		if ($layout) {
