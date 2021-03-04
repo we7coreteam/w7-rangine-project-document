@@ -187,7 +187,7 @@ class AuthController extends BaseController
 			throw new ErrorHttpException('app_id错误');
 		}
 
-		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($appId);
+		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($appId, 0);
 		if (!$setting) {
 			throw new ErrorHttpException('不支持该授权方式');
 		}

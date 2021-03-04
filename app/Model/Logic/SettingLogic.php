@@ -42,7 +42,6 @@ class SettingLogic extends BaseLogic
 			$data->value = json_encode($value);
 			$data->setting = $value;
 		} elseif ($key == SettingLogic::KEY_THIRD_PARTY_LOGIN) {
-			dump($data->setting);
 			$value = $data->setting;
 			if (!empty($value['channel']) && $value['channel']) {
 				foreach ($value['channel'] as $key => $val) {
