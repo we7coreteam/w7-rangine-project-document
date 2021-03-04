@@ -68,7 +68,7 @@ class IndexController extends BaseController
 		if ($isInstall) {
 			if ($isInstall == 3) {
 				$data = [
-					['id' => 1, 'name' => '数据库已安装', 'result' => '数据库已安装', 'enable' => $isInstall],
+					['id' => 1, 'name' => '数据库已安装', 'result' => '数据库已安装', 'enable' => 2],
 				];
 			} else {
 				$data = [
