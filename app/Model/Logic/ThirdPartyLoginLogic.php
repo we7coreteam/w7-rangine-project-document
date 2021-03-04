@@ -53,9 +53,9 @@ class ThirdPartyLoginLogic extends BaseLogic
 		}
 	}
 
-	public function getThirdPartyLoginSetting()
+	public function getThirdPartyLoginSetting($hide = 0)
 	{
-		$setting = SettingLogic::instance()->getByKey(self::THIRD_PARTY_LOGIN_SETTING_KEY);
+		$setting = SettingLogic::instance()->getByKey(self::THIRD_PARTY_LOGIN_SETTING_KEY, $hide);
 		if (!$setting) {
 			return [];
 		}
@@ -71,7 +71,7 @@ class ThirdPartyLoginLogic extends BaseLogic
 			//判断是不是默认支持的
 			$setting['is_default'] = $setting['is_default'] ?? false;
 		}
-		
+
 		return $setting;
 	}
 
@@ -91,7 +91,7 @@ class ThirdPartyLoginLogic extends BaseLogic
 
 		return true;
 	}
-	
+
 	public function addThirdPartyLoginChannel(array $config)
 	{
 		$setting = $this->getThirdPartyLoginSetting();
@@ -99,7 +99,7 @@ class ThirdPartyLoginLogic extends BaseLogic
 		$setting['channel'][$maxId] = $config;
 		SettingLogic::instance()->save(self::THIRD_PARTY_LOGIN_SETTING_KEY, $setting);
 	}
-	
+
 	public function updateThirdPartyLoginChannelById($id, array $config)
 	{
 		$setting = $this->getThirdPartyLoginSetting();
@@ -121,7 +121,7 @@ class ThirdPartyLoginLogic extends BaseLogic
 			}
 		}
 	}
-	
+
 	public function setDefaultLoginSetting(array $data)
 	{
 		$setting = $this->getThirdPartyLoginSetting();

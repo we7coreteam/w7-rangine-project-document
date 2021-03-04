@@ -32,7 +32,7 @@ class ThirdPartyLoginController extends BaseController
 	{
 		$this->check($request);
 
-		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginSetting();
+		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginSetting(1);
 		$data = [];
 		foreach ($setting['channel'] as $key => $item) {
 			$data[] = [
@@ -56,7 +56,7 @@ class ThirdPartyLoginController extends BaseController
 			throw new ErrorHttpException($e->getMessage());
 		}
 	}
-	
+
 	public function add(Request $request)
 	{
 		$this->check($request);
@@ -77,7 +77,7 @@ class ThirdPartyLoginController extends BaseController
 		$params['setting']['access_token_url'] = rtrim($params['setting']['access_token_url'], '/');
 		$params['setting']['enable'] = !empty($request->post('setting')['enable']) ? 1 : 0;
 		$params['convert'] = $request->post('convert');
-		
+
 		try {
 			ThirdPartyLoginLogic::instance()->addThirdPartyLoginChannel($params);
 			return $this->data('success');
@@ -107,7 +107,7 @@ class ThirdPartyLoginController extends BaseController
 		$params['setting']['access_token_url'] = rtrim($params['setting']['access_token_url'], '/');
 		$params['setting']['enable'] = !empty($request->post('setting')['enable']) ? 1 : 0;
 		$params['convert'] = $request->post('convert');
-		
+
 		try {
 			ThirdPartyLoginLogic::instance()->updateThirdPartyLoginChannelById($params['id'], $params);
 			return $this->data('success');
@@ -147,7 +147,7 @@ class ThirdPartyLoginController extends BaseController
 	public function getDefaultLoginChannel(Request $request)
 	{
 		$this->check($request);
-		
+
 		return $this->data(ThirdPartyLoginLogic::instance()->getDefaultLoginSetting());
 	}
 }
