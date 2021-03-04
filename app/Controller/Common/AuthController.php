@@ -107,7 +107,7 @@ class AuthController extends BaseController
 	public function method(Request $request)
 	{
 		$redirectUrl = $request->post('redirect_url');
-		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginSetting(0);
+		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginSetting();
 		$data = [];
 		/**
 		 * @var SocialiteManager $socialite
@@ -187,7 +187,7 @@ class AuthController extends BaseController
 			throw new ErrorHttpException('app_id错误');
 		}
 
-		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($appId, 0);
+		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($appId);
 		if (!$setting) {
 			throw new ErrorHttpException('不支持该授权方式');
 		}
