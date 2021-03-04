@@ -63,7 +63,7 @@ class ThirdPartyLoginLogic extends BaseLogic
 		return $setting->setting;
 	}
 
-	public function getThirdPartyLoginChannelById($id, $hide = 1)
+	public function getThirdPartyLoginChannelById($id, $hide = 0)
 	{
 		$setting = $this->getThirdPartyLoginSetting($hide);
 		$setting = $setting['channel'][$id] ?? [];
