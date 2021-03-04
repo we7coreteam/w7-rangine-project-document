@@ -39,6 +39,13 @@ class IndexController extends BaseController
 				//已安装已重启
 				$value = 2;
 			}
+		} else {
+			//如果吗没有install
+			$dateBasePwd = ienv('DATABASE_DEFAULT_PASSWORD', '');
+			if ($dateBasePwd) {
+				//如果数据库已安装或者配置
+				$value = 3;
+			}
 		}
 		return $value;
 	}
@@ -58,9 +65,15 @@ class IndexController extends BaseController
 		$isInstall = $this->isInstall();
 		$installMsg = '确认项目服务是否重启，重启请操作命令： sh restart.sh';
 		if ($isInstall) {
-			$data = [
-				['id' => 1, 'name' => '服务重启', 'result' => $isInstall ? $installMsg : '未安装', 'enable' => $isInstall],
-			];
+			if ($isInstall == 3) {
+				$data = [
+					['id' => 1, 'name' => '数据库已安装', 'result' => '数据库已安装', 'enable' => $isInstall],
+				];
+			} else {
+				$data = [
+					['id' => 1, 'name' => '服务重启', 'result' => $isInstall ? $installMsg : '未安装', 'enable' => $isInstall],
+				];
+			}
 		} else {
 			$data = [
 				['id' => 1, 'name' => '服务重启', 'result' => $isInstall ? $installMsg : '未安装', 'enable' => $isInstall],

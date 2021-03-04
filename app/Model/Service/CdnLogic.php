@@ -78,7 +78,7 @@ class CdnLogic extends LogicAbstract
 	public function channel($channel, $runTestBucket = false)
 	{
 		//从库里读取配置
-		$setting = SettingLogic::instance()->getByKey($channel);
+		$setting = SettingLogic::instance()->getByKey($channel, 0);
 
 		if (empty($setting)) {
 			throw new \RuntimeException('请先配置上传参数');

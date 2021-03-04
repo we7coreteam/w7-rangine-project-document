@@ -107,7 +107,7 @@ class AuthController extends BaseController
 	public function method(Request $request)
 	{
 		$redirectUrl = $request->post('redirect_url');
-		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginSetting();
+		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginSetting(1);
 		$data = [];
 		/**
 		 * @var SocialiteManager $socialite

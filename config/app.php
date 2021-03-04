@@ -36,7 +36,7 @@ return [
 			'database' => ienv('DATABASE_DEFAULT_DATABASE', 'document'),
 			'host' => ienv('DATABASE_DEFAULT_HOST', '127.0.0.1'),
 			'username' => ienv('DATABASE_DEFAULT_USERNAME', 'root'),
-			'password' => ienv('DATABASE_DEFAULT_PASSWORD', 'root'),
+			'password' => ienv('DATABASE_DEFAULT_PASSWORD', ''),
 			'charset' => 'utf8mb4',
 			'collation' => 'utf8mb4_general_ci',
 			'prefix' => ienv('DATABASE_DEFAULT_PREFIX', 'ims_'),
