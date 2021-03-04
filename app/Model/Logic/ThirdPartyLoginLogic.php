@@ -63,9 +63,9 @@ class ThirdPartyLoginLogic extends BaseLogic
 		return $setting->setting;
 	}
 
-	public function getThirdPartyLoginChannelById($id)
+	public function getThirdPartyLoginChannelById($id, $hide = 1)
 	{
-		$setting = $this->getThirdPartyLoginSetting(1);
+		$setting = $this->getThirdPartyLoginSetting($hide);
 		$setting = $setting['channel'][$id] ?? [];
 		if ($setting) {
 			//判断是不是默认支持的
