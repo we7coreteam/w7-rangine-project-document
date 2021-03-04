@@ -107,7 +107,7 @@ class AuthController extends BaseController
 	public function method(Request $request)
 	{
 		$redirectUrl = $request->post('redirect_url');
-		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginSetting(1);
+		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginSetting(0);
 		$data = [];
 		/**
 		 * @var SocialiteManager $socialite
@@ -519,14 +519,15 @@ class AuthController extends BaseController
 	/**
 	 * 解绑
 	 */
-	public function unbind(Request $request){
+	public function unbind(Request $request)
+	{
 		$userSession = $request->session->get('user');
 		$userSourceAppId = $request->session->get('user-source-app');
 		$res = UserThirdParty::query()
 			->where('source', '=', $userSourceAppId)
 			->where('uid', '=', $userSession['uid'])
 			->update(['uid' => 0]);
-		if ($res){
+		if ($res) {
 			//$this->logout($request);
 			return $this->data($res);
 		}
