@@ -42,7 +42,8 @@ class IndexController extends BaseController
 		} else {
 			//如果吗没有install
 			$dateBasePwd = ienv('DATABASE_DEFAULT_PASSWORD', '');
-			if ($dateBasePwd) {
+			$dateBase = ienv('DATABASE_DEFAULT_DATABASE', '');
+			if ($dateBasePwd || $dateBase) {
 				//如果数据库已安装或者配置
 				$value = 3;
 			}
