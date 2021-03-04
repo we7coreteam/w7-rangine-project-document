@@ -51,7 +51,7 @@ class ThirdPartyLoginController extends BaseController
 			'id' => 'required'
 		]);
 		try {
-			return $this->data(ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($params['id']));
+			return $this->data(ThirdPartyLoginLogic::instance()->getThirdPartyLoginChannelById($params['id'], 1));
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());
 		}
