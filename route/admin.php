@@ -22,6 +22,9 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 		$route->post('/delete', 'Admin\DocumentController@delete');
 		$route->post('/create', 'Admin\DocumentController@create');
 		$route->post('/change-founder', 'Admin\DocumentController@changeDocumentFounder');
+		//反馈建议
+		$route->post('/feedback-list', 'Admin\FeedbackController@getList');
+		$route->post('/feedback-detail','Admin\FeedbackController@detail');
 	});
 
 	//api文档内容管理-公共

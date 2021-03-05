@@ -43,3 +43,5 @@ irouter()->post('/common/auth/third-party-login-bind', 'Common\AuthController@th
 irouter()->post('/common/auth/default-login-url', 'Common\AuthController@defaultLoginUrl');
 
 irouter()->post('/menu/setting', 'Common\MenuController@setting');
+//上传图片
+irouter()->post('/common/upload/image', 'Admin\UploadController@image');
