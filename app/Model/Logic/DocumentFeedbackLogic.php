@@ -20,18 +20,18 @@ class DocumentFeedbackLogic extends BaseLogic
 {
 	use InstanceTraiter;
 
-	public function getByFeedbackDetail($id)
+	public function getByFeedbackDetail($id,$did)
 	{
 		$id = intval($id);
 		if (empty($id)) {
 			return [];
 		}
-		return DocumentFeedback::query()->find($id);
+		return DocumentFeedback::query()->where('id',$id)->where('document_id',$did)->first();
 	}
 
 	//更改反馈建议查看状态
-    public function setByFeedbackStatus($id){
-		return DocumentFeedback::query()->where('id',$id)->update(['status'=>1]);
+    public function setByFeedbackStatus($id,$did){
+		return DocumentFeedback::query()->where('id',$id)->where('document_id',$did)->update(['status'=>1]);
 	}
 
     //查看是否有新的数据未读
