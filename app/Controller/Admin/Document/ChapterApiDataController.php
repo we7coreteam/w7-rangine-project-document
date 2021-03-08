@@ -56,7 +56,7 @@ class ChapterApiDataController extends BaseController
 		 $respondId = intval($request->post('respond_id',0));
 		 if ($respondId){
 			 //先删除原先的数据
-			 $chapter = ChapterApiDataLogic::instance()->deleteChapterApiData($respondId,$params['chapter_id']);
+			 $chapter = ChapterApiDataLogic::instance()->deleteChapterApiData($params['chapter_id']);
 			 if (!$chapter) {
 				 throw new ErrorHttpException('数据更新错误');
 			 }

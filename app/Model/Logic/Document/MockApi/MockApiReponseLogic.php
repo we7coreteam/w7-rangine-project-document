@@ -17,6 +17,7 @@ use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\Document\ChapterApiParam;
 use W7\App\Model\Logic\Document\ChapterApi\ChapterCommonLogic;
 use W7\App\Model\Logic\Document\ChapterApi\ChapterRuleLogic;
+use W7\App\Model\Logic\Document\ChapterApiDataLogic;
 use W7\Http\Message\Server\Request;
 
 class MockApiReponseLogic extends ChapterCommonLogic
@@ -85,15 +86,26 @@ class MockApiReponseLogic extends ChapterCommonLogic
 						return ['code' => 422, 'msg' => $checkMsg];
 					}
 					//获取rule参数样例
-					$reponseId = 0;
-					$ChapterApiReponse = Document\ChapterApiReponse::query()->where('chapter_id', $api->chapter_id)->get()->toArray();
-					if (count($ChapterApiReponse)) {
-						$reponseIds = array_column($ChapterApiReponse, 'id');
-						$reponseId = $reponseIds[rand(0, count($reponseIds) - 1)];
+//					$reponseId = 0;
+//					$ChapterApiReponse = Document\ChapterApiReponse::query()->where('chapter_id', $api->chapter_id)->get()->toArray();
+//					if (count($ChapterApiReponse)) {
+//						$reponseIds = array_column($ChapterApiReponse, 'id');
+//						$reponseId = $reponseIds[rand(0, count($reponseIds) - 1)];
+//					}
+//
+//					$chapterDemoLogic = new ChapterRuleLogic($api->chapter_id);
+//					$result = $chapterDemoLogic->getChapterRuleMock($reponseId);
+
+					//更新 mock 服务接口
+					$result = [];
+					$ChapterApiReponse = ChapterApiDataLogic::instance()->getRandomChapterApiData($api->chapter_id);
+					if ($ChapterApiReponse->respond ){
+						$result = $ChapterApiReponse->respond;
+						if ( $this->isJson($ChapterApiReponse->respond)){
+							$result = json_decode($ChapterApiReponse->respond,true);
+						}
 					}
 
-					$chapterDemoLogic = new ChapterRuleLogic($api->chapter_id);
-					$result = $chapterDemoLogic->getChapterRuleMock($reponseId);
 					if (isset($result['__root__']) && $result['__root__']) {
 						if ($this->is_assoc($result['__root__'])) {
 							$result = [$result['__root__']];

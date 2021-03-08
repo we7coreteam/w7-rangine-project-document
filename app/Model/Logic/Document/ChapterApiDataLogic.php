@@ -21,10 +21,10 @@ class ChapterApiDataLogic extends BaseLogic
 {
 	use InstanceTraiter;
 
-	public function deleteChapterApiData($respondId,$chapter_id){
-		$checkData = ChapterApiData::query()->where(['id'=>$respondId,'chapter_id'=>$chapter_id])->first();
+	public function deleteChapterApiData($chapter_id){
+		$checkData = ChapterApiData::query()->where('chapter_id',$chapter_id)->first();
 		if ($checkData){
-			return ChapterApiData::query()->where(['id'=>$respondId,'chapter_id'=>$chapter_id])->delete();
+			return ChapterApiData::query()->where('chapter_id',$chapter_id)->delete();
 		}
 		return true;
 	}
@@ -33,5 +33,9 @@ class ChapterApiDataLogic extends BaseLogic
 		return ChapterApiData::query()->where('chapter_id',$chapter_id)->get();
 	}
 
+	//随机获取Api data
+	public function getRandomChapterApiData($chapter_id){
+       return  ChapterApiData::query()->where('chapter_id',$chapter_id)->inRandomOrder()->take(1)->first();
+	}
 
 }
