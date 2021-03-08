@@ -37,6 +37,6 @@ class DocumentFeedbackLogic extends BaseLogic
     //查看是否有新的数据未读
 	public function getByFeedbackNew()
 	{
-		return Document::query()->where('status', 0)->orderByDesc('created_at')->first();
+		return DocumentFeedback::query()->where('status', 0)->orderByDesc('created_at')->first();
 	}
 }

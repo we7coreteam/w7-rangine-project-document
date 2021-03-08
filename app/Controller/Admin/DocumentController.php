@@ -22,6 +22,7 @@ use W7\App\Model\Entity\Setting;
 use W7\App\Model\Entity\Star;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserOperateLog;
+use W7\App\Model\Logic\DocumentFeedbackLogic;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\App\Model\Logic\DocumentPermissionLogic;
 use W7\App\Model\Logic\UserLogic;
@@ -267,6 +268,12 @@ class DocumentController extends BaseController
 			});
 		}
 
+		//查看是否有新的 反馈建议
+		$result['new_feed'] = false;
+		$isNewFeed = DocumentFeedbackLogic::instance()->getByFeedbackNew();
+        if ($isNewFeed){
+			$result['new_feed'] = true;
+		}
 		$roleList = DocumentPermissionLogic::instance()->getRoleList();
 		if ($document->isPublicDoc) {
 			unset($roleList[DocumentPermission::READER_PERMISSION]);

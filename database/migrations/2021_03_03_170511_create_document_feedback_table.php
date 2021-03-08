@@ -17,7 +17,7 @@ class CreateDocumentFeedbackTable2021_03_03_170511 extends Migration {
 			$table->tinyInteger('status')->nullable()->default(0)->comment('状态:0：未查看 1：已查看');
 			$table->string('type', '200');
 			$table->string('content','300');
-			$table->string('images', '200');
+			$table->string('images', '500');
 			$table->integer('created_at')->nullable()->default(0);
 			$table->integer('updated_at')->nullable()->default(0);
 		});
