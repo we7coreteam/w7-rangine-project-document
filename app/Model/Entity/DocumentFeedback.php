@@ -54,7 +54,7 @@ class DocumentFeedback extends BaseModel
 	}
 
     public function getImagesAttribute(){
-		return $this->images ? json_decode($this->images,true): [];
+		return $this->attributes['images'] ? json_decode($this->attributes['images'],true): [];
 	}
 
 	public function getContentAttribute(){
