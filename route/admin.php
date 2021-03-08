@@ -30,6 +30,8 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 	//api文档内容管理-公共
 	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix' => '/document/chapterapi'], function (\W7\Core\Route\Route $route) {
 		$route->get('/getApiLabel', 'Admin\Document\ChapterApiController@getApiLabel');
+		//修改接口 data 数据
+		$route->post('/setApiData', 'Admin\Document\ChapterApiDataController@setData');
 	});
 	//文档内容管理
 	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix' => '/chapter'], function (\W7\Core\Route\Route $route) {
@@ -107,3 +109,6 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 	//图片上传
 	$route->post('/upload/image', 'Admin\UploadController@image');
 });
+
+//获取请求数据 结构
+irouter()->get('/admin/document/chapterapi/getData', 'Admin\Document\ChapterApiDataController@getData');

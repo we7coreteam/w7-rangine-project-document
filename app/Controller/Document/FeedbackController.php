@@ -22,7 +22,7 @@ class FeedbackController extends BaseController
 
 	/**
 	 * 提交反馈
-	 * @api {post} /document/feedback/add 文档API-查看
+	 * @api {post} /document/feedback/add 文档API-提交
 	 * @apiName add
 	 * @apiGroup document.Feedback
 	 *
