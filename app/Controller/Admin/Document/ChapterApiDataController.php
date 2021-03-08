@@ -29,6 +29,7 @@ class ChapterApiDataController extends BaseController
 	 *
 	 * @apiParam {Number} chapter_id 章节ID
 	 * @apiParam {Number} document_id 文档ID
+	 * @apiParam {Number} respond_id  数据ID 非必填 编辑的时候传参
 	 * @apiParam {String} respond 数据文本
 	 *
 	 * @apiSuccessExample {json} Success-Response:
@@ -52,10 +53,13 @@ class ChapterApiDataController extends BaseController
 			throw new ErrorHttpException('您没有权限管理该文档', [], Setting::ERROR_NO_POWER);
 		 }
 
-         //先删除原先的数据
-		 $chapter = ChapterApiDataLogic::instance()->deleteChapterApiData($params['chapter_id']);
-		 if (!$chapter) {
-			throw new ErrorHttpException('数据更新错误');
+		 $respondId = intval($request->post('respond_id',0));
+		 if ($respondId){
+			 //先删除原先的数据
+			 $chapter = ChapterApiDataLogic::instance()->deleteChapterApiData($respondId,$params['chapter_id']);
+			 if (!$chapter) {
+				 throw new ErrorHttpException('数据更新错误');
+			 }
 		 }
 
 		 ChapterApiData::query()->create([
@@ -68,7 +72,7 @@ class ChapterApiDataController extends BaseController
 
 
 	/**
-	 * @api {get} /document/chapterapi/getData  API请求数据保存
+	 * @api {get} /admin/document/chapterapi/getData  API请求数据保存
 	 * @apiName getData
 	 * @apiGroup Chapterapi
 	 *
@@ -84,7 +88,6 @@ class ChapterApiDataController extends BaseController
 		]);
 
         $chapter = ChapterApiDataLogic::instance()->getByChapterApiData($params['chapter_id']);
-        dump($chapter);
         if (!$chapter){
 			throw new ErrorHttpException('获取数据失败');
 		}

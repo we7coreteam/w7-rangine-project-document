@@ -12,7 +12,6 @@
 
 namespace W7\App\Model\Logic;
 
-use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\DocumentFeedback;
 use W7\Core\Helper\Traiter\InstanceTraiter;
 
