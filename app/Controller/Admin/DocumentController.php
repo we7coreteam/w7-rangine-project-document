@@ -268,12 +268,6 @@ class DocumentController extends BaseController
 			});
 		}
 
-		//查看是否有新的 反馈建议
-		$result['new_feed'] = false;
-		$isNewFeed = DocumentFeedbackLogic::instance()->getByFeedbackNew();
-        if ($isNewFeed){
-			$result['new_feed'] = true;
-		}
 		$roleList = DocumentPermissionLogic::instance()->getRoleList();
 		if ($document->isPublicDoc) {
 			unset($roleList[DocumentPermission::READER_PERMISSION]);
@@ -290,6 +284,33 @@ class DocumentController extends BaseController
 
 		return $this->data($result);
 	}
+
+
+	/**
+	 * @api {post} /admin/document/new-feedback 检测是否有最新反馈
+	 * @apiName new-feedback
+	 * @apiGroup document.Feedback
+	 *
+	 *
+	 * @apiParam {Number} document_id 文档ID
+	 */
+	public function checkNewFeed(Request $request){
+		$params = $this->validate($request, [
+			'document_id' => 'required|integer',
+		], [
+			'document_id.required' => '请指定文档',
+		]);
+
+		//查看是否有新的 反馈建议
+		$result['new_feed'] = false;
+		$isNewFeed = DocumentFeedbackLogic::instance()->getByFeedbackNew($params['document_id']);
+		if ($isNewFeed){
+			$result['new_feed'] = true;
+		}
+		return $this->data($result);
+	}
+
+
 
 	public function operator(Request $request)
 	{
