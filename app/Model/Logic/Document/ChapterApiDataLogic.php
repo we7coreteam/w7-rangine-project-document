@@ -22,8 +22,8 @@ class ChapterApiDataLogic extends BaseLogic
 	use InstanceTraiter;
 
 	public function deleteChapterApiData($chapter_id){
-		$checkData = ChapterApiData::query()->where('chapter_id',$chapter_id)->first();
-		if ($checkData){
+		$checkData = ChapterApiData::query()->where('chapter_id',$chapter_id)->count('id');
+		if ($checkData >= 3){
 			return ChapterApiData::query()->where('chapter_id',$chapter_id)->delete();
 		}
 		return true;

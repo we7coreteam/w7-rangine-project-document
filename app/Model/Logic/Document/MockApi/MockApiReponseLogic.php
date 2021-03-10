@@ -100,7 +100,8 @@ class MockApiReponseLogic extends ChapterCommonLogic
 					$result = [];
 					$ChapterApiReponse = ChapterApiDataLogic::instance()->getRandomChapterApiData($api->chapter_id);
 					if ($ChapterApiReponse->respond ){
-						$result = $ChapterApiReponse->respond;
+						parse_str(urldecode($ChapterApiReponse->respond),$data);
+                        $result = $data;
 						if ( $this->isJson($ChapterApiReponse->respond)){
 							$result = json_decode($ChapterApiReponse->respond,true);
 						}
