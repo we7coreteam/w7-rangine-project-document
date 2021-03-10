@@ -16,8 +16,11 @@ irouter()->middleware('FrontendDocumentPermissionMiddleware')->group(['prefix' =
 	$route->post('/chapter/detail', 'Document\ChapterController@detail');
 	$route->post('/chapter/search', 'Document\ChapterController@search');
 	$route->post('/chapter/ruleDemo', 'Document\ChapterController@ruleDemo');
+	$route->post('/feedback/add', 'Document\FeedbackController@add');
+
 });
 irouter()->middleware('CorsApiMiddleware')->group(['prefix' => '/document'], function (\W7\Core\Route\Route $route) {
 	$route->post('/chapter/record', 'Document\ChapterController@record');
 	$route->all('/mockApiReponse/{id}/{router:[\w/]+}', 'Document\MockApiReponseController@index');
 });
+

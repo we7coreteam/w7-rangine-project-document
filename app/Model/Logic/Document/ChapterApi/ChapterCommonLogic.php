@@ -33,6 +33,24 @@ class ChapterCommonLogic
 		return false;
 	}
 
+
+	/**
+	 * url参数转化成数组
+	 * @param string
+	 * @return mixed
+	 */
+	public  function urlToArray($query)
+	{
+		$op = array();
+		$pairs = explode("&", $query);
+		foreach ($pairs as $pair) {
+			list($k, $v) = array_map("urldecode", explode("=", $pair));
+			$op[$k] = $v;
+		}
+		return $op;
+	}
+
+
 	//请求列表
 	public function requestIds()
 	{

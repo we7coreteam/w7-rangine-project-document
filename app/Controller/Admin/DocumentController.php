@@ -22,6 +22,7 @@ use W7\App\Model\Entity\Setting;
 use W7\App\Model\Entity\Star;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserOperateLog;
+use W7\App\Model\Logic\DocumentFeedbackLogic;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\App\Model\Logic\DocumentPermissionLogic;
 use W7\App\Model\Logic\UserLogic;
@@ -283,6 +284,33 @@ class DocumentController extends BaseController
 
 		return $this->data($result);
 	}
+
+
+	/**
+	 * @api {post} /admin/document/new-feedback 检测是否有最新反馈
+	 * @apiName new-feedback
+	 * @apiGroup document.Feedback
+	 *
+	 *
+	 * @apiParam {Number} document_id 文档ID
+	 */
+	public function checkNewFeed(Request $request){
+		$params = $this->validate($request, [
+			'document_id' => 'required|integer',
+		], [
+			'document_id.required' => '请指定文档',
+		]);
+
+		//查看是否有新的 反馈建议
+		$result['new_feed'] = false;
+		$isNewFeed = DocumentFeedbackLogic::instance()->getByFeedbackNew($params['document_id']);
+		if ($isNewFeed){
+			$result['new_feed'] = true;
+		}
+		return $this->data($result);
+	}
+
+
 
 	public function operator(Request $request)
 	{
