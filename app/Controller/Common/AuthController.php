@@ -55,6 +55,7 @@ class AuthController extends BaseController
 		$result = [
 			'id' => $user->id,
 			'username' => $user->username,
+			'group_id' => $user->group_id,
 			'created_at' => $user->created_at->toDateTimeString(),
 			'updated_at' => $user->updated_at->toDateTimeString(),
 			//判断当前用户是否有密码

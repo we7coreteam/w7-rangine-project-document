@@ -38,13 +38,10 @@ class ChapterApiDataController extends BaseController
 	public function setData(Request $request){
 		//验证
 		 $params = $this->validate($request,[
-			 'respond' => 'string|required',
-			 'chapter_id' => 'required|integer|min:1',
+			 'chapter_id' => 'required|integer',
 			 'document_id' => 'required|integer',
 		 ],[
-			 'respond.required' => '章节名称必填',
-			 'chapter_id.required' => '文档id必填',
-			 'chapter_id.min' => '文档id最小为0',
+			 'chapter_id.required' => '章节id必填',
 			 'document_id.required' => '文档id必填',
 		 ]);
 
@@ -61,7 +58,7 @@ class ChapterApiDataController extends BaseController
 
 		 ChapterApiData::query()->create([
 		 	     'chapter_id'=>$params['chapter_id'],
-		 	     'respond'=> $params['respond']
+		 	     'respond'=> trim($request->post('respond'))
 		 ]);
 
 		 return $this->data('success');

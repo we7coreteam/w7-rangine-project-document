@@ -33,7 +33,7 @@ class DocumentFeedback extends BaseModel
 
 	protected $table = 'document_feedback';
 
-	protected $appends=['type_name'];
+	protected $appends=['type_name','status_text'];
 
 	public function document()
 	{
@@ -52,6 +52,13 @@ class DocumentFeedback extends BaseModel
 		$typeArr = array_intersect_key($this->permissionName,array_flip($type));
 		return !empty($typeArr) ? implode(',',$typeArr) : '';
 	}
+
+
+	public function getStatusTextAttribute(){
+		$statusText = [0=>'未读',1=>'已读'];
+		return $statusText[$this->attributes['status']];
+	}
+
 
     public function getImagesAttribute(){
 		return $this->attributes['images'] ? json_decode($this->attributes['images'],true): [];
