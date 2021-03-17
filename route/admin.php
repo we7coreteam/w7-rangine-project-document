@@ -107,6 +107,7 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 		$route->get('/list', 'Admin\DocumentHomeController@getList');
 		$route->post('/add', 'Admin\DocumentHomeController@addHomeData');
 		$route->all('/edit', 'Admin\DocumentHomeController@editHomeData');
+		$route->post('/delete', 'Admin\DocumentHomeController@delHomeData');
 		$route->get('/get-type', 'Admin\DocumentHomeController@getType');
 		$route->post('/search-doc', 'Admin\DocumentHomeController@queryDocument');
 		$route->get('/get-set', 'Admin\HomepageSettingController@getHomePageSet');

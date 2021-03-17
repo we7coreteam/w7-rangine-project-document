@@ -58,6 +58,21 @@ class DocumentHomeLogic extends BaseLogic
 	}
 
 
+
+	/**
+	 * 删除文档数据
+	 * @param $id
+	 */
+	public function delHomeData($id){
+		$check = DocumentHome::query()->where('id','=',$id)->first();
+		if (!$check){
+			throw new ErrorHttpException('数据不存在');
+		}
+		return DocumentHome::query()->where('id','=',$id)->delete();
+	}
+
+
+
 	/**
 	 * 获取详情
 	 * @param $id

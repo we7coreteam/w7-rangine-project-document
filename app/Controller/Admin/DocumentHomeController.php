@@ -6,7 +6,6 @@ namespace W7\App\Controller\Admin;
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Logic\DocumentHomeLogic;
-use W7\App\Model\Logic\HomepageSettingLogic;
 use W7\Http\Message\Server\Request;
 //首页文档设置
 class DocumentHomeController extends BaseController
@@ -92,7 +91,7 @@ class DocumentHomeController extends BaseController
 	 * @apiName edit
 	 * @apiGroup DocumentHome
 	 *
-	 * @apiParam {Number} id  主键 ID （GET请求只传 id）
+	 * @apiParam {Number} id  主键 ID （ GET请求只传 id  GET 获取数据  POST 提交数据）
 	 * @apiParam {Number} type 类型 ( 1：公告 2：首页类型一 3：首页类型二)
 	 * @apiParam {Number} document_id 文档id
 	 * @apiParam {String} logo 文档图标（类型 2 必填，其他非必填）
@@ -147,6 +146,29 @@ class DocumentHomeController extends BaseController
 	}
 
 
+	/**
+	 * @api {post} /admin/home/delete 首页文档设置-删除操作
+	 *
+	 * @apiName delete
+	 * @apiGroup DocumentHome
+	 *
+	 * @apiParam {Number} id  主键 ID
+	 *
+	 */
+	public function delHomeData(Request $request){
+		$this->check($request);
+		$params = $this->validate($request, [
+			'id' => 'required|integer|min:1',
+		], [
+			'id.required' => 'id 不能为空',
+			'id.min' => 'id 最小为 1',
+		]);
+
+		DocumentHomeLogic::instance()->delHomeData(intval($params['id']));
+
+		return $this->data('success');
+	}
+
 
 	/**
 	 * @api {get} /admin/home/get-type 首页文档设置-获取类型
@@ -169,7 +191,7 @@ class DocumentHomeController extends BaseController
 	 * @apiName search-doc
 	 * @apiGroup DocumentHome
 	 *
-	 * @apiParam {String} keyword 文档简介（非必填）
+	 * @apiParam {String} keyword 关键词（非必填）
 	 *
 	 */
 	public function queryDocument(Request $request){
