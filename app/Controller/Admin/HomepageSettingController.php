@@ -27,7 +27,7 @@ class HomepageSettingController extends BaseController
 	 *
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 * {"status":true,"code":200,"data":{"open_home":{"is_open":"0","url":"http:\/\/192.168.168.99"},"banner":{"images":[]},"title":{"title":""}},"message":"ok"}
+	 * {"status":true,"code":200,"data":{"open_home":{"is_open":"0","url":"http:\/\/192.168.168.99"},"banner":["http:\/\/111.234.xxxx","http:\/\/xxx.xxx.xx"],"title":"11111"},"message":"ok"}
 	 */
     public function getHomePageSet(Request $request){
 		$this->check($request);
