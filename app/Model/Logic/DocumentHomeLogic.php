@@ -27,7 +27,11 @@ class DocumentHomeLogic extends BaseLogic
 	 */
 	public function getTypeData(){
 		$model = new DocumentHome();
-		return $model->typeName;
+		$data = [];
+        foreach ($model->typeName as $key=>$val){
+        	$data[] = ['label'=>$val,'val'=>$key];
+		}
+        return array_values($data);
 	}
 
 	/**
@@ -166,6 +170,192 @@ class DocumentHomeLogic extends BaseLogic
 		}
 		return $result;
 	}
+
+
+	/**
+	 * 获取前端 首页公告数据
+	 */
+	public function getDocumentNotice(){
+        $notice = DocumentHome::query()->select('id','type','document_id')->where('type','=',1)->first();
+        $data = [];
+        if ($notice){
+        	//项目信息
+			$document = DocumentLogic::instance()->getById($notice->document_id);
+        	$data['document_id'] = $notice->document_id;
+        	$data['document_name'] = $document->name;
+        	//章节信息
+			$chapter = Document\Chapter::query()
+				->select('id', 'name', 'sort', 'parent_id', 'is_dir', 'document_id','created_at')
+				->where('document_id', $notice->document_id)
+				->where('is_dir','<>',Document\Chapter::IS_DIR)
+				->orderByDesc('created_at')->limit(8)->get()->toArray();
+			foreach ($chapter as $key => $item){
+				$data['chapter'][$key]['chapter_id'] = $item['id'];
+				$data['chapter'][$key]['chapter_name'] = $item['name'];
+				$data['chapter'][$key]['created_at'] = date('Y.n.d',$item['created_at']);
+			}
+		}
+        return  $data;
+	}
+
+
+	/**
+	 * 获取前端 类型一数据
+	 */
+	public function getDocumentTypeI(){
+		//获取类型一数据
+		$typeList = DocumentHome::query()
+			        ->select('id','type','sort','document_id','logo','description','created_at')
+			        ->where('type','=',2)
+			        ->orderBy('sort','asc')
+					->orderByDesc('created_at')
+			        ->limit(4)->get()->toArray();
+
+		$data = [];
+		if ($typeList){
+			foreach ($typeList as $key=>$item){
+				$document = DocumentLogic::instance()->getById($item['document_id']);
+				$data[$key]['document_id'] = $item['document_id'];
+				$data[$key]['document_name'] = $document->name;
+				$data[$key]['logo'] = $item['logo'];
+				$data[$key]['description'] = $item['description'];
+				$data[$key]['created_at'] = date('Y-m-d H:i:s',$item['created_at']);
+			}
+		}
+		return $data;
+	}
+
+
+	/**
+	 * 获取前端 类型二数据
+	 */
+	public function getDocumentTypeII(){
+		//获取类型二数据
+		$typeList = DocumentHome::query()
+			->select('id','type','sort','document_id','created_at')
+			->where('type','=',3)
+			->orderBy('sort','asc')
+			->orderByDesc('created_at')
+			->limit(4)->get()->toArray();
+		$data = [];
+		if ($typeList){
+			foreach ($typeList as $key=>$item){
+				$document = DocumentLogic::instance()->getById($item['document_id']);
+				$data[$key]['document_id'] = $item['document_id'];
+				$data[$key]['document_name'] = $document->name;
+                //获取章节数据
+				$data[$key]['chapter'] = $this->getByChapterList($item['document_id']);
+			}
+		}
+		return $data;
+	}
+
+
+
+	/**
+	 *前端 搜索文档
+	 * @param $keyword
+	 */
+	public function searchDocument($keyword,$page,$pageSize,$isPublic = 1){
+         $query = Document::query();
+         if (!empty($keyword)){
+			 $query->where('name', 'LIKE', "%{$keyword}%");
+		 }
+		 if (!empty($isPublic)){
+			$query->where('is_public', '=', $isPublic);
+		 }
+
+		 $list = $query->select('id','name','cover','is_public')
+			           ->orderByDesc('created_at')
+			           ->paginate($pageSize, '*', 'page', $page)->toArray();
+		 //数据处理
+		 if (is_array($list['data']) && $list['data']){
+		 	 foreach ($list['data'] as $key => &$item){
+                $data =  $this->getByChapter($item['id']);
+                $item['chapter_id'] = !empty($data)? $data['chapter_id'] : 0;
+                $item['chapter_name'] = !empty($data)? $data['chapter_name'] : '';
+                $item['chapter_content'] = !empty($data)? mb_strimwidth($data['chapter_content'], 0, 200, '...','utf-8') : '';
+			 }
+		 }
+		 return $list;
+	}
+
+
+	/**
+	 * 获取文档章节
+	 * @param $documentId
+	 * @return array
+	 */
+	private function getByChapter($documentId)
+	{
+		$chapter = Document\Chapter::query()
+			->select('id', 'name', 'sort', 'parent_id', 'is_dir', 'default_show_chapter_id')
+			->where('document_id', $documentId)
+			->orderBy('parent_id', 'asc')
+			->orderBy('sort', 'asc')->first();
+		$data = [];
+		if ($chapter){
+			if ($chapter->is_dir == Document\Chapter::IS_DIR){
+				return $this->getByChapterChildren($chapter->id);
+			}else{
+				$content = Document\ChapterContent::query()->where('chapter_id','=',$chapter->id)->first();
+				$data['chapter_id'] = $chapter->id;
+				$data['chapter_name'] = $chapter->name;
+				$data['chapter_content'] = $content->content ? : '';
+			}
+		}
+        return $data;
+	}
+
+
+	/**
+	 * 递归查找 文档章节内容
+	 * @param $chapterId
+	 */
+    private function getByChapterChildren($chapterId){
+    	$chapter = Document\Chapter::query()
+			->select('id', 'name', 'sort', 'parent_id', 'is_dir', 'default_show_chapter_id')
+			->where('parent_id', $chapterId)
+			->orderBy('sort', 'asc')->first();
+		$data = [];
+    	if ($chapter){
+    		if ($chapter->is_dir == Document\Chapter::IS_DIR){
+    			return $this->getByChapterChildren($chapter->id);
+			}else{
+				$content = Document\ChapterContent::query()->where('chapter_id','=',$chapter->id)->first();
+				$data['chapter_id'] = $chapter->id;
+				$data['chapter_name'] = $chapter->name;
+				$data['chapter_content'] = $content->content ? $content->content : '';
+			}
+		}
+        return $data;
+	}
+
+
+	/**
+	 * 获取章节数据列表
+	 * @param $documentId
+	 * @param int $limit
+	 * @return array
+	 */
+	public function getByChapterList($documentId,$limit=5){
+		//获取章节信息
+		$chapter = Document\Chapter::query()
+			->select('id', 'name', 'sort', 'parent_id', 'is_dir', 'document_id','created_at')
+			->where('document_id', $documentId)
+			->where('is_dir','<>',Document\Chapter::IS_DIR)
+			->orderByDesc('created_at')->limit($limit)->get()->toArray();
+		$data = [];
+		if ($chapter){
+			foreach ($chapter as $key=>$item){
+				$data[$key]['chapter_id'] = $item['id'];
+				$data[$key]['chapter_name'] = $item['name'];
+				$data[$key]['created_at'] = date('Y-m-d H:i:s',$item['created_at']);
+			}
+		}
+		return $data;
+	}
+
 
 
 

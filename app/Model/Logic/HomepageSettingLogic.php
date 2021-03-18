@@ -33,7 +33,7 @@ class HomepageSettingLogic extends BaseLogic
 	 * @param array $config
 	 */
 	public function setOpenHome( array $config){
-         $setting['is_open'] = $config['is_open'];
+         $setting['is_open'] = intval($config['is_open']);
          $setting['url'] = $config['url'];
          SettingLogic::instance()->save(self::HOME_OPEN_KEY,$setting);
 	}
