@@ -47,6 +47,11 @@ class DocumentHomeLogic extends BaseLogic
 				throw new ErrorHttpException('公告只允许添加一条');
 			}
 		}
+		//检测是否为空文档
+		$checkDocument = $this->getByChapter(intval($params['document_id']));
+		if (!$checkDocument){
+			throw new ErrorHttpException('请勿选择空文档');
+		}
 		return DocumentHome::query()->create($params);
 	}
 
@@ -58,6 +63,11 @@ class DocumentHomeLogic extends BaseLogic
 	 * @return int
 	 */
 	public function editHomeData($params){
+		//检测是否为空文档
+		$checkDocument = $this->getByChapter(intval($params['document_id']));
+		if (!$checkDocument){
+			throw new ErrorHttpException('请勿选择空文档');
+		}
 		return DocumentHome::query()->where('id','=',intval($params['id']))->update($params);
 	}
 
@@ -122,12 +132,16 @@ class DocumentHomeLogic extends BaseLogic
 		$query = $query->orderBy('sort','asc');
 		$list = $query->paginate($pageSize, ['id','user_id','document_id','type','sort','logo','url','description','created_at'], 'page', $page);
 		foreach ($list->items() as $i => $row) {
+			//获取文档第一个章节数据
+			$chapter = $this->getByChapter(intval($row['document_id']));
 			$result['data'][] = [
 				'id' => $row->id,
 				'user_id' => $row->user_id,
 				'user' => $row->user->username,
 				'document_id' => $row->document_id,
 				'document_name' => $row->document->name,
+				'first_chapter_id' => $chapter ? $chapter['chapter_id'] : 0,
+				'first_chapter_name' => $chapter ? $chapter['chapter_name'] : '',
 				'logo' => $row->logo,
 				'url' => $row->url,
 				'description' => $row->description,
@@ -217,6 +231,10 @@ class DocumentHomeLogic extends BaseLogic
 				$document = DocumentLogic::instance()->getById($item['document_id']);
 				$data[$key]['document_id'] = $item['document_id'];
 				$data[$key]['document_name'] = $document->name;
+				//获取文档第一个章节数据
+				$chapter = $this->getByChapter(intval($item['document_id']));
+				$data[$key]['first_chapter_id'] = $chapter ? $chapter['chapter_id'] : 0;
+				$data[$key]['first_chapter_name'] = $chapter ? $chapter['chapter_name'] : '';
 				$data[$key]['logo'] = $item['logo'];
 				$data[$key]['description'] = $item['description'];
 				$data[$key]['created_at'] = date('Y-m-d H:i:s',$item['created_at']);
@@ -282,7 +300,7 @@ class DocumentHomeLogic extends BaseLogic
 
 
 	/**
-	 * 获取文档章节
+	 * 获取文档章节 内容
 	 * @param $documentId
 	 * @return array
 	 */
