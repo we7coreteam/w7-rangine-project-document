@@ -52,7 +52,7 @@ class DocumentHomeController extends BaseController
 
 	/**
 	 * @api {get} /document/home/check 检测首页是否开启
-	 * @apiName home
+	 * @apiName check
 	 * @apiGroup Document.home
 	 *
 	 * @apiSuccessExample {json} Success-Response:
