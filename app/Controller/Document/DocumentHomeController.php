@@ -22,6 +22,20 @@ class DocumentHomeController extends BaseController
 {
 
 	/**
+	 * @api {get} /document/home/check 检测首页是否开启
+	 * @apiName home
+	 * @apiGroup Document.home
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":{"is_open":1,"url":"http:\/\/192.168.168.99:80"},"message":"ok"}
+	 */
+	public function checkHome(){
+		$set = HomepageSettingLogic::instance()->getOpenHome();
+		return $this->data($set);
+	}
+
+
+	/**
 	 * @api {get} /document/home 前端首页数据
 	 * @apiName home
 	 * @apiGroup Document.home
