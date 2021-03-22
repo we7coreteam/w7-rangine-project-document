@@ -292,10 +292,42 @@ class DocumentHomeLogic extends BaseLogic
                 $data =  $this->getByChapter($item['id']);
                 $item['chapter_id'] = !empty($data)? $data['chapter_id'] : 0;
                 $item['chapter_name'] = !empty($data)? $data['chapter_name'] : '';
-                $item['chapter_content'] = !empty($data)? mb_strimwidth($data['chapter_content'], 0, 200, '...','utf-8') : '';
+                $item['chapter_content'] = !empty($data)? mb_strimwidth($data['chapter_content'], 0, 266, '...','utf-8') : '';
+                $item['nav'] = $this->buildNavigationSun($item['chapter_id']);
 			 }
 		 }
 		 return $list;
+	}
+
+
+	/**
+	 * 面包屑导航
+	 * @param $chapterId
+	 * @param string $str
+	 * @param int $i
+	 * @return \Illuminate\Database\Eloquent\HigherOrderBuilderProxy|\Illuminate\Support\HigherOrderCollectionProxy|mixed|string
+	 */
+	public function buildNavigationSun($chapterId, $str = '', $i = 0)
+	{
+		$i++;
+		if ($i > 50) {
+			//循环大于100，不再处理
+			return $str;
+		}
+		$chapter = Document\Chapter::query()->find($chapterId);
+		if ($chapter) {
+			if (!$str) {
+				//如果是根级
+				$str = $chapter->name;
+			} else {
+				//如果是上级
+				$str = $chapter->name . '>' . $str;
+			}
+			if ($chapter->parent_id) {
+				$str = $this->buildNavigationSun($chapter->parent_id, $str);
+			}
+		}
+		return $str;
 	}
 
 
