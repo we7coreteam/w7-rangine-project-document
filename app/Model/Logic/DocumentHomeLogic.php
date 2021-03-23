@@ -223,7 +223,7 @@ class DocumentHomeLogic extends BaseLogic
 			        ->where('type','=',2)
 			        ->orderBy('sort','asc')
 					->orderByDesc('created_at')
-			        ->limit(4)->get()->toArray();
+			        ->get()->toArray();
 
 		$data = [];
 		if ($typeList){
@@ -254,7 +254,7 @@ class DocumentHomeLogic extends BaseLogic
 			->where('type','=',3)
 			->orderBy('sort','asc')
 			->orderByDesc('created_at')
-			->limit(4)->get()->toArray();
+			->get()->toArray();
 		$data = [];
 		if ($typeList){
 			foreach ($typeList as $key=>$item){
@@ -292,7 +292,7 @@ class DocumentHomeLogic extends BaseLogic
                 $data =  $this->getByChapter($item['id']);
                 $item['chapter_id'] = !empty($data)? $data['chapter_id'] : 0;
                 $item['chapter_name'] = !empty($data)? $data['chapter_name'] : '';
-                $item['chapter_content'] = !empty($data)? mb_strimwidth($data['chapter_content'], 0, 266, '...','utf-8') : '';
+                $item['chapter_content'] = !empty($data)? mb_strimwidth(trim($data['chapter_content']), 0, 266, '...','utf-8') : '';
                 $item['nav'] = $this->buildNavigationSun($item['chapter_id']);
 			 }
 		 }
