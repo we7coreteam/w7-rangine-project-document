@@ -394,7 +394,8 @@ class DocumentHomeLogic extends BaseLogic
 			->select('id', 'name', 'sort', 'parent_id', 'is_dir', 'document_id','created_at')
 			->where('document_id', $documentId)
 			->where('is_dir','<>',Document\Chapter::IS_DIR)
-			->orderByDesc('created_at')->limit($limit)->get()->toArray();
+			->orderBy('sort','asc')
+			->orderBy('created_at','asc')->limit($limit)->get()->toArray();
 		$data = [];
 		if ($chapter){
 			foreach ($chapter as $key=>$item){
