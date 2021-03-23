@@ -385,53 +385,44 @@ class DocumentHomeLogic extends BaseLogic
 	/**
 	 * 获取章节数据列表
 	 * @param $documentId
-	 * @param int $limit
 	 * @return array
 	 */
-	public function getByChapterList($documentId,$limit=5){
-		//获取章节信息
-		$chapter = Document\Chapter::query()
-			->select('id', 'name', 'sort', 'parent_id', 'is_dir', 'document_id','created_at')
-			->where('document_id', $documentId)
-			->orderBy('parent_id', 'asc')
-			->orderBy('sort','asc')
-			->get()->toArray();
+	public function getByChapterList($documentId){
+		//获取章章节目录
+		$chapter = ChapterLogic::instance()->getCatalog($documentId);
 		$data = [];
 		if ($chapter){
-			$i = 0;
-			foreach ($chapter as $key=>$item){
-				if ($item['is_dir'] == Document\Chapter::IS_DIR){
-					$this->getByChapterChildrenList($data,$item['id'],$i);
+			$k = 0;
+			foreach ($chapter as $key => $item){
+				if ($item['is_dir'] && $item['children']){
+                     $this->getByChapterChildrenList($data,$item['children'],$k);
 				}else{
-					$data[$i]['chapter_id'] = $item['id'];
-					$data[$i]['chapter_name'] = $item['name'];
+					$data[$k]['chapter_id'] = $item['id'];
+					$data[$k]['chapter_name'] = $item['name'];
 				}
-				++$i;
+				++$k;
 			}
 		}
-		return $data ? array_splice($data,0,5) : $data;
+
+		return $data ;
 	}
 
 
 	/**
-	 * 递归查找 文档章节列表
-	 * @param $chapterId
+	 * 获取章节目录 列表
+	 * @param $data
+	 * @param $children
+	 * @param $k
 	 */
-	private function getByChapterChildrenList(&$data=[],$chapterId,&$k){
-		$chapter = Document\Chapter::query()
-			->select('id', 'name', 'sort', 'parent_id', 'is_dir', 'default_show_chapter_id')
-			->where('parent_id', $chapterId)
-			->orderBy('sort', 'asc')
-			->get()->toArray();
-		if ($chapter){
-			foreach ($chapter as $key=>$item){
-				if ($item['is_dir'] == Document\Chapter::IS_DIR){
-					$this->getByChapterChildrenList($data,$item['id'],$k);
-				}
+	private function getByChapterChildrenList(&$data,$children,&$k){
+		foreach ($children as $key => $item){
+			if ($item['is_dir'] && $item['children']){
+                $this->getByChapterChildrenList($data,$item['children'],$k);
+			}else{
 				$data[$k]['chapter_id'] = $item['id'];
 				$data[$k]['chapter_name'] = $item['name'];
-				++$k;
 			}
+			++$k;
 		}
 	}
 
