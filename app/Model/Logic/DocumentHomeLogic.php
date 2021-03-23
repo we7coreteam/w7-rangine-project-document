@@ -393,19 +393,49 @@ class DocumentHomeLogic extends BaseLogic
 		$chapter = Document\Chapter::query()
 			->select('id', 'name', 'sort', 'parent_id', 'is_dir', 'document_id','created_at')
 			->where('document_id', $documentId)
-			->where('is_dir','<>',Document\Chapter::IS_DIR)
+			->orderBy('parent_id', 'asc')
 			->orderBy('sort','asc')
-			->orderBy('created_at','asc')->limit($limit)->get()->toArray();
+			->get()->toArray();
 		$data = [];
 		if ($chapter){
+			$i = 0;
 			foreach ($chapter as $key=>$item){
-				$data[$key]['chapter_id'] = $item['id'];
-				$data[$key]['chapter_name'] = $item['name'];
-				$data[$key]['created_at'] = date('Y-m-d H:i:s',$item['created_at']);
+				if ($item['is_dir'] == Document\Chapter::IS_DIR){
+					$this->getByChapterChildrenList($data,$item['id'],$i);
+				}else{
+					$data[$i]['chapter_id'] = $item['id'];
+					$data[$i]['chapter_name'] = $item['name'];
+				}
+				++$i;
 			}
 		}
-		return $data;
+		return $data ? array_splice($data,0,5) : $data;
 	}
+
+
+	/**
+	 * 递归查找 文档章节列表
+	 * @param $chapterId
+	 */
+	private function getByChapterChildrenList(&$data=[],$chapterId,&$k){
+		$chapter = Document\Chapter::query()
+			->select('id', 'name', 'sort', 'parent_id', 'is_dir', 'default_show_chapter_id')
+			->where('parent_id', $chapterId)
+			->orderBy('sort', 'asc')
+			->get()->toArray();
+		if ($chapter){
+			foreach ($chapter as $key=>$item){
+				if ($item['is_dir'] == Document\Chapter::IS_DIR){
+					$this->getByChapterChildrenList($data,$item['id'],$k);
+				}
+				$data[$k]['chapter_id'] = $item['id'];
+				$data[$k]['chapter_name'] = $item['name'];
+				++$k;
+			}
+		}
+	}
+
+
 
 
 
