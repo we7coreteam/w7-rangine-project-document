@@ -404,7 +404,7 @@ class DocumentHomeLogic extends BaseLogic
 			}
 		}
 
-		return $data ;
+		return $data ? array_splice($data,0,5) : $data;
 	}
 
 
