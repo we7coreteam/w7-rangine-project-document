@@ -47,12 +47,14 @@ class FeedbackController extends BaseController
 		  }
           //查询数据
 		  $query = DocumentFeedback::query()->where('document_id', '=', $params['document_id'])->orderByDesc('created_at');
-		  $list = $query->paginate($pageSize, ['id','user_id','document_id','type','created_at'], 'page', $page);
+		  $list = $query->paginate($pageSize, ['id','user_id','document_id','type','status','created_at'], 'page', $page);
 		  foreach ($list->items() as $i => $row) {
 			  $result['data'][] = [
 				  'id' => $row->id,
 				  'user_id' => $row->user_id,
 				  'document_id' => $row->document_id,
+				  'status' => $row->status,
+				  'status_text' => $row->status_text,
 				  'type' => $row->type,
 				  'type_name' => $row->type_name,
 				  'created_at' => $row->created_at->toDateTimeString()
@@ -103,6 +105,8 @@ class FeedbackController extends BaseController
 
 		  $result = [
 			  'id'=> $detail->id,
+			  'status' => $detail->status,
+			  'status_text' => $detail->status_text,
 			  'type'=> $detail->type,
 			  'type_name'=> $detail->type_name,
 			  'document_id'=> $detail->document_id,

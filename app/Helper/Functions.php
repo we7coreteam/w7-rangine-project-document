@@ -71,3 +71,17 @@ function generate_label($name, $value, $isFormat = true)
 	}
 	return ['label' => $name, 'option' => $option];
 }
+
+/**
+ * 获取当前域名及根路径
+ * @return string
+ */
+function base_url()
+{
+	static $baseUrl = '';
+	if (empty($baseUrl)) {
+		$request = \W7\App::getApp()->getContext()->getRequest();
+		$baseUrl = $request->getUri()->getScheme() . '://' . $request->server('HTTP_HOST');
+	}
+	return $baseUrl;
+}

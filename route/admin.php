@@ -102,6 +102,22 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 		$route->post('/get-theme', 'Admin\MenuSettingController@getTheme');
 	});
 
+	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix' => '/home'], function (\W7\Core\Route\Route $route) {
+		//首页管理设置
+		$route->get('/list', 'Admin\DocumentHomeController@getList');
+		$route->post('/add', 'Admin\DocumentHomeController@addHomeData');
+		$route->all('/edit', 'Admin\DocumentHomeController@editHomeData');
+		$route->post('/delete', 'Admin\DocumentHomeController@delHomeData');
+		$route->get('/get-type', 'Admin\DocumentHomeController@getType');
+		$route->post('/search-doc', 'Admin\DocumentHomeController@queryDocument');
+		$route->get('/get-set', 'Admin\HomepageSettingController@getHomePageSet');
+		$route->post('/set-open', 'Admin\HomepageSettingController@setOpenHome');
+		$route->post('/set-banner', 'Admin\HomepageSettingController@setHomeBanner');
+		$route->post('/set-title', 'Admin\HomepageSettingController@setHomeTtile');
+
+	});
+
+
 	$route->middleware('CheckFounderMiddleware')->group([], function (\W7\Core\Route\Route $route) {
 		$route->post('/setting/cos', 'Admin\SettingController@cos');
 		$route->post('/setting/save', 'Admin\SettingController@save');
