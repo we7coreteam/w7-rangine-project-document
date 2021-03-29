@@ -15,6 +15,7 @@ namespace W7\App\Controller\Document;
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Logic\DocumentHomeLogic;
+use W7\App\Model\Logic\DocumentSearchLogic;
 use W7\App\Model\Logic\HomepageSettingLogic;
 use W7\Http\Message\Server\Request;
 
@@ -77,9 +78,25 @@ class DocumentHomeController extends BaseController
 	 public function search(Request $request){
 		 $page = intval($request->input('page', 1));
 		 $pageSize = intval($request->input('page_size', 10));
-		 $keyword = $request->input('keywords');
+		 $keyword = $request->input('keywords','');
+		 //记录搜索词
+		 DocumentSearchLogic::instance()->addSearchHotWord($keyword);
+		 //搜索列表
 		 $data = DocumentHomeLogic::instance()->searchDocument($keyword,$page,$pageSize);
          return  $this->data($data);
+	 }
+
+	/**
+	 * @api {get} /document/home/search-hot 获取搜索热词列表
+	 * @apiName  search-hot
+	 * @apiGroup Document.home
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":["7","666","111","22","kkk"],"message":"ok"}
+	 */
+	 public function getSearchHot(){
+	 	$data = DocumentSearchLogic::instance()->getSearchHotList();
+	 	return $this->data($data);
 	 }
 
 
