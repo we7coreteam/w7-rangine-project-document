@@ -38,8 +38,8 @@ class DocumentHomeController extends BaseController
 		], [
 			'type.required' => '请选择类型',
 		]);
-		$page = intval($request->post('page',1));
-		$pageSize = intval($request->post('page_size',10));
+		$page = intval($request->input('page',1));
+		$pageSize = intval($request->input('page_size',10));
 		$data = DocumentHomeLogic::instance()->getListData($params['type'],$page,$pageSize);
 		return $this->data($data);
 	}
