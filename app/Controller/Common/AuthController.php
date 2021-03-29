@@ -484,7 +484,8 @@ class AuthController extends BaseController
 			if ($userThirdPartyHas) {
 				//如果当前用户
 				ilogger()->channel('test')->debug('userThirdPartyHas-' . $userThirdPartyHas->id . '-new-userId-' . $user->id);
-				throw new ErrorHttpException('当前账号已绑定其它账号，您可以选择重新注册或绑定其它账号。' . $userThirdPartyHas->id . '-' . $user->id);
+//				throw new ErrorHttpException('当前账号已绑定其它账号，您可以选择重新注册或绑定其它账号。' . $userThirdPartyHas->id . '-' . $user->id);
+				throw new ErrorHttpException('当前账号已绑定其它账号，您可以选择重新注册或绑定其它账号');
 			}
 
 			if (!empty($user->is_ban)) {

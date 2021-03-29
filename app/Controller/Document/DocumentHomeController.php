@@ -95,7 +95,7 @@ class DocumentHomeController extends BaseController
 	 * {"status":true,"code":200,"data":["7","666","111","22","kkk"],"message":"ok"}
 	 */
 	 public function getSearchHot(){
-	 	$data = DocumentSearchLogic::instance()->getSearchHotList();
+	 	$data = DocumentSearchLogic::instance()->getSearchHotList(3);
 	 	return $this->data($data);
 	 }
 
