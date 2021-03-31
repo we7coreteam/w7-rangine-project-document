@@ -20,6 +20,7 @@ irouter()->middleware('FrontendDocumentPermissionMiddleware')->group(['prefix' =
 	$route->get('/home', 'Document\DocumentHomeController@getDocumentHome');
 	$route->post('/home/search', 'Document\DocumentHomeController@search');
 	$route->get('/home/check', 'Document\DocumentHomeController@checkHome');
+	$route->get('/home/search-hot', 'Document\DocumentHomeController@getSearchHot');
 });
 irouter()->middleware('CorsApiMiddleware')->group(['prefix' => '/document'], function (\W7\Core\Route\Route $route) {
 	$route->post('/chapter/record', 'Document\ChapterController@record');
