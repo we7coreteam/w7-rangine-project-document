@@ -412,6 +412,10 @@ class ChapterController extends BaseController
 			$chapterRecord = new ChapterRecordLogic($chapter->id);
 			$content = $chapterRecord->recordToMarkdown($record);
 		}
+		$words = hasForbidWords($content);
+		if ($words){
+			throw new ErrorHttpException('您输入的内容存在敏感词“'.implode('、',$words).'”，请修改之后提交。');
+		}
 
 		if (!empty($chapter->content)) {
 			if ($chapter->content->layout != $layout) {

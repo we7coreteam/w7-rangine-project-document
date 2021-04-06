@@ -10,6 +10,18 @@
  * visited https://www.w7.cc for more details
  */
 
+function hasForbidWords($content = ''){
+	$Setting = new \W7\App\Model\Logic\SettingLogic();
+	$words = $Setting->getByKey(\W7\App\Model\Logic\SettingLogic::KEY_FORBID_WORDS,0);
+	$words = explode(',',$words);
+	$forbid = [];
+	foreach ($words as $v){
+		if (stripos($content,$v) !== false){
+			$forbid[] = $v;
+		}
+	}
+	return $forbid;
+}
 function authcode($string, $operation = 'DECODE', $key = '', $expiry = 0)
 {
 	$ckey_length = 4;
