@@ -23,4 +23,14 @@ class UserOperateLogic extends BaseLogic
 	{
 		return UserOperateLog::query()->where('document_id', '=', $documentId)->delete();
 	}
+
+	public function lists($where = [], $page = 1, $size = 20){
+		$query = UserOperateLog::query()->with(['user','document','document.user'=>function($query){
+			$query->select(['id','username','avatar']);
+		}]);
+		if (!empty($where['user_id']))	$query->where('user_id',$where['user_id']);
+		if (!empty($where['operate']))	$query->whereIn('operate',$where['operate']);
+
+		return $query->paginate($size,['*'],'',$page);
+	}
 }

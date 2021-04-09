@@ -4,18 +4,23 @@ namespace W7\App\Model\Entity;
 
 class UserOperateLog extends BaseModel
 {
-	const CREATE = 1;
-	const PREVIEW = 2;
-	const EDIT = 3;
-	const DELETE = 4;
-	const CHAPTER_MOVE = 5;
-	const CHAPTER_COPY = 6;
-	const DOCUMENT_TRANSFER = 7;
-	const SHARE = 8;
+	const CREATE = 1; //创建
+	const PREVIEW = 2; //预览
+	const EDIT = 3; //编辑
+	const DELETE = 4; //删除
+	const CHAPTER_MOVE = 5; //移动
+	const CHAPTER_COPY = 6; //复制
+	const DOCUMENT_TRANSFER = 7; //转让
+	const SHARE = 8; //分享
+	const COLLECT = 9; //收藏
 
 	protected $table = 'user_operate_log';
 	protected $primaryKey = 'id';
+	protected $appends = ['time_str'];
 
+	public function getTimeStrAttribute(){
+		return timeToString($this->created_at->unix());
+	}
 	public function setUpdatedAt($value)
 	{
 		return null;
@@ -23,7 +28,7 @@ class UserOperateLog extends BaseModel
 
 	public function user()
 	{
-		return $this->belongsTo(User::class, 'user_id', 'id');
+		return $this->belongsTo(User::class, 'user_id', 'id')->select(['id','username','avatar']);
 	}
 
 	public function targetUser()

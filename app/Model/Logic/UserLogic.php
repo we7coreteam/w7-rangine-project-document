@@ -53,7 +53,7 @@ class UserLogic extends BaseLogic
 	}
 
 
-	public function createBucket($username) {
+	public function createBucket($username, $avatar = '') {
 		$user = $this->getByUserName($username);
 		if ($user) {
 			return $user->id;
@@ -65,6 +65,7 @@ class UserLogic extends BaseLogic
 			'remark' => '',
 			'is_ban' => 0,
 			'group_id' => 0,
+			'avatar' => $avatar
 		]);
 
 		if (!$user) {
@@ -76,7 +77,7 @@ class UserLogic extends BaseLogic
 
 	public function updateUser($userInfo)
 	{
-		$user = $this->getByUserName($userInfo['username']);
+		$user = isset($userInfo['id']) ? $this->getByUid($userInfo['id']) : $this->getByUserName($userInfo['username']);
 		if ($user && $userInfo['id'] != $user->id) {
 			throw new \RuntimeException('用户名已经存在');
 		}
@@ -86,7 +87,7 @@ class UserLogic extends BaseLogic
 			//修改完密码后强制退出
 			icache()->delete(sprintf(self::USER_LOGOUT_AFTER_CHANGE_PWD, $userInfo['id']));
 		}
-		
+
 		$result = User::query()->where('id', $userInfo['id'])->update($userInfo);
 		if (!$result) {
 			throw new \RuntimeException('修改用户信息失败');
