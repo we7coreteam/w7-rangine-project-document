@@ -6,6 +6,7 @@ use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Star;
 use W7\App\Model\Entity\User;
+use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\Http\Message\Server\Request;
 
@@ -79,6 +80,14 @@ class StarController extends BaseController
 		$star->document_id = $params['document_id'];
 		$star->chapter_id = (int)$request->post('chapter_id', 0);
 		$star->save();
+
+		UserOperateLog::query()->create([
+			'user_id' => $user->id,
+			'document_id' => $params['document_id'],
+			'chapter_id' => $star->chapter_id,
+			'operate' => UserOperateLog::COLLECT,
+			'remark'	=> '添加星标'
+		]);
 
 		return $this->data(['star_id' => $star->id]);
 	}

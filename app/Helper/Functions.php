@@ -10,6 +10,18 @@
  * visited https://www.w7.cc for more details
  */
 
+function timeToString($time){
+	$diff = time()-$time;
+	if ($diff < 60){
+		return '刚刚';
+	}elseif($diff > 60 && $diff <= 60*60){
+		return floor($diff/60).'分钟前';
+	}elseif($diff > 60*60 && $diff <= 60*60*24){
+		return floor($diff / 3600).'小时前';
+	}else{
+		return date('Y-m-d H:i',$time);
+	}
+}
 function hasForbidWords($content = ''){
 	$Setting = new \W7\App\Model\Logic\SettingLogic();
 	$words = $Setting->getByKey(\W7\App\Model\Logic\SettingLogic::KEY_FORBID_WORDS,0);

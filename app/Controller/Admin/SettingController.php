@@ -25,6 +25,17 @@ class SettingController extends BaseController
 		SettingLogic::KEY_FORBID_WORDS => '',
 	];
 
+	public function config(Request $request){
+		$param = $this->validate($request, [
+			'key' => 'required',
+		], [
+			'key.required' => 'key必填',
+		]);
+		$this->check($request);
+		$setting = SettingLogic::instance()->getByKey($param['key'],0);
+		return $this->data([$param['key'] => $setting->setting]);
+	}
+
 	public function cos(Request $request)
 	{
 		$this->check($request);
