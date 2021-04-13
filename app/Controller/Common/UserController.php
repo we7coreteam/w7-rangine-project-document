@@ -59,7 +59,7 @@ class UserController extends BaseController
 			'user_id' => '用户id'
 		]);
 		$page	= $request->input('page',1);
-		$size 	= $request->input('size',20);
+		$size 	= $request->input('page_size',20);
 		$Logic	= new UserOperateLogic();
 		$param['operate'] = [UserOperateLog::CREATE,UserOperateLog::COLLECT];
 		return $this->data($Logic->lists($param,$page,$size));
