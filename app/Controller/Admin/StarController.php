@@ -106,9 +106,9 @@ class StarController extends BaseController
 		 * @var User $user
 		 */
 		$user = $request->getAttribute('user');
-		if (!$user->isReader) {
+		/*if (!$user->isReader) {
 			throw new ErrorHttpException('无权限操作该文档');
-		}
+		}*/
 
 		$document = DocumentLogic::instance()->getById($params['document_id']);
 		if (empty($document)) {
