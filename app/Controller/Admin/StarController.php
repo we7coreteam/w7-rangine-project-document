@@ -115,7 +115,14 @@ class StarController extends BaseController
 			throw new ErrorHttpException('您操作的文档不存在');
 		}
 
-		Star::query()->where('user_id', '=', $user->id)->where('id', '=', $params['id'])->delete();
+		$star = Star::query()->where('user_id', '=', $user->id)->where('id', '=', $params['id'])->first();
+
+		UserOperateLog::query()
+			->where('user_id',$star->user_id)
+			->where('document_id', $star->document_id)
+			->where('chapter_id',$star->chapter_id)
+			->delete();
+		$star->delete();
 
 		return $this->data('success');
 	}
