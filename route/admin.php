@@ -121,6 +121,7 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 	$route->middleware('CheckFounderMiddleware')->group([], function (\W7\Core\Route\Route $route) {
 		$route->post('/setting/cos', 'Admin\SettingController@cos');
 		$route->post('/setting/save', 'Admin\SettingController@save');
+		$route->get('/setting/config', 'Admin\SettingController@config');
 	});
 
 	//图片上传

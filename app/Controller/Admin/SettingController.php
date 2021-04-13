@@ -22,7 +22,19 @@ class SettingController extends BaseController
 {
 	private $handler = [
 		SettingLogic::KEY_COS => 'saveCos',
+		SettingLogic::KEY_FORBID_WORDS => '',
 	];
+
+	public function config(Request $request){
+		$param = $this->validate($request, [
+			'key' => 'required',
+		], [
+			'key.required' => 'key必填',
+		]);
+		$this->check($request);
+		$setting = SettingLogic::instance()->getByKey($param['key'],0);
+		return $this->data([$param['key'] => $setting->setting]);
+	}
 
 	public function cos(Request $request)
 	{
@@ -55,17 +67,17 @@ class SettingController extends BaseController
 		if (!empty($this->handler[$key])) {
 			$value = call_user_func_array([$this, $this->handler[$key]], [$request]);
 		} else {
-			$value = $request->post('setting');
+			$value = $request->post('setting','');
 		}
 
 		try {
 			idb()->beginTransaction();
-			if (empty($value['url']) || !$value['url']) {
+			if ($key == SettingLogic::KEY_COS && (empty($value['url']) || !$value['url'])) {
 				$value['url'] = 'https://' . $value['bucket'] . '.cos.' . $value['region'] . '.myqcloud.com';
 			}
 			SettingLogic::instance()->save($key, $value);
 			//验证票据
-			CdnLogic::instance()->channel(SettingLogic::KEY_COS, true);
+			if ($key == SettingLogic::KEY_COS) CdnLogic::instance()->channel(SettingLogic::KEY_COS, true);
 			idb()->commit();
 		} catch (\Throwable $e) {
 			idb()->rollBack();

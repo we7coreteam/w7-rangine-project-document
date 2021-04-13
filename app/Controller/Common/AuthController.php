@@ -205,7 +205,8 @@ class AuthController extends BaseController
 		//获取第三方数据
 		$userInfo = [
 			'uid' => $user->uid,
-			'username' => $user->username
+			'username' => $user->username,
+			'avatar' => $user->avatar ?? ''
 		];
 
 		if (empty($userInfo['username']) || empty($userInfo['uid'])) {
@@ -235,12 +236,18 @@ class AuthController extends BaseController
 			if (empty($loginSetting['is_need_bind'])) {
 				//不需要绑定已有账户的话，直接创建新用户
 				$username = 'tpl_' . $userInfo['username'] . $userInfo['uid'];
-				$thirdPartyUser->uid = UserLogic::instance()->createBucket($username);
+				$thirdPartyUser->uid = UserLogic::instance()->createBucket($username,$userInfo['avatar']);
 				$thirdPartyUser->save();
 			} else {
 				$username = $userInfo['username'];
 				$thirdPartyUser->uid = 0;
 			}
+		}else{
+			UserLogic::instance()->updateUser([
+				'id' => $thirdPartyUser->uid,
+				'username' => $userInfo['username'],
+				'avatar' => $userInfo['avatar']
+			]);
 		}
 		//已登陆的用户校验是否需要切换用户S
 		$sessionUser = $request->session->get('user');
