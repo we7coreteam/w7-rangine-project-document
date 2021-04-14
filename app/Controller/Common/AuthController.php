@@ -107,8 +107,7 @@ class AuthController extends BaseController
 
 	public function method(Request $request)
 	{
-//		$redirectUrl = $request->post('redirect_url');
-		$redirectUrl = ienv('API_HOST');
+		$redirectUrl = $request->post('redirect_url');
 		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginSetting();
 		$data = [];
 		/**
