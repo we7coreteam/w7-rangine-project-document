@@ -107,7 +107,8 @@ class AuthController extends BaseController
 
 	public function method(Request $request)
 	{
-		$redirectUrl = $request->post('redirect_url');
+//		$redirectUrl = $request->post('redirect_url');
+		$redirectUrl = ienv('API_HOST');
 		$setting = ThirdPartyLoginLogic::instance()->getThirdPartyLoginSetting();
 		$data = [];
 		/**
@@ -115,6 +116,7 @@ class AuthController extends BaseController
 		 */
 		$socialite = iloader()->get(SocialiteManager::class);
 		//获取可用的第三方登录列表
+
 		foreach ($setting['channel'] as $key => $item) {
 			if (!empty($item['setting']['enable'])) {
 				try {
@@ -236,13 +238,13 @@ class AuthController extends BaseController
 			if (empty($loginSetting['is_need_bind'])) {
 				//不需要绑定已有账户的话，直接创建新用户
 				$username = 'tpl_' . $userInfo['username'] . $userInfo['uid'];
-				$thirdPartyUser->uid = UserLogic::instance()->createBucket($username,$userInfo['avatar']);
+				$thirdPartyUser->uid = UserLogic::instance()->createBucket($username, $userInfo['avatar']);
 				$thirdPartyUser->save();
 			} else {
 				$username = $userInfo['username'];
 				$thirdPartyUser->uid = 0;
 			}
-		}else{
+		} else {
 			UserLogic::instance()->updateUser([
 				'id' => $thirdPartyUser->uid,
 				'username' => $userInfo['username'],
