@@ -57,7 +57,7 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 		$this->schema->create($this->articleTable, function (Blueprint $table) {
 			$table->bigIncrements('id');
 			$table->integer('column_id', false, true)->default(0)->comment('专栏id');
-			$table->string('tag_id', 255)->default('')->comment('标签列表');
+			$table->string('tag_ids', 255)->default('')->comment('标签列表');
 			$table->integer('user_id', false, true)->default(0)->comment('用户id');
 			$table->string('title', 255)->default('')->comment('文章标题');
 			$table->longText('content')->default('')->comment('文章内容');
