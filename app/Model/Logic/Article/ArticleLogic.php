@@ -18,4 +18,8 @@ use W7\Core\Helper\Traiter\InstanceTraiter;
 class ArticleLogic extends BaseLogic
 {
 	use InstanceTraiter;
+
+	public function index(){
+
+	}
 }
