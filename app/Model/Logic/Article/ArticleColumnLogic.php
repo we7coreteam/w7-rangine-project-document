@@ -20,24 +20,36 @@ class ArticleColumnLogic extends BaseLogic
 {
 	use InstanceTraiter;
 
-	public function info($user)
+	public function info($userId)
 	{
-		return ArticleColumn::query()->where('user_id', $user->id)->first();
+		return ArticleColumn::query()->where('user_id', $userId)->orderBy('id')->first();
 	}
 
-	public function save($user, $data)
+	public function store($data)
 	{
-		$row = ArticleColumn::query()->where('user_id', $user->id)->first();
+		$row = ArticleColumn::query()->where('user_id', $data['user_id'])->first();
 		if ($row) {
-			$row->name = $data['name'];
-			$row->save();
+			throw new \RuntimeException('一个人只能新建一个栏目');
 		} else {
 			$saveData = [
-				'user_id' => $user->id,
+				'user_id' => $data['user_id'],
 				'name' => $data['name']
 			];
 			$row = ArticleColumn::query()->create($saveData);
 		}
 		return $row;
+	}
+
+	public function update($data, $id, $checkAuth = false)
+	{
+		$row = ArticleColumn::query()->find($id);
+		if ($row) {
+			if ($checkAuth && $data['user_id'] != $row->user_id) {
+				throw new \RuntimeException('栏目不存在');
+			}
+			$row->name = $data['name'];
+			$row->save();
+		}
+		throw new \RuntimeException('栏目不存在');
 	}
 }

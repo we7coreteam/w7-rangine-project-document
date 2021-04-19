@@ -23,13 +23,24 @@ class ArticleColumnController extends BaseController
 		return new ArticleColumnLogic();
 	}
 
+	/**
+	 * @api {get} /articleColumn/info 文章栏目-详情
+	 * @apiName info
+	 * @apiGroup articleColumn
+	 */
 	public function info(Request $request)
 	{
 		$user = $request->getAttribute('user');
-		$this->block()->info($user);
+		$result = $this->block()->info($user->id);
+		return $this->data($result);
 	}
 
-	public function save(Request $request)
+	/**
+	 * @api {post} /articleColumn 文章栏目-编辑、新增
+	 * @apiName info
+	 * @apiGroup articleColumn
+	 */
+	public function store(Request $request)
 	{
 		$data = $this->validate($request, [
 			'name' => 'required|string',
@@ -38,6 +49,23 @@ class ArticleColumnController extends BaseController
 		]);
 
 		$user = $request->getAttribute('user');
-		$this->block()->save($user, $data);
+		$data['user_id'] = $user->id;
+		$result = $this->block()->store($data);
+		return $this->data($result);
+	}
+
+	public function update(Request $request, $id)
+	{
+		$data = $this->validate($request, [
+			'id' => 'required|integer',
+			'name' => 'required|string',
+		], [
+			'name.required' => '专栏名称不能为空',
+		]);
+
+		$user = $request->getAttribute('user');
+		$data['user_id'] = $user->id;
+		$result = $this->block()->update($data, $id, true);
+		return $this->data($result);
 	}
 }

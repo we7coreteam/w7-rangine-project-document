@@ -11,6 +11,7 @@
  */
 
 irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['prefix' => '/article'], function (\W7\Core\Route\Route $route) {
-	$route->get('/articleColumn', 'Article\ArticleColumnController@info');
-	$route->put('/articleColumn', 'Article\ArticleColumnController@save');
+	$route->get('/articleColumn/info', 'Article\ArticleColumnController@info');
+	$route->post('/articleColumn', 'Article\ArticleColumnController@store');
+	$route->put('/articleColumn', 'Article\ArticleColumnController@update');
 });
