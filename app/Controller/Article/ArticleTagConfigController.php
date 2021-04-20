@@ -20,15 +20,15 @@ use W7\Http\Message\Server\Request;
 
 class ArticleTagConfigController extends BaseController
 {
-	protected $query = [
-		'=' => ['status'],
-		'like' => ['name']
-	];
-
 	protected function block()
 	{
 		return new ArticleTagConfigLogic();
 	}
+
+	protected $query = [
+		'=' => ['status'],
+		'like' => ['name']
+	];
 
 	/**
 	 * @api {get} /article/articleTagConfig 标签-列表
