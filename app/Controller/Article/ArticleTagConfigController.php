@@ -20,22 +20,36 @@ use W7\Http\Message\Server\Request;
 
 class ArticleTagConfigController extends BaseController
 {
+	protected $query = [
+		'=' => ['status'],
+		'like' => ['name']
+	];
+
 	protected function block()
 	{
 		return new ArticleTagConfigLogic();
 	}
 
+	/**
+	 * @api {get} /article/articleTagConfig 标签-列表
+	 * @apiName index
+	 * @apiGroup articleTagConfig
+	 *
+	 * @apiParam {String} name 标签名称
+	 * @apiParam {Number} status 状态
+	 *
+	 * @apiSuccess {String} name 标签名称
+	 * @apiSuccess {Number} sort 排序
+	 * @apiSuccess {Number} status 状态
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":{"name":"标签3","updated_at":"1618902333","created_at":"1618902333","id":3},"message":"ok"}
+	 */
 	public function index(Request $request)
 	{
 		$page = $request->query('page', 1);
 		$limit = $request->query('limit', 20);
-		$condition = $this->validate($request, [
-			'name' => 'string',
-			'status' => 'integer',
-		], [
-			'name' => '标签名称',
-			'status' => '状态',
-		]);
+		$condition = $this->block()->handleCondition($this->query);
 		$result = $this->block()->lists($condition, $page, $limit);
 		return $this->data($result);
 	}
