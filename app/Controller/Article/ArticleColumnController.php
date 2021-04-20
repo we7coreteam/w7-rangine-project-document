@@ -25,9 +25,18 @@ class ArticleColumnController extends BaseController
 	}
 
 	/**
-	 * @api {get} /articleColumn/info 栏目-详情
+	 * @api {get} /article/articleColumn/info 栏目-详情
 	 * @apiName info
 	 * @apiGroup articleColumn
+	 *
+	 * @apiParam {String} name 栏目名称
+	 * @apiParam {Number} article_num 排序
+	 * @apiParam {Number} read_num 阅读数量
+	 * @apiParam {Number} subscribe_num 关注数量
+	 * @apiParam {Number} praise_num 点赞数量
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":{"id":2,"user_id":2,"name":"栏目3","article_num":0,"read_num":0,"subscribe_num":0,"praise_num":0,"created_at":"1618906453","updated_at":"1618907138"},"message":"ok"}
 	 */
 	public function info(Request $request)
 	{
@@ -41,16 +50,11 @@ class ArticleColumnController extends BaseController
 	 * @apiName store
 	 * @apiGroup articleColumn
 	 *
-	 * @apiParam {String} name 标签名称
-	 * @apiParam {Number} sort 排序
-	 * @apiParam {Number} status 状态
-	 *
-	 *     "user_id": 2,
-	"name": "标签33",
-	"article_num": 0,
-	"read_num": 0,
-	"subscribe_num": 0,
-	"praise_num": 0,
+	 * @apiParam {String} name 栏目名称
+	 * @apiParam {Number} article_num 排序
+	 * @apiParam {Number} read_num 阅读数量
+	 * @apiParam {Number} subscribe_num 关注数量
+	 * @apiParam {Number} praise_num 点赞数量
 	 *
 	 * @apiSuccessExample {json} Success-Response:
 	 * {"status":true,"code":200,"data":{"id":2,"user_id":2,"name":"栏目3","article_num":0,"read_num":0,"subscribe_num":0,"praise_num":0,"created_at":"1618906453","updated_at":"1618907138"},"message":"ok"}
@@ -69,6 +73,20 @@ class ArticleColumnController extends BaseController
 		return $this->data($result);
 	}
 
+	/**
+	 * @api {put} /article/articleColumn 栏目-修改
+	 * @apiName store
+	 * @apiGroup articleColumn
+	 *
+	 * @apiParam {String} name 栏目名称
+	 * @apiParam {Number} article_num 排序
+	 * @apiParam {Number} read_num 阅读数量
+	 * @apiParam {Number} subscribe_num 关注数量
+	 * @apiParam {Number} praise_num 点赞数量
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":{"id":2,"user_id":2,"name":"栏目3","article_num":0,"read_num":0,"subscribe_num":0,"praise_num":0,"created_at":"1618906453","updated_at":"1618907138"},"message":"ok"}
+	 */
 	public function update(Request $request, $id)
 	{
 		$data = $this->validate($request, [
