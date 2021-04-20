@@ -42,7 +42,7 @@ class ArticleColumnLogic extends BaseLogic
 		return $row;
 	}
 
-	public function update($data, $id, $checkAuth = false)
+	public function update($id, $data, $checkAuth = false)
 	{
 		$row = ArticleColumn::query()->find($id);
 		if ($row) {

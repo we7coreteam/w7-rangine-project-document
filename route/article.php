@@ -16,7 +16,9 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 	$route->post('/articleColumn', 'Article\ArticleColumnController@store');
 	$route->put('/articleColumn', 'Article\ArticleColumnController@update');
 
+	//系统标签配置
 	$route->get('/articleTagConfig', 'Article\ArticleColumnController@index');
+	$route->get('/articleTagConfig/{id:\d+}', 'Article\ArticleColumnController@show');
 	$route->post('/articleTagConfig', 'Article\ArticleColumnController@store');
 	$route->put('/articleTagConfig', 'Article\ArticleColumnController@update');
 });

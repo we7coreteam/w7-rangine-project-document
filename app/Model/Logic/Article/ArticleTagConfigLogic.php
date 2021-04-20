@@ -21,4 +21,9 @@ class ArticleTagConfigLogic extends BaseLogic
 	use InstanceTraiter;
 
 	protected $model = ArticleTagConfig::class;
+
+	public function index($condition = [], $page = 1, $limit = 10)
+	{
+		return $this->lists($condition, $page, $limit);
+	}
 }

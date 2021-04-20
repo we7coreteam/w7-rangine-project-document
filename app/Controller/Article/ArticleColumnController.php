@@ -65,7 +65,7 @@ class ArticleColumnController extends BaseController
 
 		$user = $request->getAttribute('user');
 		$data['user_id'] = $user->id;
-		$result = $this->block()->update($data, $id, true);
+		$result = $this->block()->update($id, $data, true);
 		return $this->data($result);
 	}
 }
