@@ -38,7 +38,8 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->string('name', 255)->default('')->comment('标签名称');
 			$table->tinyInteger('sort', false, true)->default(0)->comment('排序');
 			$table->tinyInteger('status', false, true)->default(1)->comment('状态0不可用1可用');
-			$table->timestamps();
+			$table->integer('created_at', false, true)->default(0);
+			$table->integer('updated_at', false, true)->default(0);
 			$table->index(['status'], 'status');
 			$table->index(['sort'], 'sort');
 		});
@@ -51,7 +52,8 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->integer('read_num', false, true)->default(0)->comment('阅读次数');
 			$table->integer('subscribe_num', false, true)->default(0)->comment('订阅数量');
 			$table->integer('praise_num', false, true)->default(0)->comment('点赞次数');
-			$table->timestamps();
+			$table->integer('created_at', false, true)->default(0);
+			$table->integer('updated_at', false, true)->default(0);
 			$table->index(['user_id'], 'user_id');
 			$table->index(['name'], 'name');
 		});
@@ -71,7 +73,8 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->integer('praise_num', false, true)->default(0)->comment('点赞次数');
 			$table->tinyInteger('status', false, true)->default(0)->comment('状态0未审核1已审核2审核失败');
 			$table->string('reason', 255)->default('')->comment('驳回原因');
-			$table->timestamps();
+			$table->integer('created_at', false, true)->default(0);
+			$table->integer('updated_at', false, true)->default(0);
 			$table->index(['user_id'], 'user_id');
 			$table->index(['column_id'], 'column_id');
 			$table->index(['title'], 'title');
@@ -82,7 +85,8 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->bigIncrements('id');
 			$table->integer('tag_id', false, true)->default(0)->comment('专栏id');
 			$table->integer('article_id', false, true)->default(0)->comment('文章id');
-			$table->timestamps();
+			$table->integer('created_at', false, true)->default(0);
+			$table->integer('updated_at', false, true)->default(0);
 			$table->index(['article_id'], 'article_id');
 			$table->index(['tag_id'], 'tag_id');
 		});
@@ -92,7 +96,8 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->integer('article_id', false, true)->default(0)->comment('文章id');
 			$table->string('comment', 255)->default('')->comment('评论');
 			$table->tinyInteger('status', false, true)->default(0)->comment('状态0不显示1显示');
-			$table->timestamps();
+			$table->integer('created_at', false, true)->default(0);
+			$table->integer('updated_at', false, true)->default(0);
 			$table->index(['article_id'], 'article_id');
 			$table->index(['status'], 'status');
 		});
@@ -104,7 +109,8 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->integer('creater_id', false, true)->default(0)->comment('栏目作者id');
 			$table->tinyInteger('status', false, true)->default(2)->comment('状态1创建2订阅0取消订阅');
 			$table->integer('sub_time', false, true)->default(0)->comment('订阅时间');
-			$table->timestamps();
+			$table->integer('created_at', false, true)->default(0);
+			$table->integer('updated_at', false, true)->default(0);
 			$table->index(['user_id'], 'user_id');
 			$table->index(['creater_id'], 'creater_id');
 			$table->index(['status'], 'status');
@@ -117,7 +123,8 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->integer('user_id', false, true)->default(0)->comment('点赞用户id');
 			$table->tinyInteger('status', false, true)->default(2)->comment('状态0取消点赞1点赞');
 			$table->integer('praise_time', false, true)->default(0)->comment('点赞时间');
-			$table->timestamps();
+			$table->integer('created_at', false, true)->default(0);
+			$table->integer('updated_at', false, true)->default(0);
 			$table->index(['article_id'], 'article_id');
 			$table->index(['status'], 'status');
 		});
@@ -133,7 +140,8 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->integer('target_id', false, true)->default(0);
 			$table->string('target_url', 255)->default('');
 			$table->tinyInteger('is_read')->default(2)->comment('状态 1:已读, 2:未读');
-			$table->timestamps();
+			$table->integer('created_at', false, true)->default(0);
+			$table->integer('updated_at', false, true)->default(0);
 			$table->softDeletes();
 			$table->index(['to_id', 'is_read'], 'to_id');
 			$table->index(['to_id', 'created_at', 'is_read'], 'to_id_created_at');
@@ -146,7 +154,8 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->integerIncrements('id');
 			$table->string('title', 100)->default('')->comment('标题');
 			$table->text('content')->comment('内容');
-			$table->timestamps();
+			$table->integer('created_at', false, true)->default(0);
+			$table->integer('updated_at', false, true)->default(0);
 		});
 	}
 

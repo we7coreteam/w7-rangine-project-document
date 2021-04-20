@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
 use W7\App\Exception\ErrorHttpException;
 use W7\Core\Cache\Cache;
 use W7\Core\Database\LogicAbstract;
+use W7\Core\Database\ModelAbstract;
 
 class BaseLogic extends LogicAbstract
 {
@@ -24,25 +25,28 @@ class BaseLogic extends LogicAbstract
 
 	public function update($id, $data)
 	{
-		$row = $this->model::query()->find($id);
-		if ($row) {
-			$row->update($data);
-			return $row->toArray();
+		$model = $this->show($id);
+		if (!$model->update($data)) {
+			throw new ErrorHttpException('保存失败');
 		}
-		throw new ErrorHttpException('修改失败');
+		return $model;
 	}
 
 	public function store($data)
 	{
-		$row = $this->model::query()->create($data);
-		return $row->toArray();
+		/** @var ModelAbstract $model */
+		$model = new $this->model($data);
+		if (!$model->save()) {
+			throw new ErrorHttpException('创建失败');
+		}
+		return $model;
 	}
 
 	public function show($id)
 	{
 		$row = $this->model::query()->find($id);
 		if ($row) {
-			return $row->toArray();
+			return $row;
 		}
 		throw new ErrorHttpException('资源不存在');
 	}
