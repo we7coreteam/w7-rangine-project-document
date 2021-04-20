@@ -29,7 +29,7 @@ class ArticleController extends BaseController
 	];
 
 	/**
-	 * @api {get} /article 文章-列表
+	 * @api {get} /article 个人文章-列表
 	 * @apiName index
 	 * @apiGroup article
 	 *
@@ -51,6 +51,8 @@ class ArticleController extends BaseController
 	 * @apiSuccess {Number} status 状态0待审核1已审核2审核失败
 	 * @apiSuccess {Number} reason 驳回描述
 	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":{"current_page":1,"data":[{"id":4,"column_id":1,"tag_ids":["1","2"],"user_id":1,"title":"222","content":"111","comment_status":1,"is_reprint":1,"reprint_url":"","home_thumbnail":1,"read_num":0,"praise_num":0,"status":0,"reason":"","created_at":"1618912571","updated_at":"1618912571","status_text":"待审核"}],"first_page_url":"\/?=1","from":1,"last_page":4,"last_page_url":"\/?=4","next_page_url":"\/?=2","path":"\/","per_page":"1","prev_page_url":null,"to":1,"total":4},"message":"ok"}
 	 **/
 
 	public function index(Request $request)
@@ -58,12 +60,20 @@ class ArticleController extends BaseController
 		$page = $request->query('page', 1);
 		$limit = $request->query('limit', 20);
 		$condition = $this->block()->handleCondition($this->query);
+		$user = $request->getAttribute('user');
+		$condition['user_id'] = $user->id;
 		$result = $this->block()->lists($condition, $page, $limit);
 		return $this->data($result);
 	}
 
+	public function show(Request $request, $id)
+	{
+		$result = $this->block()->show($id);
+		return $this->data($result);
+	}
+
 	/**
-	 * @api {post} /article 文章-新增
+	 * @api {post} /article 个人文章-新增
 	 * @apiName store
 	 * @apiGroup article
 	 *
@@ -77,7 +87,7 @@ class ArticleController extends BaseController
 	 * @apiParam {Number} home_thumbnail 首页缩略图
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 * {"status":true,"code":200,"data":{"id":2,"user_id":2,"name":"栏目3","article_num":0,"read_num":0,"subscribe_num":0,"praise_num":0,"created_at":"1618906453","updated_at":"1618907138"},"message":"ok"}
+	 * {"status":true,"code":200,"data":{"id":1,"column_id":1,"tag_ids":["1"],"user_id":1,"title":"222","content":"111","comment_status":1,"is_reprint":1,"reprint_url":"2222","home_thumbnail":1,"read_num":0,"praise_num":0,"status":0,"reason":"","created_at":"1618911866","updated_at":"1618911866","status_text":"待审核"},"message":"ok"}
 	 */
 	public function store(Request $request)
 	{
@@ -113,7 +123,7 @@ class ArticleController extends BaseController
 	}
 
 	/**
-	 * @api {put} /article 文章-修改
+	 * @api {put} /article 个人文章-修改
 	 * @apiName store
 	 * @apiGroup article
 	 *
@@ -127,7 +137,7 @@ class ArticleController extends BaseController
 	 * @apiParam {Number} home_thumbnail 首页缩略图
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 * {"status":true,"code":200,"data":{"id":2,"user_id":2,"name":"栏目3","article_num":0,"read_num":0,"subscribe_num":0,"praise_num":0,"created_at":"1618906453","updated_at":"1618907138"},"message":"ok"}
+	 * {"status":true,"code":200,"data":{"id":1,"column_id":1,"tag_ids":["1"],"user_id":1,"title":"222","content":"111","comment_status":1,"is_reprint":1,"reprint_url":"2222","home_thumbnail":1,"read_num":0,"praise_num":0,"status":0,"reason":"","created_at":"1618911866","updated_at":"1618911866","status_text":"待审核"},"message":"ok"}
 	 */
 	public function update(Request $request, $id)
 	{
@@ -135,7 +145,7 @@ class ArticleController extends BaseController
 		$user = $request->getAttribute('user');
 		//必须本用户修改
 		$checkData['user_id'] = $user->id;
-
+		$data['user_id'] = $user->id;
 		$result = $this->block()->update($id, $data, $checkData);
 		return $this->data($result);
 	}
