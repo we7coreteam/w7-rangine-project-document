@@ -112,9 +112,9 @@ class BaseLogic extends LogicAbstract
 		return $condition;
 	}
 
-	public function update($id, $data)
+	public function update($id, $data, $checkData = [])
 	{
-		$model = $this->show($id);
+		$model = $this->show($id, $checkData);
 		if (!$model->update($data)) {
 			throw new ErrorHttpException('保存失败');
 		}
@@ -131,11 +131,19 @@ class BaseLogic extends LogicAbstract
 		return $model;
 	}
 
-	public function show($id)
+	public function show($id, $checkData = [])
 	{
-		$row = $this->model::query()->find($id);
-		if ($row) {
-			return $row;
+		$model = $this->model::query()->find($id);
+		if ($model) {
+			// 判断是不是当前用户的资源
+			if ($checkData) {
+				foreach ($checkData as $key => $val) {
+					if ($model->$key != $val) {
+						throw new ErrorHttpException('没有权限获取该资源');
+					}
+				}
+			}
+			return $model;
 		}
 		throw new ErrorHttpException('资源不存在');
 	}

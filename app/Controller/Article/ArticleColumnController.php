@@ -13,6 +13,7 @@
 namespace W7\App\Controller\Article;
 
 use W7\App\Controller\BaseController;
+use W7\App\Model\Entity\User;
 use W7\App\Model\Logic\Article\ArticleColumnLogic;
 use W7\Http\Message\Server\Request;
 
@@ -24,7 +25,7 @@ class ArticleColumnController extends BaseController
 	}
 
 	/**
-	 * @api {get} /articleColumn/info 文章栏目-详情
+	 * @api {get} /articleColumn/info 栏目-详情
 	 * @apiName info
 	 * @apiGroup articleColumn
 	 */
@@ -36,9 +37,23 @@ class ArticleColumnController extends BaseController
 	}
 
 	/**
-	 * @api {post} /articleColumn 文章栏目-编辑、新增
-	 * @apiName info
+	 * @api {post} /article/articleColumn 栏目-新增
+	 * @apiName store
 	 * @apiGroup articleColumn
+	 *
+	 * @apiParam {String} name 标签名称
+	 * @apiParam {Number} sort 排序
+	 * @apiParam {Number} status 状态
+	 *
+	 *     "user_id": 2,
+	"name": "标签33",
+	"article_num": 0,
+	"read_num": 0,
+	"subscribe_num": 0,
+	"praise_num": 0,
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":{"id":2,"user_id":2,"name":"栏目3","article_num":0,"read_num":0,"subscribe_num":0,"praise_num":0,"created_at":"1618906453","updated_at":"1618907138"},"message":"ok"}
 	 */
 	public function store(Request $request)
 	{
@@ -50,22 +65,23 @@ class ArticleColumnController extends BaseController
 
 		$user = $request->getAttribute('user');
 		$data['user_id'] = $user->id;
-		$result = $this->block()->store($data);
+		$result = $this->block()->add($data);
 		return $this->data($result);
 	}
 
 	public function update(Request $request, $id)
 	{
 		$data = $this->validate($request, [
-			'id' => 'required|integer',
 			'name' => 'required|string',
 		], [
 			'name.required' => '专栏名称不能为空',
 		]);
 
 		$user = $request->getAttribute('user');
-		$data['user_id'] = $user->id;
-		$result = $this->block()->update($id, $data, true);
+		//必须本用户修改
+		$checkData['user_id']=$user->id;
+
+		$result = $this->block()->update($id, $data,$checkData);
 		return $this->data($result);
 	}
 }

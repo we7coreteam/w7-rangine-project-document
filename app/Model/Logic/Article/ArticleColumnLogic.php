@@ -12,6 +12,7 @@
 
 namespace W7\App\Model\Logic\Article;
 
+use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Article\ArticleColumn;
 use W7\App\Model\Logic\BaseLogic;
 use W7\Core\Helper\Traiter\InstanceTraiter;
@@ -27,11 +28,11 @@ class ArticleColumnLogic extends BaseLogic
 		return ArticleColumn::query()->where('user_id', $userId)->orderBy('id')->first();
 	}
 
-	public function store($data)
+	public function add($data)
 	{
 		$row = ArticleColumn::query()->where('user_id', $data['user_id'])->first();
 		if ($row) {
-			throw new \RuntimeException('一个人只能新建一个栏目');
+			throw new ErrorHttpException('一个人只能新建一个栏目');
 		} else {
 			$saveData = [
 				'user_id' => $data['user_id'],
@@ -42,16 +43,16 @@ class ArticleColumnLogic extends BaseLogic
 		return $row;
 	}
 
-	public function update($id, $data, $checkAuth = false)
+	public function save($id, $data, $checkAuth = false)
 	{
 		$row = ArticleColumn::query()->find($id);
 		if ($row) {
 			if ($checkAuth && $data['user_id'] != $row->user_id) {
-				throw new \RuntimeException('栏目不存在');
+				throw new ErrorHttpException('栏目不存在');
 			}
 			$row->name = $data['name'];
 			$row->save();
 		}
-		throw new \RuntimeException('栏目不存在');
+		throw new ErrorHttpException('栏目不存在');
 	}
 }
