@@ -33,6 +33,30 @@ class Article extends BaseModel
 	const IS_REPRINT_NO = 0;//非转载
 	const IS_REPRINT_YES = 1;//转载
 
+	public function getContentAttribute($value)
+	{
+		$option = ['allowed_classes' => false];
+		return unserialize($value, $option);
+	}
+
+	public function setContentAttribute($value)
+	{
+		$this->attributes['content'] = serialize($value);
+	}
+
+	public function getTagIdsAttribute($value)
+	{
+		return explode(',', $value);
+	}
+
+	public function setTagIdsAttribute($value)
+	{
+		if (is_array($value)) {
+			$value = implode(',', $value);
+		}
+		$this->attributes['tag_ids'] = empty($value) ? '' : $value;
+	}
+
 	public static function getStatusLabels()
 	{
 		return [

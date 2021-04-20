@@ -28,12 +28,115 @@ class ArticleController extends BaseController
 		'like' => ['title']
 	];
 
+	/**
+	 * @api {get} /article 文章-列表
+	 * @apiName index
+	 * @apiGroup article
+	 *
+	 * @apiParam {Number} column_id 栏目名称
+	 * @apiParam {Number} status 状态0待审核1已审核2审核失败
+	 * @apiParam {String} title 文章标题
+	 *
+	 * @apiSuccess {Number} column_id 栏目ID
+	 * @apiSuccess {Array} tag_ids 标签列表
+	 * @apiSuccess {Number} user_id 用户ID
+	 * @apiSuccess {String} title 文章标题
+	 * @apiSuccess {String} content 文章内容
+	 * @apiSuccess {Number} comment_status 是否开启评论
+	 * @apiSuccess {Number} is_reprint 文章来源
+	 * @apiSuccess {Number} reprint_url 来源链接
+	 * @apiSuccess {Number} home_thumbnail 首页缩略图
+	 * @apiSuccess {Number} read_num 阅读数量
+	 * @apiSuccess {Number} praise_num 点赞数量
+	 * @apiSuccess {Number} status 状态0待审核1已审核2审核失败
+	 * @apiSuccess {Number} reason 驳回描述
+	 *
+	 **/
+
 	public function index(Request $request)
 	{
 		$page = $request->query('page', 1);
 		$limit = $request->query('limit', 20);
 		$condition = $this->block()->handleCondition($this->query);
 		$result = $this->block()->lists($condition, $page, $limit);
+		return $this->data($result);
+	}
+
+	/**
+	 * @api {post} /article 文章-新增
+	 * @apiName store
+	 * @apiGroup article
+	 *
+	 * @apiParam {Number} column_id 栏目ID
+	 * @apiParam {Array} tag_ids 标签列表
+	 * @apiParam {String} title 文章标题
+	 * @apiParam {String} content 文章内容
+	 * @apiParam {Number} comment_status 是否开启评论
+	 * @apiParam {Number} is_reprint 文章来源
+	 * @apiParam {Number} reprint_url 来源链接
+	 * @apiParam {Number} home_thumbnail 首页缩略图
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":{"id":2,"user_id":2,"name":"栏目3","article_num":0,"read_num":0,"subscribe_num":0,"praise_num":0,"created_at":"1618906453","updated_at":"1618907138"},"message":"ok"}
+	 */
+	public function store(Request $request)
+	{
+		$data = $this->handleValidate($request);
+
+		$user = $request->getAttribute('user');
+		$data['user_id'] = $user->id;
+		$result = $this->block()->store($data);
+		return $this->data($result);
+	}
+
+	public function handleValidate(Request $request)
+	{
+		return $this->validate($request, [
+			'column_id' => 'required|integer|gt:0',
+			'tag_ids' => 'required|array|max:5',
+			'title' => 'required|string',
+			'content' => 'required|string',
+			'comment_status' => 'required|in:0,1',
+			'is_reprint' => 'required|in:0,1',
+			'reprint_url' => 'string|url',
+			'home_thumbnail' => 'required|in:0,1',
+		], [
+			'column_id' => '栏目',
+			'tag_ids' => '标签',
+			'title' => '标题',
+			'content' => '内容',
+			'comment_status' => '评论状态',
+			'is_reprint' => '文章来源',
+			'reprint_url' => '来源地址',
+			'home_thumbnail' => '首页缩略图',
+		]);
+	}
+
+	/**
+	 * @api {put} /article 文章-修改
+	 * @apiName store
+	 * @apiGroup article
+	 *
+	 * @apiParam {Number} column_id 栏目ID
+	 * @apiParam {Array} tag_ids 标签列表
+	 * @apiParam {String} title 文章标题
+	 * @apiParam {String} content 文章内容
+	 * @apiParam {Number} comment_status 是否开启评论
+	 * @apiParam {Number} is_reprint 文章来源
+	 * @apiParam {Number} reprint_url 来源链接
+	 * @apiParam {Number} home_thumbnail 首页缩略图
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":{"id":2,"user_id":2,"name":"栏目3","article_num":0,"read_num":0,"subscribe_num":0,"praise_num":0,"created_at":"1618906453","updated_at":"1618907138"},"message":"ok"}
+	 */
+	public function update(Request $request, $id)
+	{
+		$data = $this->handleValidate($request);
+		$user = $request->getAttribute('user');
+		//必须本用户修改
+		$checkData['user_id'] = $user->id;
+
+		$result = $this->block()->update($id, $data, $checkData);
 		return $this->data($result);
 	}
 }
