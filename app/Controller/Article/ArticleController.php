@@ -23,8 +23,17 @@ class ArticleController extends BaseController
 		return new ArticleLogic();
 	}
 
+	protected $query = [
+		'=' => ['status', 'column_id'],
+		'like' => ['title']
+	];
+
 	public function index(Request $request)
 	{
-		$this->block()->index();
+		$page = $request->query('page', 1);
+		$limit = $request->query('limit', 20);
+		$condition = $this->block()->handleCondition($this->query);
+		$result = $this->block()->lists($condition, $page, $limit);
+		return $this->data($result);
 	}
 }
