@@ -43,7 +43,7 @@ class ArticleTagConfigController extends BaseController
 	 * @apiSuccess {Number} status 状态
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 * {"status":true,"code":200,"data":{"name":"标签3","updated_at":"1618902333","created_at":"1618902333","id":3},"message":"ok"}
+	 * {"status":true,"code":200,"data":{"current_page":1,"data":[{"id":1,"name":"标签1","sort":0,"status":1,"created_at":"1618903332","updated_at":"1618903332"}],"first_page_url":"\/?=1","from":1,"last_page":1,"last_page_url":"\/?=1","next_page_url":null,"path":"\/","per_page":20,"prev_page_url":null,"to":1,"total":1},"message":"ok"}
 	 */
 	public function index(Request $request)
 	{
