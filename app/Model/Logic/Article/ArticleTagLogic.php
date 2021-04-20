@@ -12,10 +12,13 @@
 
 namespace W7\App\Model\Logic\Article;
 
+use W7\App\Model\Entity\Article\ArticleTag;
 use W7\App\Model\Logic\BaseLogic;
 use W7\Core\Helper\Traiter\InstanceTraiter;
 
 class ArticleTagLogic extends BaseLogic
 {
 	use InstanceTraiter;
+
+	protected $model = ArticleTag::class;
 }

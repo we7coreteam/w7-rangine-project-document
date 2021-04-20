@@ -12,10 +12,13 @@
 
 namespace W7\App\Model\Logic\Article;
 
+use W7\App\Model\Entity\Article\ArticleComment;
 use W7\App\Model\Logic\BaseLogic;
 use W7\Core\Helper\Traiter\InstanceTraiter;
 
 class ArticleCommentLogic extends BaseLogic
 {
 	use InstanceTraiter;
+
+	protected $model = ArticleComment::class;
 }

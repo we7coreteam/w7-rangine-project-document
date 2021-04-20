@@ -37,7 +37,9 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->bigIncrements('id');
 			$table->string('name', 255)->default('')->comment('标签名称');
 			$table->tinyInteger('sort', false, true)->default(0)->comment('排序');
+			$table->tinyInteger('status', false, true)->default(1)->comment('状态0不可用1可用');
 			$table->timestamps();
+			$table->index(['status'], 'status');
 			$table->index(['sort'], 'sort');
 		});
 		//文章专栏

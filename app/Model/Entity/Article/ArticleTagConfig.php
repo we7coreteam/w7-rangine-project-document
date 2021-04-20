@@ -16,8 +16,8 @@ use W7\App\Model\Entity\BaseModel;
 
 class ArticleTagConfig extends BaseModel
 {
-	protected $table = 'article_tag';
+	protected $table = 'article_tag_config';
 	protected $fillable = [
-		'name', 'sort'
+		'name', 'sort', 'status'
 	];
 }

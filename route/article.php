@@ -11,7 +11,12 @@
  */
 
 irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['prefix' => '/article'], function (\W7\Core\Route\Route $route) {
+	//文章专栏
 	$route->get('/articleColumn/info', 'Article\ArticleColumnController@info');
 	$route->post('/articleColumn', 'Article\ArticleColumnController@store');
 	$route->put('/articleColumn', 'Article\ArticleColumnController@update');
+
+	$route->get('/articleTagConfig', 'Article\ArticleColumnController@index');
+	$route->post('/articleTagConfig', 'Article\ArticleColumnController@store');
+	$route->put('/articleTagConfig', 'Article\ArticleColumnController@update');
 });

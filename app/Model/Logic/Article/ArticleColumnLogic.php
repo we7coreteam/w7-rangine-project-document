@@ -20,6 +20,8 @@ class ArticleColumnLogic extends BaseLogic
 {
 	use InstanceTraiter;
 
+	protected $model = ArticleColumn::class;
+
 	public function info($userId)
 	{
 		return ArticleColumn::query()->where('user_id', $userId)->orderBy('id')->first();

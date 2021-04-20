@@ -12,12 +12,15 @@
 
 namespace W7\App\Model\Logic\Article;
 
+use W7\App\Model\Entity\Article\Article;
 use W7\App\Model\Logic\BaseLogic;
 use W7\Core\Helper\Traiter\InstanceTraiter;
 
 class ArticleLogic extends BaseLogic
 {
 	use InstanceTraiter;
+
+	protected $model = Article::class;
 
 	public function index(){
 
