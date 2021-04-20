@@ -29,7 +29,8 @@ irouter()->middleware(['CheckAdminMiddleware'])->group(['prefix' => '/admin/arti
 	$route->put('/articleTagConfig/{id:\d+}', 'Admin\Article\ArticleTagConfigController@update');
 
 	//文章专栏
-	$route->get('/articleColumn/info', 'Admin\Article\ArticleColumnController@info');
+	$route->get('/articleColumn', 'Admin\Article\ArticleColumnController@index');
+	$route->get('/articleColumn/{id:\d+}', 'Admin\Article\ArticleColumnController@show');
 	$route->post('/articleColumn', 'Admin\Article\ArticleColumnController@store');
 	$route->put('/articleColumn/{id:\d+}', 'Admin\Article\ArticleColumnController@update');
 });

@@ -10,7 +10,7 @@
  * visited https://www.w7.cc for more details
  */
 
-namespace W7\App\Controller\Article;
+namespace W7\App\Controller\Admin\Article;
 
 use W7\App\Controller\BaseController;
 use W7\App\Model\Entity\User;
@@ -24,10 +24,14 @@ class ArticleColumnController extends BaseController
 		return new ArticleColumnLogic();
 	}
 
+	protected $query = [
+		'like' => ['name']
+	];
+
 	/**
-	 * @api {get} /article/articleColumn/info 栏目-详情
-	 * @apiName info
-	 * @apiGroup articleColumn
+	 * @api {get} /admin/article/articleColumn 栏目-列表
+	 * @apiName index
+	 * @apiGroup articleColumnAdmin
 	 *
 	 * @apiParam {String} name 栏目名称
 	 * @apiParam {Number} article_num 排序
@@ -38,17 +42,25 @@ class ArticleColumnController extends BaseController
 	 * @apiSuccessExample {json} Success-Response:
 	 * {"status":true,"code":200,"data":{"id":2,"user_id":2,"name":"栏目3","article_num":0,"read_num":0,"subscribe_num":0,"praise_num":0,"created_at":"1618906453","updated_at":"1618907138"},"message":"ok"}
 	 */
-	public function info(Request $request)
+	public function index(Request $request)
 	{
-		$user = $request->getAttribute('user');
-		$result = $this->block()->info($user->id);
+		$page = $request->query('page', 1);
+		$limit = $request->query('limit', 20);
+		$condition = $this->block()->handleCondition($this->query);
+		$result = $this->block()->lists($condition, $page, $limit);
+		return $this->data($result);
+	}
+
+	public function show(Request $request, $id)
+	{
+		$result = $this->block()->show($id);
 		return $this->data($result);
 	}
 
 	/**
-	 * @api {post} /article/articleColumn 栏目-新增
+	 * @api {post} /admin/article/articleColumn 栏目-新增
 	 * @apiName store
-	 * @apiGroup articleColumn
+	 * @apiGroup articleColumnAdmin
 	 *
 	 * @apiParam {String} name 栏目名称
 	 * @apiParam {Number} article_num 排序
@@ -74,9 +86,9 @@ class ArticleColumnController extends BaseController
 	}
 
 	/**
-	 * @api {put} /article/articleColumn 栏目-修改
+	 * @api {put} /admin/article/articleColumn 栏目-修改
 	 * @apiName store
-	 * @apiGroup articleColumn
+	 * @apiGroup articleColumnAdmin
 	 *
 	 * @apiParam {String} name 栏目名称
 	 * @apiParam {Number} article_num 排序
