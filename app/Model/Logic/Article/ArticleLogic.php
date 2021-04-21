@@ -64,7 +64,7 @@ class ArticleLogic extends BaseLogic
 		throw new ErrorHttpException('审核失败');
 	}
 
-	public function reject($id)
+	public function reject($id, $reason)
 	{
 		$row = Article::query()->find($id);
 		if ($row) {
@@ -74,11 +74,12 @@ class ArticleLogic extends BaseLogic
 					throw new ErrorHttpException('当前状态不是待审核状态');
 				}
 				$row->status = Article::STATUS_FAIL;
+				$row->reason = $reason;
 				$row->save();
 				//更新栏目统计信息
 				(new ArticleColumnLogic())->retry($row->column_id);
 				//发送消息
-				(new RemindLogic())->add(0, $row->user_id, '您的文章审核未通过', Message::REMIND_ARTICLE, $row->id);
+				(new RemindLogic())->add(0, $row->user_id, '您的文章审核未通过，原因：' . $reason, Message::REMIND_ARTICLE, $row->id);
 				idb()->commit();
 				return $row;
 			} catch (\Exception $e) {

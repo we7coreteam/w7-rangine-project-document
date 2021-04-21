@@ -103,7 +103,7 @@ class ArticleController extends BaseController
 			'id' => '文章ID',
 			'reason' => '驳回原因',
 		]);
-		$result = $this->block()->reject($data['id']);
+		$result = $this->block()->reject($data['id'], $data['reason']);
 		return $this->data($result);
 	}
 }
