@@ -91,6 +91,7 @@ class MessageLogic extends BaseLogic
 		// 系统通知
 		$this->model::query()->whereIn('id', $ids)->where('to_id', $userId)
 			->whereIn('type', [Message\Message::TYPE_REMIND])->update(['is_read' => Message\Message::IS_READ_Y]);
+		return true;
 	}
 
 	public function deleteSelection($userId, array $ids)
@@ -98,5 +99,6 @@ class MessageLogic extends BaseLogic
 		// 系统通知
 		$this->model::query()->whereIn('id', $ids)->where('to_id', $userId)
 			->whereIn('type', [Message\Message::TYPE_REMIND])->delete();
+		return true;
 	}
 }
