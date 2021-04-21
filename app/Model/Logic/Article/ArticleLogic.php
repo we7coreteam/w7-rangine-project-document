@@ -42,7 +42,7 @@ class ArticleLogic extends BaseLogic
 		$data = $this->checkPost($data);
 		$row = parent::store($data);
 		(new ArticleTagLogic())->saveTag($row);
-		//更新统计信息
+		//更新栏目统计信息
 		(new ArticleColumnLogic())->retry($row->column_id);
 		return $row;
 	}
@@ -66,10 +66,16 @@ class ArticleLogic extends BaseLogic
 
 	public function destroy($id, $checkData = [])
 	{
-		$row = parent::destroy($id, $checkData);
-		//更新统计信息
-		(new ArticleColumnLogic())->retry($row->column_id);
-		return $row;
+		try {
+			$model = $this->show($id, '', $checkData);
+			$columnId = $model->column_id;
+			$model->delete();
+			//更新栏目统计信息
+			(new ArticleColumnLogic())->retry($columnId);
+			return true;
+		} catch (\Exception $e) {
+			throw new ErrorHttpException($e->getMessage());
+		}
 	}
 
 	public function update($id, $data, $checkData = [])
@@ -77,7 +83,7 @@ class ArticleLogic extends BaseLogic
 		$data = $this->checkPost($data);
 		$row = parent::update($id, $data, $checkData);
 		(new ArticleTagLogic())->saveTag($row);
-		//更新统计信息
+		//更新栏目统计信息
 		(new ArticleColumnLogic())->retry($row->column_id);
 		return $row;
 	}
