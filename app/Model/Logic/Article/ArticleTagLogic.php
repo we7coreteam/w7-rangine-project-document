@@ -21,4 +21,39 @@ class ArticleTagLogic extends BaseLogic
 	use InstanceTraiter;
 
 	protected $model = ArticleTag::class;
+
+	public function saveTag($article)
+	{
+		$old = ArticleTag::query()->where('article_id', $article->id)->get()->toArray();
+		$oldTagIds = array_column($old, 'tag_id');
+		$insert = [];
+		$update = [];
+		$tagIds = $article->tag_ids;
+		if ($tagIds) {
+			foreach ($tagIds as $key => $val) {
+				if (in_array($val, $oldTagIds)) {
+					$update[$val] = [
+						'tag_id' => $val,
+						'article_id' => $article->id
+					];
+				} else {
+					$insert[] = [
+						'tag_id' => $val,
+						'article_id' => $article->id
+					];
+				}
+			}
+		}
+		if ($insert) {
+			ArticleTag::query()->insert($insert);
+		}
+		// 删除已有的
+		$removeTagIds = array_diff($oldTagIds, array_keys($update));
+
+		if ($removeTagIds) {
+			ArticleTag::query()->where('article_id', $article->id)->whereIn('tag_id', $removeTagIds)->delete();
+		}
+
+		return true;
+	}
 }

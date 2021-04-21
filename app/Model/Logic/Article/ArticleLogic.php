@@ -37,6 +37,7 @@ class ArticleLogic extends BaseLogic
 	{
 		$data = $this->checkPost($data);
 		$row = parent::store($data);
+		(new ArticleTagLogic())->saveTag($row);
 		(new ArticleColumnLogic())->retry($row->column_id);
 		return $row;
 	}
@@ -62,6 +63,7 @@ class ArticleLogic extends BaseLogic
 	{
 		$data = $this->checkPost($data);
 		$row = parent::update($id, $data, $checkData);
+		(new ArticleTagLogic())->saveTag($row);
 		(new ArticleColumnLogic())->retry($row->column_id);
 		return $row;
 	}
