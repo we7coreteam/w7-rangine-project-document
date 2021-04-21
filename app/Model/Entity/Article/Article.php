@@ -13,6 +13,7 @@
 namespace W7\App\Model\Entity\Article;
 
 use W7\App\Model\Entity\BaseModel;
+use W7\App\Model\Entity\User;
 
 class Article extends BaseModel
 {
@@ -74,5 +75,10 @@ class Article extends BaseModel
 	public function tags()
 	{
 		return $this->hasMany(ArticleTag::class, 'article_id', 'id')->with('tagConfig');
+	}
+
+	public function user()
+	{
+		return $this->hasOne(User::class, 'id', 'user_id');
 	}
 }
