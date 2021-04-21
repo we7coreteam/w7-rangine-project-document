@@ -30,9 +30,9 @@ class ArticleController extends BaseController
 	];
 
 	/**
-	 * @api {get} /admin/article 全部文章-列表
+	 * @api {get} /admin/article 管理员-全部文章-列表
 	 * @apiName index
-	 * @apiGroup article
+	 * @apiGroup articleAdmin
 	 *
 	 * @apiParam {Number} column_id 栏目名称
 	 * @apiParam {String} title 文章标题
@@ -60,7 +60,7 @@ class ArticleController extends BaseController
 		$page = $request->query('page', 1);
 		$limit = $request->query('limit', 20);
 		$condition = $this->block()->handleCondition($this->query);
-		$result = $this->block()->lists($condition, $page, $limit);
+		$result = $this->block()->lists($condition, $page, $limit, 'tags');
 		return $this->data($result);
 	}
 }
