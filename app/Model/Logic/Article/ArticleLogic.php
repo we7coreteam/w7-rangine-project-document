@@ -33,7 +33,7 @@ class ArticleLogic extends BaseLogic
 			$row = Article::query()->find($id);
 		}
 		$row->increment('read_num', $num);
-		(new ArticleColumnLogic())->incrementNum($row->column_id, 'read_num', $num);
+		(new ArticleColumnLogic())->incrementNum($row, 'read_num', $num);
 		return $row;
 	}
 

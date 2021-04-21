@@ -28,10 +28,11 @@ class ArticleColumnLogic extends BaseLogic
 	{
 		$row = ArticleColumn::query()->find($id);
 		if ($row) {
-			//重算文章、点赞、阅读数量
+			//重算文章、点赞、阅读数量-只统计审核通过的
 			$sum = Article::query()
 				->selectRaw('count(1) sum,sum(read_num) as sum_read_num,sum(praise_num) as sum_praise_num')
 				->where('column_id', $id)
+				->where('status', Article::STATUS_SUCCESS)
 				->first();
 			if ($sum) {
 				$row->article_num = $sum->sum;
@@ -49,12 +50,15 @@ class ArticleColumnLogic extends BaseLogic
 		return false;
 	}
 
-	public function incrementNum($id, $field, $num = 1)
+	public function incrementNum($article, $field, $num = 1)
 	{
-		$row = ArticleColumn::query()->find($id);
-		if ($row) {
-			$row->increment($field, $num);
-			return $row;
+		//只统计审核通过的
+		if ($article->status = Article::STATUS_SUCCESS) {
+			$row = ArticleColumn::query()->find($article->column_id);
+			if ($row) {
+				$row->increment($field, $num);
+				return $row;
+			}
 		}
 		return false;
 	}
