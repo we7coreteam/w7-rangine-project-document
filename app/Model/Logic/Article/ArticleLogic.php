@@ -64,6 +64,14 @@ class ArticleLogic extends BaseLogic
 		return $data;
 	}
 
+	public function destroy($id, $checkData = [])
+	{
+		$row = parent::destroy($id, $checkData);
+		//更新统计信息
+		(new ArticleColumnLogic())->retry($row->column_id);
+		return $row;
+	}
+
 	public function update($id, $data, $checkData = [])
 	{
 		$data = $this->checkPost($data);

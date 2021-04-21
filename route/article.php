@@ -26,4 +26,5 @@ irouter()->middleware(['CheckAuthMiddleware'])->group([], function (\W7\Core\Rou
 	$route->get('/article/{id:\d+}', 'Article\ArticleController@show');
 	$route->post('/article', 'Article\ArticleController@store');
 	$route->put('/article/{id:\d+}', 'Article\ArticleController@update');
+	$route->delete('/article/{id:\d+}', 'Article\ArticleController@destroy');
 });

@@ -216,6 +216,12 @@ class ArticleController extends BaseController
 		return $this->data($result);
 	}
 
+	/**
+	 * @api {delete} /article/:id 个人文章-删除
+	 * @apiName destroy
+	 * @apiGroup article
+	 *
+	 */
 	public function destroy(Request $request, $id)
 	{
 		$user = $request->getAttribute('user');
