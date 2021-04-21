@@ -23,6 +23,10 @@ class ArticleColumnLogic extends BaseLogic
 
 	protected $model = ArticleColumn::class;
 
+	public function retry($id){
+		//重算文章、点赞、阅读数量
+	}
+
 	public function incrementNum($id, $field, $num = 1)
 	{
 		$row = ArticleColumn::query()->find($id);

@@ -36,7 +36,9 @@ class ArticleLogic extends BaseLogic
 	public function store($data)
 	{
 		$data = $this->checkPost($data);
-		return parent::store($data);
+		$row = parent::store($data);
+		(new ArticleColumnLogic())->retry($row->column_id);
+		return $row;
 	}
 
 	public function checkPost($data)
@@ -59,6 +61,8 @@ class ArticleLogic extends BaseLogic
 	public function update($id, $data, $checkData = [])
 	{
 		$data = $this->checkPost($data);
-		return parent::update($id, $data, $checkData);
+		$row = parent::update($id, $data, $checkData);
+		(new ArticleColumnLogic())->retry($row->column_id);
+		return $row;
 	}
 }
