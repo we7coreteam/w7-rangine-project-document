@@ -104,10 +104,39 @@ class ArticleController extends BaseController
 		return $this->data($result);
 	}
 
+	/**
+	 * @api {get} /article/:id 全部文章-详情
+	 * @apiName show
+	 * @apiGroup article
+	 *
+	 * @apiParam {Number} is_read 增加阅读次数
+	 *
+	 * @apiSuccess {Number} column_id 栏目ID
+	 * @apiSuccess {Array} tag_ids 标签列表
+	 * @apiSuccess {Number} user_id 用户ID
+	 * @apiSuccess {String} title 文章标题
+	 * @apiSuccess {String} content 文章内容
+	 * @apiSuccess {Number} comment_status 是否开启评论
+	 * @apiSuccess {Number} is_reprint 文章来源
+	 * @apiSuccess {Number} reprint_url 来源链接
+	 * @apiSuccess {Number} home_thumbnail 首页缩略图
+	 * @apiSuccess {Number} read_num 阅读数量
+	 * @apiSuccess {Number} praise_num 点赞数量
+	 * @apiSuccess {Number} status 状态0待审核1已审核2审核失败
+	 * @apiSuccess {Number} reason 驳回描述
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":{"id":1,"column_id":1,"tag_ids":["1"],"user_id":1,"title":"222","content":"111","comment_status":1,"is_reprint":1,"reprint_url":"2222","home_thumbnail":1,"read_num":0,"praise_num":0,"status":0,"reason":"","created_at":"1618911866","updated_at":"1618911866","status_text":"待审核"},"message":"ok"}
+	 **/
 	public function show(Request $request, $id)
 	{
-		$result = $this->block()->show($id);
-		return $this->data($result);
+		$isRead = $request->input('is_read', 0);
+		if ($isRead) {
+			$row = $this->block()->read($id);
+		} else {
+			$row = $this->block()->show($id);
+		}
+		return $this->data($row);
 	}
 
 	/**

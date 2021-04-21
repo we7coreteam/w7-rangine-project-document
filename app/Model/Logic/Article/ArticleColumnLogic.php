@@ -23,6 +23,16 @@ class ArticleColumnLogic extends BaseLogic
 
 	protected $model = ArticleColumn::class;
 
+	public function incrementNum($id, $field, $num = 1)
+	{
+		$row = ArticleColumn::query()->find($id);
+		if ($row) {
+			$row->increment($field, $num);
+			return $row;
+		}
+		return false;
+	}
+
 	public function info($userId)
 	{
 		return ArticleColumn::query()->where('user_id', $userId)->orderBy('id')->first();
