@@ -48,6 +48,7 @@ class ArticleLogic extends BaseLogic
 			$row->save();
 			//更新栏目统计信息
 			(new ArticleColumnLogic())->retry($row->column_id);
+			return $row;
 		}
 		throw new ErrorHttpException('审核失败');
 	}
@@ -63,6 +64,7 @@ class ArticleLogic extends BaseLogic
 			$row->save();
 			//更新栏目统计信息
 			(new ArticleColumnLogic())->retry($row->column_id);
+			return $row;
 		}
 		throw new ErrorHttpException('驳回失败');
 	}
@@ -110,8 +112,11 @@ class ArticleLogic extends BaseLogic
 
 	public function update($id, $data, $checkData = [])
 	{
-		$data = $this->checkPost($data);
 		$row = $this->show($id, '', $checkData);
+		$data['user_id'] = $row->user_id;
+		$data = $this->checkPost($data);
+
+		//审核失败变成待审核
 		if ($row->status == Article::STATUS_FAIL) {
 			$data['status'] = Article::STATUS_CREATE;
 		}

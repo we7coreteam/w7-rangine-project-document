@@ -211,7 +211,6 @@ class ArticleController extends BaseController
 		$user = $request->getAttribute('user');
 		//必须本用户修改
 		$checkData['user_id'] = $user->id;
-		$data['user_id'] = $user->id;
 		$result = $this->block()->update($id, $data, $checkData);
 		return $this->data($result);
 	}

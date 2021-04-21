@@ -12,4 +12,10 @@ irouter()->middleware(['CheckAdminMiddleware'])->group(['prefix' => '/admin'], f
 	$route->get('/article/articleColumn/{id:\d+}', 'Admin\Article\ArticleColumnController@show');
 	$route->post('/article/articleColumn', 'Admin\Article\ArticleColumnController@store');
 	$route->put('/article/articleColumn/{id:\d+}', 'Admin\Article\ArticleColumnController@update');
+
+	//文章
+	$route->get('/article', 'Admin\Article\ArticleController@index');
+	$route->get('/article/{id:\d+}', 'Admin\Article\ArticleController@show');
+	$route->post('/article/success', 'Admin\Article\ArticleController@success');
+	$route->post('/article/reject', 'Admin\Article\ArticleController@reject');
 });
