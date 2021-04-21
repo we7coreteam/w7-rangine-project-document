@@ -37,6 +37,36 @@ class ArticleLogic extends BaseLogic
 		return $row;
 	}
 
+	public function success($id)
+	{
+		$row = Article::query()->find($id);
+		if ($row) {
+			if ($row->status != Article::STATUS_CREATE) {
+				throw new ErrorHttpException('当前状态不是待审核状态');
+			}
+			$row->status = Article::STATUS_SUCCESS;
+			$row->save();
+			//更新栏目统计信息
+			(new ArticleColumnLogic())->retry($row->column_id);
+		}
+		throw new ErrorHttpException('审核失败');
+	}
+
+	public function reject($id)
+	{
+		$row = Article::query()->find($id);
+		if ($row) {
+			if ($row->status != Article::STATUS_CREATE) {
+				throw new ErrorHttpException('当前状态不是待审核状态');
+			}
+			$row->status = Article::STATUS_FAIL;
+			$row->save();
+			//更新栏目统计信息
+			(new ArticleColumnLogic())->retry($row->column_id);
+		}
+		throw new ErrorHttpException('驳回失败');
+	}
+
 	public function store($data)
 	{
 		$data = $this->checkPost($data);
@@ -81,7 +111,13 @@ class ArticleLogic extends BaseLogic
 	public function update($id, $data, $checkData = [])
 	{
 		$data = $this->checkPost($data);
-		$row = parent::update($id, $data, $checkData);
+		$row = $this->show($id, '', $checkData);
+		if ($row->status == Article::STATUS_FAIL) {
+			$data['status'] = Article::STATUS_CREATE;
+		}
+		if (!$row->update($data)) {
+			throw new ErrorHttpException('保存失败');
+		}
 		(new ArticleTagLogic())->saveTag($row);
 		//更新栏目统计信息
 		(new ArticleColumnLogic())->retry($row->column_id);

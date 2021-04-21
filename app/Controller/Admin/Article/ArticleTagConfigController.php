@@ -81,7 +81,7 @@ class ArticleTagConfigController extends BaseController
 			'sort' => 'integer',
 			'status' => 'integer',
 		], [
-			'name.required' => '标签名称不能为空',
+			'name' => '标签名称',
 			'sort' => '排序',
 			'status' => '状态',
 		]);
@@ -112,7 +112,7 @@ class ArticleTagConfigController extends BaseController
 			'sort' => 'integer',
 			'status' => 'integer',
 		], [
-			'name.required' => '标签名称不能为空',
+			'name' => '标签名称',
 			'sort' => '排序',
 			'status' => '状态',
 		]);

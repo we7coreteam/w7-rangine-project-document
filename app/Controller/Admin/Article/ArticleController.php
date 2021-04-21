@@ -63,4 +63,28 @@ class ArticleController extends BaseController
 		$result = $this->block()->lists($condition, $page, $limit, 'tags');
 		return $this->data($result);
 	}
+
+	public function success(Request $request)
+	{
+		$data = $this->validate($request, [
+			'id' => 'required|integer',
+		], [
+			'id' => '文章ID',
+		]);
+		$result = $this->block()->success($data['id']);
+		return $this->data($result);
+	}
+
+	public function reject(Request $request)
+	{
+		$data = $this->validate($request, [
+			'id' => 'required|integer',
+			'reason' => 'required|string',
+		], [
+			'id' => '文章ID',
+			'reason' => '驳回原因',
+		]);
+		$result = $this->block()->reject($data['id']);
+		return $this->data($result);
+	}
 }
