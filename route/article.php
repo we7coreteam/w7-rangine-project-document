@@ -21,6 +21,12 @@ irouter()->middleware(['CheckAuthMiddleware'])->group([], function (\W7\Core\Rou
 	$route->post('/article/articleColumn', 'Article\ArticleColumnController@store');
 	$route->put('/article/articleColumn/{id:\d+}', 'Article\ArticleColumnController@update');
 
+	//专栏关注
+	$route->get('/article/articleColumnSub', 'Article\ArticleColumnSubController@index');
+	$route->post('/article/articleColumnSub/info', 'Article\ArticleColumnSubController@info');
+	$route->post('/article/articleColumnSub/sub', 'Article\ArticleColumnSubController@sub');
+	$route->post('/article/articleColumnSub/unSub', 'Article\ArticleColumnSubController@unSub');
+
 	//文章
 	$route->get('/article', 'Article\ArticleController@index');
 	$route->get('/article/indexMy', 'Article\ArticleController@indexMy');
@@ -28,5 +34,4 @@ irouter()->middleware(['CheckAuthMiddleware'])->group([], function (\W7\Core\Rou
 	$route->post('/article', 'Article\ArticleController@store');
 	$route->put('/article/{id:\d+}', 'Article\ArticleController@update');
 	$route->delete('/article/{id:\d+}', 'Article\ArticleController@destroy');
-
 });

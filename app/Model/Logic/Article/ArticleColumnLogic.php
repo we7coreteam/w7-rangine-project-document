@@ -15,6 +15,7 @@ namespace W7\App\Model\Logic\Article;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Article\Article;
 use W7\App\Model\Entity\Article\ArticleColumn;
+use W7\App\Model\Entity\Article\ArticleColumnSub;
 use W7\App\Model\Logic\BaseLogic;
 use W7\Core\Helper\Traiter\InstanceTraiter;
 
@@ -68,13 +69,17 @@ class ArticleColumnLogic extends BaseLogic
 	//单条减少
 	public function decrementNum($article, $field, $num = 1)
 	{
-		//只统计审核通过的
-		if ($article->status = Article::STATUS_SUCCESS) {
-			$row = ArticleColumn::query()->find($article->column_id);
-			if ($row) {
-				$row->decrement($field, $num);
-				return $row;
+		try {
+			//只统计审核通过的
+			if ($article->status = Article::STATUS_SUCCESS) {
+				$row = ArticleColumn::query()->find($article->column_id);
+				if ($row) {
+					$row->decrement($field, $num);
+					return $row;
+				}
 			}
+		} catch (\Exception $e) {
+			//减少<0兼容
 		}
 		return false;
 	}
@@ -90,11 +95,27 @@ class ArticleColumnLogic extends BaseLogic
 		if ($row) {
 			throw new ErrorHttpException('一个人只能新建一个栏目');
 		} else {
-			$saveData = [
-				'user_id' => $data['user_id'],
-				'name' => $data['name']
-			];
-			$row = ArticleColumn::query()->create($saveData);
+			try {
+				idb()->beginTransaction();
+				$saveData = [
+					'user_id' => $data['user_id'],
+					'name' => $data['name']
+				];
+				$row = ArticleColumn::query()->create($saveData);
+				//专栏关注
+				$subData = [
+					'column_id' => $row->id,
+					'user_id' => $row->user_id,
+					'creater_id' => $row->user_id,
+					'status' => ArticleColumnSub::STATUS_CREATER,
+					'sub_time' => time()
+				];
+				ArticleColumnSub::query()->create($subData);
+				idb()->commit();
+			} catch (\Exception $e) {
+				idb()->rollBack();
+				throw new ErrorHttpException($e->getMessage());
+			}
 		}
 		return $row;
 	}
