@@ -31,43 +31,65 @@ class ArticleColumnSubLogic extends BaseLogic
 
 	public function sub($columnId, $uid)
 	{
-		$row = ArticleColumnSub::query()->where('column_id', $columnId)->where('user_id', $uid)->first();
-		if ($row) {
-			if (in_array($row->status, [ArticleColumnSub::STATUS_CREATER, ArticleColumnSub::STATUS_SUB])) {
-				throw new ErrorHttpException('已关注');
-			}
-			$row->status = ArticleColumnSub::STATUS_SUB;
-			$row->save();
-		} else {
-			$column = ArticleColumn::query()->find($columnId);
-			if (!$column) {
-				throw new ErrorHttpException('专栏不存在');
-			}
-			$subData = [
-				'column_id' => $column->id,
-				'user_id' => $uid,
-				'creater_id' => $column->user_id,
-				'status' => ArticleColumnSub::STATUS_SUB,
-				'sub_time' => time()
-			];
-			$row = ArticleColumnSub::query()->create($subData);
+		$column = ArticleColumn::query()->find($columnId);
+		if (!$column) {
+			throw new ErrorHttpException('专栏不存在');
 		}
-		return $row;
+		try {
+			idb()->beginTransaction();
+			$row = ArticleColumnSub::query()->where('column_id', $columnId)->where('user_id', $uid)->first();
+			if ($row) {
+				if (in_array($row->status, [ArticleColumnSub::STATUS_CREATER, ArticleColumnSub::STATUS_SUB])) {
+					throw new ErrorHttpException('已关注');
+				}
+				$row->status = ArticleColumnSub::STATUS_SUB;
+				$row->save();
+			} else {
+				$subData = [
+					'column_id' => $column->id,
+					'user_id' => $uid,
+					'creater_id' => $column->user_id,
+					'status' => ArticleColumnSub::STATUS_SUB,
+					'sub_time' => time()
+				];
+				$row = ArticleColumnSub::query()->create($subData);
+			}
+			$column->increment('subscribe_num', 1);
+			$column->save();
+			idb()->commit();
+			return 'success';
+		} catch (\Exception $e) {
+			idb()->rollBack();
+			throw new ErrorHttpException($e->getMessage());
+		}
 	}
 
 	public function unSub($columnId, $uid)
 	{
-		$row = ArticleColumnSub::query()->where('column_id', $columnId)->where('user_id', $uid)->first();
-		if ($row) {
-			if ($row->status == ArticleColumnSub::STATUS_CREATER) {
-				throw new ErrorHttpException('不能取关自己的栏目');
-			}
-			if ($row->status == ArticleColumnSub::STATUS_SUB) {
-				$row->status = ArticleColumnSub::STATUS_NO;
-				$row->save();
-				return $row;
-			}
+		$column = ArticleColumn::query()->find($columnId);
+		if (!$column) {
+			throw new ErrorHttpException('专栏不存在');
 		}
-		throw new ErrorHttpException('用户尚未关注');
+		try {
+			idb()->beginTransaction();
+			$row = ArticleColumnSub::query()->where('column_id', $columnId)->where('user_id', $uid)->first();
+			if ($row) {
+				if ($row->status == ArticleColumnSub::STATUS_CREATER) {
+					throw new ErrorHttpException('不能取关自己的栏目');
+				} elseif ($row->status == ArticleColumnSub::STATUS_SUB) {
+					$row->status = ArticleColumnSub::STATUS_NO;
+					$row->save();
+				} else {
+					throw new ErrorHttpException('已取消关注');
+				}
+			}
+			$column->decrement('subscribe_num', 1);
+			$column->save();
+			idb()->commit();
+			return 'success';
+		} catch (\Exception $e) {
+			idb()->rollBack();
+			throw new ErrorHttpException($e->getMessage());
+		}
 	}
 }
