@@ -18,10 +18,11 @@ class ArticleTag extends BaseModel
 {
 	protected $table = 'article_tag';
 	protected $fillable = [
-		'tag_id', 'article_id'
+		'tag_id', 'article_id', 'created_at', 'updated_at'
 	];
 
-	public function tagConfig(){
+	public function tagConfig()
+	{
 		return $this->hasOne(ArticleTagConfig::class, 'id', 'tag_id');
 	}
 }

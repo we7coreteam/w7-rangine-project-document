@@ -29,6 +29,7 @@ class ArticleTagLogic extends BaseLogic
 		$insert = [];
 		$update = [];
 		$tagIds = $article->tag_ids;
+		$nowTime = time();
 		if ($tagIds) {
 			foreach ($tagIds as $key => $val) {
 				if (in_array($val, $oldTagIds)) {
@@ -39,7 +40,9 @@ class ArticleTagLogic extends BaseLogic
 				} else {
 					$insert[] = [
 						'tag_id' => $val,
-						'article_id' => $article->id
+						'article_id' => $article->id,
+						'created_at' => $nowTime,
+						'updated_at' => $nowTime,
 					];
 				}
 			}
