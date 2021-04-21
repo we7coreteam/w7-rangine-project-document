@@ -114,7 +114,7 @@ class BaseLogic extends LogicAbstract
 
 	public function update($id, $data, $checkData = [])
 	{
-		$model = $this->show($id, $checkData);
+		$model = $this->show($id, '', $checkData);
 		if (!$model->update($data)) {
 			throw new ErrorHttpException('保存失败');
 		}
@@ -131,7 +131,7 @@ class BaseLogic extends LogicAbstract
 		return $model;
 	}
 
-	public function show($id, $checkData = [], $with = '')
+	public function show($id, $with = '', $checkData = [])
 	{
 		if ($with) {
 			$model = $this->model::query()->with($with)->find($id);

@@ -133,7 +133,7 @@ class ArticleController extends BaseController
 		if ($isRead) {
 			$row = $this->block()->read($id, 'tags');
 		} else {
-			$row = $this->block()->show($id, [], 'tags');
+			$row = $this->block()->show($id, 'tags');
 		}
 		return $this->data($row);
 	}
