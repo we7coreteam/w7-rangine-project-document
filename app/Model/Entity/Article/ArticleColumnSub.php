@@ -16,7 +16,7 @@ use W7\App\Model\Entity\BaseModel;
 
 class ArticleColumnSub extends BaseModel
 {
-	protected $table = 'article_column';
+	protected $table = 'article_column_sub';
 	protected $fillable = [
 		'column_id', 'user_id', 'creater_id', 'status', 'sub_time'
 	];
