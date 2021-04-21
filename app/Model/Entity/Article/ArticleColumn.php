@@ -13,6 +13,7 @@
 namespace W7\App\Model\Entity\Article;
 
 use W7\App\Model\Entity\BaseModel;
+use W7\App\Model\Entity\User;
 
 class ArticleColumn extends BaseModel
 {
@@ -20,4 +21,9 @@ class ArticleColumn extends BaseModel
 	protected $fillable = [
 		'user_id', 'name', 'article_num', 'read_num', 'subscribe_num', 'praise_num'
 	];
+
+	public function user()
+	{
+		return $this->hasOne(User::class, 'id', 'user_id');
+	}
 }

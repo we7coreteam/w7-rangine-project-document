@@ -16,7 +16,8 @@ irouter()->middleware(['CheckAuthMiddleware'])->group([], function (\W7\Core\Rou
 	$route->get('/article/articleTagConfig/{id:\d+}', 'Article\ArticleTagConfigController@show');
 
 	//文章专栏
-	$route->get('/article/articleColumn/info', 'Article\ArticleColumnController@info');
+	$route->post('/article/articleColumn/infoUser', 'Article\ArticleColumnController@infoUser');
+	$route->get('/article/articleColumn/infoMy', 'Article\ArticleColumnController@infoMy');
 	$route->post('/article/articleColumn', 'Article\ArticleColumnController@store');
 	$route->put('/article/articleColumn/{id:\d+}', 'Article\ArticleColumnController@update');
 

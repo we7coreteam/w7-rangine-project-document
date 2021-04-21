@@ -81,7 +81,7 @@ class ArticleColumnLogic extends BaseLogic
 
 	public function info($userId)
 	{
-		return ArticleColumn::query()->where('user_id', $userId)->orderBy('id')->first();
+		return ArticleColumn::query()->where('user_id', $userId)->with(['user'])->orderBy('id')->first();
 	}
 
 	public function add($data)

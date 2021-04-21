@@ -25,8 +25,35 @@ class ArticleColumnController extends BaseController
 	}
 
 	/**
-	 * @api {get} /article/articleColumn/info 栏目-详情
-	 * @apiName info
+	 * @api {post} /article/articleColumn/infoUser 栏目-获取用户专栏
+	 * @apiName infoUser
+	 * @apiGroup articleColumn
+	 *
+	 * @apiParam {Number} user_id 用户ID
+	 *
+	 * @apiSuccess {String} name 栏目名称
+	 * @apiSuccess {Number} article_num 排序
+	 * @apiSuccess {Number} read_num 阅读数量
+	 * @apiSuccess {Number} subscribe_num 关注数量
+	 * @apiSuccess {Number} praise_num 点赞数量
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":{"id":2,"user_id":2,"name":"栏目3","article_num":0,"read_num":0,"subscribe_num":0,"praise_num":0,"created_at":"1618906453","updated_at":"1618907138"},"message":"ok"}
+	 */
+	public function infoUser(Request $request)
+	{
+		$data = $this->validate($request, [
+			'user_id' => 'required|integer',
+		], [
+			'user_id' => '用户ID',
+		]);
+		$result = $this->block()->info($data['user_id']);
+		return $this->data($result);
+	}
+
+	/**
+	 * @api {get} /article/articleColumn/infoMy 栏目-详情
+	 * @apiName infoMy
 	 * @apiGroup articleColumn
 	 *
 	 * @apiSuccess {String} name 栏目名称
@@ -38,7 +65,7 @@ class ArticleColumnController extends BaseController
 	 * @apiSuccessExample {json} Success-Response:
 	 * {"status":true,"code":200,"data":{"id":2,"user_id":2,"name":"栏目3","article_num":0,"read_num":0,"subscribe_num":0,"praise_num":0,"created_at":"1618906453","updated_at":"1618907138"},"message":"ok"}
 	 */
-	public function info(Request $request)
+	public function infoMy(Request $request)
 	{
 		$user = $request->getAttribute('user');
 		$result = $this->block()->info($user->id);
@@ -62,7 +89,7 @@ class ArticleColumnController extends BaseController
 	public function store(Request $request)
 	{
 		$data = $this->validate($request, [
-			'name' => 'required',
+			'name' => 'required|string',
 		], [
 			'name' => '专栏名称',
 		]);
