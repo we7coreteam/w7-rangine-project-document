@@ -112,23 +112,42 @@ class BaseLogic extends LogicAbstract
 		return $condition;
 	}
 
+	public function destroy($id, $checkData = [])
+	{
+		try {
+			$model = $this->show($id, '', $checkData);
+			$model->delete();
+			return true;
+		} catch (\Exception $e) {
+			throw new ErrorHttpException($e->getMessage());
+		}
+	}
+
 	public function update($id, $data, $checkData = [])
 	{
-		$model = $this->show($id, '', $checkData);
-		if (!$model->update($data)) {
-			throw new ErrorHttpException('保存失败');
+		try {
+			$model = $this->show($id, '', $checkData);
+			if (!$model->update($data)) {
+				throw new ErrorHttpException('保存失败');
+			}
+			return $model;
+		} catch (\Exception $e) {
+			throw new ErrorHttpException($e->getMessage());
 		}
-		return $model;
 	}
 
 	public function store($data)
 	{
-		/** @var ModelAbstract $model */
-		$model = new $this->model($data);
-		if (!$model->save()) {
-			throw new ErrorHttpException('创建失败');
+		try {
+			/** @var ModelAbstract $model */
+			$model = new $this->model($data);
+			if (!$model->save()) {
+				throw new ErrorHttpException('创建失败');
+			}
+			return $model;
+		} catch (\Exception $e) {
+			throw new ErrorHttpException($e->getMessage());
 		}
-		return $model;
 	}
 
 	public function show($id, $with = '', $checkData = [])

@@ -215,4 +215,13 @@ class ArticleController extends BaseController
 		$result = $this->block()->update($id, $data, $checkData);
 		return $this->data($result);
 	}
+
+	public function destroy(Request $request, $id)
+	{
+		$user = $request->getAttribute('user');
+		//必须本用户修改
+		$checkData['user_id'] = $user->id;
+		$result = $this->block()->destroy($id, $checkData);
+		return $this->data($result);
+	}
 }
