@@ -20,4 +20,8 @@ class ArticleTag extends BaseModel
 	protected $fillable = [
 		'tag_id', 'article_id'
 	];
+
+	public function tagConfig(){
+		return $this->hasOne(ArticleTagConfig::class, 'id', 'tag_id');
+	}
 }

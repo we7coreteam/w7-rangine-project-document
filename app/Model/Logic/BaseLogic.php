@@ -131,9 +131,13 @@ class BaseLogic extends LogicAbstract
 		return $model;
 	}
 
-	public function show($id, $checkData = [])
+	public function show($id, $checkData = [], $with = '')
 	{
-		$model = $this->model::query()->find($id);
+		if ($with) {
+			$model = $this->model::query()->with($with)->find($id);
+		} else {
+			$model = $this->model::query()->find($id);
+		}
 		if ($model) {
 			// 判断是不是当前用户的资源
 			if ($checkData) {
@@ -165,7 +169,7 @@ class BaseLogic extends LogicAbstract
 	{
 		$query = $this->model::query();
 		if ($with) {
-			$query->with($this->with);
+			$query->with($with);
 		}
 		if ($condition) {
 			$this->handleListsCondition($query, $condition);

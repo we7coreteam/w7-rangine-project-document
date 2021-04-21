@@ -70,4 +70,9 @@ class Article extends BaseModel
 	{
 		return self::getStatusLabels()[$this->status] ?? '';
 	}
+
+	public function tags()
+	{
+		return $this->hasMany(ArticleTag::class, 'article_id', 'id')->with('tagConfig');
+	}
 }

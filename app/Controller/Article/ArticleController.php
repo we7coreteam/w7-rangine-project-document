@@ -61,7 +61,7 @@ class ArticleController extends BaseController
 		$limit = $request->query('limit', 20);
 		$condition = $this->block()->handleCondition($this->query);
 		$condition[] = ['status', '=', Article::STATUS_SUCCESS];
-		$result = $this->block()->lists($condition, $page, $limit);
+		$result = $this->block()->lists($condition, $page, $limit, 'id desc', [], 'tags');
 		return $this->data($result);
 	}
 
@@ -99,7 +99,7 @@ class ArticleController extends BaseController
 		$condition = $this->block()->handleCondition($this->query);
 		$user = $request->getAttribute('user');
 		$condition[] = ['user_id', '=', $user->id];
-		$result = $this->block()->lists($condition, $page, $limit);
+		$result = $this->block()->lists($condition, $page, $limit, 'id desc', [], 'tags');
 		return $this->data($result);
 	}
 
@@ -131,9 +131,9 @@ class ArticleController extends BaseController
 	{
 		$isRead = $request->input('is_read', 0);
 		if ($isRead) {
-			$row = $this->block()->read($id);
+			$row = $this->block()->read($id, 'tags');
 		} else {
-			$row = $this->block()->show($id);
+			$row = $this->block()->show($id, [], 'tags');
 		}
 		return $this->data($row);
 	}

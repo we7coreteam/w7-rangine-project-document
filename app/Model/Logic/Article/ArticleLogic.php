@@ -25,9 +25,13 @@ class ArticleLogic extends BaseLogic
 
 	protected $model = Article::class;
 
-	public function read($id, $num = 1)
+	public function read($id, $with = '', $num = 1)
 	{
-		$row = Article::query()->find($id);
+		if ($with) {
+			$row = Article::query()->with($with)->find($id);
+		} else {
+			$row = Article::query()->find($id);
+		}
 		$row->increment('read_num', $num);
 		(new ArticleColumnLogic())->incrementNum($row->column_id, 'read_num', $num);
 		return $row;
