@@ -43,6 +43,8 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->index(['status'], 'status');
 			$table->index(['sort'], 'sort');
 		});
+		$tableName = idb()->getTablePrefix() . $this->tagConfigTable;
+		\Illuminate\Support\Facades\DB::statement("ALTER TABLE `{$tableName}` COMMENT '文章标签配置'");
 		//文章专栏
 		$this->schema->create($this->columnTable, function (Blueprint $table) {
 			$table->bigIncrements('id');
@@ -57,6 +59,8 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->index(['user_id'], 'user_id');
 			$table->index(['name'], 'name');
 		});
+		$tableName = idb()->getTablePrefix() . $this->columnTable;
+		\Illuminate\Support\Facades\DB::statement("ALTER TABLE `{$tableName}` COMMENT '文章专栏'");
 		//文章
 		$this->schema->create($this->articleTable, function (Blueprint $table) {
 			$table->bigIncrements('id');
@@ -80,6 +84,8 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->index(['title'], 'title');
 			$table->index(['status'], 'status');
 		});
+		$tableName = idb()->getTablePrefix() . $this->articleTable;
+		\Illuminate\Support\Facades\DB::statement("ALTER TABLE `{$tableName}` COMMENT '文章'");
 		//文章标签
 		$this->schema->create($this->tagTable, function (Blueprint $table) {
 			$table->bigIncrements('id');
@@ -90,6 +96,8 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->index(['article_id'], 'article_id');
 			$table->index(['tag_id'], 'tag_id');
 		});
+		$tableName = idb()->getTablePrefix() . $this->tagTable;
+		\Illuminate\Support\Facades\DB::statement("ALTER TABLE `{$tableName}` COMMENT '文章标签'");
 		//评论
 		$this->schema->create($this->commentTable, function (Blueprint $table) {
 			$table->bigIncrements('id');
@@ -101,6 +109,8 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->index(['article_id'], 'article_id');
 			$table->index(['status'], 'status');
 		});
+		$tableName = idb()->getTablePrefix() . $this->commentTable;
+		\Illuminate\Support\Facades\DB::statement("ALTER TABLE `{$tableName}` COMMENT '文章评论'");
 		//订阅
 		$this->schema->create($this->columnSubTable, function (Blueprint $table) {
 			$table->bigIncrements('id');
@@ -115,6 +125,8 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->index(['creater_id'], 'creater_id');
 			$table->index(['status'], 'status');
 		});
+		$tableName = idb()->getTablePrefix() . $this->columnSubTable;
+		\Illuminate\Support\Facades\DB::statement("ALTER TABLE `{$tableName}` COMMENT '文章专栏订阅'");
 		//点赞
 
 		$this->schema->create($this->praiseTable, function (Blueprint $table) {
@@ -128,7 +140,8 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->index(['article_id'], 'article_id');
 			$table->index(['status'], 'status');
 		});
-
+		$tableName = idb()->getTablePrefix() . $this->praiseTable;
+		\Illuminate\Support\Facades\DB::statement("ALTER TABLE `{$tableName}` COMMENT '文章点赞'");
 		//消息
 		$this->schema->create($this->messageTable, function (Blueprint $table) {
 			$table->integerIncrements('id');
@@ -149,7 +162,8 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->index(['target_type', 'is_read'], 'target_type');
 			$table->index(['created_at', 'is_read'], 'created_at');
 		});
-
+		$tableName = idb()->getTablePrefix() . $this->messageTable;
+		\Illuminate\Support\Facades\DB::statement("ALTER TABLE `{$tableName}` COMMENT '消息'");
 		$this->schema->create($this->messageTextTable, function (Blueprint $table) {
 			$table->integerIncrements('id');
 			$table->string('title', 100)->default('')->comment('标题');
@@ -157,6 +171,8 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->integer('created_at', false, true)->default(0);
 			$table->integer('updated_at', false, true)->default(0);
 		});
+		$tableName = idb()->getTablePrefix() . $this->messageTextTable;
+		\Illuminate\Support\Facades\DB::statement("ALTER TABLE `{$tableName}` COMMENT '消息内容'");
 	}
 
 	/**
