@@ -24,6 +24,7 @@ class ArticleColumnLogic extends BaseLogic
 
 	protected $model = ArticleColumn::class;
 
+	//重置统计
 	public function retry($id)
 	{
 		$row = ArticleColumn::query()->find($id);
@@ -50,6 +51,7 @@ class ArticleColumnLogic extends BaseLogic
 		return false;
 	}
 
+	//单条增加
 	public function incrementNum($article, $field, $num = 1)
 	{
 		//只统计审核通过的
@@ -57,6 +59,20 @@ class ArticleColumnLogic extends BaseLogic
 			$row = ArticleColumn::query()->find($article->column_id);
 			if ($row) {
 				$row->increment($field, $num);
+				return $row;
+			}
+		}
+		return false;
+	}
+
+	//单条减少
+	public function decrementNum($article, $field, $num = 1)
+	{
+		//只统计审核通过的
+		if ($article->status = Article::STATUS_SUCCESS) {
+			$row = ArticleColumn::query()->find($article->column_id);
+			if ($row) {
+				$row->decrement($field, $num);
 				return $row;
 			}
 		}
