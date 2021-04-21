@@ -13,6 +13,7 @@
 namespace W7\App\Model\Logic\Article;
 
 use W7\App\Exception\ErrorHttpException;
+use W7\App\Model\Entity\Article\Article;
 use W7\App\Model\Entity\Article\ArticleColumn;
 use W7\App\Model\Logic\BaseLogic;
 use W7\Core\Helper\Traiter\InstanceTraiter;
@@ -23,8 +24,29 @@ class ArticleColumnLogic extends BaseLogic
 
 	protected $model = ArticleColumn::class;
 
-	public function retry($id){
-		//重算文章、点赞、阅读数量
+	public function retry($id)
+	{
+		$row = ArticleColumn::query()->find($id);
+		if ($row) {
+			//重算文章、点赞、阅读数量
+			$sum = Article::query()
+				->selectRaw('count(1) sum,sum(read_num) as sum_read_num,sum(praise_num) as sum_praise_num')
+				->where('column_id', $id)
+				->first();
+			if ($sum) {
+				$row->article_num = $sum->sum;
+				$row->read_num = $sum->sum_read_num;
+				$row->praise_num = $sum->sum_praise_num;
+				$row->save();
+			} else {
+				$row->article_num = 0;
+				$row->read_num = 0;
+				$row->praise_num = 0;
+				$row->save();
+			}
+			return $row;
+		}
+		return false;
 	}
 
 	public function incrementNum($id, $field, $num = 1)
