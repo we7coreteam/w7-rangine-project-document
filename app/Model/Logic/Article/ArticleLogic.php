@@ -16,7 +16,9 @@ use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Article\Article;
 use W7\App\Model\Entity\Article\ArticleColumn;
 use W7\App\Model\Entity\Article\ArticleTagConfig;
+use W7\App\Model\Entity\Message\Message;
 use W7\App\Model\Logic\BaseLogic;
+use W7\App\Model\Logic\Message\Type\RemindLogic;
 use W7\Core\Helper\Traiter\InstanceTraiter;
 
 class ArticleLogic extends BaseLogic
@@ -41,14 +43,23 @@ class ArticleLogic extends BaseLogic
 	{
 		$row = Article::query()->find($id);
 		if ($row) {
-			if ($row->status != Article::STATUS_CREATE) {
-				throw new ErrorHttpException('当前状态不是待审核状态');
+			try {
+				idb()->beginTransaction();
+				if ($row->status != Article::STATUS_CREATE) {
+					throw new ErrorHttpException('当前状态不是待审核状态');
+				}
+				$row->status = Article::STATUS_SUCCESS;
+				$row->save();
+				//更新栏目统计信息
+				(new ArticleColumnLogic())->retry($row->column_id);
+				//发送消息
+				(new RemindLogic())->add(0, $row->user_id, '您的文章已审核通过', Message::REMIND_ARTICLE, $row->id);
+				idb()->commit();
+				return $row;
+			} catch (\Exception $e) {
+				idb()->rollBack();
+				throw new ErrorHttpException($e->getMessage());
 			}
-			$row->status = Article::STATUS_SUCCESS;
-			$row->save();
-			//更新栏目统计信息
-			(new ArticleColumnLogic())->retry($row->column_id);
-			return $row;
 		}
 		throw new ErrorHttpException('审核失败');
 	}
@@ -57,14 +68,23 @@ class ArticleLogic extends BaseLogic
 	{
 		$row = Article::query()->find($id);
 		if ($row) {
-			if ($row->status != Article::STATUS_CREATE) {
-				throw new ErrorHttpException('当前状态不是待审核状态');
+			try {
+				idb()->beginTransaction();
+				if ($row->status != Article::STATUS_CREATE) {
+					throw new ErrorHttpException('当前状态不是待审核状态');
+				}
+				$row->status = Article::STATUS_FAIL;
+				$row->save();
+				//更新栏目统计信息
+				(new ArticleColumnLogic())->retry($row->column_id);
+				//发送消息
+				(new RemindLogic())->add(0, $row->user_id, '您的文章审核未通过', Message::REMIND_ARTICLE, $row->id);
+				idb()->commit();
+				return $row;
+			} catch (\Exception $e) {
+				idb()->rollBack();
+				throw new ErrorHttpException($e->getMessage());
 			}
-			$row->status = Article::STATUS_FAIL;
-			$row->save();
-			//更新栏目统计信息
-			(new ArticleColumnLogic())->retry($row->column_id);
-			return $row;
 		}
 		throw new ErrorHttpException('驳回失败');
 	}
