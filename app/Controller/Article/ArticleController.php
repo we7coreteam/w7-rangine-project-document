@@ -58,10 +58,10 @@ class ArticleController extends BaseController
 	public function index(Request $request)
 	{
 		$page = $request->query('page', 1);
-		$limit = $request->query('limit', 20);
+		$limit = $request->query('limit', 10);
 		$condition = $this->block()->handleCondition($this->query);
 		$condition[] = ['status', '=', Article::STATUS_SUCCESS];
-		$result = $this->block()->lists($condition, $page, $limit, 'id desc', [], 'tags');
+		$result = $this->block()->lists($condition, $page, $limit, 'tags');
 		return $this->data($result);
 	}
 
@@ -95,11 +95,11 @@ class ArticleController extends BaseController
 	public function indexMy(Request $request)
 	{
 		$page = $request->query('page', 1);
-		$limit = $request->query('limit', 20);
+		$limit = $request->query('limit', 10);
 		$condition = $this->block()->handleCondition($this->query);
 		$user = $request->getAttribute('user');
 		$condition[] = ['user_id', '=', $user->id];
-		$result = $this->block()->lists($condition, $page, $limit, 'id desc', [], 'tags');
+		$result = $this->block()->lists($condition, $page, $limit, 'tags');
 		return $this->data($result);
 	}
 
