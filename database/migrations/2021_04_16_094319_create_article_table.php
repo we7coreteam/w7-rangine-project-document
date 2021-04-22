@@ -103,9 +103,10 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 		//评论
 		$this->schema->create($this->commentTable, function (Blueprint $table) {
 			$table->bigIncrements('id');
-			$table->integer('article_id', false, true)->default(0)->comment('文章id');
+			$table->integer('article_id', false, true)->default(0)->comment('文章ID');
+			$table->integer('user_id', false, true)->default(0)->comment('用户ID');
 			$table->string('comment', 255)->default('')->comment('评论');
-			$table->tinyInteger('status', false, true)->default(0)->comment('状态0不显示1显示');
+			$table->tinyInteger('status', false, true)->default(1)->comment('状态0不显示1显示');
 			$table->integer('created_at', false, true)->default(0);
 			$table->integer('updated_at', false, true)->default(0);
 			$table->index(['article_id'], 'article_id');

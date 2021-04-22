@@ -41,4 +41,7 @@ irouter()->middleware(['CheckAuthMiddleware'])->group([], function (\W7\Core\Rou
 	$route->post('/article/articlePraise/praise', 'Article\ArticlePraiseController@praise');
 	$route->post('/article/articlePraise/unPraise', 'Article\ArticlePraiseController@unPraise');
 
+	//文章评论
+	$route->get('/article/articleComment', 'Article\ArticleCommentController@index');
+	$route->post('/article/articleComment', 'Article\ArticleCommentController@store');
 });
