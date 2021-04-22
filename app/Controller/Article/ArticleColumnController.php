@@ -52,6 +52,28 @@ class ArticleColumnController extends BaseController
 	}
 
 	/**
+	 * @api {post} /article/articleColumn/tags 栏目-当前栏目标签列表(已审核)
+	 * @apiName tags
+	 * @apiGroup articleColumn
+	 *
+	 * @apiSuccess {Object} tag_config 标签信息
+	 * @apiSuccess {String} tag_config.name 标签名称
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":[{"id":1,"tag_id":2,"article_id":1,"column_id":1,"created_at":"1619054514","updated_at":"1619054514","tag_config":{"id":2,"name":"标签2","sort":0,"status":1,"created_at":"1619054227","updated_at":"1619054227"}}],"message":"ok"}
+	 */
+	public function tags(Request $request)
+	{
+		$data = $this->validate($request, [
+			'column_id' => 'required|integer',
+		], [
+			'column_id' => '专栏ID',
+		]);
+		$result = $this->block()->tags($data['column_id']);
+		return $this->data($result);
+	}
+
+	/**
 	 * @api {get} /article/articleColumn/infoMy 栏目-详情
 	 * @apiName infoMy
 	 * @apiGroup articleColumn
