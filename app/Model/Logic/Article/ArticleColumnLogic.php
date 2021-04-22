@@ -16,6 +16,7 @@ use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Article\Article;
 use W7\App\Model\Entity\Article\ArticleColumn;
 use W7\App\Model\Entity\Article\ArticleColumnSub;
+use W7\App\Model\Entity\Article\ArticleTag;
 use W7\App\Model\Logic\BaseLogic;
 use W7\Core\Helper\Traiter\InstanceTraiter;
 
@@ -87,6 +88,18 @@ class ArticleColumnLogic extends BaseLogic
 	public function info($userId)
 	{
 		return ArticleColumn::query()->where('user_id', $userId)->with(['user'])->orderBy('id')->first();
+	}
+
+	public function tags($columnId)
+	{
+		return ArticleTag::query()
+			->leftJoin('article', 'article.id', 'article_tag.article_id')
+			->select(['article_tag.*'])
+			->with('tagConfig')
+			->where('article_tag.column_id', $columnId)
+			->where('article.status', Article::STATUS_SUCCESS)
+			->groupBy(['article_tag.tag_id'])
+			->get();
 	}
 
 	public function add($data)

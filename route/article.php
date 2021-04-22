@@ -20,6 +20,7 @@ irouter()->middleware(['CheckAuthMiddleware'])->group([], function (\W7\Core\Rou
 	$route->get('/article/articleColumn/infoMy', 'Article\ArticleColumnController@infoMy');
 	$route->post('/article/articleColumn', 'Article\ArticleColumnController@store');
 	$route->put('/article/articleColumn/{id:\d+}', 'Article\ArticleColumnController@update');
+	$route->post('/article/articleColumn/tags', 'Article\ArticleColumnController@tags');
 
 	//专栏关注
 	$route->get('/article/articleColumnSub', 'Article\ArticleColumnSubController@index');
