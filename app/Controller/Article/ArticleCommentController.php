@@ -47,7 +47,7 @@ class ArticleCommentController extends BaseController
 			'article_id' => '文章ID',
 		]);
 		$page = $request->query('page', 1);
-		$pageSize = intval($request->post('page_size', 10));
+		$pageSize = intval($request->input('page_size', 10));
 		$condition = $this->block()->handleCondition($this->query);
 		$condition[] = ['status', '=', ArticleComment::STATUS_YES];
 		$result = $this->block()->lists($condition, $page, $pageSize, 'user');

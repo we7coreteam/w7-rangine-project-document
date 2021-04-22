@@ -64,7 +64,7 @@ class ArticleController extends BaseController
 	public function index(Request $request)
 	{
 		$page = $request->query('page', 1);
-		$pageSize = intval($request->post('page_size', 10));
+		$pageSize = intval($request->input('page_size', 10));
 		$query = Article::query();
 		if ($request->input('tag_id', '')) {
 			$tagId = $request->input('tag_id');
@@ -129,7 +129,7 @@ class ArticleController extends BaseController
 	public function indexMy(Request $request)
 	{
 		$page = $request->query('page', 1);
-		$pageSize = intval($request->post('page_size', 10));
+		$pageSize = intval($request->input('page_size', 10));
 		$condition = $this->block()->handleCondition($this->query);
 		$user = $request->getAttribute('user');
 		$condition[] = ['user_id', '=', $user->id];
