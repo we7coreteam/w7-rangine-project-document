@@ -36,6 +36,7 @@ class ArticleController extends BaseController
 	 *
 	 * @apiParam {Number} column_id 栏目名称
 	 * @apiParam {String} title 文章标题
+	 * @apiParam {Number} tag_ids 标签ID
 	 *
 	 * @apiSuccess {Number} column_id 栏目ID
 	 * @apiSuccess {Array} tag_ids 标签列表
@@ -59,9 +60,24 @@ class ArticleController extends BaseController
 	{
 		$page = $request->query('page', 1);
 		$limit = $request->query('limit', 10);
-		$condition = $this->block()->handleCondition($this->query);
-		$condition[] = ['status', '=', Article::STATUS_SUCCESS];
-		$result = $this->block()->lists($condition, $page, $limit, 'tags');
+		$query = Article::query();
+		if ($request->input('tag_id', '')) {
+			$tagId = $request->input('tag_id');
+			if (is_numeric($tagId)) {
+//				$query->where('column_id', $tagId);
+			}
+		}
+		if ($request->input('column_id', '')) {
+			$columnId = $request->input('column_id');
+			if (is_numeric($columnId)) {
+				$query->where('column_id', $columnId);
+			}
+		}
+		if ($request->input('title', '')) {
+			$query->where('title', 'like', '%' . $request->input('title', '') . '%');
+		}
+		$query->with('tags')->where('article.status', Article::STATUS_SUCCESS);
+		$result = $query->paginate($limit, $columns = ['article.*'], '', $page);
 		return $this->data($result);
 	}
 

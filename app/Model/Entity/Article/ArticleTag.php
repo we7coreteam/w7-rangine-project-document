@@ -18,7 +18,7 @@ class ArticleTag extends BaseModel
 {
 	protected $table = 'article_tag';
 	protected $fillable = [
-		'tag_id', 'article_id', 'created_at', 'updated_at'
+		'tag_id', 'article_id', 'column_id', 'created_at', 'updated_at'
 	];
 
 	public function tagConfig()

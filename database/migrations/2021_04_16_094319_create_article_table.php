@@ -89,10 +89,12 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 		//文章标签
 		$this->schema->create($this->tagTable, function (Blueprint $table) {
 			$table->bigIncrements('id');
-			$table->integer('tag_id', false, true)->default(0)->comment('专栏id');
+			$table->integer('tag_id', false, true)->default(0)->comment('标签id');
 			$table->integer('article_id', false, true)->default(0)->comment('文章id');
+			$table->integer('column_id', false, true)->default(0)->comment('专栏id');
 			$table->integer('created_at', false, true)->default(0);
 			$table->integer('updated_at', false, true)->default(0);
+			$table->index(['column_id'], 'column_id');
 			$table->index(['article_id'], 'article_id');
 			$table->index(['tag_id'], 'tag_id');
 		});

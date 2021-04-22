@@ -55,7 +55,6 @@ class ArticleColumnSubLogic extends BaseLogic
 				$row = ArticleColumnSub::query()->create($subData);
 			}
 			$column->increment('subscribe_num', 1);
-			$column->save();
 			idb()->commit();
 			return 'success';
 		} catch (\Exception $e) {
@@ -84,7 +83,6 @@ class ArticleColumnSubLogic extends BaseLogic
 				}
 			}
 			$column->decrement('subscribe_num', 1);
-			$column->save();
 			idb()->commit();
 			return 'success';
 		} catch (\Exception $e) {

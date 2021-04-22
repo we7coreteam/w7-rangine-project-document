@@ -35,12 +35,14 @@ class ArticleTagLogic extends BaseLogic
 				if (in_array($val, $oldTagIds)) {
 					$update[$val] = [
 						'tag_id' => $val,
-						'article_id' => $article->id
+						'article_id' => $article->id,
+						'column_id' => $article->column_id
 					];
 				} else {
 					$insert[] = [
 						'tag_id' => $val,
 						'article_id' => $article->id,
+						'column_id' => $article->column_id,
 						'created_at' => $nowTime,
 						'updated_at' => $nowTime,
 					];
