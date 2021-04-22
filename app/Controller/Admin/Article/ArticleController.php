@@ -25,7 +25,7 @@ class ArticleController extends BaseController
 	}
 
 	protected $query = [
-		'=' => ['status', 'column_id'],
+		'=' => ['column_id'],
 		'like' => ['title']
 	];
 
@@ -62,6 +62,9 @@ class ArticleController extends BaseController
 		$page = $request->query('page', 1);
 		$pageSize = intval($request->input('page_size', 10));
 		$condition = $this->block()->handleCondition($this->query);
+		if (is_numeric($request->query('status', ''))) {
+			$condition[] = ['status', '=', $request->query('status')];
+		}
 		$result = $this->block()->lists($condition, $page, $pageSize, ['tags', 'user']);
 		return $this->data($result);
 	}
