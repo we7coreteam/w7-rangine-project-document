@@ -13,11 +13,20 @@
 namespace W7\App\Model\Entity\Article;
 
 use W7\App\Model\Entity\BaseModel;
+use W7\App\Model\Entity\User;
 
 class ArticleComment extends BaseModel
 {
 	protected $table = 'article_comment';
 	protected $fillable = [
-		'article_id', 'comment', 'status'
+		'article_id', 'user_id', 'comment', 'status'
 	];
+
+	const STATUS_YES = 1;
+	const STATUS_NO = 0;
+
+	public function user()
+	{
+		return $this->hasOne(User::class, 'id', 'user_id');
+	}
 }

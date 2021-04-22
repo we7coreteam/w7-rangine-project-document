@@ -52,7 +52,7 @@ class ArticleColumnController extends BaseController
 	}
 
 	/**
-	 * @api {post} /article/articleColumn/tags 栏目-当前栏目标签列表(已审核)
+	 * @api {post} /article/articleColumn/tags 栏目-当前栏目标签列表(已审核文章)
 	 * @apiName tags
 	 * @apiGroup articleColumn
 	 *
