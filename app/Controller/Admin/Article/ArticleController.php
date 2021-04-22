@@ -60,9 +60,9 @@ class ArticleController extends BaseController
 	public function index(Request $request)
 	{
 		$page = $request->query('page', 1);
-		$limit = $request->query('limit', 20);
+		$pageSize = intval($request->post('page_size', 10));
 		$condition = $this->block()->handleCondition($this->query);
-		$result = $this->block()->lists($condition, $page, $limit, ['tags', 'user']);
+		$result = $this->block()->lists($condition, $page, $pageSize, ['tags', 'user']);
 		return $this->data($result);
 	}
 
