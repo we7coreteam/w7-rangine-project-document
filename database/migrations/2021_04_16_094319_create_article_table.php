@@ -140,6 +140,7 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->integer('created_at', false, true)->default(0);
 			$table->integer('updated_at', false, true)->default(0);
 			$table->index(['article_id'], 'article_id');
+			$table->index(['user_id'], 'user_id');
 			$table->index(['status'], 'status');
 		});
 		$tableName = idb()->getTablePrefix() . $this->praiseTable;

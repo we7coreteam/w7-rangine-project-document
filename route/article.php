@@ -35,4 +35,10 @@ irouter()->middleware(['CheckAuthMiddleware'])->group([], function (\W7\Core\Rou
 	$route->post('/article', 'Article\ArticleController@store');
 	$route->put('/article/{id:\d+}', 'Article\ArticleController@update');
 	$route->delete('/article/{id:\d+}', 'Article\ArticleController@destroy');
+
+	//文章点赞
+	$route->post('/article/articlePraise/info', 'Article\ArticlePraiseController@info');
+	$route->post('/article/articlePraise/praise', 'Article\ArticlePraiseController@praise');
+	$route->post('/article/articlePraise/unPraise', 'Article\ArticlePraiseController@unPraise');
+
 });

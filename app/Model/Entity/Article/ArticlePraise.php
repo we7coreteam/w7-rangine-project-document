@@ -20,4 +20,7 @@ class ArticlePraise extends BaseModel
 	protected $fillable = [
 		'article_id', 'user_id', 'status', 'praise_time'
 	];
+
+	const STATUS_YES = 1;
+	const STATUS_NO = 0;
 }
