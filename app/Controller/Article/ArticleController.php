@@ -14,6 +14,7 @@ namespace W7\App\Controller\Article;
 
 use W7\App\Controller\BaseController;
 use W7\App\Model\Entity\Article\Article;
+use W7\App\Model\Entity\Article\ArticleColumnSub;
 use W7\App\Model\Logic\Article\ArticleLogic;
 use W7\Http\Message\Server\Request;
 
@@ -37,6 +38,7 @@ class ArticleController extends BaseController
 	 * @apiParam {Number} column_id 栏目名称
 	 * @apiParam {String} title 文章标题
 	 * @apiParam {Number} tag_ids 标签ID
+	 * @apiParam {Number} is_sub 是否筛选1已订阅(包含自己)2订阅不含自己
 	 *
 	 * @apiSuccess {Number} column_id 栏目ID
 	 * @apiSuccess {Array} tag_ids 标签列表
@@ -64,17 +66,28 @@ class ArticleController extends BaseController
 		if ($request->input('tag_id', '')) {
 			$tagId = $request->input('tag_id');
 			if (is_numeric($tagId)) {
-//				$query->where('column_id', $tagId);
+				$query->leftJoin('article_tag', 'article_tag.article_id', 'article.id');
+				$query->where('article_tag.tag_id', $tagId);
+			}
+		}
+		if ($request->input('is_sub', '')) {
+			$isSub = $request->input('is_sub');
+			if ($isSub == 1) {
+				$query->leftJoin('article_column_sub', 'article_column_sub.column_id', 'article.column_id');
+				$query->whereIn('article_column_sub.status', [ArticleColumnSub::STATUS_CREATER, ArticleColumnSub::STATUS_SUB]);
+			} elseif ($isSub == 2) {
+				$query->leftJoin('article_column_sub', 'article_column_sub.column_id', 'article.column_id');
+				$query->where('article_column_sub.status', ArticleColumnSub::STATUS_SUB);
 			}
 		}
 		if ($request->input('column_id', '')) {
 			$columnId = $request->input('column_id');
 			if (is_numeric($columnId)) {
-				$query->where('column_id', $columnId);
+				$query->where('article.column_id', $columnId);
 			}
 		}
 		if ($request->input('title', '')) {
-			$query->where('title', 'like', '%' . $request->input('title', '') . '%');
+			$query->where('article.title', 'like', '%' . $request->input('title', '') . '%');
 		}
 		$query->with('tags')->where('article.status', Article::STATUS_SUCCESS);
 		$result = $query->paginate($limit, $columns = ['article.*'], '', $page);
