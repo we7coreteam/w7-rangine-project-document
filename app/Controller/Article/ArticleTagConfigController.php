@@ -46,9 +46,9 @@ class ArticleTagConfigController extends BaseController
 	public function index(Request $request)
 	{
 		$page = $request->query('page', 1);
-		$limit = $request->query('limit', 10);
+		$pageSize = intval($request->post('page_size', 10));
 		$condition = $this->block()->handleCondition($this->query);
-		$result = $this->block()->lists($condition, $page, $limit,'','sort desc,id desc');
+		$result = $this->block()->lists($condition, $page, $pageSize, '', 'sort desc,id desc');
 		return $this->data($result);
 	}
 

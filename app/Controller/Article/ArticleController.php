@@ -64,7 +64,7 @@ class ArticleController extends BaseController
 	public function index(Request $request)
 	{
 		$page = $request->query('page', 1);
-		$limit = $request->query('limit', 10);
+		$pageSize = intval($request->post('page_size', 10));
 		$query = Article::query();
 		if ($request->input('tag_id', '')) {
 			$tagId = $request->input('tag_id');
@@ -93,7 +93,7 @@ class ArticleController extends BaseController
 			$query->where('article.title', 'like', '%' . $request->input('title', '') . '%');
 		}
 		$query->with('tags')->where('article.status', Article::STATUS_SUCCESS);
-		$result = $query->paginate($limit, $columns = ['article.*'], '', $page);
+		$result = $query->paginate($pageSize, $columns = ['article.*'], '', $page);
 		return $this->data($result);
 	}
 
@@ -129,11 +129,11 @@ class ArticleController extends BaseController
 	public function indexMy(Request $request)
 	{
 		$page = $request->query('page', 1);
-		$limit = $request->query('limit', 10);
+		$pageSize = intval($request->post('page_size', 10));
 		$condition = $this->block()->handleCondition($this->query);
 		$user = $request->getAttribute('user');
 		$condition[] = ['user_id', '=', $user->id];
-		$result = $this->block()->lists($condition, $page, $limit, 'tags');
+		$result = $this->block()->lists($condition, $page, $pageSize, 'tags');
 		return $this->data($result);
 	}
 
