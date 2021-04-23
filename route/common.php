@@ -45,7 +45,7 @@ irouter()->post('/common/auth/default-login-url', 'Common\AuthController@default
 irouter()->post('/menu/setting', 'Common\MenuController@setting');
 //上传图片
 irouter()->post('/common/upload/image', 'Admin\UploadController@image');
-irouter()->post('/common/uEditor', 'Admin\UploadController@uEditor');
+irouter()->add(['options', 'post', 'get'], '/common/uEditor', 'Admin\UploadController@uEditor');
 
 //
 irouter()->get('/user/info', 'Common\UserController@info');
