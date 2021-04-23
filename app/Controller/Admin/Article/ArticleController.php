@@ -53,7 +53,6 @@ class ArticleController extends BaseController
 	 * @apiSuccess {Object} user 作者信息
 	 * @apiSuccess {String} user.username 作者昵称
 	 *
-	 *
 	 * @apiSuccessExample {json} Success-Response:
 	 * {"status":true,"code":200,"data":{"current_page":1,"data":[{"id":4,"column_id":1,"tag_ids":["1","2"],"user_id":1,"title":"222","content":"111","comment_status":1,"is_reprint":1,"reprint_url":"","home_thumbnail":1,"read_num":0,"praise_num":0,"status":0,"reason":"","created_at":"1618912571","updated_at":"1618912571","status_text":"待审核"}],"first_page_url":"\/?=1","from":1,"last_page":4,"last_page_url":"\/?=4","next_page_url":"\/?=2","path":"\/","per_page":"1","prev_page_url":null,"to":1,"total":4},"message":"ok"}
 	 **/
