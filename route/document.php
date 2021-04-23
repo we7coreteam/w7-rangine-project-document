@@ -11,6 +11,7 @@
  */
 
 irouter()->middleware('FrontendDocumentPermissionMiddleware')->group(['prefix' => '/document'], function (\W7\Core\Route\Route $route) {
+	$route->post('/all', 'Document\DocumentController@all');
 	$route->post('/detail', 'Document\DocumentController@detail');
 	$route->post('/chapter/list', 'Document\ChapterController@catalog');
 	$route->post('/chapter/detail', 'Document\ChapterController@detail');
