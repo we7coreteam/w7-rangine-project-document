@@ -45,6 +45,7 @@ class ArticleController extends BaseController
 	 * @apiSuccess {Number} user_id 用户ID
 	 * @apiSuccess {String} title 文章标题
 	 * @apiSuccess {String} content 文章内容
+	 * @apiSuccess {String} first_img 首图片
 	 * @apiSuccess {Number} comment_status 是否开启评论
 	 * @apiSuccess {Number} is_reprint 文章来源
 	 * @apiSuccess {Number} reprint_url 来源链接
@@ -93,7 +94,8 @@ class ArticleController extends BaseController
 			$query->where('article.title', 'like', '%' . $request->input('title', '') . '%');
 		}
 		$query->with(['tags', 'user'])->where('article.status', Article::STATUS_SUCCESS);
-		$result = $query->paginate($pageSize, $columns = ['article.*'], '', $page);
+		$list = $query->paginate($pageSize, $columns = ['article.*'], '', $page);
+		$result = $this->block()->getListFirstImg($list->toArray());
 		return $this->data($result);
 	}
 
@@ -111,6 +113,7 @@ class ArticleController extends BaseController
 	 * @apiSuccess {Number} user_id 用户ID
 	 * @apiSuccess {String} title 文章标题
 	 * @apiSuccess {String} content 文章内容
+	 * @apiSuccess {String} first_img 首图片
 	 * @apiSuccess {Number} comment_status 是否开启评论
 	 * @apiSuccess {Number} is_reprint 文章来源
 	 * @apiSuccess {Number} reprint_url 来源链接
@@ -136,7 +139,8 @@ class ArticleController extends BaseController
 		if (is_numeric($request->query('status', ''))) {
 			$condition[] = ['status', '=', $request->query('status')];
 		}
-		$result = $this->block()->index($condition, $page, $pageSize, ['tags', 'user']);
+		$list = $this->block()->index($condition, $page, $pageSize, ['tags', 'user']);
+		$result = $this->block()->getListFirstImg($list->toArray());
 		return $this->data($result);
 	}
 

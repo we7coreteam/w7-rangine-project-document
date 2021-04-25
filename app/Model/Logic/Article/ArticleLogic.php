@@ -27,6 +27,30 @@ class ArticleLogic extends BaseLogic
 
 	protected $model = Article::class;
 
+	public function getListFirstImg($list)
+	{
+		if (count($list['data'])) {
+			$data = $list['data'];
+			foreach ($data as $key => $val) {
+				$data[$key]['first_img'] = $this->getContentFirstImg($val['content'], $val['home_thumbnail']);
+			}
+			$list['data'] = $data;
+		}
+		return $list;
+	}
+
+	public function getContentFirstImg($content, $homeThumbnail)
+	{
+		if ($homeThumbnail) {
+			$pattern = "/<[img|IMG].*?src=[\'|\"](.*?(?:[\.gif|\.jpg]))[\'|\"].*?[\/]?>/";
+			preg_match_all($pattern, $content, $match);
+			if (!empty($match[1][0])) {
+				return $match[1][0];
+			}
+		}
+		return null;
+	}
+
 	public function read($id, $with = '', $num = 1)
 	{
 		if ($with) {
@@ -53,7 +77,7 @@ class ArticleLogic extends BaseLogic
 				//更新栏目统计信息
 				(new ArticleColumnLogic())->retry($row->column_id);
 				//发送消息
-				(new RemindLogic())->add(0, $row->user_id, '恭喜，您发表的文章《'.$row->title.'》已通过审核。', Message::REMIND_ARTICLE, $row->id);
+				(new RemindLogic())->add(0, $row->user_id, '恭喜，您发表的文章《' . $row->title . '》已通过审核。', Message::REMIND_ARTICLE, $row->id);
 				idb()->commit();
 				return $row;
 			} catch (\Exception $e) {
@@ -79,7 +103,7 @@ class ArticleLogic extends BaseLogic
 				//更新栏目统计信息
 				(new ArticleColumnLogic())->retry($row->column_id);
 				//发送消息
-				(new RemindLogic())->add(0, $row->user_id, '抱歉，您发表的文章《'.$row->title.'》审核不通过，拒绝原因：' . $reason, Message::REMIND_ARTICLE, $row->id);
+				(new RemindLogic())->add(0, $row->user_id, '抱歉，您发表的文章《' . $row->title . '》审核不通过，拒绝原因：' . $reason, Message::REMIND_ARTICLE, $row->id);
 				idb()->commit();
 				return $row;
 			} catch (\Exception $e) {
