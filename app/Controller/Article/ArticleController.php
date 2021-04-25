@@ -233,7 +233,7 @@ class ArticleController extends BaseController
 	}
 
 	/**
-	 * @api {put} /article 个人文章-修改
+	 * @api {put} /article/:id 个人文章-修改
 	 * @apiName store
 	 * @apiGroup article
 	 *

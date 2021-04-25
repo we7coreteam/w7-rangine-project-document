@@ -123,8 +123,8 @@ class ArticleColumnController extends BaseController
 	}
 
 	/**
-	 * @api {put} /article/articleColumn 栏目-修改
-	 * @apiName store
+	 * @api {put} /article/articleColumn/:id 栏目-修改
+	 * @apiName update
 	 * @apiGroup articleColumn
 	 *
 	 * @apiParam {String} name 栏目名称
