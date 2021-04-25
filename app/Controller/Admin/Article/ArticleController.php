@@ -64,7 +64,7 @@ class ArticleController extends BaseController
 		if (is_numeric($request->query('status', ''))) {
 			$condition[] = ['status', '=', $request->query('status')];
 		}
-		$result = $this->block()->lists($condition, $page, $pageSize, ['tags', 'user']);
+		$result = $this->block()->index($condition, $page, $pageSize, ['tags', 'user']);
 		return $this->data($result);
 	}
 

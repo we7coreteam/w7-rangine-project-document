@@ -49,7 +49,7 @@ class ArticleColumnSubController extends BaseController
 		$pageSize = intval($request->input('page_size', 10));
 		$condition = $this->block()->handleCondition($this->query);
 		$condition[] = ['status', '>', 0];
-		$result = $this->block()->lists($condition, $page, $pageSize, 'column');
+		$result = $this->block()->index($condition, $page, $pageSize, 'column');
 		return $this->data($result);
 	}
 

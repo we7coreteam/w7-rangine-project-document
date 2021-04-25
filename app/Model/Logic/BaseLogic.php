@@ -202,7 +202,7 @@ class BaseLogic extends LogicAbstract
 		return $query;
 	}
 
-	public function lists($condition = [], $page = 1, $limit = 20, $with = '', $orderBy = 'id desc', $groupBy = [], $columns = ['*'])
+	public function index($condition = [], $page = 1, $limit = 20, $with = '', $orderBy = 'id desc', $groupBy = [], $columns = ['*'])
 	{
 		$page = $page < 1 ? 1 : $page;
 		$limit = $limit > 5000 ? 5000 : $limit;
