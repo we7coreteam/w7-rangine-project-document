@@ -50,7 +50,7 @@ class ArticleCommentController extends BaseController
 		$pageSize = intval($request->input('page_size', 10));
 		$condition = $this->block()->handleCondition($this->query);
 		$condition[] = ['status', '=', ArticleComment::STATUS_YES];
-		$result = $this->block()->lists($condition, $page, $pageSize, 'user');
+		$result = $this->block()->index($condition, $page, $pageSize, 'user');
 		return $this->data($result);
 	}
 
