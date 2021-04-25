@@ -92,7 +92,7 @@ class ArticleController extends BaseController
 		if ($request->input('title', '')) {
 			$query->where('article.title', 'like', '%' . $request->input('title', '') . '%');
 		}
-		$query->with('tags')->where('article.status', Article::STATUS_SUCCESS);
+		$query->with(['tags', 'user'])->where('article.status', Article::STATUS_SUCCESS);
 		$result = $query->paginate($pageSize, $columns = ['article.*'], '', $page);
 		return $this->data($result);
 	}
@@ -136,7 +136,7 @@ class ArticleController extends BaseController
 		if (is_numeric($request->query('status', ''))) {
 			$condition[] = ['status', '=', $request->query('status')];
 		}
-		$result = $this->block()->index($condition, $page, $pageSize, 'tags');
+		$result = $this->block()->index($condition, $page, $pageSize, ['tags', 'user']);
 		return $this->data($result);
 	}
 
