@@ -175,9 +175,9 @@ class ArticleController extends BaseController
 	{
 		$isRead = $request->input('is_read', 0);
 		if ($isRead) {
-			$row = $this->block()->read($id, 'tags');
+			$row = $this->block()->read($id, ['tags', 'user']);
 		} else {
-			$row = $this->block()->show($id, 'tags');
+			$row = $this->block()->show($id, ['tags', 'user']);
 		}
 		return $this->data($row);
 	}
@@ -233,7 +233,7 @@ class ArticleController extends BaseController
 	}
 
 	/**
-	 * @api {put} /article 个人文章-修改
+	 * @api {put} /article/:id 个人文章-修改
 	 * @apiName store
 	 * @apiGroup article
 	 *
