@@ -175,9 +175,9 @@ class ArticleController extends BaseController
 	{
 		$isRead = $request->input('is_read', 0);
 		if ($isRead) {
-			$row = $this->block()->read($id, 'tags');
+			$row = $this->block()->read($id, ['tags', 'user']);
 		} else {
-			$row = $this->block()->show($id, 'tags');
+			$row = $this->block()->show($id, ['tags', 'user']);
 		}
 		return $this->data($row);
 	}
