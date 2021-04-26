@@ -19,8 +19,11 @@ class ArticleColumn extends BaseModel
 {
 	protected $table = 'article_column';
 	protected $fillable = [
-		'user_id', 'name', 'article_num', 'read_num', 'subscribe_num', 'praise_num'
+		'user_id', 'name', 'article_num', 'read_num', 'subscribe_num', 'praise_num', 'status'
 	];
+
+	const STATUS_CREATE = 0;
+	const STATUS_EDIT = 1;
 
 	public function user()
 	{

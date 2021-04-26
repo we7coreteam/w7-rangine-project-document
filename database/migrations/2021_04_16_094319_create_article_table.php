@@ -54,6 +54,7 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->integer('read_num', false, true)->default(0)->comment('阅读次数');
 			$table->integer('subscribe_num', false, true)->default(0)->comment('订阅数量');
 			$table->integer('praise_num', false, true)->default(0)->comment('点赞次数');
+			$table->tinyInteger('status', false, true)->default(0)->comment('状态0可修改1不可修改');
 			$table->integer('created_at', false, true)->default(0);
 			$table->integer('updated_at', false, true)->default(0);
 			$table->index(['user_id'], 'user_id');
