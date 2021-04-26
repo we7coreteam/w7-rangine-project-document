@@ -100,10 +100,6 @@ class ArticleColumnController extends BaseController
 	 * @apiGroup articleColumn
 	 *
 	 * @apiParam {String} name 栏目名称
-	 * @apiParam {Number} article_num 排序
-	 * @apiParam {Number} read_num 阅读数量
-	 * @apiParam {Number} subscribe_num 关注数量
-	 * @apiParam {Number} praise_num 点赞数量
 	 *
 	 * @apiSuccessExample {json} Success-Response:
 	 * {"status":true,"code":200,"data":{"id":2,"user_id":2,"name":"栏目3","article_num":0,"read_num":0,"subscribe_num":0,"praise_num":0,"created_at":"1618906453","updated_at":"1618907138"},"message":"ok"}
@@ -128,10 +124,12 @@ class ArticleColumnController extends BaseController
 	 * @apiGroup articleColumn
 	 *
 	 * @apiParam {String} name 栏目名称
-	 * @apiParam {Number} article_num 排序
-	 * @apiParam {Number} read_num 阅读数量
-	 * @apiParam {Number} subscribe_num 关注数量
-	 * @apiParam {Number} praise_num 点赞数量
+	 *
+	 * @apiSuccess {String} name 栏目名称
+	 * @apiSuccess {Number} article_num 排序
+	 * @apiSuccess {Number} read_num 阅读数量
+	 * @apiSuccess {Number} subscribe_num 关注数量
+	 * @apiSuccess {Number} praise_num 点赞数量
 	 *
 	 * @apiSuccessExample {json} Success-Response:
 	 * {"status":true,"code":200,"data":{"id":2,"user_id":2,"name":"栏目3","article_num":0,"read_num":0,"subscribe_num":0,"praise_num":0,"created_at":"1618906453","updated_at":"1618907138"},"message":"ok"}
@@ -148,7 +146,7 @@ class ArticleColumnController extends BaseController
 		//必须本用户修改
 		$checkData['user_id'] = $user->id;
 
-		$result = $this->block()->update($id, $data, $checkData);
+		$result = $this->block()->save($id, $data, $checkData);
 		return $this->data($result);
 	}
 }

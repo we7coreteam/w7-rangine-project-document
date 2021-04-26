@@ -133,15 +133,20 @@ class ArticleColumnLogic extends BaseLogic
 		return $row;
 	}
 
-	public function save($id, $data, $checkAuth = false)
+	public function save($id, $data, $checkData = [])
 	{
 		$row = ArticleColumn::query()->find($id);
 		if ($row) {
-			if ($checkAuth && $data['user_id'] != $row->user_id) {
+			if ($checkData['user_id'] != $row->user_id) {
 				throw new ErrorHttpException('栏目不存在');
 			}
+			if ($row->status != ArticleColumn::STATUS_CREATE) {
+				throw new ErrorHttpException('栏目只能修改一次');
+			}
+			$row->status = ArticleColumn::STATUS_EDIT;
 			$row->name = $data['name'];
 			$row->save();
+			return $row;
 		}
 		throw new ErrorHttpException('栏目不存在');
 	}
