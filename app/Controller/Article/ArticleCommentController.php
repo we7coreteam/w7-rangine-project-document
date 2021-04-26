@@ -29,7 +29,7 @@ class ArticleCommentController extends BaseController
 	];
 
 	/**
-	 * @api {get} /articleComment 文章评论-列表
+	 * @api {get} /article/articleComment 文章评论-列表
 	 * @apiName index
 	 * @apiGroup articleComment
 	 *
@@ -61,7 +61,7 @@ class ArticleCommentController extends BaseController
 	}
 
 	/**
-	 * @api {post} /articleComment 文章评论-新增
+	 * @api {post} /article/articleComment 文章评论-新增
 	 * @apiName store
 	 * @apiGroup articleComment
 	 *
