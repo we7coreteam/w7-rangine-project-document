@@ -37,7 +37,7 @@ class ArticleController extends BaseController
 	 *
 	 * @apiParam {Number} column_id 栏目名称
 	 * @apiParam {String} title 文章标题
-	 * @apiParam {Number} tag_ids 标签ID
+	 * @apiParam {Number} tag_id 标签ID
 	 * @apiParam {Number} is_sub 是否筛选1已订阅(包含自己)2订阅不含自己
 	 *
 	 * @apiSuccess {Number} column_id 栏目ID
