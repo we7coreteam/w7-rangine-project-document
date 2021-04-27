@@ -63,13 +63,17 @@ class ArticlePraiseLogic extends BaseLogic
 			}
 			//点赞数量+1
 			$article->increment('praise_num', $num);
-			(new ArticleColumnLogic())->incrementNum($article, 'praise_num', $num);
+			$articleColumn = (new ArticleColumnLogic())->incrementNum($article, 'praise_num', $num);
 			idb()->commit();
 		} catch (\Exception $e) {
 			idb()->rollBack();
 			throw new ErrorHttpException($e->getMessage());
 		}
-		return $row;
+		return [
+			'article_praise' => $row,
+			'article' => $article,
+			'article_column' => $articleColumn
+		];
 	}
 
 	public function unPraise($articleId, $uid)
@@ -93,16 +97,20 @@ class ArticlePraiseLogic extends BaseLogic
 				$row->save();
 				//点赞数量-1
 				$article->decrement('praise_num', $num);
-				(new ArticleColumnLogic())->decrementNum($article, 'praise_num', $num);
+				$articleColumn = (new ArticleColumnLogic())->decrementNum($article, 'praise_num', $num);
 			} else {
 				//没有记录
-				(new ArticleColumnLogic())->retry($article->column_id);
+				$articleColumn = (new ArticleColumnLogic())->retry($article->column_id);
 			}
 			idb()->commit();
 		} catch (\Exception $e) {
 			idb()->rollBack();
 			throw new ErrorHttpException($e->getMessage());
 		}
-		return $row;
+		return [
+			'article_praise' => $row,
+			'article' => $article,
+			'article_column' => $articleColumn
+		];
 	}
 }
