@@ -69,7 +69,10 @@ class CommentPraiseLogic extends BaseLogic
 			idb()->rollBack();
 			throw new ErrorHttpException($e->getMessage());
 		}
-		return $row;
+		return [
+			'article_comment_praise' => $row,
+			'article_comment' => $articleComment
+		];
 	}
 
 	public function unPraise($commentId, $uid)
@@ -92,7 +95,7 @@ class CommentPraiseLogic extends BaseLogic
 				$row->status = CommentPraise::STATUS_NO;
 				$row->save();
 				//点赞数量-1
-				if ($articleComment->praise_num > $num) {
+				if ($articleComment->praise_num > 0) {
 					$articleComment->decrement('praise_num', $num);
 				}
 			}
@@ -101,6 +104,9 @@ class CommentPraiseLogic extends BaseLogic
 			idb()->rollBack();
 			throw new ErrorHttpException($e->getMessage());
 		}
-		return $row;
+		return [
+			'article_comment_praise' => $row,
+			'article_comment' => $articleComment
+		];
 	}
 }
