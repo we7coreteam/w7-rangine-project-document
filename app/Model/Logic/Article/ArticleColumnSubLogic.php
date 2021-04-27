@@ -26,7 +26,7 @@ class ArticleColumnSubLogic extends BaseLogic
 
 	public function info($columnId, $uid)
 	{
-		return ArticleColumnSub::query()->where('column_id', $columnId)->where('user_id', $uid)->first();
+		return ArticleColumnSub::query()->where('column_id', $columnId)->whereIn('status', [ArticleColumnSub::STATUS_CREATER, ArticleColumnSub::STATUS_SUB])->where('user_id', $uid)->first();
 	}
 
 	public function sub($columnId, $uid)
