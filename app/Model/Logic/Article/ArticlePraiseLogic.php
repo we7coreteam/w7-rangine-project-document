@@ -95,8 +95,10 @@ class ArticlePraiseLogic extends BaseLogic
 				}
 				$row->status = ArticlePraise::STATUS_NO;
 				$row->save();
-				//点赞数量-1
-				$article->decrement('praise_num', $num);
+				if ($article->praise_num > 0) {
+					//点赞数量-1
+					$article->decrement('praise_num', $num);
+				}
 				$articleColumn = (new ArticleColumnLogic())->decrementNum($article, 'praise_num', $num);
 			} else {
 				//没有记录
