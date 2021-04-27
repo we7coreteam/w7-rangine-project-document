@@ -57,7 +57,7 @@ class ArticlePraiseController extends BaseController
 	 * @apiSuccess {Number} status 1已点赞0未点赞
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 * {"status":true,"code":200,"data":{"article_id":"1","user_id":1,"status":1,"praise_time":1619063551,"updated_at":"1619063551","created_at":"1619063551","id":1},"message":"ok"}
+	 * {"status":true,"code":200,"data":{"article_praise":{"article_id":"7","user_id":1,"status":1,"praise_time":1619509293,"updated_at":"1619509294","created_at":"1619509294","id":5},"article":{"id":7,"column_id":1,"tag_ids":["2"],"user_id":1,"title":"7","content":"111","comment_status":1,"is_reprint":1,"reprint_url":"","home_thumbnail":1,"read_num":0,"praise_num":1,"status":1,"reason":"","created_at":"1619076216","updated_at":"1619076945","status_text":"审核通过"},"article_column":{"id":1,"user_id":1,"name":"栏目2","article_num":13,"read_num":0,"subscribe_num":0,"praise_num":4,"status":1,"created_at":"1619074729","updated_at":"1619508900"}},"message":"ok"}
 	 */
 	public function praise(Request $request)
 	{
@@ -81,7 +81,7 @@ class ArticlePraiseController extends BaseController
 	 * @apiSuccess {Number} status 1已点赞0未点赞
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 * {"status":true,"code":200,"data":{"id":1,"article_id":1,"user_id":1,"status":1,"praise_time":1619063551,"created_at":"1619063551","updated_at":"1619063677"},"message":"ok"}
+	 * {"status":true,"code":200,"data":{"article_praise":{"id":5,"article_id":7,"user_id":1,"status":0,"praise_time":1619509293,"created_at":"1619509294","updated_at":"1619509316"},"article":{"id":7,"column_id":1,"tag_ids":["2"],"user_id":1,"title":"7","content":"111","comment_status":1,"is_reprint":1,"reprint_url":"","home_thumbnail":1,"read_num":0,"praise_num":0,"status":1,"reason":"","created_at":"1619076216","updated_at":"1619509294","status_text":"审核通过"},"article_column":{"id":1,"user_id":1,"name":"栏目2","article_num":13,"read_num":0,"subscribe_num":0,"praise_num":3,"status":1,"created_at":"1619074729","updated_at":"1619509294"}},"message":"ok"}
 	 */
 	public function unPraise(Request $request)
 	{
