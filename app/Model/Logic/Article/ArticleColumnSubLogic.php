@@ -52,6 +52,9 @@ class ArticleColumnSubLogic extends BaseLogic
 					'status' => ArticleColumnSub::STATUS_SUB,
 					'sub_time' => time()
 				];
+				if ($column->user_id == $uid) {
+					throw new ErrorHttpException('不能关注自己');
+				}
 				$row = ArticleColumnSub::query()->create($subData);
 			}
 			$column->increment('subscribe_num', 1);
