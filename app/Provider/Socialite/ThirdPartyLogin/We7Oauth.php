@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * WeEngine Document System
+ *
+ * (c) We7Team 2019 <https://www.w7.cc>
+ *
+ * This is not a free software
+ * Using it under the license terms
+ * visited https://www.w7.cc for more details
+ */
+
 namespace W7\App\Provider\Socialite\ThirdPartyLogin;
 
 use GuzzleHttp\Client;
@@ -55,9 +65,23 @@ class We7Oauth extends AbstractProvider implements ProviderInterface
 	 */
 	protected function getTokenFields($code)
 	{
-		return [
+		$data = [
+			'appid' => $this->clientId,
 			'code' => $code
 		];
+		$data['sign'] = $this->getSign($data, $this->clientSecret);
+		return $data;
+	}
+
+	public function getSign($data, $appsecret = '')
+	{
+		unset($data['sign']);
+
+		ksort($data, SORT_STRING);
+		reset($data);
+
+		$sign = md5(http_build_query($data, '', '&') . $appsecret);
+		return $sign;
 	}
 
 	/**
@@ -69,8 +93,9 @@ class We7Oauth extends AbstractProvider implements ProviderInterface
 	 */
 	public function getAccessToken($code)
 	{
+		$formParams = $this->getTokenFields($code);
 		$response = $this->getHttpClient()->post($this->getTokenUrl(), [
-			'form_params' => $this->getTokenFields($code),
+			'form_params' => $formParams,
 		]);
 
 		$data = \json_decode($response->getBody()->getContents(), true);
