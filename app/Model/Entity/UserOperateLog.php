@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * WeEngine Document System
+ *
+ * (c) We7Team 2019 <https://www.w7.cc>
+ *
+ * This is not a free software
+ * Using it under the license terms
+ * visited https://www.w7.cc for more details
+ */
+
 namespace W7\App\Model\Entity;
 
 class UserOperateLog extends BaseModel
@@ -16,11 +26,33 @@ class UserOperateLog extends BaseModel
 
 	protected $table = 'user_operate_log';
 	protected $primaryKey = 'id';
-	protected $appends = ['time_str'];
+	protected $appends = ['time_str', 'operate_desc'];
 
-	public function getTimeStrAttribute(){
+	public function getTimeStrAttribute()
+	{
 		return timeToString($this->created_at->unix());
 	}
+
+	public static function getOperateLabel()
+	{
+		return [
+			self::CREATE => '创建',
+			self::PREVIEW => '预览',
+			self::EDIT => '编辑',
+			self::DELETE => '删除',
+			self::CHAPTER_MOVE => '移动',
+			self::CHAPTER_COPY => '复制',
+			self::DOCUMENT_TRANSFER => '转让',
+			self::SHARE => '分享',
+			self::COLLECT => '收藏'
+		];
+	}
+
+	public function getOperateDescAttribute()
+	{
+		return self::getOperateLabel()[$this->operate] ?? '';
+	}
+
 	public function setUpdatedAt($value)
 	{
 		return null;
@@ -28,7 +60,7 @@ class UserOperateLog extends BaseModel
 
 	public function user()
 	{
-		return $this->belongsTo(User::class, 'user_id', 'id')->select(['id','username','avatar']);
+		return $this->belongsTo(User::class, 'user_id', 'id')->select(['id', 'username', 'avatar']);
 	}
 
 	public function targetUser()
@@ -39,19 +71,5 @@ class UserOperateLog extends BaseModel
 	public function document()
 	{
 		return $this->belongsTo(Document::class, 'document_id', 'id');
-	}
-
-	public function getOperateDescAttribute()
-	{
-		switch ($this->operate) {
-			case self::CREATE:
-				return '创建';
-			case self::PREVIEW:
-				return '预览';
-			case self::EDIT:
-				return '编辑';
-			case self::DELETE:
-				return '删除';
-		}
 	}
 }

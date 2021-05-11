@@ -17,6 +17,7 @@ use W7\App\Exception\BadRequestException;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Logic\SettingLogic;
 use W7\App\Model\Service\CdnLogic;
+use W7\App\Model\Service\UEditor\Uploader;
 use W7\Http\Message\Server\Request;
 
 class UploadController extends BaseController
@@ -48,5 +49,26 @@ class UploadController extends BaseController
 		}
 
 		return $this->data(['url' => $url]);
+	}
+
+	public function uEditor(Request $request){
+		$action = $request->input('action', 'config');
+		$config = iconfig()->getUserConfig('ueditor')['config'];
+		switch ($action) {
+			case 'config':
+				return $config;
+			/* 上传图片 */
+			case 'uploadimage':
+				$uploadConfig = array(
+					'pathFormat' => $config['imagePathFormat'],
+					'maxSize' => $config['imageMaxSize'],
+					'allowFiles' => $config['imageAllowFiles']
+				);
+				$fieldName = $config['imageFieldName'];
+				$up = new Uploader($fieldName, $uploadConfig, 'upload');
+				return $up->getFileInfo();
+			default:
+				throw new ErrorHttpException('不支持的操作');
+		}
 	}
 }

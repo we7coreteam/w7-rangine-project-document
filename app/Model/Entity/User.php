@@ -23,6 +23,7 @@ namespace W7\App\Model\Entity;
  */
 class User extends BaseModel
 {
+	protected $hidden = ['userpass'];
 	const GROUP_ADMIN = 1;
 
 	protected $table = 'user';
