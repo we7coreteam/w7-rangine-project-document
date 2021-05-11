@@ -43,7 +43,7 @@ class DocumentController extends BaseController
 		]);
 		$query = Document::query();
 		if (!empty($params['user_id'])) {
-			$query->where('user_id', $params['user_id']);
+			$query->where('creator_id', $params['user_id']);
 		}
 		$query->where('is_public', '=', 1);
 		$list = $query->select('id', 'name', 'cover', 'is_public')
