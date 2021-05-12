@@ -24,8 +24,8 @@ class MessageController extends BaseController
 	}
 
 	/**
-	 * @api {get} /message/indexMy 我的-消息列表
-	 * @apiName indexMy
+	 * @api {get} /message 我的-消息列表
+	 * @apiName index
 	 * @apiGroup message
 	 *
 	 * @apiParam {String} target_type 消息类型
