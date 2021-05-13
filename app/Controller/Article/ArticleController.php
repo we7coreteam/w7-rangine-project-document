@@ -74,13 +74,16 @@ class ArticleController extends BaseController
 				$query->where('article_tag.tag_id', $tagId);
 			}
 		}
+		$user = $request->getAttribute('user');
 		if ($request->input('is_sub', '')) {
 			$isSub = $request->input('is_sub');
 			if ($isSub == 1) {
 				$query->leftJoin('article_column_sub', 'article_column_sub.column_id', 'article.column_id');
+				$query->where('article_column_sub.user_id', $user->id);
 				$query->whereIn('article_column_sub.status', [ArticleColumnSub::STATUS_CREATER, ArticleColumnSub::STATUS_SUB]);
 			} elseif ($isSub == 2) {
 				$query->leftJoin('article_column_sub', 'article_column_sub.column_id', 'article.column_id');
+				$query->where('article_column_sub.user_id', $user->id);
 				$query->where('article_column_sub.status', ArticleColumnSub::STATUS_SUB);
 			}
 		}
