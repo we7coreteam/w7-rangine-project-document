@@ -9,3 +9,5 @@ vendor/
 /vendor
 .env
 /runtime
+/route/test.php
+/app/Controller/Test/
