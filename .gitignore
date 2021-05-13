@@ -8,6 +8,6 @@ vendor/
 .DS_Store
 /vendor
 .env
-/runtime
-/route/test.php
-/app/Controller/Test/
+runtime
+route/test.php
+app/Controller/Test/
