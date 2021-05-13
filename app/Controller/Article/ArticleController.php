@@ -230,7 +230,7 @@ class ArticleController extends BaseController
 			'content' => '内容',
 			'comment_status' => '评论状态',
 			'is_reprint' => '文章来源',
-			'reprint_url' => '来源地址',
+			'reprint_url' => '转载地址',
 			'home_thumbnail' => '首页缩略图',
 		]);
 	}
