@@ -56,6 +56,8 @@ class ArticleColumnController extends BaseController
 	 * @apiName tags
 	 * @apiGroup articleColumn
 	 *
+	 * @apiParam {Number} column_id 栏目ID
+	 *
 	 * @apiSuccess {Object} tag_config 标签信息
 	 * @apiSuccess {String} tag_config.name 标签名称
 	 *
