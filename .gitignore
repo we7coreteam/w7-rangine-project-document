@@ -11,3 +11,5 @@ vendor/
 runtime
 route/test.php
 app/Controller/Test/
+/*.env
+/*.sh
