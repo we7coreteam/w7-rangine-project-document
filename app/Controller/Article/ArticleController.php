@@ -74,13 +74,16 @@ class ArticleController extends BaseController
 				$query->where('article_tag.tag_id', $tagId);
 			}
 		}
+		$user = $request->getAttribute('user');
 		if ($request->input('is_sub', '')) {
 			$isSub = $request->input('is_sub');
 			if ($isSub == 1) {
 				$query->leftJoin('article_column_sub', 'article_column_sub.column_id', 'article.column_id');
+				$query->where('article_column_sub.user_id', $user->id);
 				$query->whereIn('article_column_sub.status', [ArticleColumnSub::STATUS_CREATER, ArticleColumnSub::STATUS_SUB]);
 			} elseif ($isSub == 2) {
 				$query->leftJoin('article_column_sub', 'article_column_sub.column_id', 'article.column_id');
+				$query->where('article_column_sub.user_id', $user->id);
 				$query->where('article_column_sub.status', ArticleColumnSub::STATUS_SUB);
 			}
 		}
@@ -94,6 +97,7 @@ class ArticleController extends BaseController
 			$query->where('article.title', 'like', '%' . $request->input('title', '') . '%');
 		}
 		$query->with(['tags', 'user'])->where('article.status', Article::STATUS_SUCCESS);
+		$query->orderBy('article.id', 'desc');
 		$list = $query->paginate($pageSize, $columns = ['article.*'], '', $page);
 		$result = $this->block()->getListFirstImg($list->toArray());
 		return $this->data($result);
@@ -220,14 +224,14 @@ class ArticleController extends BaseController
 			'is_reprint' => 'required|in:0,1',
 			'reprint_url' => 'string|url',
 			'home_thumbnail' => 'required|in:0,1',
-		], [
+		], [], [
 			'column_id' => '栏目',
 			'tag_ids' => '标签',
 			'title' => '标题',
 			'content' => '内容',
 			'comment_status' => '评论状态',
 			'is_reprint' => '文章来源',
-			'reprint_url' => '来源地址',
+			'reprint_url' => '转载地址',
 			'home_thumbnail' => '首页缩略图',
 		]);
 	}

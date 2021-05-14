@@ -8,4 +8,8 @@ vendor/
 .DS_Store
 /vendor
 .env
-/runtime
+runtime
+route/test.php
+app/Controller/Test/
+/*.env
+/*.sh
