@@ -82,7 +82,7 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->integer('updated_at', false, true)->default(0);
 			$table->index(['user_id'], 'user_id');
 			$table->index(['column_id'], 'column_id');
-			$table->index(['title'], 'title');
+//			$table->index(['title'], 'title');
 			$table->index(['status'], 'status');
 		});
 		$tableName = idb()->getTablePrefix() . $this->articleTable;
