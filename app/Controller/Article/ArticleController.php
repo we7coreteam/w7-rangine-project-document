@@ -16,6 +16,7 @@ use W7\App\Controller\BaseController;
 use W7\App\Model\Entity\Article\Article;
 use W7\App\Model\Entity\Article\ArticleColumnSub;
 use W7\App\Model\Logic\Article\ArticleLogic;
+use W7\App\Model\Logic\UserLogic;
 use W7\Http\Message\Server\Request;
 
 class ArticleController extends BaseController
@@ -74,17 +75,22 @@ class ArticleController extends BaseController
 				$query->where('article_tag.tag_id', $tagId);
 			}
 		}
-		$user = $request->getAttribute('user');
+		$userData = $request->session->get('user');
 		if ($request->input('is_sub', '')) {
 			$isSub = $request->input('is_sub');
-			if ($isSub == 1) {
-				$query->leftJoin('article_column_sub', 'article_column_sub.column_id', 'article.column_id');
-				$query->where('article_column_sub.user_id', $user->id);
-				$query->whereIn('article_column_sub.status', [ArticleColumnSub::STATUS_CREATER, ArticleColumnSub::STATUS_SUB]);
-			} elseif ($isSub == 2) {
-				$query->leftJoin('article_column_sub', 'article_column_sub.column_id', 'article.column_id');
-				$query->where('article_column_sub.user_id', $user->id);
-				$query->where('article_column_sub.status', ArticleColumnSub::STATUS_SUB);
+			if ($userData && $isSub) {
+				$user = UserLogic::instance()->getByUid($userData['uid']);
+				if ($isSub == 1) {
+					$query->leftJoin('article_column_sub', 'article_column_sub.column_id', 'article.column_id');
+					$query->where('article_column_sub.user_id', $user->id);
+					$query->whereIn('article_column_sub.status', [ArticleColumnSub::STATUS_CREATER, ArticleColumnSub::STATUS_SUB]);
+				} elseif ($isSub == 2) {
+					$query->leftJoin('article_column_sub', 'article_column_sub.column_id', 'article.column_id');
+					$query->where('article_column_sub.user_id', $user->id);
+					$query->where('article_column_sub.status', ArticleColumnSub::STATUS_SUB);
+				}
+			} else {
+				$query->where('article.id', 0);
 			}
 		}
 		if ($request->input('column_id', '')) {
