@@ -58,7 +58,7 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->integer('created_at', false, true)->default(0);
 			$table->integer('updated_at', false, true)->default(0);
 			$table->index(['user_id'], 'user_id');
-			$table->index(['name'], 'name');
+//			$table->index(['name'], 'name');
 		});
 		$tableName = idb()->getTablePrefix() . $this->columnTable;
 		\Illuminate\Support\Facades\DB::statement("ALTER TABLE `{$tableName}` COMMENT '文章专栏'");
