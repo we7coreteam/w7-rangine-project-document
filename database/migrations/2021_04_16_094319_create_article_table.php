@@ -49,7 +49,7 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 		$this->schema->create($this->columnTable, function (Blueprint $table) {
 			$table->bigIncrements('id');
 			$table->integer('user_id', false, true)->default(0)->comment('用户id');
-			$table->string('name', 255)->default('')->comment('栏目名称');
+			$table->string('name', 100)->default('')->comment('栏目名称');
 			$table->integer('article_num', false, true)->default(0)->comment('文章数量');
 			$table->integer('read_num', false, true)->default(0)->comment('阅读次数');
 			$table->integer('subscribe_num', false, true)->default(0)->comment('订阅数量');
@@ -58,7 +58,7 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->integer('created_at', false, true)->default(0);
 			$table->integer('updated_at', false, true)->default(0);
 			$table->index(['user_id'], 'user_id');
-//			$table->index(['name'], 'name');
+			$table->index(['name'], 'name');
 		});
 		$tableName = idb()->getTablePrefix() . $this->columnTable;
 		\Illuminate\Support\Facades\DB::statement("ALTER TABLE `{$tableName}` COMMENT '文章专栏'");
@@ -68,7 +68,7 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->integer('column_id', false, true)->default(0)->comment('专栏id');
 			$table->string('tag_ids', 255)->default('')->comment('标签列表');
 			$table->integer('user_id', false, true)->default(0)->comment('用户id');
-			$table->string('title', 255)->default('')->comment('文章标题');
+			$table->string('title', 100)->default('')->comment('文章标题');
 			$table->longText('content')->default('')->comment('文章内容');
 			$table->tinyInteger('comment_status', false, true)->default(0)->comment('是否开启评论0否1是');
 			$table->tinyInteger('is_reprint', false, true)->default(0)->comment('是否来自转载0否1是');
@@ -82,7 +82,7 @@ class CreateArticleTable2021_04_16_094319 extends Migration
 			$table->integer('updated_at', false, true)->default(0);
 			$table->index(['user_id'], 'user_id');
 			$table->index(['column_id'], 'column_id');
-//			$table->index(['title'], 'title');
+			$table->index(['title'], 'title');
 			$table->index(['status'], 'status');
 		});
 		$tableName = idb()->getTablePrefix() . $this->articleTable;
