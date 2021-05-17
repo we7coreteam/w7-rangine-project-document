@@ -183,6 +183,12 @@ class ArticleController extends BaseController
 		} else {
 			$row = $this->block()->show($id, ['tags', 'user']);
 		}
+		$user = $request->getAttribute('user');
+		if (!$user) {
+			if ($row && $row->status != Article::STATUS_SUCCESS) {
+				$row = null;
+			}
+		}
 		return $this->data($row);
 	}
 
