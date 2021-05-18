@@ -34,6 +34,11 @@ class User extends BaseModel
 		return $this->belongsTo(Document::class);
 	}
 
+	public function articleCollections()
+	{
+		return $this->belongsToMany('W7\App\Model\Entity\Article\Article', 'article_collection', 'user_id', 'article_id');
+	}
+
 	public function getIsFounderAttribute()
 	{
 		return $this->group_id == self::GROUP_ADMIN;

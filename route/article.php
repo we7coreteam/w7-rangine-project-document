@@ -49,4 +49,9 @@ irouter()->middleware(['CheckAuthMiddleware'])->group([], function (\W7\Core\Rou
 	$route->post('/article/commentPraise/info', 'Article\CommentPraiseController@info');
 	$route->post('/article/commentPraise/praise', 'Article\CommentPraiseController@praise');
 	$route->post('/article/commentPraise/unPraise', 'Article\CommentPraiseController@unPraise');
+
+	//文章收藏
+	$route->get('/article/articleCollection/info', 'Article\ArticleCollectionController@info');
+	$route->post('/article/articleCollection/collection', 'Article\ArticleCollectionController@collection');
+	$route->post('/article/articleCollection/unCollection', 'Article\ArticleCollectionController@unCollection');
 });
