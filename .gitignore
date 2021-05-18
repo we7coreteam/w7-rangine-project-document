@@ -11,4 +11,4 @@ vendor/
 runtime
 route/test.php
 app/Controller/Test/
-/*.sh
+
