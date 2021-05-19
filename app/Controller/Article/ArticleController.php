@@ -189,10 +189,14 @@ class ArticleController extends BaseController
 		} else {
 			$row = $this->block()->show($id, ['tags', 'user']);
 		}
-		$user = $request->getAttribute('user');
-		if (!$user) {
-			if ($row && $row->status != Article::STATUS_SUCCESS) {
-				$row = null;
+
+		if ($row) {
+			if ($row->status != Article::STATUS_SUCCESS) {
+				//审核未通过-只能看见自己的
+				$userData = $request->session->get('user');
+				if ($userData['uid'] != $row->user_id) {
+					$row = null;
+				}
 			}
 		}
 		return $this->data($row);
