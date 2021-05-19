@@ -55,3 +55,5 @@ irouter()->middleware(['CheckAuthMiddleware'])->group([], function (\W7\Core\Rou
 	$route->post('/article/articleCollection/collection', 'Article\ArticleCollectionController@collection');
 	$route->post('/article/articleCollection/unCollection', 'Article\ArticleCollectionController@unCollection');
 });
+
+irouter()->get('/article/articleCollection/all', 'Article\ArticleCollectionController@index');
