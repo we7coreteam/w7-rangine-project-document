@@ -12,6 +12,8 @@
 
 namespace W7\App\Model\Logic;
 
+use phpDocumentor\Reflection\DocBlock\Tags\Uses;
+use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\UserOperateLog;
 use W7\Core\Helper\Traiter\InstanceTraiter;
 
@@ -39,22 +41,23 @@ class UserOperateLogic extends BaseLogic
 	public function lists($where = [], $page = 1, $size = 20, $hasCreateChapter = false)
 	{
 		$query = UserOperateLog::query()
+			->select('user_operate_log.*')
 			->with(['user','document','column','document.user' => function ($query) {
-				$query->select(['id','username','avatar']);
+				$query->select(['id', 'username', 'avatar']);
 			}]);
-		if (!empty($where['user_id'])) {
-			$query->where('user_id', $where['user_id']);
-		}
+		//只展示公开的
+		$query->leftJoin('document', 'document.id', 'user_operate_log.id')->where('document.is_public', Document::PUBLIC_DOCUMENT);
+		if (!empty($where['user_id'])) $query->where('user_id', $where['user_id']);
 		if (!empty($where['operate'])) {
 			(!$hasCreateChapter && in_array(UserOperateLog::CREATE, $where['operate']))
-			? $query->where(function ($query) use ($where) {
+				? $query->where(function ($query) use ($where) {
 				$query->where(function ($query) {
 					$query->where('operate', UserOperateLog::CREATE)->where('chapter_id', 0);
 				})->orWhere(function ($query) use ($where) {
 					$query->whereIn('operate', array_diff($where['operate'], [UserOperateLog::CREATE]));
 				});
 			})
-			: $query->whereIn('operate', $where['operate']);
+				: $query->whereIn('operate', $where['operate']);
 		}
 
 		return $query->orderBy('id', 'desc')->paginate($size, ['*'], '', $page);
