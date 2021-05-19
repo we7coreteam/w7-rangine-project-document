@@ -192,7 +192,7 @@ class ArticleController extends BaseController
 
 		if ($row) {
 			if ($row->status != Article::STATUS_SUCCESS) {
-				//审核未通过
+				//审核未通过-只能看见自己的
 				$userData = $request->session->get('user');
 				if ($userData['uid'] != $row->user_id) {
 					$row = null;
