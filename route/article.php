@@ -39,8 +39,10 @@ irouter()->middleware(['CheckAuthMiddleware'])->group([], function (\W7\Core\Rou
 	//文章评论
 	$route->post('/article/articleComment', 'Article\ArticleCommentController@store');
 
-	//评论点赞
+	//文章点赞
 	$route->post('/article/articlePraise/info', 'Article\ArticlePraiseController@info');
+	//评论点赞
+	$route->post('/article/commentPraise/info', 'Article\CommentPraiseController@info');
 	$route->post('/article/commentPraise/praise', 'Article\CommentPraiseController@praise');
 	$route->post('/article/commentPraise/unPraise', 'Article\CommentPraiseController@unPraise');
 });
@@ -59,6 +61,5 @@ irouter()->group([], function (\W7\Core\Route\Route $route) {
 	//文章评论
 	$route->get('/article/articleComment', 'Article\ArticleCommentController@index');
 
-	//评论点赞
-	$route->post('/article/commentPraise/info', 'Article\CommentPraiseController@info');
+
 });
