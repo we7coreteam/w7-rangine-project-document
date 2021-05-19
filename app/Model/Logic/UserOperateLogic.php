@@ -34,7 +34,7 @@ class UserOperateLogic extends BaseLogic
 				$query->select(['id', 'username', 'avatar']);
 			}]);
 		//只展示公开的
-		$query->leftJoin('document', 'document.id', 'user_operate_log.id')->where('document.is_public', Document::PUBLIC_DOCUMENT);
+		$query->leftJoin('document', 'document.id', 'user_operate_log.document_id')->where('document.is_public', Document::PUBLIC_DOCUMENT);
 		if (!empty($where['user_id'])) $query->where('user_id', $where['user_id']);
 		if (!empty($where['operate'])) {
 			(!$hasCreateChapter && in_array(UserOperateLog::CREATE, $where['operate']))
