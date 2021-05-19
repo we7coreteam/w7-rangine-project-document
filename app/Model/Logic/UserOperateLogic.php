@@ -1,8 +1,17 @@
 <?php
 
+/**
+ * WeEngine Document System
+ *
+ * (c) We7Team 2019 <https://www.w7.cc>
+ *
+ * This is not a free software
+ * Using it under the license terms
+ * visited https://www.w7.cc for more details
+ */
+
 namespace W7\App\Model\Logic;
 
-use phpDocumentor\Reflection\DocBlock\Tags\Uses;
 use W7\App\Model\Entity\Document;
 use W7\App\Model\Entity\UserOperateLog;
 use W7\Core\Helper\Traiter\InstanceTraiter;
@@ -35,19 +44,21 @@ class UserOperateLogic extends BaseLogic
 			}]);
 		//只展示公开的
 		$query->leftJoin('document', 'document.id', 'user_operate_log.document_id')->where('document.is_public', Document::PUBLIC_DOCUMENT);
-		if (!empty($where['user_id'])) $query->where('user_id', $where['user_id']);
+		if (!empty($where['user_id'])) {
+			$query->where('user_operate_log.user_id', $where['user_id']);
+		}
 		if (!empty($where['operate'])) {
 			(!$hasCreateChapter && in_array(UserOperateLog::CREATE, $where['operate']))
 				? $query->where(function ($query) use ($where) {
-				$query->where(function ($query) {
-					$query->where('operate', UserOperateLog::CREATE)->where('chapter_id', 0);
-				})->orWhere(function ($query) use ($where) {
-					$query->whereIn('operate', array_diff($where['operate'], [UserOperateLog::CREATE]));
-				});
-			})
-				: $query->whereIn('operate', $where['operate']);
+					$query->where(function ($query) {
+						$query->where('user_operate_log.operate', UserOperateLog::CREATE)->where('chapter_id', 0);
+					})->orWhere(function ($query) use ($where) {
+						$query->whereIn('user_operate_log.operate', array_diff($where['operate'], [UserOperateLog::CREATE]));
+					});
+				})
+				: $query->whereIn('user_operate_log.operate', $where['operate']);
 		}
 
-		return $query->orderBy('id', 'desc')->paginate($size, ['*'], '', $page);
+		return $query->orderBy('user_operate_log.id', 'desc')->paginate($size, ['*'], '', $page);
 	}
 }
