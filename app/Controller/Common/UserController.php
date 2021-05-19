@@ -61,7 +61,7 @@ class UserController extends BaseController
 		$page	= $request->input('page',1);
 		$size 	= $request->input('page_size',20);
 		$Logic	= new UserOperateLogic();
-		$param['operate'] = [UserOperateLog::CREATE,UserOperateLog::COLLECT];
+		$param['operate'] = [UserOperateLog::CREATE,UserOperateLog::COLLECT,UserOperateLog::COLUMN_CREATE,UserOperateLog::COLUMN_SUB];
 		return $this->data($Logic->lists($param,$page,$size));
 	}
 

@@ -12,6 +12,8 @@
 
 namespace W7\App\Model\Entity;
 
+use W7\App\Model\Entity\Article\ArticleColumn;
+
 class UserOperateLog extends BaseModel
 {
 	const CREATE = 1; //创建
@@ -23,6 +25,9 @@ class UserOperateLog extends BaseModel
 	const DOCUMENT_TRANSFER = 7; //转让
 	const SHARE = 8; //分享
 	const COLLECT = 9; //收藏
+    const COLUMN_CREATE = 10; //创建专栏
+    const COLUMN_SUB = 11; //订阅专栏
+    const COLUMN_UNSUB = 12; //取消订阅
 
 	protected $table = 'user_operate_log';
 	protected $primaryKey = 'id';
@@ -44,7 +49,10 @@ class UserOperateLog extends BaseModel
 			self::CHAPTER_COPY => '复制',
 			self::DOCUMENT_TRANSFER => '转让',
 			self::SHARE => '分享',
-			self::COLLECT => '收藏'
+			self::COLLECT => '收藏',
+            self::COLUMN_CREATE => '创建专栏',
+            self::COLUMN_SUB => '订阅专栏',
+            self::COLUMN_UNSUB => '取消订阅'
 		];
 	}
 
@@ -72,4 +80,9 @@ class UserOperateLog extends BaseModel
 	{
 		return $this->belongsTo(Document::class, 'document_id', 'id');
 	}
+
+	public function column()
+    {
+        return $this->belongsTo(ArticleColumn::class, 'column_id', 'id');
+    }
 }

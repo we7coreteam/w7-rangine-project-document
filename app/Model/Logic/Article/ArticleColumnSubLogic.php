@@ -15,7 +15,9 @@ namespace W7\App\Model\Logic\Article;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Article\ArticleColumn;
 use W7\App\Model\Entity\Article\ArticleColumnSub;
+use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\BaseLogic;
+use W7\App\Model\Logic\UserOperateLogic;
 use W7\Core\Helper\Traiter\InstanceTraiter;
 
 class ArticleColumnSubLogic extends BaseLogic
@@ -58,6 +60,7 @@ class ArticleColumnSubLogic extends BaseLogic
 				$row = ArticleColumnSub::query()->create($subData);
 			}
 			$column->increment('subscribe_num', 1);
+			UserOperateLogic::instance()->createOperateLog($row, UserOperateLog::COLUMN_SUB);
 			idb()->commit();
 			return 'success';
 		} catch (\Exception $e) {
@@ -86,6 +89,7 @@ class ArticleColumnSubLogic extends BaseLogic
 				}
 			}
 			$column->decrement('subscribe_num', 1);
+			UserOperateLogic::instance()->createOperateLog($row, UserOperateLog::COLUMN_UNSUB);
 			idb()->commit();
 			return 'success';
 		} catch (\Exception $e) {

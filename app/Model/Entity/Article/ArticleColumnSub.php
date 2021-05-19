@@ -13,6 +13,7 @@
 namespace W7\App\Model\Entity\Article;
 
 use W7\App\Model\Entity\BaseModel;
+use W7\App\Model\Entity\User;
 
 class ArticleColumnSub extends BaseModel
 {
@@ -44,4 +45,9 @@ class ArticleColumnSub extends BaseModel
 	{
 		return $this->hasOne(ArticleColumn::class, 'id', 'column_id');
 	}
+
+	public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }
