@@ -22,7 +22,7 @@ class Article extends BaseModel
 		'column_id', 'tag_ids', 'user_id', 'title', 'content', 'comment_status', 'is_reprint', 'reprint_url', 'home_thumbnail',
 		'read_num', 'praise_num', 'status', 'reason',
 	];
-	protected $appends = ['status_text'];
+	protected $appends = ['time_str', 'status_text'];
 
 	const STATUS_CREATE = 0;
 	const STATUS_SUCCESS = 1;
@@ -39,6 +39,11 @@ class Article extends BaseModel
 		$option = ['allowed_classes' => false];
 		return unserialize($value, $option);
 	}
+
+    public function getTimeStrAttribute()
+    {
+        return timeToString($this->created_at->unix());
+    }
 
 	public function setContentAttribute($value)
 	{
