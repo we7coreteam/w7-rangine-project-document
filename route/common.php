@@ -51,6 +51,8 @@ irouter()->middleware(['CheckAuthMiddleware'])->add(['options', 'post', 'get'], 
 irouter()->get('/user/info', 'Common\UserController@info');
 irouter()->post('/user/update', 'Common\UserController@update');
 irouter()->get('/user/operate', 'Common\UserController@operate');
+irouter()->get('/user/followers', 'Common\UserController@followers');
+irouter()->get('/user/followings', 'Common\UserController@followings');
 
 //消息
 irouter()->middleware(['CheckAuthMiddleware'])->group([], function (\W7\Core\Route\Route $route) {

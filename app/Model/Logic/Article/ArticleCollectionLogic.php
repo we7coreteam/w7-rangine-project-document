@@ -53,7 +53,7 @@ class ArticleCollectionLogic extends BaseLogic
 				];
 				$collection = ArticleCollection::query()->create($saveData);
 			}
-			//点赞数量+1
+			//收藏数量+1
 			$num = 1;
 			$article->increment('collection_num', $num);
 			idb()->commit();
@@ -77,7 +77,7 @@ class ArticleCollectionLogic extends BaseLogic
 				$collection->status = ArticleCollection::STATUS_NO;
 				$collection->save();
 				if ($article->collection_num > 0) {
-					//点赞数量-1
+					//收藏数量-1
 					$num = 1;
 					$article->decrement('collection_num', $num);
 				}
