@@ -81,6 +81,16 @@ class UserController extends BaseController
 		return $this->data($Logic->lists($param, $page, $size));
 	}
 
+    /**
+     * @api {post} /user/follow 用户-关注
+     * @apiName follow
+     * @apiGroup user
+     *
+     * @apiParam {Number} user_id 关注用户id
+     *
+     * @apiSuccessExample {json} Success-Response:
+     * {"status":true,"code":200,"data":[],"message":"ok"}
+     */
 	public function follow(Request $request)
 	{
 		$data = $this->validate($request, [
@@ -93,6 +103,16 @@ class UserController extends BaseController
 		return $this->data();
 	}
 
+    /**
+     * @api {post} /user/unFollow 用户-取消关注
+     * @apiName unFollow
+     * @apiGroup user
+     *
+     * @apiParam {Number} user_id 取消关注用户id
+     *
+     * @apiSuccessExample {json} Success-Response:
+     * {"status":true,"code":200,"data":[],"message":"ok"}
+     */
 	public function unFollow(Request $request)
 	{
 		$data = $this->validate($request, [
@@ -105,6 +125,18 @@ class UserController extends BaseController
 		return $this->data();
 	}
 
+    /**
+     * @api {get} /user/isFollowing 用户-判断用户是否关注
+     * @apiName isFollowing
+     * @apiGroup user
+     *
+     * @apiParam {Number} user_id 用户id
+     *
+     * @apiSuccess {Boolean} is_following true已关注false未关注
+     *
+     * @apiSuccessExample {json} Success-Response:
+     * {"status":true,"code":200,"data":{"is_following":true},"message":"ok"}
+     */
 	public function isFollowing(Request $request)
 	{
 		$data = $this->validate($request, [
