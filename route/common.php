@@ -58,4 +58,9 @@ irouter()->middleware(['CheckAuthMiddleware'])->group([], function (\W7\Core\Rou
 	$route->get('/message/{id:\d+}', 'Message\MessageController@show');
 	$route->post('/message/read', 'Message\MessageController@read');
 	$route->post('/message/readAll', 'Message\MessageController@readAll');
+
+	//关注
+	$route->post('/user/follow', 'Common\UserController@follow');
+	$route->post('/user/unFollow', 'Common\UserController@unFollow');
+	$route->get('/user/isFollowing', 'Common\UserController@isFollowing');
 });

@@ -43,4 +43,14 @@ class User extends BaseModel
 	{
 		return $this->group_id == self::GROUP_ADMIN;
 	}
+
+	public function followers()
+	{
+		return $this->belongsToMany(User::class, 'user_follower', 'user_id', 'follower_id')->using(UserFollower::class);
+	}
+
+	public function followings()
+	{
+		return $this->belongsToMany(User::class, 'user_follower', 'follower_id', 'user_id')->using(UserFollower::class)->withTimestamps();
+	}
 }

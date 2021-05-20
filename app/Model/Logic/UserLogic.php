@@ -14,6 +14,7 @@ namespace W7\App\Model\Logic;
 
 use W7\App\Model\Entity\User;
 use W7\Core\Helper\Traiter\InstanceTraiter;
+use W7\App\Exception\ErrorHttpException;
 
 class UserLogic extends BaseLogic
 {
@@ -52,8 +53,8 @@ class UserLogic extends BaseLogic
 		return $user->id;
 	}
 
-
-	public function createBucket($username, $avatar = '') {
+	public function createBucket($username, $avatar = '')
+	{
 		$user = $this->getByUserName($username);
 		if ($user) {
 			return $user->id;
@@ -125,5 +126,26 @@ class UserLogic extends BaseLogic
 	public function userPwdEncryption($username, $userpass)
 	{
 		return md5(md5($username.$userpass));
+	}
+
+	public function follow($user_id, User $user)
+	{
+		if ($this->isFollowing($user_id, $user)) {
+			throw new ErrorHttpException('您已关注此用户');
+		}
+		return $user->followings()->sync([$user_id], false);
+	}
+
+	public function unFollow($user_id, User $user)
+	{
+		if (!$this->isFollowing($user_id, $user)) {
+			throw new ErrorHttpException('您未关注此用户');
+		}
+		return $user->followings()->detach($user_id, false);
+	}
+
+	public function isFollowing($user_id, User $user)
+	{
+		return $user->followings->contains($user_id);
 	}
 }
