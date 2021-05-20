@@ -25,7 +25,7 @@ class ArticleCollectionController extends BaseController
 	}
 
 	/**
-	 * @api {get} admin/article/collection 收藏文章-获取收藏文章列表
+	 * @api {get} article/articleCollection/all 收藏文章-获取收藏文章列表
 	 * @apiName index
 	 * @apiGroup articleCollectionAdmin
      *
