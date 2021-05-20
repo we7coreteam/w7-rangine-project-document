@@ -15,6 +15,7 @@ namespace W7\App\Controller\Article;
 use W7\App\Controller\BaseController;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Logic\Article\ArticleCollectionLogic;
+use W7\App\Model\Logic\Article\ArticleLogic;
 use W7\Http\Message\Server\Request;
 
 class ArticleCollectionController extends BaseController
@@ -39,7 +40,7 @@ class ArticleCollectionController extends BaseController
 	 * @apiSuccess {Number} comment_status 是否开启评论
 	 * @apiSuccess {Number} is_reprint 文章来源
 	 * @apiSuccess {Number} reprint_url 来源链接
-	 * @apiSuccess {Number} home_thumbnail 首页缩略图
+	 * @apiSuccess {Number} first_img 首页缩略图
 	 * @apiSuccess {Number} read_num 阅读数量
 	 * @apiSuccess {Number} praise_num 点赞数量
 	 * @apiSuccess {Number} status 状态0待审核1已审核2审核失败
@@ -61,7 +62,8 @@ class ArticleCollectionController extends BaseController
 		$page = $request->query('page', 1);
 		$pageSize = intval($request->input('page_size', 10));
 		$user = User::find($param['user_id']);
-		$result = $user->articleCollections()->where('article_collection.status', 1)->with('user')->paginate($pageSize, ['*'], 'page', $page);
+		$collectionArticles = $user->articleCollections()->where('article_collection.status', 1)->with('user')->paginate($pageSize, ['*'], 'page', $page)->toArray();
+        $result = ArticleLogic::instance()->getListFirstImg($collectionArticles);
 		return $this->data($result);
 	}
 
