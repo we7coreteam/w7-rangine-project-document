@@ -13,8 +13,9 @@
 namespace W7\App\Controller\Article;
 
 use W7\App\Controller\BaseController;
-use W7\App\Model\Entity\Article\ArticleColumnSub;
+use W7\App\Model\Entity\UserStatus;
 use W7\App\Model\Logic\Article\ArticleColumnSubLogic;
+use W7\App\Model\Logic\UserStatusLogic;
 use W7\Http\Message\Server\Request;
 
 class ArticleColumnSubController extends BaseController
@@ -96,6 +97,7 @@ class ArticleColumnSubController extends BaseController
 		$user = $request->getAttribute('user');
 		$data['user_id'] = $user->id;
 		$result = $this->block()->sub($data['column_id'], $user->id);
+		UserStatusLogic::instance()->createStatus($result, $user, UserStatus::SUB_COLUMN);
 		return $this->data($result);
 	}
 
@@ -117,6 +119,7 @@ class ArticleColumnSubController extends BaseController
 		$user = $request->getAttribute('user');
 		$data['user_id'] = $user->id;
 		$result = $this->block()->unSub($data['column_id'], $user->id);
+        UserStatusLogic::instance()->deleteStatus($result, $user, UserStatus::SUB_COLUMN);
 		return $this->data($result);
 	}
 }

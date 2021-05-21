@@ -14,8 +14,10 @@ namespace W7\App\Controller\Common;
 
 use W7\App\Controller\BaseController;
 use W7\App\Model\Entity\UserOperateLog;
+use W7\App\Model\Entity\UserStatus;
 use W7\App\Model\Logic\UserLogic;
 use W7\App\Model\Logic\UserOperateLogic;
+use W7\App\Model\Logic\UserStatusLogic;
 use W7\Http\Message\Server\Request;
 
 class UserController extends BaseController
@@ -88,7 +90,7 @@ class UserController extends BaseController
 		$page = $request->input('page', 1);
 		$size = $request->input('page_size', 20);
 		$Logic = new UserOperateLogic();
-		$param['operate'] = [UserOperateLog::CREATE,UserOperateLog::COLLECT,UserOperateLog::COLUMN_CREATE,UserOperateLog::COLUMN_SUB];
+		$param['operate'] = [UserOperateLog::CREATE,UserOperateLog::COLLECT];
 		return $this->data($Logic->lists($param, $page, $size));
 	}
 
@@ -110,8 +112,9 @@ class UserController extends BaseController
 			'user_id' => '用户id'
 		]);
 		$user = $request->getAttribute('user');
-		$this->block()->follow($data['user_id'], $user);
-		return $this->data();
+		$row = $this->block()->follow($data['user_id'], $user);
+		UserStatusLogic::instance()->createStatus($row, $user, UserStatus::FOLLOW_USER);
+		return $this->data($row);
 	}
 
 	/**
@@ -132,8 +135,9 @@ class UserController extends BaseController
 			'user_id' => '用户id'
 		]);
 		$user = $request->getAttribute('user');
-		$this->block()->unFollow($data['user_id'], $user);
-		return $this->data();
+		$row = $this->block()->unFollow($data['user_id'], $user);
+		UserStatusLogic::instance()->deleteStatus($row, $user, UserStatus::FOLLOW_USER);
+		return $this->data($row);
 	}
 
 	/**
@@ -165,12 +169,14 @@ class UserController extends BaseController
 	 * @apiName followers
 	 * @apiGroup user
 	 *
-	 * @apiParam {String} username 用户名
-	 * @apiParam {String} avatar 头像
-	 * @apiParam {String} skill 简介
-	 * @apiParam {Number} article_num 文章数量
-	 * @apiParam {Number} follower_num 关注者数量
-	 * @apiParam {Number} is_following 是否关注此用户（登录的情况下有该属性）1已关注0未关注
+	 * @apiParam {Number} user_id 用户id
+	 *
+	 * @apiSuccess {String} username 用户名
+	 * @apiSuccess {String} avatar 头像
+	 * @apiSuccess {String} skill 简介
+	 * @apiSuccess {Number} article_num 文章数量
+	 * @apiSuccess {Number} follower_num 关注者数量
+	 * @apiSuccess {Number} is_following 是否关注此用户（登录的情况下有该属性）1已关注0未关注
 	 *
 	 * @apiSuccessExample {json} Success-Response:
 	 * {"status":true,"code":200,"data":{"current_page":1,"data":[{"id":2,"username":"rxw","avatar":"","remark":"","is_ban":0,"group_id":0,"company":"","resume":"","skill":"","address":"","created_at":"1576832671","updated_at":"1577166012","follower_num":2,"following_num":1,"article_num":0,"pivot":{"user_id":201,"follower_id":2}},{"id":3,"username":"donknap","avatar":"","remark":"","is_ban":0,"group_id":0,"company":"","resume":"","skill":"","address":"","created_at":"1576832694","updated_at":"1576832694","follower_num":0,"following_num":1,"article_num":0,"pivot":{"user_id":201,"follower_id":3}},{"id":4,"username":"jiajia123","avatar":"","remark":"","is_ban":0,"group_id":0,"company":"","resume":"","skill":"","address":"","created_at":"1577072657","updated_at":"1577072657","follower_num":1,"following_num":1,"article_num":0,"pivot":{"user_id":201,"follower_id":4}}],"first_page_url":"\/?page=1","from":1,"last_page":1,"last_page_url":"\/?page=1","next_page_url":null,"path":"\/","per_page":20,"prev_page_url":null,"to":3,"total":3},"message":"ok"}
@@ -194,12 +200,14 @@ class UserController extends BaseController
 	 * @apiName followings
 	 * @apiGroup user
 	 *
-	 * @apiParam {String} username 用户名
-	 * @apiParam {String} avatar 头像
-	 * @apiParam {String} skill 简介
-	 * @apiParam {Number} article_num 文章数量
-	 * @apiParam {Number} follower_num 关注者数量
-	 * @apiParam {Number} is_following 是否关注此用户（登录的情况下有该属性）1已关注0未关注
+	 * @apiParam {Number} user_id 用户id
+	 *
+	 * @apiSuccess {String} username 用户名
+	 * @apiSuccess {String} avatar 头像
+	 * @apiSuccess {String} skill 简介
+	 * @apiSuccess {Number} article_num 文章数量
+	 * @apiSuccess {Number} follower_num 关注者数量
+	 * @apiSuccess {Number} is_following 是否关注此用户（登录的情况下有该属性）1已关注0未关注
 	 *
 	 * @apiSuccessExample {json} Success-Response:
 	 * {"status":true,"code":200,"data":{"current_page":1,"data":[{"id":2,"username":"rxw","avatar":"","remark":"","is_ban":0,"group_id":0,"company":"","resume":"","skill":"","address":"","created_at":"1576832671","updated_at":"1577166012","is_following":1,"follower_num":2,"following_num":1,"article_num":0,"pivot":{"follower_id":1,"user_id":2,"created_at":"0","updated_at":"0"}},{"id":4,"username":"jiajia123","avatar":"","remark":"","is_ban":0,"group_id":0,"company":"","resume":"","skill":"","address":"","created_at":"1577072657","updated_at":"1577072657","is_following":0,"follower_num":1,"following_num":1,"article_num":0,"pivot":{"follower_id":1,"user_id":4,"created_at":"0","updated_at":"0"}}],"first_page_url":"\/?page=1","from":1,"last_page":1,"last_page_url":"\/?page=1","next_page_url":null,"path":"\/","per_page":20,"prev_page_url":null,"to":2,"total":2},"message":"ok"}

@@ -63,36 +63,4 @@ class UserOperateLogic extends BaseLogic
 
 		return $query->orderBy('user_operate_log.id', 'desc')->paginate($size, ['*'], '', $page);
 	}
-
-	public function createOperateLog($row, $operate)
-	{
-		$data = [];
-		switch ($operate) {
-			case UserOperateLog::COLUMN_CREATE:
-				$data = [
-					'user_id' => $row->user_id,
-					'column_id' => $row->id,
-					'operate' => UserOperateLog::COLUMN_CREATE,
-					'remark' => $row->user->username . '创建专栏' . $row->name
-				];
-				break;
-			case UserOperateLog::COLUMN_SUB:
-				$data = [
-					'user_id' => $row->user_id,
-					'column_id' => $row->column_id,
-					'operate' => UserOperateLog::COLUMN_SUB,
-					'remark' => $row->user->username . '订阅专栏' . $row->column->name
-				];
-				break;
-			case UserOperateLog::COLUMN_UNSUB:
-				$data = [
-					'user_id' => $row->user_id,
-					'column_id' => $row->column_id,
-					'operate' => UserOperateLog::COLUMN_UNSUB,
-					'remark' => $row->user->username . '取消订阅专栏' . $row->column->name
-				];
-				break;
-		}
-		return parent::store($data);
-	}
 }

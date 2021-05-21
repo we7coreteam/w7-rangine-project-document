@@ -130,13 +130,18 @@ class UserLogic extends BaseLogic
 
 	public function follow($user_id, User $user)
 	{
+		$followUser = User::find($user_id);
+		if (!$followUser) {
+			throw new ErrorHttpException('此用户不存在');
+		}
 		if ($this->isFollowing($user_id, $user)) {
 			throw new ErrorHttpException('您已关注此用户');
 		}
 		if ($user_id == $user->id) {
-            throw new ErrorHttpException('不能关注自己');
-        }
-		return $user->followings()->sync($user_id, false);
+			throw new ErrorHttpException('不能关注自己');
+		}
+		$user->followings()->sync($user_id, false);
+		return $followUser;
 	}
 
 	public function unFollow($user_id, User $user)
@@ -144,7 +149,8 @@ class UserLogic extends BaseLogic
 		if (!$this->isFollowing($user_id, $user)) {
 			throw new ErrorHttpException('您未关注此用户');
 		}
-		return $user->followings()->detach($user_id, false);
+		$user->followings()->detach($user_id, false);
+		return User::find($user_id);
 	}
 
 	public function isFollowing($user_id, User $user)
@@ -155,16 +161,16 @@ class UserLogic extends BaseLogic
 	public function getFollowers($user_id, $login_user, $page = 1, $limit = 20)
 	{
 		$user = User::find($user_id);
-        $followers = $user->followers()->orderBy('user_follower.created_at', 'desc')->paginate($limit, ['*'], 'page', $page);
+		$followers = $user->followers()->orderBy('user_follower.created_at', 'desc')->paginate($limit, ['*'], 'page', $page);
 		if ($login_user) {
 			$loginUser = User::find($login_user['uid']);
-            $followers->map(function ($item) use ($loginUser) {
-                if ($loginUser->followings->contains($item->id)) {
-                    return $item->is_following = 1;
-                } else {
-                    return $item->is_following = 0;
-                }
-            });
+			$followers->map(function ($item) use ($loginUser) {
+				if ($loginUser->followings->contains($item->id)) {
+					return $item->is_following = 1;
+				} else {
+					return $item->is_following = 0;
+				}
+			});
 		}
 		return $followers;
 	}
@@ -172,16 +178,16 @@ class UserLogic extends BaseLogic
 	public function getFollowings($user_id, $login_user, $page = 1, $limit = 20)
 	{
 		$user = User::find($user_id);
-        $followings = $user->followings()->orderBy('user_follower.created_at', 'desc')->paginate($limit, ['*'], 'page', $page);
+		$followings = $user->followings()->orderBy('user_follower.created_at', 'desc')->paginate($limit, ['*'], 'page', $page);
 		if ($login_user) {
-            $loginUser = User::find($login_user['uid']);
-            $followings->map(function ($item) use ($loginUser) {
-                if ($loginUser->followings->contains($item->id)) {
-                    return $item->is_following = 1;
-                } else {
-                    return $item->is_following = 0;
-                }
-            });
+			$loginUser = User::find($login_user['uid']);
+			$followings->map(function ($item) use ($loginUser) {
+				if ($loginUser->followings->contains($item->id)) {
+					return $item->is_following = 1;
+				} else {
+					return $item->is_following = 0;
+				}
+			});
 		}
 		return $followings;
 	}

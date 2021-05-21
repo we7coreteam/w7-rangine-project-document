@@ -126,7 +126,6 @@ class ArticleColumnLogic extends BaseLogic
 					'sub_time' => time()
 				];
 				ArticleColumnSub::query()->create($subData);
-				UserOperateLogic::instance()->createOperateLog($row, UserOperateLog::COLUMN_CREATE);
 				idb()->commit();
 			} catch (\Exception $e) {
 				idb()->rollBack();

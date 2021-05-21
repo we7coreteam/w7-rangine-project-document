@@ -76,4 +76,9 @@ class User extends BaseModel
 	{
 		return $this->belongsToMany(User::class, 'user_follower', 'follower_id', 'user_id')->using(UserFollower::class)->withTimestamps();
 	}
+
+	public function statuses()
+    {
+        return $this->hasMany(UserStatus::class, 'operator_id');
+    }
 }

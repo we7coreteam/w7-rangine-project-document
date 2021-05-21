@@ -60,9 +60,8 @@ class ArticleColumnSubLogic extends BaseLogic
 				$row = ArticleColumnSub::query()->create($subData);
 			}
 			$column->increment('subscribe_num', 1);
-			UserOperateLogic::instance()->createOperateLog($row, UserOperateLog::COLUMN_SUB);
 			idb()->commit();
-			return 'success';
+			return $column;
 		} catch (\Exception $e) {
 			idb()->rollBack();
 			throw new ErrorHttpException($e->getMessage());
@@ -89,9 +88,8 @@ class ArticleColumnSubLogic extends BaseLogic
 				}
 			}
 			$column->decrement('subscribe_num', 1);
-			UserOperateLogic::instance()->createOperateLog($row, UserOperateLog::COLUMN_UNSUB);
 			idb()->commit();
-			return 'success';
+			return $column;
 		} catch (\Exception $e) {
 			idb()->rollBack();
 			throw new ErrorHttpException($e->getMessage());

@@ -22,10 +22,12 @@ use W7\App\Model\Entity\Setting;
 use W7\App\Model\Entity\Star;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserOperateLog;
+use W7\App\Model\Entity\UserStatus;
 use W7\App\Model\Logic\DocumentFeedbackLogic;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\App\Model\Logic\DocumentPermissionLogic;
 use W7\App\Model\Logic\UserLogic;
+use W7\App\Model\Logic\UserStatusLogic;
 use W7\Http\Message\Server\Request;
 
 class DocumentController extends BaseController
@@ -285,7 +287,6 @@ class DocumentController extends BaseController
 		return $this->data($result);
 	}
 
-
 	/**
 	 * @api {post} /admin/document/new-feedback 检测是否有最新反馈
 	 * @apiName new-feedback
@@ -294,7 +295,8 @@ class DocumentController extends BaseController
 	 *
 	 * @apiParam {Number} document_id 文档ID
 	 */
-	public function checkNewFeed(Request $request){
+	public function checkNewFeed(Request $request)
+	{
 		$params = $this->validate($request, [
 			'document_id' => 'required|integer',
 		], [
@@ -304,13 +306,11 @@ class DocumentController extends BaseController
 		//查看是否有新的 反馈建议
 		$result['new_feed'] = false;
 		$isNewFeed = DocumentFeedbackLogic::instance()->getByFeedbackNew($params['document_id']);
-		if ($isNewFeed){
+		if ($isNewFeed) {
 			$result['new_feed'] = true;
 		}
 		return $this->data($result);
 	}
-
-
 
 	public function operator(Request $request)
 	{
@@ -430,13 +430,7 @@ class DocumentController extends BaseController
 //			'parent_id' => 0
 //		]);
 
-		UserOperateLog::query()->create([
-			'user_id' => $user->id,
-			'document_id' => $document->id,
-			'chapter_id' => 0,
-			'operate' => UserOperateLog::CREATE,
-			'remark' => $user->username . '创建文档'
-		]);
+		UserStatusLogic::instance()->createStatus($document, $user, UserStatus::CREATE_DOCUMENT);
 
 		return $this->data($document->id);
 	}
@@ -481,6 +475,12 @@ class DocumentController extends BaseController
 			'remark' => $user->username . '编辑文档基本信息'
 		]);
 
+		if ($document->is_public == 1) {
+			UserStatusLogic::instance()->changeShow($document, $user, UserStatus::CREATE_DOCUMENT, 1);
+		} elseif ($document->is_public == 2) {
+			UserStatusLogic::instance()->changeShow($document, $user, UserStatus::CREATE_DOCUMENT, 0);
+		}
+
 		return $this->data('success');
 	}
 
@@ -498,6 +498,8 @@ class DocumentController extends BaseController
 				'operate' => UserOperateLog::DELETE,
 				'remark' => $user->username . '删除文档'
 			]);
+
+			UserStatusLogic::instance()->deleteStatus($document, $user, UserStatus::CREATE_DOCUMENT);
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());
 		}

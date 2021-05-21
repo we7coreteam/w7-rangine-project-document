@@ -54,6 +54,9 @@ irouter()->get('/user/operate', 'Common\UserController@operate');
 irouter()->get('/user/followers', 'Common\UserController@followers');
 irouter()->get('/user/followings', 'Common\UserController@followings');
 
+// 用户动态
+irouter()->get('/user/userStatus', 'User\UserStatusController@index');
+
 //消息
 irouter()->middleware(['CheckAuthMiddleware'])->group([], function (\W7\Core\Route\Route $route) {
 	$route->get('/message', 'Message\MessageController@index');
