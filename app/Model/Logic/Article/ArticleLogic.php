@@ -103,7 +103,7 @@ class ArticleLogic extends BaseLogic
 				//更新栏目统计信息
 				(new ArticleColumnLogic())->retry($row->column_id);
 				//发送消息
-				(new RemindLogic())->add(0, $row->user_id, "抱歉，您发表的文章<span class='article_title'>《{$row->title}》审核不通过，拒绝原因：" . $reason, Message::REMIND_ARTICLE, $row->id);
+				(new RemindLogic())->add(0, $row->user_id, "抱歉，您发表的文章<span class='article_title'>《{$row->title}》</span>审核不通过，拒绝原因：" . $reason, Message::REMIND_ARTICLE, $row->id);
 				idb()->commit();
 				return $row;
 			} catch (\Exception $e) {

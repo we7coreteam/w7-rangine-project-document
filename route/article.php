@@ -22,7 +22,7 @@ irouter()->middleware(['CheckAuthMiddleware'])->group([], function (\W7\Core\Rou
 
 	//专栏关注
 	$route->get('/article/articleColumnSub', 'Article\ArticleColumnSubController@index');
-	$route->get('/article/userSub', 'Article\ArticleColumnSubController@getUserSub');
+	$route->get('/article/articleColumnSub/userSub', 'Article\ArticleColumnSubController@getUserSub');
 	$route->post('/article/articleColumnSub/info', 'Article\ArticleColumnSubController@info');
 	$route->post('/article/articleColumnSub/sub', 'Article\ArticleColumnSubController@sub');
 	$route->post('/article/articleColumnSub/unSub', 'Article\ArticleColumnSubController@unSub');

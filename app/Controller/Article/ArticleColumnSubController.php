@@ -124,7 +124,7 @@ class ArticleColumnSubController extends BaseController
 	}
 
 	/**
-	 * @api {get} /article/userSub 关注栏目-获取用户订阅的栏目
+	 * @api {get} /article/articleColumnSub/userSub 关注栏目-获取用户订阅的栏目
 	 * @apiName userSub
 	 * @apiGroup articleColumnSub
 	 *
