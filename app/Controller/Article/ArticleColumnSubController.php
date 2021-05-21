@@ -132,8 +132,9 @@ class ArticleColumnSubController extends BaseController
 	 *
 	 * @apiSuccess {Object} column 栏目详情
 	 * @apiSuccess {String} column.name 栏目名称
-	 * @apiSuccess {Number} column,article_num 文章数量
-	 * @apiSuccess {Number} column,subscribe_num 关注者数量
+	 * @apiSuccess {Number} column.article_num 文章数量
+	 * @apiSuccess {Number} column.subscribe_num 关注者数量
+	 * @apiSuccess {Number} is_sub 当前登录用户是否订阅（此字段仅在用户登录时存在）1已订阅0未订阅
 	 *
 	 **/
 	public function getUserSub(Request $request)
@@ -151,6 +152,16 @@ class ArticleColumnSubController extends BaseController
 			['status', '=', 2]
 		];
 		$result = $this->block()->index($condition, $page, $pageSize, 'column');
+		$user = $request->session->get('user');
+		if ($user) {
+			$result->map(function ($itme) use ($user) {
+				if ($this->block()->info($itme->column_id, $user['uid'])) {
+					$itme->is_sub = 1;
+				} else {
+					$itme->is_sub = 0;
+				}
+			});
+		}
 		return $this->data($result);
 	}
 }
