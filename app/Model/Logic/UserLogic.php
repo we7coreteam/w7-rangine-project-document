@@ -78,7 +78,7 @@ class UserLogic extends BaseLogic
 
 	public function updateUser($userInfo)
 	{
-		$user = isset($userInfo['id']) ? $this->getByUid($userInfo['id']) : $this->getByUserName($userInfo['username']);
+		$user = $this->getByUserName($userInfo['username']);
 		if ($user && $userInfo['id'] != $user->id) {
 			throw new \RuntimeException('用户名已经存在');
 		}

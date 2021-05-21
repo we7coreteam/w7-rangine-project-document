@@ -12,7 +12,10 @@
 
 namespace W7\App\Controller\User;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use W7\App\Controller\BaseController;
+use W7\App\Model\Entity\User;
 use W7\App\Model\Logic\UserStatusLogic;
 use W7\Http\Message\Server\Request;
 
@@ -39,6 +42,15 @@ class UserStatusController extends BaseController
 	 */
 	public function index(Request $request)
 	{
+//	    $re = DB::select('SELECT * FROM ims_user WHERE username IN (SELECT username FROM ims_user GROUP BY username HAVING COUNT(username)> 1)');
+        $users = User::whereIn('username', function ($query) {
+            $query->select('username')->from('user')->groupBy('username')->havingRaw('COUNT(username) > 1');
+        })->get();
+        $users->map(function ($item) {
+            $item->username = $item->username . Str::random(6);
+            $item->save();
+        });
+	    return $this->data($users);
 		$param = $this->validate($request, [
 			'user_id' => 'required|integer'
 		], [

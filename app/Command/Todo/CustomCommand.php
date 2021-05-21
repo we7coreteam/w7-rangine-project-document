@@ -13,6 +13,7 @@
 namespace W7\App\Command\Todo;
 
 use W7\Console\Command\CommandAbstract;
+use W7\App\Model\Entity\User;
 
 class CustomCommand extends CommandAbstract
 {
@@ -25,5 +26,15 @@ class CustomCommand extends CommandAbstract
 
 	protected function handle($options)
 	{
+		go(function () {
+			$users = User::whereIn('username', function ($query) {
+				$query->select('username')->from('user')->groupBy('username')->havingRaw('COUNT(username) > 1');
+			})->get();
+			$users->map(function ($item) {
+				$item->username = $item->username . Str::random(6);
+				$item->save();
+			});
+			$this->output->success('处理成功');
+		});
 	}
 }
