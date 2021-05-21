@@ -14,6 +14,7 @@ namespace W7\App\Command\Todo;
 
 use W7\Console\Command\CommandAbstract;
 use W7\App\Model\Entity\User;
+use Illuminate\Support\Str;
 
 class CustomCommand extends CommandAbstract
 {
