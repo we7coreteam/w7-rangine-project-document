@@ -119,7 +119,38 @@ class ArticleColumnSubController extends BaseController
 		$user = $request->getAttribute('user');
 		$data['user_id'] = $user->id;
 		$result = $this->block()->unSub($data['column_id'], $user->id);
-        UserStatusLogic::instance()->deleteStatus($result, $user, UserStatus::SUB_COLUMN);
+		UserStatusLogic::instance()->deleteStatus($result, $user, UserStatus::SUB_COLUMN);
+		return $this->data($result);
+	}
+
+	/**
+	 * @api {get} /article/userSub 关注栏目-获取用户订阅的栏目
+	 * @apiName userSub
+	 * @apiGroup articleColumnSub
+	 *
+	 * @apiParam {Number} column_id 用户ID
+	 *
+	 * @apiSuccess {Object} column 栏目详情
+	 * @apiSuccess {String} column.name 栏目名称
+	 * @apiSuccess {Number} column,article_num 文章数量
+	 * @apiSuccess {Number} column,subscribe_num 关注者数量
+	 *
+	 **/
+	public function getUserSub(Request $request)
+	{
+		$data = $this->validate($request, [
+			'user_id' => 'required|integer',
+		], [
+			'user_id' => '用户id',
+		]);
+
+		$page = $request->query('page', 1);
+		$pageSize = intval($request->input('page_size', 10));
+		$condition = [
+			['user_id', '=', $data['user_id']],
+			['status', '=', 2]
+		];
+		$result = $this->block()->index($condition, $page, $pageSize, 'column');
 		return $this->data($result);
 	}
 }
