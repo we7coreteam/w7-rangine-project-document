@@ -13,16 +13,16 @@
 namespace W7\App\Model\Entity\Message;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
+use W7\App\Model\Entity\BaseModel;
 use W7\App\Model\Entity\User;
-use W7\Core\Database\ModelAbstract;
 
-class Message extends ModelAbstract
+class Message extends BaseModel
 {
 	use SoftDeletes;
 
 	protected $table = 'message';
 	protected $fillable = ['from_id', 'to_id', 'text_id', 'type', 'target_type', 'target_id', 'target_url', 'is_read', 'team_id'];
-	protected $appends = ['type_text', 'target_type_text'];
+	protected $appends = ['type_text', 'target_type_text', 'time_str'];
 
 	// 系统通知
 	const TYPE_REMIND = 'remind';
@@ -77,6 +77,11 @@ class Message extends ModelAbstract
 	public function getTargetTypeTextAttribute()
 	{
 		return self::getTargetTypeLabel()[$this->target_type] ?? '';
+	}
+
+	public function getTimeStrAttribute()
+	{
+		return timeToString($this->created_at->unix());
 	}
 
 	public function text()

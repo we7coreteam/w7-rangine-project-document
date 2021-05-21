@@ -12,9 +12,9 @@
 
 namespace W7\App\Model\Entity\Message;
 
-use W7\Core\Database\ModelAbstract;
+use W7\App\Model\Entity\BaseModel;
 
-class Text extends ModelAbstract
+class Text extends BaseModel
 {
 	protected $table = 'message_text';
 	protected $fillable = ['title', 'content'];
