@@ -13,8 +13,9 @@
 namespace W7\App\Controller\Admin\Article;
 
 use W7\App\Controller\BaseController;
-use W7\App\Model\Entity\Article\Article;
+use W7\App\Model\Entity\UserStatus;
 use W7\App\Model\Logic\Article\ArticleLogic;
+use W7\App\Model\Logic\UserStatusLogic;
 use W7\Http\Message\Server\Request;
 
 class ArticleController extends BaseController
@@ -89,7 +90,8 @@ class ArticleController extends BaseController
 			'id' => '文章ID',
 		]);
 		$result = $this->block()->success($data['id']);
-		return $this->data($result);
+		$re = UserStatusLogic::instance()->changeShow($result, $result->user_id, UserStatus::CREATE_ARTICLE, UserStatus::SHOW);
+		return $this->data($re);
 	}
 
 	/**

@@ -128,7 +128,7 @@ class StarController extends BaseController
 			->delete();
 		$star->delete();
 
-		UserStatusLogic::instance()->deleteStatus($document, $user, UserStatus::COLLECT_DOCUMENT);
+		UserStatusLogic::instance()->deleteStatus($document, $user->id, UserStatus::COLLECT_DOCUMENT);
 		return $this->data('success');
 	}
 }

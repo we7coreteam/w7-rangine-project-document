@@ -136,7 +136,7 @@ class UserController extends BaseController
 		]);
 		$user = $request->getAttribute('user');
 		$row = $this->block()->unFollow($data['user_id'], $user);
-		UserStatusLogic::instance()->deleteStatus($row, $user, UserStatus::FOLLOW_USER);
+		UserStatusLogic::instance()->deleteStatus($row, $user->id, UserStatus::FOLLOW_USER);
 		return $this->data($row);
 	}
 

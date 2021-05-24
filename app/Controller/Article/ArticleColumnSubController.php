@@ -119,7 +119,7 @@ class ArticleColumnSubController extends BaseController
 		$user = $request->getAttribute('user');
 		$data['user_id'] = $user->id;
 		$result = $this->block()->unSub($data['column_id'], $user->id);
-		UserStatusLogic::instance()->deleteStatus($result, $user, UserStatus::SUB_COLUMN);
+		UserStatusLogic::instance()->deleteStatus($result, $user->id, UserStatus::SUB_COLUMN);
 		return $this->data($result);
 	}
 

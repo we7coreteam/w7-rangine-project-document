@@ -476,9 +476,9 @@ class DocumentController extends BaseController
 		]);
 
 		if ($document->is_public == 1) {
-			UserStatusLogic::instance()->changeShow($document, $user, UserStatus::CREATE_DOCUMENT, 1);
+			UserStatusLogic::instance()->changeShow($document, $document->creator_id, UserStatus::CREATE_DOCUMENT, UserStatus::SHOW);
 		} elseif ($document->is_public == 2) {
-			UserStatusLogic::instance()->changeShow($document, $user, UserStatus::CREATE_DOCUMENT, 0);
+			UserStatusLogic::instance()->changeShow($document, $document->creator_id, UserStatus::CREATE_DOCUMENT, UserStatus::UN_SHOW);
 		}
 
 		return $this->data('success');
@@ -499,7 +499,7 @@ class DocumentController extends BaseController
 				'remark' => $user->username . '删除文档'
 			]);
 
-			UserStatusLogic::instance()->deleteStatus($document, $user, UserStatus::CREATE_DOCUMENT);
+			UserStatusLogic::instance()->deleteStatus($document, $document->creator_id, UserStatus::CREATE_DOCUMENT);
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());
 		}

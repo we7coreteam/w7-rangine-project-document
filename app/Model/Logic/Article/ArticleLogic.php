@@ -149,7 +149,7 @@ class ArticleLogic extends BaseLogic
 			$model->delete();
 			//更新栏目统计信息
 			(new ArticleColumnLogic())->retry($columnId);
-			return true;
+			return $model;
 		} catch (\Exception $e) {
 			throw new ErrorHttpException($e->getMessage());
 		}

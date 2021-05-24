@@ -15,8 +15,10 @@ namespace W7\App\Controller\Article;
 use W7\App\Controller\BaseController;
 use W7\App\Model\Entity\Article\Article;
 use W7\App\Model\Entity\Article\ArticleColumnSub;
+use W7\App\Model\Entity\UserStatus;
 use W7\App\Model\Logic\Article\ArticleLogic;
 use W7\App\Model\Logic\UserLogic;
+use W7\App\Model\Logic\UserStatusLogic;
 use W7\Http\Message\Server\Request;
 
 class ArticleController extends BaseController
@@ -226,6 +228,7 @@ class ArticleController extends BaseController
 		$user = $request->getAttribute('user');
 		$data['user_id'] = $user->id;
 		$result = $this->block()->store($data);
+		UserStatusLogic::instance()->createStatus($result, $user, UserStatus::CREATE_ARTICLE);
 		return $this->data($result);
 	}
 
@@ -291,6 +294,7 @@ class ArticleController extends BaseController
 		//必须本用户修改
 		$checkData['user_id'] = $user->id;
 		$result = $this->block()->destroy($id, $checkData);
+		UserStatusLogic::instance()->deleteStatus($result, $user->id, UserStatus::CREATE_ARTICLE);
 		return $this->data($result);
 	}
 }
