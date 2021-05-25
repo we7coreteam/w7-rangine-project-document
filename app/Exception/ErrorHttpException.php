@@ -21,6 +21,10 @@ class ErrorHttpException extends ResponseExceptionAbstract
 		if (empty($code)) {
 			$code = '500';
 		}
+		$hasCase = json_decode($message, true);
+		if ($hasCase && !empty($hasCase['message']) && !empty($hasCase['code'])) {
+			$message = $hasCase['message'];
+		}
 		$message = json_encode([
 			'status' => false,
 			'code' => $code,
