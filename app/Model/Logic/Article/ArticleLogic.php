@@ -42,7 +42,7 @@ class ArticleLogic extends BaseLogic
 	public function getContentFirstImg($content, $homeThumbnail)
 	{
 		if ($homeThumbnail) {
-			$pattern = "/<[img|IMG].*?src=[\'|\"](.*?(?:[\.gif|\.jpg]))[\'|\"].*?[\/]?>/";
+			$pattern = "/<[img|IMG].*?src=[\'|\"](.*?)[\'|\"]?\s.*?>/";
 			preg_match_all($pattern, $content, $match);
 			if (!empty($match[1][0])) {
 				return $match[1][0];
