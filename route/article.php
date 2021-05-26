@@ -22,7 +22,6 @@ irouter()->middleware(['CheckAuthMiddleware'])->group([], function (\W7\Core\Rou
 
 	//专栏关注
 	$route->get('/article/articleColumnSub', 'Article\ArticleColumnSubController@index');
-	$route->get('/article/articleColumnSub/userSub', 'Article\ArticleColumnSubController@getUserSub');
 	$route->post('/article/articleColumnSub/info', 'Article\ArticleColumnSubController@info');
 	$route->post('/article/articleColumnSub/sub', 'Article\ArticleColumnSubController@sub');
 	$route->post('/article/articleColumnSub/unSub', 'Article\ArticleColumnSubController@unSub');
@@ -53,6 +52,7 @@ irouter()->middleware(['CheckAuthMiddleware'])->group([], function (\W7\Core\Rou
 	$route->post('/article/articleCollection/unCollection', 'Article\ArticleCollectionController@unCollection');
 });
 
+irouter()->get('/article/articleColumnSub/userSub', 'Article\ArticleColumnSubController@getUserSub');
 irouter()->get('/article/articleCollection/all', 'Article\ArticleCollectionController@index');
 
 irouter()->group([], function (\W7\Core\Route\Route $route) {
