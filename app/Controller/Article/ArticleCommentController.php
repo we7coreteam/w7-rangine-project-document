@@ -38,6 +38,7 @@ class ArticleCommentController extends BaseController
 	 * @apiSuccess {Text} comment 评论内容
 	 * @apiSuccess {Object} user 用户信息
 	 * @apiSuccess {String} user.username 用户昵称
+	 * @apiSuccess {Number} is_praise 是否已点赞（该属性只在用户登录情况下存在）1已点赞0未点赞
 	 **/
 	public function index(Request $request)
 	{
@@ -50,8 +51,12 @@ class ArticleCommentController extends BaseController
 		$pageSize = intval($request->input('page_size', 10));
 		$condition = $this->block()->handleCondition($this->query);
 		$condition[] = ['status', '=', ArticleComment::STATUS_YES];
-		$result = $this->block()->index($condition, $page, $pageSize, 'user');
-		return $this->data($result);
+		$user = $request->session->get('user');
+		$comments = $this->block()->index($condition, $page, $pageSize, 'user', 'praise_num desc');
+		if ($user) {
+			$comments = $this->block()->isPraise($comments, $user);
+		}
+		return $this->data($comments);
 	}
 
 	public function show(Request $request, $id)

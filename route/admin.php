@@ -25,7 +25,7 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 		//反馈建议
 		$route->post('/new-feedback', 'Admin\DocumentController@checkNewFeed');
 		$route->post('/feedback-list', 'Admin\FeedbackController@getList');
-		$route->post('/feedback-detail','Admin\FeedbackController@detail');
+		$route->post('/feedback-detail', 'Admin\FeedbackController@detail');
 	});
 
 	//api文档内容管理-公共
@@ -59,6 +59,7 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 	$route->group(['prefix' => '/share'], function (\W7\Core\Route\Route $route) {
 		$route->post('/all', 'Admin\UserShareController@all');
 		$route->post('/url', 'Admin\UserShareController@shareUrl');
+		$route->get('/articleUrl', 'Admin\UserShareController@articleShareUrl');
 	});
 
 	$route->group(['prefix' => '/user'], function (\W7\Core\Route\Route $route) {
@@ -114,9 +115,7 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 		$route->post('/set-open', 'Admin\HomepageSettingController@setOpenHome');
 		$route->post('/set-banner', 'Admin\HomepageSettingController@setHomeBanner');
 		$route->post('/set-title', 'Admin\HomepageSettingController@setHomeTtile');
-
 	});
-
 
 	$route->middleware('CheckFounderMiddleware')->group([], function (\W7\Core\Route\Route $route) {
 		$route->post('/setting/cos', 'Admin\SettingController@cos');

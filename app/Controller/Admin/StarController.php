@@ -7,7 +7,9 @@ use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Star;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserOperateLog;
+use W7\App\Model\Entity\UserStatus;
 use W7\App\Model\Logic\DocumentLogic;
+use W7\App\Model\Logic\UserStatusLogic;
 use W7\Http\Message\Server\Request;
 
 class StarController extends BaseController
@@ -89,6 +91,8 @@ class StarController extends BaseController
 			'remark'	=> '添加星标'
 		]);
 
+		UserStatusLogic::instance()->createStatus($document, $user, UserStatus::COLLECT_DOCUMENT);
+
 		return $this->data(['star_id' => $star->id]);
 	}
 
@@ -124,6 +128,7 @@ class StarController extends BaseController
 			->delete();
 		$star->delete();
 
+		UserStatusLogic::instance()->deleteStatus($document, $user->id, UserStatus::COLLECT_DOCUMENT);
 		return $this->data('success');
 	}
 }

@@ -13,8 +13,9 @@
 namespace W7\App\Controller\Article;
 
 use W7\App\Controller\BaseController;
-use W7\App\Model\Entity\Article\ArticleColumnSub;
+use W7\App\Model\Entity\UserStatus;
 use W7\App\Model\Logic\Article\ArticleColumnSubLogic;
+use W7\App\Model\Logic\UserStatusLogic;
 use W7\Http\Message\Server\Request;
 
 class ArticleColumnSubController extends BaseController
@@ -96,6 +97,7 @@ class ArticleColumnSubController extends BaseController
 		$user = $request->getAttribute('user');
 		$data['user_id'] = $user->id;
 		$result = $this->block()->sub($data['column_id'], $user->id);
+		UserStatusLogic::instance()->createStatus($result, $user, UserStatus::SUB_COLUMN);
 		return $this->data($result);
 	}
 
@@ -117,6 +119,49 @@ class ArticleColumnSubController extends BaseController
 		$user = $request->getAttribute('user');
 		$data['user_id'] = $user->id;
 		$result = $this->block()->unSub($data['column_id'], $user->id);
+		UserStatusLogic::instance()->deleteStatus($result, $user->id, UserStatus::SUB_COLUMN);
+		return $this->data($result);
+	}
+
+	/**
+	 * @api {get} /article/articleColumnSub/userSub 关注栏目-获取用户订阅的栏目
+	 * @apiName userSub
+	 * @apiGroup articleColumnSub
+	 *
+	 * @apiParam {Number} column_id 用户ID
+	 *
+	 * @apiSuccess {Object} column 栏目详情
+	 * @apiSuccess {String} column.name 栏目名称
+	 * @apiSuccess {Number} column.article_num 文章数量
+	 * @apiSuccess {Number} column.subscribe_num 关注者数量
+	 * @apiSuccess {Number} is_sub 当前登录用户是否订阅（此字段仅在用户登录时存在）1已订阅0未订阅
+	 *
+	 **/
+	public function getUserSub(Request $request)
+	{
+		$data = $this->validate($request, [
+			'user_id' => 'required|integer',
+		], [
+			'user_id' => '用户id',
+		]);
+
+		$page = $request->query('page', 1);
+		$pageSize = intval($request->input('page_size', 10));
+		$condition = [
+			['user_id', '=', $data['user_id']],
+			['status', '=', 2]
+		];
+		$result = $this->block()->index($condition, $page, $pageSize, 'column');
+		$user = $request->session->get('user');
+		if ($user) {
+			$result->map(function ($itme) use ($user) {
+				if ($this->block()->info($itme->column_id, $user['uid'])) {
+					$itme->is_sub = 1;
+				} else {
+					$itme->is_sub = 0;
+				}
+			});
+		}
 		return $this->data($result);
 	}
 }

@@ -42,7 +42,7 @@ class ArticleLogic extends BaseLogic
 	public function getContentFirstImg($content, $homeThumbnail)
 	{
 		if ($homeThumbnail) {
-			$pattern = "/<[img|IMG].*?src=[\'|\"](.*?(?:[\.gif|\.jpg]))[\'|\"].*?[\/]?>/";
+			$pattern = "/<[img|IMG].*?src=[\'|\"](.*?)[\'|\"]?\s.*?>/";
 			preg_match_all($pattern, $content, $match);
 			if (!empty($match[1][0])) {
 				return $match[1][0];
@@ -77,7 +77,7 @@ class ArticleLogic extends BaseLogic
 				//更新栏目统计信息
 				(new ArticleColumnLogic())->retry($row->column_id);
 				//发送消息
-				(new RemindLogic())->add(0, $row->user_id, '恭喜，您发表的文章《' . $row->title . '》已通过审核。', Message::REMIND_ARTICLE, $row->id);
+				(new RemindLogic())->add(0, $row->user_id, "恭喜，您发表的文章<span class='article_title'>《{$row->title}》</span>已通过审核。", Message::REMIND_ARTICLE, $row->id);
 				idb()->commit();
 				return $row;
 			} catch (\Exception $e) {
@@ -103,7 +103,7 @@ class ArticleLogic extends BaseLogic
 				//更新栏目统计信息
 				(new ArticleColumnLogic())->retry($row->column_id);
 				//发送消息
-				(new RemindLogic())->add(0, $row->user_id, '抱歉，您发表的文章《' . $row->title . '》审核不通过，拒绝原因：' . $reason, Message::REMIND_ARTICLE, $row->id);
+				(new RemindLogic())->add(0, $row->user_id, "抱歉，您发表的文章<span class='article_title'>《{$row->title}》</span>审核不通过，拒绝原因：" . $reason, Message::REMIND_ARTICLE, $row->id);
 				idb()->commit();
 				return $row;
 			} catch (\Exception $e) {
@@ -149,7 +149,7 @@ class ArticleLogic extends BaseLogic
 			$model->delete();
 			//更新栏目统计信息
 			(new ArticleColumnLogic())->retry($columnId);
-			return true;
+			return $model;
 		} catch (\Exception $e) {
 			throw new ErrorHttpException($e->getMessage());
 		}

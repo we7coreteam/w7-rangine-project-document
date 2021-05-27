@@ -8,4 +8,6 @@
 # 执行数据库迁移命令
 $ bin/gerent migrate:migrate --force
 
+#自定义命令
+$ bin/gerent todo:custom
 ```

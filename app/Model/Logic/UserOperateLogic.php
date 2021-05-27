@@ -20,6 +20,8 @@ class UserOperateLogic extends BaseLogic
 {
 	use InstanceTraiter;
 
+	protected $model = UserOperateLog::class;
+
 	public function getByChapterAndOperate($chapterId, $operate)
 	{
 		return UserOperateLog::query()->where('chapter_id', '=', $chapterId)->where('operate', '=', $operate)->first();
@@ -39,7 +41,7 @@ class UserOperateLogic extends BaseLogic
 	{
 		$query = UserOperateLog::query()
 			->select('user_operate_log.*')
-			->with(['user', 'document', 'document.user' => function ($query) {
+			->with(['user','document','column','document.user' => function ($query) {
 				$query->select(['id', 'username', 'avatar']);
 			}]);
 		//只展示公开的

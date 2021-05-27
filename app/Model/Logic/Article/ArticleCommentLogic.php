@@ -15,6 +15,7 @@ namespace W7\App\Model\Logic\Article;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Entity\Article\Article;
 use W7\App\Model\Entity\Article\ArticleComment;
+use W7\App\Model\Entity\Article\CommentPraise;
 use W7\App\Model\Logic\BaseLogic;
 use W7\Core\Helper\Traiter\InstanceTraiter;
 
@@ -32,5 +33,23 @@ class ArticleCommentLogic extends BaseLogic
 		}
 		$data['status'] = ArticleComment::STATUS_YES;
 		return parent::store($data);
+	}
+
+	public function isPraise($comments, $user)
+	{
+		$comments->map(function ($item) use ($user) {
+			$is_praise = CommentPraise::where([
+				['comment_id', '=', $item->id],
+				['user_id', '=', $user['uid']],
+				['status', '=', 1],
+			])->get()->isNotEmpty();
+
+			if ($is_praise) {
+				return $item->is_praise = 1;
+			} else {
+				return $item->is_praise = 0;
+			}
+		});
+		return $comments;
 	}
 }

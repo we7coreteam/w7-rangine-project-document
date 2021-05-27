@@ -13,8 +13,9 @@
 namespace W7\App\Controller\Article;
 
 use W7\App\Controller\BaseController;
-use W7\App\Model\Entity\User;
+use W7\App\Model\Entity\UserStatus;
 use W7\App\Model\Logic\Article\ArticleColumnLogic;
+use W7\App\Model\Logic\UserStatusLogic;
 use W7\Http\Message\Server\Request;
 
 class ArticleColumnController extends BaseController
@@ -117,6 +118,7 @@ class ArticleColumnController extends BaseController
 		$user = $request->getAttribute('user');
 		$data['user_id'] = $user->id;
 		$result = $this->block()->add($data);
+		UserStatusLogic::instance()->createStatus($result, $user, UserStatus::CREATE_COLUMN);
 		return $this->data($result);
 	}
 

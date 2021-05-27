@@ -17,6 +17,8 @@ use W7\App\Model\Entity\Article\Article;
 use W7\App\Model\Entity\Article\ArticleColumn;
 use W7\App\Model\Entity\Article\ArticleColumnSub;
 use W7\App\Model\Entity\Article\ArticleTag;
+use W7\App\Model\Logic\UserOperateLogic;
+use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\BaseLogic;
 use W7\Core\Helper\Traiter\InstanceTraiter;
 
