@@ -14,6 +14,7 @@ namespace W7\App\Model\Logic;
 
 use W7\App\Model\Entity\User;
 use W7\Core\Helper\Traiter\InstanceTraiter;
+use W7\App\Exception\ErrorHttpException;
 
 class UserLogic extends BaseLogic
 {
@@ -52,8 +53,8 @@ class UserLogic extends BaseLogic
 		return $user->id;
 	}
 
-
-	public function createBucket($username, $avatar = '') {
+	public function createBucket($username, $avatar = '')
+	{
 		$user = $this->getByUserName($username);
 		if ($user) {
 			return $user->id;
@@ -77,7 +78,7 @@ class UserLogic extends BaseLogic
 
 	public function updateUser($userInfo)
 	{
-		$user = isset($userInfo['id']) ? $this->getByUid($userInfo['id']) : $this->getByUserName($userInfo['username']);
+		$user = $this->getByUserName($userInfo['username']);
 		if ($user && $userInfo['id'] != $user->id) {
 			throw new \RuntimeException('用户名已经存在');
 		}
@@ -125,5 +126,69 @@ class UserLogic extends BaseLogic
 	public function userPwdEncryption($username, $userpass)
 	{
 		return md5(md5($username.$userpass));
+	}
+
+	public function follow($user_id, User $user)
+	{
+		$followUser = User::find($user_id);
+		if (!$followUser) {
+			throw new ErrorHttpException('此用户不存在');
+		}
+		if ($this->isFollowing($user_id, $user)) {
+			throw new ErrorHttpException('您已关注此用户');
+		}
+		if ($user_id == $user->id) {
+			throw new ErrorHttpException('不能关注自己');
+		}
+		$user->followings()->sync($user_id, false);
+		return $followUser;
+	}
+
+	public function unFollow($user_id, User $user)
+	{
+		if (!$this->isFollowing($user_id, $user)) {
+			throw new ErrorHttpException('您未关注此用户');
+		}
+		$user->followings()->detach($user_id, false);
+		return User::find($user_id);
+	}
+
+	public function isFollowing($user_id, User $user)
+	{
+		return $user->followings->contains($user_id);
+	}
+
+	public function getFollowers($user_id, $login_user, $page = 1, $limit = 20)
+	{
+		$user = User::find($user_id);
+		$followers = $user->followers()->orderBy('user_follower.created_at', 'desc')->paginate($limit, ['*'], 'page', $page);
+		if ($login_user) {
+			$loginUser = User::find($login_user['uid']);
+			$followers->map(function ($item) use ($loginUser) {
+				if ($loginUser->followings->contains($item->id)) {
+					return $item->is_following = 1;
+				} else {
+					return $item->is_following = 0;
+				}
+			});
+		}
+		return $followers;
+	}
+
+	public function getFollowings($user_id, $login_user, $page = 1, $limit = 20)
+	{
+		$user = User::find($user_id);
+		$followings = $user->followings()->orderBy('user_follower.created_at', 'desc')->paginate($limit, ['*'], 'page', $page);
+		if ($login_user) {
+			$loginUser = User::find($login_user['uid']);
+			$followings->map(function ($item) use ($loginUser) {
+				if ($loginUser->followings->contains($item->id)) {
+					return $item->is_following = 1;
+				} else {
+					return $item->is_following = 0;
+				}
+			});
+		}
+		return $followings;
 	}
 }

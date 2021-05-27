@@ -12,6 +12,8 @@
 
 namespace W7\App\Model\Entity;
 
+use W7\App\Model\Entity\Article\ArticleColumn;
+
 class UserOperateLog extends BaseModel
 {
 	const CREATE = 1; //创建
@@ -44,7 +46,7 @@ class UserOperateLog extends BaseModel
 			self::CHAPTER_COPY => '复制',
 			self::DOCUMENT_TRANSFER => '转让',
 			self::SHARE => '分享',
-			self::COLLECT => '收藏'
+			self::COLLECT => '收藏',
 		];
 	}
 
@@ -72,4 +74,9 @@ class UserOperateLog extends BaseModel
 	{
 		return $this->belongsTo(Document::class, 'document_id', 'id');
 	}
+
+	public function column()
+    {
+        return $this->belongsTo(ArticleColumn::class, 'column_id', 'id');
+    }
 }

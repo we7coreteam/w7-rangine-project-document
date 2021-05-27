@@ -33,9 +33,10 @@ class MessageController extends BaseController
 	 *
 	 * @apiSuccess {Object} text 消息内容对象
 	 * @apiSuccess {String} text.content 消息内容
+	 * @apiSuccess {Object} target_info 消息关联内容详情
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 * {"status":true,"code":200,"data":{"current_page":1,"data":[{"id":3,"from_id":0,"to_id":1,"text_id":3,"type":"remind","target_type":"remind_article","target_id":4,"target_url":"","is_read":2,"created_at":"1970-01-01 08:33:41","updated_at":"1970-01-01 08:33:41","deleted_at":null,"type_text":"系统通知","target_type_text":"文章通知","text":{"id":3,"title":"","content":"您的文章审核未通过，原因：111","created_at":"1970-01-01 08:33:41","updated_at":"1970-01-01 08:33:41"}}],"first_page_url":"\/?=1","from":1,"last_page":3,"last_page_url":"\/?=3","next_page_url":"\/?=2","path":"\/","per_page":"1","prev_page_url":null,"to":1,"total":3},"message":"ok"}
+	 * {"status":true,"code":200,"data":{"current_page":1,"data":[{"id":59,"from_id":0,"to_id":1,"text_id":59,"type":"remind","target_type":"remind_article","target_id":64,"target_url":"","is_read":2,"created_at":"1621828356","updated_at":"1621828356","deleted_at":null,"type_text":"系统通知","target_type_text":"文章通知","target_info":{"id":64,"column_id":1,"tag_ids":["15"],"user_id":1,"title":"ewfwegf","content":"<p>wergregb<\/p>","comment_status":1,"is_reprint":0,"reprint_url":"","home_thumbnail":1,"read_num":0,"praise_num":0,"collection_num":0,"status":2,"reason":"rthger","created_at":"1621818746","updated_at":"1621828356","time_str":"4小时前","status_text":"审核失败"},"time_str":"1小时前","text":{"id":59,"title":"","content":"抱歉，您发表的文章<span class='article_title'>《ewfwegf》<\/span>审核不通过，拒绝原因：rthger","created_at":"1621828356","updated_at":"1621828356"}}],"first_page_url":"\/?=1","from":1,"last_page":6,"last_page_url":"\/?=6","next_page_url":"\/?=2","path":"\/","per_page":"1","prev_page_url":null,"to":1,"total":6},"message":"ok"}
 	 **/
 	public function index(Request $request)
 	{

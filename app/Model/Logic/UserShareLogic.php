@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * WeEngine Document System
+ *
+ * (c) We7Team 2019 <https://www.w7.cc>
+ *
+ * This is not a free software
+ * Using it under the license terms
+ * visited https://www.w7.cc for more details
+ */
+
 namespace W7\App\Model\Logic;
 
 use W7\Core\Helper\Traiter\InstanceTraiter;
@@ -13,6 +23,11 @@ class UserShareLogic extends BaseLogic
 	public function getShareUrl($userId, $documentId, $chapterId)
 	{
 		return rtrim(ienv('API_HOST'), '/') . '/chapter/' . $documentId. '?id=' . $chapterId . '&share_key=' . urlencode(authcode($userId . '-' . $chapterId, 'ENCODED', self::SHARE_KEY));
+	}
+
+	public function getArticleShareUrl($userId, $articleId)
+	{
+		return rtrim(ienv('API_HOST'), '/') . '/articleDetail?id=' . $articleId . '&share_key=' . urlencode(authcode($userId . '-' . $articleId, 'ENCODED', self::SHARE_KEY));
 	}
 
 	public function getUidAndChapterByShareKey($shareKey)

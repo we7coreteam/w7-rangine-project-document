@@ -45,7 +45,15 @@ irouter()->middleware(['CheckAuthMiddleware'])->group([], function (\W7\Core\Rou
 	$route->post('/article/commentPraise/info', 'Article\CommentPraiseController@info');
 	$route->post('/article/commentPraise/praise', 'Article\CommentPraiseController@praise');
 	$route->post('/article/commentPraise/unPraise', 'Article\CommentPraiseController@unPraise');
+
+	//文章收藏
+	$route->get('/article/articleCollection/info', 'Article\ArticleCollectionController@info');
+	$route->post('/article/articleCollection/collection', 'Article\ArticleCollectionController@collection');
+	$route->post('/article/articleCollection/unCollection', 'Article\ArticleCollectionController@unCollection');
 });
+
+irouter()->get('/article/articleColumnSub/userSub', 'Article\ArticleColumnSubController@getUserSub');
+irouter()->get('/article/articleCollection/all', 'Article\ArticleCollectionController@index');
 
 irouter()->group([], function (\W7\Core\Route\Route $route) {
 	//系统标签配置

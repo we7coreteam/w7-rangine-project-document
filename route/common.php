@@ -51,6 +51,11 @@ irouter()->middleware(['CheckAuthMiddleware'])->add(['options', 'post', 'get'], 
 irouter()->get('/user/info', 'Common\UserController@info');
 irouter()->post('/user/update', 'Common\UserController@update');
 irouter()->get('/user/operate', 'Common\UserController@operate');
+irouter()->get('/user/followers', 'Common\UserController@followers');
+irouter()->get('/user/followings', 'Common\UserController@followings');
+
+// 用户动态
+irouter()->get('/user/userStatus', 'User\UserStatusController@index');
 
 //消息
 irouter()->middleware(['CheckAuthMiddleware'])->group([], function (\W7\Core\Route\Route $route) {
@@ -58,4 +63,9 @@ irouter()->middleware(['CheckAuthMiddleware'])->group([], function (\W7\Core\Rou
 	$route->get('/message/{id:\d+}', 'Message\MessageController@show');
 	$route->post('/message/read', 'Message\MessageController@read');
 	$route->post('/message/readAll', 'Message\MessageController@readAll');
+
+	//关注
+	$route->post('/user/follow', 'Common\UserController@follow');
+	$route->post('/user/unFollow', 'Common\UserController@unFollow');
+	$route->get('/user/isFollowing', 'Common\UserController@isFollowing');
 });
