@@ -17,8 +17,6 @@ use W7\App\Model\Entity\Article\Article;
 use W7\App\Model\Entity\Article\ArticleColumn;
 use W7\App\Model\Entity\Article\ArticleColumnSub;
 use W7\App\Model\Entity\Article\ArticleTag;
-use W7\App\Model\Logic\UserOperateLogic;
-use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\BaseLogic;
 use W7\Core\Helper\Traiter\InstanceTraiter;
 
@@ -142,12 +140,13 @@ class ArticleColumnLogic extends BaseLogic
 			if ($checkData['user_id'] != $row->user_id) {
 				throw new ErrorHttpException('栏目不存在');
 			}
-			if ($row->status != ArticleColumn::STATUS_CREATE) {
-				throw new ErrorHttpException('栏目只能修改一次');
+			if ($data['name']) {
+				if ($row->status != ArticleColumn::STATUS_CREATE) {
+					throw new ErrorHttpException('栏目只能修改一次');
+				}
+				$data['status'] = ArticleColumn::STATUS_EDIT;
 			}
-			$row->status = ArticleColumn::STATUS_EDIT;
-			$row->name = $data['name'];
-			$row->save();
+			$row->update($data);
 			return $row;
 		}
 		throw new ErrorHttpException('栏目不存在');
