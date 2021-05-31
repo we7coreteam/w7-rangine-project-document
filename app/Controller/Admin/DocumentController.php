@@ -78,6 +78,8 @@ class DocumentController extends BaseController
 						'description' => $row->descriptionShort,
 						'is_public' => $row->isPublicDoc,
 						'acl' => DocumentPermissionLogic::instance()->getFounderACL(),
+						'time_str' => $row->time_str,
+						'created_at' => $row->created_at->unix(),
 					];
 				}
 			}
@@ -144,6 +146,8 @@ class DocumentController extends BaseController
 						'description' => $row->document->descriptionShort,
 						'is_public' => $row->document->isPublicDoc,
 						'acl' => $acl,
+						'time_str' => $row->document->time_str,
+						'created_at' => $row->document->created_at->unix(),
 					];
 				}
 			}
