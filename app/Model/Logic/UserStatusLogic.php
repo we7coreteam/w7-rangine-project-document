@@ -24,9 +24,13 @@ class UserStatusLogic extends BaseLogic
 
 	public function getStatus($user_id, $page = 1, $limit = 20)
 	{
-		$user = User::find($user_id);
-		$statuses = $user->statuses()->where('is_show', 1)->orderBy('created_at', 'desc')->paginate($limit, ['*'], 'page', $page);
-		return $statuses;
+		return UserStatus::query()
+			->where([
+				['is_show', '=', 1],
+				['operator_id', '=', $user_id],
+			])
+			->orderBy('created_at', 'desc')
+			->paginate($limit, ['*'], 'page', $page);
 	}
 
 	public function createStatus($row, User $operator, $operate)

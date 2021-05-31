@@ -14,6 +14,7 @@ namespace W7\App\Model\Entity;
 
 use W7\App\Model\Entity\Article\Article;
 use W7\App\Model\Entity\Article\ArticleColumn;
+use W7\App\Model\Logic\Article\ArticleLogic;
 
 class UserStatus extends BaseModel
 {
@@ -37,7 +38,6 @@ class UserStatus extends BaseModel
 		self::SUB_COLUMN => '订阅了专栏',
 		self::FOLLOW_USER => '关注了用户',
 		self::CREATE_ARTICLE => '创建了文章'
-
 	];
 
 	public function getTimeStrAttribute()
@@ -58,8 +58,12 @@ class UserStatus extends BaseModel
 				return User::where('id', $this->relation_id)->first();
 				break;
 			case 'Article':
-				return Article::where('id', $this->relation_id)->with('user')->first();
+				$article = Article::where('id', $this->relation_id)->with('user')->first();
+				$article->first_img = ArticleLogic::instance()->getContentFirstImg($article->content, $article->home_thumbnail);
+				return $article;
 				break;
+			default:
+				return [];
 		}
 	}
 
