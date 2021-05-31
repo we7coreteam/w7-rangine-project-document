@@ -21,7 +21,7 @@ class Document extends BaseModel
 	const LOGIN_PREVIEW_DOCUMENT = 3;//点击链接登录后查看
 
 	protected $table = 'document';
-
+	protected $appends = ['time_str'];
 	/**
 	 * 关联作者
 	 */
@@ -37,6 +37,11 @@ class Document extends BaseModel
 	public function operator()
 	{
 		return $this->hasMany(DocumentPermission::class, 'document_id', 'id');
+	}
+
+	public function getTimeStrAttribute()
+	{
+		return timeToString($this->created_at->unix());
 	}
 
 	public function getDescriptionShortAttribute()

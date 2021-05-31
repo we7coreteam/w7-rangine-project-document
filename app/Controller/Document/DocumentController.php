@@ -46,7 +46,7 @@ class DocumentController extends BaseController
 			$query->where('creator_id', $params['user_id']);
 		}
 		$query->where('is_public', '=', 1);
-		$list = $query->select('id', 'name', 'cover', 'is_public')
+		$list = $query->select('id', 'name', 'cover', 'is_public', 'created_at')
 			->orderByDesc('id')
 			->paginate($pageSize, '*', 'page', $page)->toArray();
 		return $this->data($list);
