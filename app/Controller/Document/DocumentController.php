@@ -30,6 +30,8 @@ class DocumentController extends BaseController
 	 * @apiParam {Number} user_id 用户ID
 	 *
 	 * @apiSuccess {String} name 文档名称
+	 * @apiSuccess {String} time_str 文档创建时间
+	 * @apiSuccess {Number} created_at 文档创建时间戳
 	 */
 	public function all(Request $request)
 	{
