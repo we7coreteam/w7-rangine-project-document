@@ -30,6 +30,8 @@ class DocumentController extends BaseController
 	 * @apiParam {Number} user_id 用户ID
 	 *
 	 * @apiSuccess {String} name 文档名称
+	 * @apiSuccess {String} time_str 文档创建时间
+	 * @apiSuccess {Number} created_at 文档创建时间戳
 	 */
 	public function all(Request $request)
 	{
@@ -46,7 +48,7 @@ class DocumentController extends BaseController
 			$query->where('creator_id', $params['user_id']);
 		}
 		$query->where('is_public', '=', 1);
-		$list = $query->select('id', 'name', 'cover', 'is_public')
+		$list = $query->select('id', 'name', 'cover', 'is_public', 'created_at')
 			->orderByDesc('id')
 			->paginate($pageSize, '*', 'page', $page)->toArray();
 		return $this->data($list);

@@ -128,22 +128,26 @@ class ArticleColumnController extends BaseController
 	 * @apiGroup articleColumn
 	 *
 	 * @apiParam {String} name 栏目名称
+	 * @apiParam {String} avatar 栏目头像
 	 *
 	 * @apiSuccess {String} name 栏目名称
+	 * @apiSuccess {String} avatar 栏目头像
 	 * @apiSuccess {Number} article_num 排序
 	 * @apiSuccess {Number} read_num 阅读数量
 	 * @apiSuccess {Number} subscribe_num 关注数量
 	 * @apiSuccess {Number} praise_num 点赞数量
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 * {"status":true,"code":200,"data":{"id":2,"user_id":2,"name":"栏目3","article_num":0,"read_num":0,"subscribe_num":0,"praise_num":0,"created_at":"1618906453","updated_at":"1618907138"},"message":"ok"}
+	 * {"status":true,"code":200,"data":{"id":41,"user_id":201,"name":"222","avatar":"123","article_num":2,"read_num":15,"subscribe_num":2,"praise_num":0,"status":1,"created_at":"1621564718","updated_at":"1622439648"},"message":"ok"}
 	 */
 	public function update(Request $request, $id)
 	{
 		$data = $this->validate($request, [
-			'name' => 'required|string',
+			'name' => 'sometimes|string',
+			'avatar' => 'sometimes|string',
 		], [
 			'name' => '专栏名称',
+			'avatar' => '专栏头像',
 		]);
 
 		$user = $request->getAttribute('user');

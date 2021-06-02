@@ -160,11 +160,7 @@ class ArticleLogic extends BaseLogic
 		$row = $this->show($id, '', $checkData);
 		$data['user_id'] = $row->user_id;
 		$data = $this->checkPost($data);
-
-		//审核失败变成待审核
-		if ($row->status == Article::STATUS_FAIL) {
-			$data['status'] = Article::STATUS_CREATE;
-		}
+		$data['status'] = Article::STATUS_CREATE;
 		if (!$row->update($data)) {
 			throw new ErrorHttpException('保存失败');
 		}
