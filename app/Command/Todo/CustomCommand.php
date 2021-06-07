@@ -26,6 +26,7 @@ class CustomCommand extends CommandAbstract
 	protected function handle($options)
 	{
 		go(function () {
+		    // test
 		});
 	}
 }
