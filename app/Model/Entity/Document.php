@@ -41,11 +41,7 @@ class Document extends BaseModel
 
 	public function getTimeStrAttribute()
 	{
-	    if ($this->created_at) {
-            return timeToString($this->created_at->unix());
-        } else {
-            return '';
-        }
+		return $this->created_at ? timeToString($this->created_at->unix()) : '';
 	}
 
 	public function getDescriptionShortAttribute()
