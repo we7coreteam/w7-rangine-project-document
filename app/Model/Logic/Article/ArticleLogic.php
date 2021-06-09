@@ -58,9 +58,12 @@ class ArticleLogic extends BaseLogic
 		} else {
 			$row = Article::query()->find($id);
 		}
-		$row->increment('read_num', $num);
-		(new ArticleColumnLogic())->incrementNum($row, 'read_num', $num);
-		return $row;
+		if ($row) {
+			$row->increment('read_num', $num);
+			(new ArticleColumnLogic())->incrementNum($row, 'read_num', $num);
+			return $row;
+		}
+		throw new ErrorHttpException('文章不存在');
 	}
 
 	public function success($id)
