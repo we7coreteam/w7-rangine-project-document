@@ -64,7 +64,7 @@ class ArticleCollectionController extends BaseController
 		$page = $request->query('page', 1);
 		$pageSize = intval($request->input('page_size', 10));
 		$user = User::find($param['user_id']);
-		$collectionArticles = $user->articleCollections()->where('article_collection.status', 1)->with(['tags','user'])->paginate($pageSize, ['*'], 'page', $page)->toArray();
+		$collectionArticles = $user->articleCollections()->where('article_collection.status', 1)->with(['tags','user'])->orderBy('article_collection.created_at', 'desc')->paginate($pageSize, ['*'], 'page', $page)->toArray();
 		$result = ArticleLogic::instance()->getListFirstImg($collectionArticles);
 		return $this->data($result);
 	}
