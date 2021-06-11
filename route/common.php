@@ -30,9 +30,9 @@ irouter()->post('/common/auth/method', 'Common\AuthController@method');
 irouter()->get('/common/auth/getlogouturl', 'Common\AuthController@getlogouturl');
 irouter()->get('/common/auth/logout', 'Common\AuthController@logout');
 irouter()->post('/common/auth/logout', 'Common\AuthController@logout');
-irouter()->middleware('CheckAuthMiddleware')
+irouter()->middleware(App\Middleware\CheckAuthMiddleware::class)
 	->post('/common/auth/user', 'Common\AuthController@user');
-irouter()->middleware('CheckAuthMiddleware')
+irouter()->middleware(App\Middleware\CheckAuthMiddleware::class)
 	->post('/common/auth/unbind', 'Common\AuthController@unbind'); //解绑
 
 irouter()->post('/common/auth/third-party-login', 'Common\AuthController@thirdPartyLogin');
@@ -45,7 +45,7 @@ irouter()->post('/common/auth/default-login-url', 'Common\AuthController@default
 irouter()->post('/menu/setting', 'Common\MenuController@setting');
 //上传图片
 irouter()->post('/common/upload/image', 'Admin\UploadController@image');
-irouter()->middleware(['CheckAuthMiddleware'])->add(['options', 'post', 'get'], '/common/uEditor', 'Admin\UploadController@uEditor');
+irouter()->middleware(App\Middleware\CheckAuthMiddleware::class)->add(['options', 'post', 'get'], '/common/uEditor', 'Admin\UploadController@uEditor');
 
 //
 irouter()->get('/user/info', 'Common\UserController@info');
@@ -58,7 +58,7 @@ irouter()->get('/user/followings', 'Common\UserController@followings');
 irouter()->get('/user/userStatus', 'User\UserStatusController@index');
 
 //消息
-irouter()->middleware(['CheckAuthMiddleware'])->group([], function (\W7\Core\Route\Route $route) {
+irouter()->middleware(App\Middleware\CheckAuthMiddleware::class)->group([], function (\W7\Core\Route\Router $route) {
 	$route->get('/message', 'Message\MessageController@index');
 	$route->get('/message/{id:\d+}', 'Message\MessageController@show');
 	$route->post('/message/read', 'Message\MessageController@read');
