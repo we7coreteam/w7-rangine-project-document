@@ -64,7 +64,7 @@ class BaseLogic extends LogicAbstract
 	 */
 	protected function handleParamType($param, $paramType)
 	{
-		$request = App::getApp()->getContext()->getRequest();
+		$request = \W7\Facade\Context::getRequest();
 		$value = trim($request->input($param, ''));
 		if (!isset($paramType[$param])) {
 			return $value;
@@ -89,7 +89,7 @@ class BaseLogic extends LogicAbstract
 	public function handleCondition($query, $paramType = [])
 	{
 		$condition = [];
-		$request = App::getApp()->getContext()->getRequest();
+		$request = \W7\Facade\Context::getRequest();
 		foreach ($query as $symbol => $symbolValue) {
 			foreach ($symbolValue as $query) {
 				$queryValue = $paramType ? $this->handleParamType($query, $paramType) : $request->input($query);
