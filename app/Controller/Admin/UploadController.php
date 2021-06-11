@@ -13,7 +13,6 @@
 namespace W7\App\Controller\Admin;
 
 use W7\App\Controller\BaseController;
-use W7\App\Exception\BadRequestException;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Logic\SettingLogic;
 use W7\App\Model\Service\CdnLogic;
@@ -51,9 +50,10 @@ class UploadController extends BaseController
 		return $this->data(['url' => $url]);
 	}
 
-	public function uEditor(Request $request){
+	public function uEditor(Request $request)
+	{
 		$action = $request->input('action', 'config');
-		$config = iconfig()->getUserConfig('ueditor')['config'];
+		$config = iconfig()->get('ueditor.config');
 		switch ($action) {
 			case 'config':
 				return $config;
