@@ -14,7 +14,7 @@ irouter()->middleware([\W7\App\Middleware\AppAuthMiddleware::class, \W7\App\Midd
 	//管理文档列表
 	$route->post('/document/all', 'Admin\DocumentController@all');
 	$route->post('/document/all-by-uid', 'Admin\DocumentController@getAllByUid');
-	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix' => '/document'], function (\W7\Core\Route\Router $route) {
+	$route->middleware(\W7\App\Middleware\BackendDocumentPermissionMiddleware::class)->group(['prefix' => '/document'], function (\W7\Core\Route\Router $route) {
 		//文档管理设置
 		$route->post('/detail', 'Admin\DocumentController@detail');
 		$route->post('/operator', 'Admin\DocumentController@operator');
