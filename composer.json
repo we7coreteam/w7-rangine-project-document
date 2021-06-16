@@ -34,8 +34,9 @@
 		"w7/rangine-crontab": "^1.1.0",
 		"ext-json": "*",
 		"gregwar/captcha": "^1.1",
-		"qcloud/cos-sdk-v5": "^1.3",
-		"overtrue/socialite": "^2.0"
+		"qcloud/cos-sdk-v5": "2.2.0",
+		"overtrue/socialite": "^2.0",
+		"guzzlehttp/guzzle": "6.5.5"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "^7.0",

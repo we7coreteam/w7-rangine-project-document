@@ -140,7 +140,7 @@ class CdnLogic extends LogicAbstract
 		} catch (\Throwable $e) {
 			throw new \RuntimeException($e->getMessage(), $e->getCode());
 		}
-		return $this->replacePublicRootUrl($result['ObjectURL']);
+		return $this->replacePublicRootUrl($result['Location']);
 	}
 
 	/**
