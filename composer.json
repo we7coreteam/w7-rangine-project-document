@@ -30,7 +30,7 @@
 		]
 	},
 	"require": {
-		"w7/rangine": "2.4.18",
+		"w7/rangine": "2.4.19",
 		"w7/rangine-crontab": "^1.1.0",
 		"ext-json": "*",
 		"gregwar/captcha": "^1.1",

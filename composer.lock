@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "36e49a3d6a949f119f80b9a3f25810a7",
+    "content-hash": "770d2894adc57e68645a0ae208bd0991",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -5338,16 +5338,16 @@
         },
         {
             "name": "w7/rangine",
-            "version": "v2.4.18",
+            "version": "v2.4.19",
             "source": {
                 "type": "git",
                 "url": "https://github.com/we7coreteam/w7-rangine.git",
-                "reference": "4abca27d7421b281d2364eb7f4c18d7b550cd7a7"
+                "reference": "680a17dd44cb2a229f138bddd540fa33fce29ed3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/we7coreteam/w7-rangine/zipball/4abca27d7421b281d2364eb7f4c18d7b550cd7a7",
-                "reference": "4abca27d7421b281d2364eb7f4c18d7b550cd7a7",
+                "url": "https://api.github.com/repos/we7coreteam/w7-rangine/zipball/680a17dd44cb2a229f138bddd540fa33fce29ed3",
+                "reference": "680a17dd44cb2a229f138bddd540fa33fce29ed3",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -5409,20 +5409,20 @@
                 }
             ],
             "description": "基于 Swoole 的常驻内存型 PHP 高性能框架",
-            "time": "2021-06-10T06:49:17+00:00"
+            "time": "2021-06-15T04:02:06+00:00"
         },
         {
             "name": "w7/rangine-command",
-            "version": "v2.1.4",
+            "version": "v2.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/we7coreteam/w7-rangine-command.git",
-                "reference": "b6883a391de90a41c4d20e46981567795f27f922"
+                "reference": "fe98c55cdd3b2f10f7eace2097b24ee15d71c09e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/we7coreteam/w7-rangine-command/zipball/b6883a391de90a41c4d20e46981567795f27f922",
-                "reference": "b6883a391de90a41c4d20e46981567795f27f922",
+                "url": "https://api.github.com/repos/we7coreteam/w7-rangine-command/zipball/fe98c55cdd3b2f10f7eace2097b24ee15d71c09e",
+                "reference": "fe98c55cdd3b2f10f7eace2097b24ee15d71c09e",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -5460,7 +5460,7 @@
             "keywords": [
                 "rangine"
             ],
-            "time": "2021-05-10T03:08:51+00:00"
+            "time": "2021-06-11T07:20:09+00:00"
         },
         {
             "name": "w7/rangine-compat",
@@ -5565,16 +5565,16 @@
         },
         {
             "name": "w7/rangine-crontab",
-            "version": "v1.1.4",
+            "version": "v1.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/we7coreteam/w7-rangine-crontab.git",
-                "reference": "957df51aa6c3ab34086de9237370b5f627695bc2"
+                "reference": "679b323a5e97185a7c8d0234e3f8a92108808658"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/we7coreteam/w7-rangine-crontab/zipball/957df51aa6c3ab34086de9237370b5f627695bc2",
-                "reference": "957df51aa6c3ab34086de9237370b5f627695bc2",
+                "url": "https://api.github.com/repos/we7coreteam/w7-rangine-crontab/zipball/679b323a5e97185a7c8d0234e3f8a92108808658",
+                "reference": "679b323a5e97185a7c8d0234e3f8a92108808658",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -5614,20 +5614,20 @@
                 "crontab",
                 "rangine"
             ],
-            "time": "2020-12-30T08:56:14+00:00"
+            "time": "2021-06-11T07:26:19+00:00"
         },
         {
             "name": "w7/rangine-database-tool",
-            "version": "v1.1.4",
+            "version": "v1.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/we7coreteam/w7-rangine-database-tool.git",
-                "reference": "a9b84b16f1fd1211eb0751dee83773735697e397"
+                "reference": "aeb73e9f5e576763e3a0d198768bfae659febdf7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/we7coreteam/w7-rangine-database-tool/zipball/a9b84b16f1fd1211eb0751dee83773735697e397",
-                "reference": "a9b84b16f1fd1211eb0751dee83773735697e397",
+                "url": "https://api.github.com/repos/we7coreteam/w7-rangine-database-tool/zipball/aeb73e9f5e576763e3a0d198768bfae659febdf7",
+                "reference": "aeb73e9f5e576763e3a0d198768bfae659febdf7",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -5666,7 +5666,7 @@
                 "database-tool",
                 "rangine"
             ],
-            "time": "2021-04-20T08:07:21+00:00"
+            "time": "2021-06-11T07:31:39+00:00"
         },
         {
             "name": "w7/rangine-facade",
@@ -5780,16 +5780,16 @@
         },
         {
             "name": "w7/rangine-lang",
-            "version": "v1.1.2",
+            "version": "v1.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/we7coreteam/w7-rangine-lang.git",
-                "reference": "158af2a3c17924bc4c7e5ced943052174a128d91"
+                "reference": "ed6790035b0e5c77cbc94ef6e3255d6ab2043585"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/we7coreteam/w7-rangine-lang/zipball/158af2a3c17924bc4c7e5ced943052174a128d91",
-                "reference": "158af2a3c17924bc4c7e5ced943052174a128d91",
+                "url": "https://api.github.com/repos/we7coreteam/w7-rangine-lang/zipball/ed6790035b0e5c77cbc94ef6e3255d6ab2043585",
+                "reference": "ed6790035b0e5c77cbc94ef6e3255d6ab2043585",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -5831,7 +5831,7 @@
                 "rangine",
                 "translator"
             ],
-            "time": "2021-01-11T10:00:03+00:00"
+            "time": "2021-06-11T07:09:58+00:00"
         },
         {
             "name": "w7/rangine-package-plugin",
