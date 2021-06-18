@@ -10,7 +10,7 @@
  * visited https://www.w7.cc for more details
  */
 
-irouter()->middleware('FrontendDocumentPermissionMiddleware')->group(['prefix' => '/document'], function (\W7\Core\Route\Route $route) {
+irouter()->middleware('FrontendDocumentPermissionMiddleware')->group(['prefix' => '/document'], function (\W7\Core\Route\Router $route) {
 	$route->get('/history/all', 'Document\HistoryController@all');
 	$route->get('/history/detail', 'Document\HistoryController@detail');
 	$route->get('/history/chapter/list', 'Document\HistoryChapterController@catalog');
@@ -18,8 +18,8 @@ irouter()->middleware('FrontendDocumentPermissionMiddleware')->group(['prefix' =
 	$route->get('/statistics', 'Document\DocumentController@statistics');
 });
 
-irouter()->middleware('FrontendDocumentPermissionMiddleware')->group(['prefix' => '/admin'], function (\W7\Core\Route\Route $route) {
-	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix' => '/document'], function (\W7\Core\Route\Route $route) {
+irouter()->middleware('FrontendDocumentPermissionMiddleware')->group(['prefix' => '/admin'], function (\W7\Core\Route\Router $route) {
+	$route->middleware('BackendDocumentPermissionMiddleware')->group(['prefix' => '/document'], function (\W7\Core\Route\Router $route) {
 		$route->put('/change-history', 'Admin\DocumentController@changeDocumentHistory');
 	});
 });
