@@ -573,4 +573,29 @@ class DocumentController extends BaseController
 
 		return $this->data('success');
 	}
+
+	/**
+	 * @api {put} admin/document/change-history 开启或关闭文档历史版本
+	 * @apiName change-history
+	 * @apiGroup adminDocument
+	 *
+	 * @apiParam {Number} document_id 文档id
+	 * @apiParam {Number} is_history 是否开启历史版本
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 *{"status":true,"code":200,"data":"success","message":"ok"}
+	 */
+	public function changeDocumentHistory(Request $request)
+	{
+		$this->validate($request, [
+			'is_history' => 'required|integer',
+		], [
+			'is_history.required' => '请选择开启或关闭',
+		]);
+		$document = $this->checkPermissionAndGetDocument($request);
+		$document->is_history = intval($request->input('is_history', 0));
+		$document->save();
+
+		return $this->data('success');
+	}
 }
