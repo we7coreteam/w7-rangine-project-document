@@ -22,8 +22,16 @@ use W7\Http\Message\Server\Request;
 class UploadController extends BaseController
 {
 	/**
-	 * 分片上传
-	 **/
+	 * @api {post} /admin/article/articleColumn 栏目-新增
+	 * @apiName store
+	 * @apiGroup articleColumnAdmin
+	 *
+	 * @apiParam {String} file_name 文件名称
+	 * @apiParam {Number} part_number 当前分配ID
+	 * @apiParam {Number} part_max 最大分片数量
+	 * @apiParam {String} upload_id 上传ID part_number=1的时候会返回
+	 * @apiParam {String} body 文件内容
+	 */
 	public function multipartUpload(Request $request)
 	{
 		$post = $this->validate($request, [
@@ -67,7 +75,8 @@ class UploadController extends BaseController
 		array_push($parts, $part);
 		icache()->set($multipartUploadCacheName, $parts, 60 * 60);
 		$updateBack = [
-			'parts' => $parts
+			'parts' => $parts,
+			'upload_id' => $post['upload_id']
 		];
 		if ($post['part_max'] == $post['part_number']) {
 			//如果当前是最后一片
