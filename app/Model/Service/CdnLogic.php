@@ -148,6 +148,59 @@ class CdnLogic extends LogicAbstract
 	}
 
 	/**
+	 * 创建分片上传文件任务ID
+	 */
+	public function createMultipartUpload($fileName)
+	{
+		try {
+			$result = $this->connection()->createMultipartUpload([
+				'Key' => $fileName,
+				'Bucket' => $this->bucketSpace[$this->channel]['bucket']
+			]);
+		} catch (\Throwable $e) {
+			throw new \RuntimeException($e->getMessage(), $e->getCode());
+		}
+		return $result['UploadId'];
+	}
+
+	/**
+	 * 分片上传
+	 */
+	public function uploadPart($fileName, $uploadId, $body, $partNumber)
+	{
+		try {
+			$result = $this->connection()->uploadPart([
+				'Key' => $fileName,
+				'Bucket' => $this->bucketSpace[$this->channel]['bucket'],
+				'Body' => $body,
+				'UploadId' => $uploadId,
+				'PartNumber' => $partNumber,
+			]);
+		} catch (\Throwable $e) {
+			throw new \RuntimeException($e->getMessage(), $e->getCode());
+		}
+		return $result;
+	}
+
+	/**
+	 * 分片结束
+	 */
+	public function completeMultipartUpload($fileName, $uploadId, $parts)
+	{
+		try {
+			$result = $this->connection()->completeMultipartUpload([
+				'Key' => $fileName,
+				'Bucket' => $this->bucketSpace[$this->channel]['bucket'],
+				'UploadId' => $uploadId,
+				'Parts' => $parts
+			]);
+		} catch (\Throwable $e) {
+			throw new \RuntimeException($e->getMessage(), $e->getCode());
+		}
+		return $result;
+	}
+
+	/**
 	 * 获取目录下的所有文件
 	 * @param $dir
 	 * @return array

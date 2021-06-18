@@ -21,6 +21,69 @@ use W7\Http\Message\Server\Request;
 
 class UploadController extends BaseController
 {
+	/**
+	 * 分片上传
+	 **/
+	public function multipartUpload(Request $request)
+	{
+		$post = $this->validate($request, [
+			'file_name' => 'required',
+			'part_number' => 'required',
+			'part_max' => 'required',
+			'upload_id' => 'required',
+			'body' => 'required',
+		], [
+			'file_name' => '文件名称',
+			'part_number' => '分配ID',
+			'part_max' => '最大分配数',
+			'upload_id' => '上传ID',
+			'body' => '文件内容',
+		]);
+		$path = time() . rand(1000, 9999) . '/' . $post['file_name'];
+		if ($post['part_number'] == 1) {
+			try {
+				$post['upload_id'] = CdnLogic::instance()->channel(SettingLogic::KEY_COS)
+					->createMultipartUpload($path);
+			} catch (\Throwable $e) {
+				throw new ErrorHttpException($e->getMessage());
+			}
+		} elseif (empty($post['upload_id'])) {
+			throw new ErrorHttpException('没有上传ID');
+		}
+		//分片上传
+		try {
+			$result = CdnLogic::instance()->channel(SettingLogic::KEY_COS)
+				->uploadPart($path, $post['upload_id'], $post['body'], $post['part_number']);
+		} catch (\Throwable $e) {
+			throw new ErrorHttpException($e->getMessage());
+		}
+		$parts = [];
+		$multipartUploadCacheName = 'multipartUpload_' . $post['upload_id'];
+		$multipartUploadCache = icache()->get($multipartUploadCacheName);
+		if ($multipartUploadCache) {
+			$parts = $multipartUploadCache;
+		}
+		$part = array('PartNumber' => $post['part_number'], 'ETag' => $result['ETag']);
+		array_push($parts, $part);
+		icache()->set($multipartUploadCacheName, $parts, 60 * 60);
+		$updateBack = [
+			'parts' => $parts
+		];
+		if ($post['part_max'] == $post['part_number']) {
+			//如果当前是最后一片
+			try {
+				$end = CdnLogic::instance()->channel(SettingLogic::KEY_COS)
+					->completeMultipartUpload($path, $post['upload_id'], $parts);
+				$updateBack['url'] = $end['Location'];
+				icache()->set($multipartUploadCacheName, $parts, 0);
+			} catch (\Throwable $e) {
+				throw new ErrorHttpException($e->getMessage());
+			}
+		}
+
+		return $updateBack;
+	}
+
 	public function image(Request $request)
 	{
 		$this->validate($request, [
