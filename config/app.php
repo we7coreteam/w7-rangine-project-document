@@ -18,7 +18,6 @@ return [
 		'basedir' => [
 			BASE_PATH,
 		],
-		'lang' => 'zh-CN',
 	],
 	'cache' => [
 		'default' => [

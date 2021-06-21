@@ -1,7 +1,7 @@
 <?php
 
 /**
- * WeEngine Team
+ * WeEngine Document System
  *
  * (c) We7Team 2019 <https://www.w7.cc>
  *
@@ -16,13 +16,12 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use W7\App;
 
 class CorsApiMiddleware implements MiddlewareInterface
 {
 	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
 	{
-		$headerHost='*';
+		$headerHost = '*';
 //		$headerHost = $request->getHeader('origin');
 //		if (!$headerHost) {
 //			$headerHost = $request->getHeader('referer');
@@ -31,12 +30,12 @@ class CorsApiMiddleware implements MiddlewareInterface
 //		$urlInfo = parse_url($headerHost);
 //		$headerHost = ($urlInfo['scheme'] ?? '') . '://' . ($urlInfo['host'] ?? '');
 
-		$response = App::getApp()->getContext()->getResponse();
+		$response = \W7\Facade\Context::getResponse();
 
-		$header=$request->getHeaders();
-		$allowHeaders=[];
-		foreach ($header as $key =>$val){
-			$allowHeaders[count($allowHeaders)]=$key;
+		$header = $request->getHeaders();
+		$allowHeaders = [];
+		foreach ($header as $key => $val) {
+			$allowHeaders[count($allowHeaders)] = $key;
 		}
 
 		$response = $response->withHeader('Access-Control-Allow-Origin', $headerHost);
@@ -47,7 +46,7 @@ class CorsApiMiddleware implements MiddlewareInterface
 			return $response->json('success');
 		}
 
-		App::getApp()->getContext()->setResponse($response);
+		\W7\Facade\Context::setResponse($response);
 		return $handler->handle($request);
 	}
 }

@@ -140,7 +140,64 @@ class CdnLogic extends LogicAbstract
 		} catch (\Throwable $e) {
 			throw new \RuntimeException($e->getMessage(), $e->getCode());
 		}
-		return $this->replacePublicRootUrl($result['ObjectURL']);
+		$url = $result['Location'];
+		if (!(strpos($url, 'http://') !== false || strpos($url, 'https://') !== false)) {
+			$url = 'https://' . $url;
+		}
+		return $this->replacePublicRootUrl($url);
+	}
+
+	/**
+	 * 创建分片上传文件任务ID
+	 */
+	public function createMultipartUpload($fileName)
+	{
+		try {
+			$result = $this->connection()->createMultipartUpload([
+				'Key' => $fileName,
+				'Bucket' => $this->bucketSpace[$this->channel]['bucket']
+			]);
+		} catch (\Throwable $e) {
+			throw new \RuntimeException($e->getMessage(), $e->getCode());
+		}
+		return $result['UploadId'];
+	}
+
+	/**
+	 * 分片上传
+	 */
+	public function uploadPart($fileName, $uploadId, $body, $partNumber)
+	{
+		try {
+			$result = $this->connection()->uploadPart([
+				'Key' => $fileName,
+				'Bucket' => $this->bucketSpace[$this->channel]['bucket'],
+				'Body' => $body,
+				'UploadId' => $uploadId,
+				'PartNumber' => $partNumber,
+			]);
+		} catch (\Throwable $e) {
+			throw new \RuntimeException($e->getMessage(), $e->getCode());
+		}
+		return $result;
+	}
+
+	/**
+	 * 分片结束
+	 */
+	public function completeMultipartUpload($fileName, $uploadId, $parts)
+	{
+		try {
+			$result = $this->connection()->completeMultipartUpload([
+				'Key' => $fileName,
+				'Bucket' => $this->bucketSpace[$this->channel]['bucket'],
+				'UploadId' => $uploadId,
+				'Parts' => $parts
+			]);
+		} catch (\Throwable $e) {
+			throw new \RuntimeException($e->getMessage(), $e->getCode());
+		}
+		return $result;
 	}
 
 	/**

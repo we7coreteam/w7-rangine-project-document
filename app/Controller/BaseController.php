@@ -14,6 +14,7 @@ namespace W7\App\Controller;
 
 use Illuminate\Validation\Factory;
 use Illuminate\Validation\ValidationException;
+use W7\App\Exception\ErrorHttpException;
 use W7\Core\Controller\ControllerAbstract;
 use W7\Core\Exception\ValidatorException;
 use W7\Http\Message\Server\Request;
@@ -56,7 +57,7 @@ class BaseController extends ControllerAbstract
 			}
 			//反馈去重
 			$errorMessage = array_unique($errorMessage);
-			throw new ValidatorException(implode('；', $errorMessage), 403);
+			throw new  ErrorHttpException(implode('；', $errorMessage), [], 422);
 		}
 
 		return $result;

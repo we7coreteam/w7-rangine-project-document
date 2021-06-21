@@ -10,7 +10,7 @@
  * visited https://www.w7.cc for more details
  */
 
-irouter()->middleware(['CheckAuthMiddleware'])->group([], function (\W7\Core\Route\Route $route) {
+irouter()->middleware(\W7\App\Middleware\CheckAuthMiddleware::class)->group([], function (\W7\Core\Route\Router $route) {
 	//系统标签配置
 	$route->get('/article/articleTagConfig/{id:\d+}', 'Article\ArticleTagConfigController@show');
 
@@ -55,7 +55,7 @@ irouter()->middleware(['CheckAuthMiddleware'])->group([], function (\W7\Core\Rou
 irouter()->get('/article/articleColumnSub/userSub', 'Article\ArticleColumnSubController@getUserSub');
 irouter()->get('/article/articleCollection/all', 'Article\ArticleCollectionController@index');
 
-irouter()->group([], function (\W7\Core\Route\Route $route) {
+irouter()->group([], function (\W7\Core\Route\Router $route) {
 	//系统标签配置
 	$route->get('/article/articleTagConfig', 'Article\ArticleTagConfigController@index');
 	//文章专栏

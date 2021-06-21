@@ -10,7 +10,7 @@
  * visited https://www.w7.cc for more details
  */
 
-irouter()->middleware(['CheckAdminMiddleware'])->group(['prefix' => '/admin'], function (\W7\Core\Route\Route $route) {
+irouter()->middleware(\W7\App\Middleware\CheckAdminMiddleware::class)->group(['prefix' => '/admin'], function (\W7\Core\Route\Router $route) {
 	//系统标签配置
 	$route->get('/article/articleTagConfig', 'Admin\Article\ArticleTagConfigController@index');
 	$route->get('/article/articleTagConfig/{id:\d+}', 'Admin\Article\ArticleTagConfigController@show');
