@@ -125,6 +125,7 @@ irouter()->middleware(['AppAuthMiddleware', 'CheckAuthMiddleware'])->group(['pre
 
 	//图片上传
 	$route->post('/upload/image', 'Admin\UploadController@image');
+	$route->post('/upload/multipartUpload', 'Admin\UploadController@multipartUpload');
 });
 
 //获取请求数据 结构
