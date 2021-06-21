@@ -40,6 +40,7 @@ class HistoryLogic extends BaseLogic
 				'parent_id' => $chapter['parent_id'],
 				'name' => $chapter['name'],
 				'history_id' => $history->id,
+				'document_id' => $document['id'],
 				'sort' => $chapter['sort'],
 				'is_dir' => $chapter['is_dir'],
 				'levels' => $chapter['levels'],
