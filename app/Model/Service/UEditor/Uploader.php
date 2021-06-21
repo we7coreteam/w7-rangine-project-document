@@ -77,7 +77,7 @@ class Uploader
 	{
 		$this->fileField = $fileField;
 		$this->config = $config;
-		$this->request = App::getApp()->getContext()->getRequest();
+		$this->request = \W7\Facade\Context::getRequest();
 		if ($type == 'remote') {
 			$this->saveRemote();
 		} elseif ($type == 'base64') {
