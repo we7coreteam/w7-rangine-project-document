@@ -25,7 +25,7 @@ class HistoryLogic extends BaseLogic
 	public function createHistory($document_id, $creator_id)
 	{
 		$document = Document::query()->where('document.id', $document_id)->with(['chapter', 'chapter.content'])->first()->toArray();
-		if ($document->is_history != Document::IS_HISTORY_YES) {
+		if ($document['is_history'] != Document::IS_HISTORY_YES) {
 			return true;
 		}
 		$historyData = [
