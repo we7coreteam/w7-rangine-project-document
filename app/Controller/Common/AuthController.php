@@ -82,7 +82,7 @@ class AuthController extends BaseController
 		]);
 		$code = $request->session->get('img_code');
 		if (strtolower($data['code']) != strtolower($code)) {
-			ilogger()->debug('verify-code-check: ' . strtolower($data['code']) . '-' . strtolower($code));
+			ilogger()->debug('verify-code-check: ' . $data['code'] . '-' . $code . '=' . strtolower($data['code']) . '-' . strtolower($code));
 			throw new ErrorHttpException('请输入正确的验证码');
 		}
 
