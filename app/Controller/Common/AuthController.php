@@ -82,6 +82,7 @@ class AuthController extends BaseController
 		]);
 		$code = $request->session->get('img_code');
 		if (strtolower($data['code']) != strtolower($code)) {
+			ilogger()->debug('verify-code-check: ' . $data['code'] . '-' . $code);
 			throw new ErrorHttpException('请输入正确的验证码');
 		}
 
@@ -579,7 +580,7 @@ class AuthController extends BaseController
 		$session->set('user', [
 			'uid' => $user->id,
 			'username' => $user->username,
-			'group_id'=>$user->group_id,
+			'group_id' => $user->group_id,
 		]);
 		//用户在修改密码后，删除该值，触发退出操作
 		icache()->set(sprintf(UserLogic::USER_LOGOUT_AFTER_CHANGE_PWD, $user->id), 1, 7 * 86400);
