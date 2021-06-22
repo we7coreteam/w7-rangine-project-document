@@ -69,3 +69,8 @@ irouter()->middleware(App\Middleware\CheckAuthMiddleware::class)->group([], func
 	$route->post('/user/unFollow', 'Common\UserController@unFollow');
 	$route->get('/user/isFollowing', 'Common\UserController@isFollowing');
 });
+
+//install
+irouter()->post('/install/systemDetection', 'Install\IndexController@systemDetection');
+irouter()->post('/install/install', 'Install\IndexController@install');
+irouter()->post('/install/config', 'Install\IndexController@config');
