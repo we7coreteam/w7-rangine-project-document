@@ -49,7 +49,7 @@ return [
 		]
 	],
 	'session' => [
-		'expires' => 86400,
+		'expires' => 5,//86400,
 		'handler' => ienv('SESSION_HANDLER', 'file')
 	],
 	'cookie' => [
