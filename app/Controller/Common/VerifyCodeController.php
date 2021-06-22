@@ -21,7 +21,7 @@ use W7\Http\Message\Server\Request;
 class VerifyCodeController extends BaseController
 {
 	const CODE_LENGTH = 4;
-	
+
 	public function image(Request $request)
 	{
 		try {
@@ -49,7 +49,7 @@ class VerifyCodeController extends BaseController
 			'img' => 'data:image/jpg;base64,'.base64_encode($image)
 		];
 
-		ilogger()->debug('verify-code: '. $phrase);
+//		ilogger()->debug('verify-code-build: '. $phrase);
 		return $this->data($data);
 	}
 }
