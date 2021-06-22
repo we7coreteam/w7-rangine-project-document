@@ -49,7 +49,7 @@ class VerifyCodeController extends BaseController
 			'img' => 'data:image/jpg;base64,'.base64_encode($image)
 		];
 
-		ilogger()->debug('verify-code-build: '. $phrase);
+//		ilogger()->debug('verify-code-build: '. $phrase);
 		return $this->data($data);
 	}
 }
