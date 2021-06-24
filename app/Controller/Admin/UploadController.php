@@ -39,14 +39,15 @@ class UploadController extends BaseController
 			'part_number' => 'required',
 			'part_max' => 'required',
 			'upload_id' => 'required',
-			'body' => 'required',
+			'file' => 'required',
 		], [
 			'file_name' => '文件名称',
 			'part_number' => '分配ID',
 			'part_max' => '最大分配数',
 			'upload_id' => '上传ID',
-			'body' => '文件内容',
+			'file' => '文件内容',
 		]);
+
 		$path = time() . rand(1000, 9999) . '/' . $post['file_name'];
 		if ($post['part_number'] == 1) {
 			try {
@@ -60,8 +61,11 @@ class UploadController extends BaseController
 		}
 		//分片上传
 		try {
+			$file = $post['body'];
+			$realPath = $file->getRealPath();
+			$body = fopen($realPath, 'rb');
 			$result = CdnLogic::instance()->channel(SettingLogic::KEY_COS)
-				->uploadPart($path, $post['upload_id'], $post['body'], $post['part_number']);
+				->uploadPart($path, $post['upload_id'], $body, $post['part_number']);
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());
 		}
@@ -83,7 +87,11 @@ class UploadController extends BaseController
 			try {
 				$end = CdnLogic::instance()->channel(SettingLogic::KEY_COS)
 					->completeMultipartUpload($path, $post['upload_id'], $parts);
-				$updateBack['url'] = $end['Location'];
+				$url = $result['Location'];
+				if (!(strpos($url, 'http://') !== false || strpos($url, 'https://') !== false)) {
+					$url = 'https://' . $url;
+				}
+				$updateBack['url'] = $url;
 				icache()->set($multipartUploadCacheName, $parts, 0);
 			} catch (\Throwable $e) {
 				throw new ErrorHttpException($e->getMessage());
