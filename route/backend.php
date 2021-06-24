@@ -147,6 +147,10 @@ irouter()->middleware(\W7\App\Middleware\CheckAdminMiddleware::class)->group(['p
 	$route->get('/article/{id:\d+}', 'Admin\Article\ArticleController@show');
 	$route->post('/article/success', 'Admin\Article\ArticleController@success');
 	$route->post('/article/reject', 'Admin\Article\ArticleController@reject');
+
+	//视频分类
+	$route->post('/video/category', 'Admin\Video\CategoryController@store');
+	$route->put('/video/category/{id:\d+}', 'Admin\Video\CategoryController@update');
 });
 
 //获取请求数据 结构
