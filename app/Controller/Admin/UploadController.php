@@ -61,7 +61,7 @@ class UploadController extends BaseController
 		}
 		//分片上传
 		try {
-			$file = $post['body'];
+			$file = $post['file'];
 			$realPath = $file->getRealPath();
 			$body = fopen($realPath, 'rb');
 			$result = CdnLogic::instance()->channel(SettingLogic::KEY_COS)
