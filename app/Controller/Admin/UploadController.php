@@ -22,9 +22,9 @@ use W7\Http\Message\Server\Request;
 class UploadController extends BaseController
 {
 	/**
-	 * @api {post} /admin/article/articleColumn 栏目-新增
-	 * @apiName store
-	 * @apiGroup articleColumnAdmin
+	 * @api {post} /admin/upload/multipartUpload 切片上传
+	 * @apiName multipartUpload
+	 * @apiGroup Upload
 	 *
 	 * @apiParam {String} file_name 文件名称
 	 * @apiParam {Number} part_number 当前分配ID
@@ -90,7 +90,7 @@ class UploadController extends BaseController
 			}
 		}
 
-		return $updateBack;
+		return $this->data($updateBack);
 	}
 
 	public function image(Request $request)
