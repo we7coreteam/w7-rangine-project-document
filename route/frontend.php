@@ -9,8 +9,8 @@
  * Using it under the license terms
  * visited https://www.w7.cc for more details
  */
-
-irouter()->middleware(\W7\App\Middleware\FrontendDocumentPermissionMiddleware::class)->group(['prefix' => '/document'], function (\W7\Core\Route\Router $route) {
+$route=irouter();
+$route->middleware(\W7\App\Middleware\FrontendDocumentPermissionMiddleware::class)->group(['prefix' => '/document'], function ($route) {
 	$route->post('/all', 'Document\DocumentController@all');
 	$route->post('/detail', 'Document\DocumentController@detail');
 	$route->post('/chapter/list', 'Document\ChapterController@catalog');
@@ -29,7 +29,7 @@ irouter()->middleware(\W7\App\Middleware\FrontendDocumentPermissionMiddleware::c
 	$route->get('/statistics', 'Document\DocumentController@statistics');
 });
 
-irouter()->middleware(\W7\App\Middleware\CheckAuthMiddleware::class)->group([], function (\W7\Core\Route\Router $route) {
+$route->middleware(\W7\App\Middleware\CheckAuthMiddleware::class)->group([], function ($route) {
 	//系统标签配置
 	$route->get('/article/articleTagConfig/{id:\d+}', 'Article\ArticleTagConfigController@show');
 
@@ -73,7 +73,7 @@ irouter()->middleware(\W7\App\Middleware\CheckAuthMiddleware::class)->group([], 
 	$route->post('/video', 'Video\VideoController@store');
 });
 
-irouter()->group([], function (\W7\Core\Route\Router $route) {
+$route->group([], function ($route) {
 	//系统标签配置
 	$route->get('/article/articleTagConfig', 'Article\ArticleTagConfigController@index');
 	//文章专栏
