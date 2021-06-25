@@ -14,10 +14,10 @@ use W7\App;
 use function GuzzleHttp\Psr7\build_query;
 $route=irouter();
 $route->any('/oauth/login', function () {
-	$request = App::getApp()->getContext()->getRequest();
+	$request = \W7\Facade\Context::getRequest();
 	$query = $request->getQueryParams();
 
-	return App::getApp()->getContext()->getResponse()->redirect(ienv('API_HOST') . 'login?' . build_query($query));
+	return \W7\Facade\Context::getResponse()->redirect(ienv('API_HOST') . 'login?' . build_query($query));
 });
 
 //获取验证码
