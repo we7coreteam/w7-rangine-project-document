@@ -87,7 +87,7 @@ class UploadController extends BaseController
 			try {
 				$end = CdnLogic::instance()->channel(SettingLogic::KEY_COS)
 					->completeMultipartUpload($path, $post['upload_id'], $parts);
-				$url = $result['Location'];
+				$url = $end['Location'];
 				if (!(strpos($url, 'http://') !== false || strpos($url, 'https://') !== false)) {
 					$url = 'https://' . $url;
 				}
