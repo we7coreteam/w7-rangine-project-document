@@ -96,7 +96,7 @@ class UploadController extends BaseController
 	 * @apiName multipartUpload
 	 * @apiGroup Upload
 	 *
-	 * @apiParam {String} file_name 文件名称
+	 * @apiParam {String} key 文件key
 	 * @apiParam {Number} part_number 当前分配ID
 	 * @apiParam {String} upload_id 上传ID part_number=1的时候会返回
 	 * @apiParam {String} file 文件内容
