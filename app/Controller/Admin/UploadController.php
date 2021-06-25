@@ -99,7 +99,7 @@ class UploadController extends BaseController
 	 * @apiParam {String} file_name 文件名称
 	 * @apiParam {Number} part_number 当前分配ID
 	 * @apiParam {String} upload_id 上传ID part_number=1的时候会返回
-	 * @apiParam {String} body 文件内容
+	 * @apiParam {String} file 文件内容
 	 *
 	 */
 	public function multipartUpload(Request $request)
