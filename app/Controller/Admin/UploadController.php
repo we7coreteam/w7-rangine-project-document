@@ -29,6 +29,10 @@ class UploadController extends BaseController
 	 * @apiParam {String} file_name 文件名称
 	 * @apiParam {String} handle 操作start、end
 	 * @apiParam {String} upload_id 上传ID handle=end必传
+	 *
+	 * @apiSuccess {String} upload_id 上传ID
+	 * @apiSuccess {String} key 视频key
+	 * @apiSuccess {String} url 视频地址handle=end时
 	 */
 	public function multipartUploadHandle(Request $request)
 	{
@@ -96,6 +100,7 @@ class UploadController extends BaseController
 	 * @apiParam {Number} part_number 当前分配ID
 	 * @apiParam {String} upload_id 上传ID part_number=1的时候会返回
 	 * @apiParam {String} body 文件内容
+	 *
 	 */
 	public function multipartUpload(Request $request)
 	{
