@@ -9,12 +9,12 @@
  * Using it under the license terms
  * visited https://www.w7.cc for more details
  */
-
-irouter()->middleware([\W7\App\Middleware\AppAuthMiddleware::class, \W7\App\Middleware\CheckAuthMiddleware::class])->group(['prefix' => '/admin'], function (\W7\Core\Route\Router $route) {
+$route=irouter();
+$route->middleware([\W7\App\Middleware\AppAuthMiddleware::class, \W7\App\Middleware\CheckAuthMiddleware::class])->group(['prefix' => '/admin'], function ($route) {
 	//管理文档列表
 	$route->post('/document/all', 'Admin\DocumentController@all');
 	$route->post('/document/all-by-uid', 'Admin\DocumentController@getAllByUid');
-	$route->middleware(\W7\App\Middleware\BackendDocumentPermissionMiddleware::class)->group(['prefix' => '/document'], function (\W7\Core\Route\Router $route) {
+	$route->middleware(\W7\App\Middleware\BackendDocumentPermissionMiddleware::class)->group(['prefix' => '/document'], function ($route) {
 		//文档管理设置
 		$route->post('/detail', 'Admin\DocumentController@detail');
 		$route->post('/operator', 'Admin\DocumentController@operator');
@@ -30,13 +30,13 @@ irouter()->middleware([\W7\App\Middleware\AppAuthMiddleware::class, \W7\App\Midd
 	});
 
 	//api文档内容管理-公共
-	$route->middleware(\W7\App\Middleware\BackendDocumentPermissionMiddleware::class)->group(['prefix' => '/document/chapterapi'], function (\W7\Core\Route\Router $route) {
+	$route->middleware(\W7\App\Middleware\BackendDocumentPermissionMiddleware::class)->group(['prefix' => '/document/chapterapi'], function ($route) {
 		$route->get('/getApiLabel', 'Admin\Document\ChapterApiController@getApiLabel');
 		//修改接口 data 数据
 		$route->post('/setApiData', 'Admin\Document\ChapterApiDataController@setData');
 	});
 	//文档内容管理
-	$route->middleware(\W7\App\Middleware\BackendDocumentPermissionMiddleware::class)->group(['prefix' => '/chapter'], function (\W7\Core\Route\Router $route) {
+	$route->middleware(\W7\App\Middleware\BackendDocumentPermissionMiddleware::class)->group(['prefix' => '/chapter'], function ($route) {
 		//文档管理设置
 		$route->post('/detail', 'Admin\ChapterController@detail');
 		$route->post('/create', 'Admin\ChapterController@create');
@@ -51,19 +51,19 @@ irouter()->middleware([\W7\App\Middleware\AppAuthMiddleware::class, \W7\App\Midd
 		$route->post('/import', 'Admin\ChapterController@import');
 	});
 
-	$route->middleware(\W7\App\Middleware\BackendDocumentPermissionMiddleware::class)->group(['prefix' => '/operate-log'], function (\W7\Core\Route\Router $route) {
+	$route->middleware(\W7\App\Middleware\BackendDocumentPermissionMiddleware::class)->group(['prefix' => '/operate-log'], function ($route) {
 		$route->post('/get-user-read-log', 'Admin\UserOperateLogController@getUserReaderLog');
 		$route->post('/get-by-document', 'Admin\UserOperateLogController@getByDocument');
 		$route->post('/delete-by-id', 'Admin\UserOperateLogController@deleteById');
 	});
 
-	$route->group(['prefix' => '/share'], function (\W7\Core\Route\Router $route) {
+	$route->group(['prefix' => '/share'], function ($route) {
 		$route->post('/all', 'Admin\UserShareController@all');
 		$route->post('/url', 'Admin\UserShareController@shareUrl');
 		$route->get('/articleUrl', 'Admin\UserShareController@articleShareUrl');
 	});
 
-	$route->group(['prefix' => '/user'], function (\W7\Core\Route\Router $route) {
+	$route->group(['prefix' => '/user'], function ($route) {
 		//文档管理设置
 		$route->post('/all', 'Admin\UserController@all');
 		$route->post('/search', 'Admin\UserController@search');
@@ -75,14 +75,14 @@ irouter()->middleware([\W7\App\Middleware\AppAuthMiddleware::class, \W7\App\Midd
 		$route->post('/batch-update-permission', 'Admin\UserController@batchUpdateDocPermissionByUid');
 	});
 
-	$route->middleware(\W7\App\Middleware\BackendDocumentPermissionMiddleware::class)->group(['prefix' => '/star'], function (\W7\Core\Route\Router $route) {
+	$route->middleware(\W7\App\Middleware\BackendDocumentPermissionMiddleware::class)->group(['prefix' => '/star'], function ($route) {
 		//文档管理设置
 		$route->post('/all', 'Admin\StarController@all');
 		$route->post('/add', 'Admin\StarController@add');
 		$route->post('/delete', 'Admin\StarController@delete');
 	});
 
-	$route->middleware(\W7\App\Middleware\BackendDocumentPermissionMiddleware::class)->group(['prefix' => '/third-party-login'], function (\W7\Core\Route\Router $route) {
+	$route->middleware(\W7\App\Middleware\BackendDocumentPermissionMiddleware::class)->group(['prefix' => '/third-party-login'], function ($route) {
 		//文档管理设置
 		$route->post('/all', 'Admin\ThirdPartyLoginController@all');
 		$route->post('/add', 'Admin\ThirdPartyLoginController@add');
@@ -93,7 +93,7 @@ irouter()->middleware([\W7\App\Middleware\AppAuthMiddleware::class, \W7\App\Midd
 		$route->post('/get-default-channel', 'Admin\ThirdPartyLoginController@getDefaultLoginChannel');
 	});
 
-	$route->middleware(\W7\App\Middleware\BackendDocumentPermissionMiddleware::class)->group(['prefix' => '/menu'], function (\W7\Core\Route\Router $route) {
+	$route->middleware(\W7\App\Middleware\BackendDocumentPermissionMiddleware::class)->group(['prefix' => '/menu'], function ($route) {
 		//文档管理设置
 		$route->post('/all', 'Admin\MenuSettingController@all');
 		$route->post('/add', 'Admin\MenuSettingController@add');
@@ -104,7 +104,7 @@ irouter()->middleware([\W7\App\Middleware\AppAuthMiddleware::class, \W7\App\Midd
 		$route->post('/get-theme', 'Admin\MenuSettingController@getTheme');
 	});
 
-	$route->middleware(\W7\App\Middleware\BackendDocumentPermissionMiddleware::class)->group(['prefix' => '/home'], function (\W7\Core\Route\Router $route) {
+	$route->middleware(\W7\App\Middleware\BackendDocumentPermissionMiddleware::class)->group(['prefix' => '/home'], function ($route) {
 		//首页管理设置
 		$route->get('/list', 'Admin\DocumentHomeController@getList');
 		$route->post('/add', 'Admin\DocumentHomeController@addHomeData');
@@ -118,7 +118,7 @@ irouter()->middleware([\W7\App\Middleware\AppAuthMiddleware::class, \W7\App\Midd
 		$route->post('/set-title', 'Admin\HomepageSettingController@setHomeTtile');
 	});
 
-	$route->middleware(\W7\App\Middleware\CheckFounderMiddleware::class)->group([], function (\W7\Core\Route\Router $route) {
+	$route->middleware(\W7\App\Middleware\CheckFounderMiddleware::class)->group([], function ($route) {
 		$route->post('/setting/cos', 'Admin\SettingController@cos');
 		$route->post('/setting/save', 'Admin\SettingController@save');
 		$route->get('/setting/config', 'Admin\SettingController@config');
@@ -130,7 +130,7 @@ irouter()->middleware([\W7\App\Middleware\AppAuthMiddleware::class, \W7\App\Midd
 	$route->post('/upload/multipartUploadHandle', 'Admin\UploadController@multipartUploadHandle');
 });
 
-irouter()->middleware(\W7\App\Middleware\CheckAdminMiddleware::class)->group(['prefix' => '/admin'], function (\W7\Core\Route\Router $route) {
+$route->middleware(\W7\App\Middleware\CheckAdminMiddleware::class)->group(['prefix' => '/admin'], function ($route) {
 	//系统标签配置
 	$route->get('/article/articleTagConfig', 'Admin\Article\ArticleTagConfigController@index');
 	$route->get('/article/articleTagConfig/{id:\d+}', 'Admin\Article\ArticleTagConfigController@show');
@@ -155,4 +155,4 @@ irouter()->middleware(\W7\App\Middleware\CheckAdminMiddleware::class)->group(['p
 });
 
 //获取请求数据 结构
-irouter()->get('/admin/document/chapterapi/getData', 'Admin\Document\ChapterApiDataController@getData');
+$route->get('/admin/document/chapterapi/getData', 'Admin\Document\ChapterApiDataController@getData');

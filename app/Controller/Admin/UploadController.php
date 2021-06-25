@@ -23,7 +23,7 @@ class UploadController extends BaseController
 {
 	/**
 	 * @api {post} /admin/upload/multipartUploadHandle 切片上传
-	 * @apiName multipartUpload
+	 * @apiName multipartUploadHandle
 	 * @apiGroup Upload
 	 *
 	 * @apiParam {String} file_name 文件名称
