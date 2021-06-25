@@ -21,6 +21,63 @@ use W7\Http\Message\Server\Request;
 
 class UploadController extends BaseController
 {
+	public function multipartUploadHandle(Request $request)
+	{
+		$post = $this->validate($request, [
+			'file_name' => 'required',
+			'handle' => 'required',
+		], [
+			'file_name' => '文件名称',
+			'handle' => '操作',
+		]);
+		if ($post['handle'] == 'end') {
+			$param = $this->validate($request, [
+				'upload_id' => 'required',
+			], [
+				'upload_id' => '上传ID',
+			]);
+			$post['upload_id'] = $param['upload_id'];
+			$multipartUploadCacheName = 'multipartUpload_' . $post['upload_id'];
+			$multipartUploadCache = icache()->get($multipartUploadCacheName);
+			if ($multipartUploadCache) {
+				$parts = $multipartUploadCache['parts'];
+				$key = $multipartUploadCache['key'];//上传路径必须与upload_id一致
+			}
+			$updateBack = [
+				'parts' => $parts,
+				'upload_id' => $post['upload_id']
+			];
+			try {
+				$end = CdnLogic::instance()->channel(SettingLogic::KEY_COS)
+					->completeMultipartUpload($key, $post['upload_id'], array_keys($parts));
+				$url = $end['Location'];
+				if (!(strpos($url, 'http://') !== false || strpos($url, 'https://') !== false)) {
+					$url = 'https://' . $url;
+				}
+				$updateBack['url'] = $url;
+				icache()->set($multipartUploadCacheName, $parts, 0);
+			} catch (\Throwable $e) {
+				throw new ErrorHttpException($e->getMessage());
+			}
+			return $this->data($updateBack);
+		}
+
+		$fileName = $post['file_name'];
+		$key = time() . rand(1000, 9999) . '/' . $fileName;
+
+		try {
+			$uploadId = CdnLogic::instance()->channel(SettingLogic::KEY_COS)
+				->createMultipartUpload($key);
+		} catch (\Throwable $e) {
+			throw new ErrorHttpException($e->getMessage());
+		}
+
+		return $this->data([
+			'upload_id' => $uploadId,
+			'key' => $key
+		]);
+	}
+
 	/**
 	 * @api {post} /admin/upload/multipartUpload 切片上传
 	 * @apiName multipartUpload
@@ -35,70 +92,45 @@ class UploadController extends BaseController
 	public function multipartUpload(Request $request)
 	{
 		$post = $this->validate($request, [
-			'file_name' => 'required',
+			'key' => 'required',
 			'part_number' => 'required',
-			'part_max' => 'required',
 			'upload_id' => 'required',
 			'file' => 'required',
 		], [
-			'file_name' => '文件名称',
+			'key' => '文件key',
 			'part_number' => '分配ID',
-			'part_max' => '最大分配数',
 			'upload_id' => '上传ID',
 			'file' => '文件内容',
 		]);
 
-		$path = time() . rand(1000, 9999) . '/' . $post['file_name'];
-		if ($post['part_number'] == 1) {
-			try {
-				$post['upload_id'] = CdnLogic::instance()->channel(SettingLogic::KEY_COS)
-					->createMultipartUpload($path);
-			} catch (\Throwable $e) {
-				throw new ErrorHttpException($e->getMessage());
-			}
-		} elseif (empty($post['upload_id'])) {
-			throw new ErrorHttpException('没有上传ID');
+		$key = $post['key'];
+		$parts = [];
+		$multipartUploadCacheName = 'multipartUpload_' . $post['upload_id'];
+		$multipartUploadCache = icache()->get($multipartUploadCacheName);
+		if ($multipartUploadCache) {
+			$parts = $multipartUploadCache['parts'] ?? [];
+			$key = $multipartUploadCache['key'] ?? $key;//上传路径必须与upload_id一致
 		}
+
 		//分片上传
 		try {
 			$file = $post['file'];
 			$realPath = $file->getRealPath();
 			$body = fopen($realPath, 'rb');
 			$result = CdnLogic::instance()->channel(SettingLogic::KEY_COS)
-				->uploadPart($path, $post['upload_id'], $body, $post['part_number']);
+				->uploadPart($key, $post['upload_id'], $body, $post['part_number']);
 		} catch (\Throwable $e) {
 			throw new ErrorHttpException($e->getMessage());
 		}
-		$parts = [];
-		$multipartUploadCacheName = 'multipartUpload_' . $post['upload_id'];
-		$multipartUploadCache = icache()->get($multipartUploadCacheName);
-		if ($multipartUploadCache) {
-			$parts = $multipartUploadCache;
-		}
-		$part = array('PartNumber' => $post['part_number'], 'ETag' => $result['ETag']);
-		array_push($parts, $part);
-		icache()->set($multipartUploadCacheName, $parts, 60 * 60);
-		$updateBack = [
-			'parts' => $parts,
-			'upload_id' => $post['upload_id']
-		];
-		if ($post['part_max'] == $post['part_number']) {
-			//如果当前是最后一片
-			try {
-				$end = CdnLogic::instance()->channel(SettingLogic::KEY_COS)
-					->completeMultipartUpload($path, $post['upload_id'], $parts);
-				$url = $end['Location'];
-				if (!(strpos($url, 'http://') !== false || strpos($url, 'https://') !== false)) {
-					$url = 'https://' . $url;
-				}
-				$updateBack['url'] = $url;
-				icache()->set($multipartUploadCacheName, $parts, 0);
-			} catch (\Throwable $e) {
-				throw new ErrorHttpException($e->getMessage());
-			}
-		}
 
-		return $this->data($updateBack);
+		$part = array('PartNumber' => $post['part_number'], 'ETag' => $result['ETag']);
+		$parts[$post['part_number']] = $part;
+		icache()->set($multipartUploadCacheName, [
+			'parts' => $parts,
+			'key' => $key,
+		], 60 * 60);
+
+		return $this->data($part);
 	}
 
 	public function image(Request $request)
