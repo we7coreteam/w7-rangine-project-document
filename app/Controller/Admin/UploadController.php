@@ -21,6 +21,15 @@ use W7\Http\Message\Server\Request;
 
 class UploadController extends BaseController
 {
+	/**
+	 * @api {post} /admin/upload/multipartUploadHandle 切片上传
+	 * @apiName multipartUpload
+	 * @apiGroup Upload
+	 *
+	 * @apiParam {String} file_name 文件名称
+	 * @apiParam {String} handle 操作start、end
+	 * @apiParam {String} upload_id 上传ID handle=end必传
+	 */
 	public function multipartUploadHandle(Request $request)
 	{
 		$post = $this->validate($request, [
@@ -85,7 +94,6 @@ class UploadController extends BaseController
 	 *
 	 * @apiParam {String} file_name 文件名称
 	 * @apiParam {Number} part_number 当前分配ID
-	 * @apiParam {Number} part_max 最大分片数量
 	 * @apiParam {String} upload_id 上传ID part_number=1的时候会返回
 	 * @apiParam {String} body 文件内容
 	 */
