@@ -127,6 +127,7 @@ irouter()->middleware([\W7\App\Middleware\AppAuthMiddleware::class, \W7\App\Midd
 	//图片上传
 	$route->post('/upload/image', 'Admin\UploadController@image');
 	$route->post('/upload/multipartUpload', 'Admin\UploadController@multipartUpload');
+	$route->post('/upload/multipartUploadHandle', 'Admin\UploadController@multipartUploadHandle');
 });
 
 irouter()->middleware(\W7\App\Middleware\CheckAdminMiddleware::class)->group(['prefix' => '/admin'], function (\W7\Core\Route\Router $route) {
