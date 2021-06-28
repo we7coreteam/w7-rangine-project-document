@@ -9,7 +9,8 @@
  * Using it under the license terms
  * visited https://www.w7.cc for more details
  */
-$route=irouter();
+
+$route = irouter();
 $route->middleware([\W7\App\Middleware\AppAuthMiddleware::class, \W7\App\Middleware\CheckAuthMiddleware::class])->group(['prefix' => '/admin'], function ($route) {
 	//管理文档列表
 	$route->post('/document/all', 'Admin\DocumentController@all');
@@ -150,8 +151,21 @@ $route->middleware(\W7\App\Middleware\CheckAdminMiddleware::class)->group(['pref
 	$route->post('/article/reject', 'Admin\Article\ArticleController@reject');
 
 	//视频分类
+	$route->get('/video/category', 'Admin\Video\CategoryController@index');
 	$route->post('/video/category', 'Admin\Video\CategoryController@store');
 	$route->put('/video/category/{id:\d+}', 'Admin\Video\CategoryController@update');
+
+	//视频轮播
+	$route->get('/video/carousel', 'Admin\Video\CarouselController@index');
+	$route->get('/video/carousel/{id:\d+}', 'Admin\Video\CarouselController@show');
+	$route->post('/video/carousel', 'Admin\Video\CarouselController@store');
+	$route->put('/video/carousel/{id:\d+}', 'Admin\Video\CarouselController@update');
+	$route->delete('/video/carousel/{id:\d+}', 'Admin\Video\CarouselController@delete');
+
+	//视频
+	$route->get('/video', 'Admin\VideoController@index');
+	$route->put('/video/success/{id:\d+}', 'Admin\VideoController@success');
+	$route->put('/video/reject/{id:\d+}', 'Admin\VideoController@reject');
 });
 
 //获取请求数据 结构

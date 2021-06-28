@@ -33,6 +33,24 @@ class CategoryController extends BaseController
 	}
 
 	/**
+	 * @api {get} /admin/video/category 视频后台-分类列表
+	 * @apiName index
+	 * @apiGroup videoCategory
+	 *
+	 * @apiSuccess {String} name 分类名称
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 *{"status":true,"code":200,"data":{"name":"test","updated_at":"1624510146","created_at":"1624510146","id":1},"message":"ok"}
+	 */
+	public function index(Request $request)
+	{
+		$page = $request->query('page', 1);
+		$pageSize = intval($request->input('page_size', 10));
+		$result = $this->block()->index([], $page, $pageSize);
+		return $this->data($result);
+	}
+
+	/**
 	 * @api {post} /admin/video/category 视频后台-新增分类
 	 * @apiName store
 	 * @apiGroup videoCategory

@@ -40,6 +40,7 @@ class CreateVideoTable2021_06_23_150738 extends Migration
 			$table->integer('praise_num', false, true)->default(0)->comment('点赞次数');
 			$table->tinyInteger('is_reprint', false, true)->default(0)->comment('是否来自转载0否1是');
 			$table->tinyInteger('status', false, true)->default(0)->comment('状态0未审核1已审核2审核失败');
+			$table->string('reason', 255)->default('')->comment('驳回原因');
 			$table->integer('created_at', false, true)->default(0);
 			$table->integer('updated_at', false, true)->default(0);
 			$table->index(['user_id'], 'user_id');
