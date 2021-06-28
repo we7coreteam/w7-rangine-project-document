@@ -21,6 +21,6 @@ class HistoryChapter extends BaseModel
 
 	public function content()
 	{
-		return $this->hasOne(ChapterContent::class, 'chapter_id', 'chapter_id');
+		return $this->hasOne(HistoryChapterContent::class, 'history_chapter_id', 'id');
 	}
 }
