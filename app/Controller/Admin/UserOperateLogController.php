@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * WeEngine Document System
+ *
+ * (c) We7Team 2019 <https://www.w7.cc>
+ *
+ * This is not a free software
+ * Using it under the license terms
+ * visited https://www.w7.cc for more details
+ */
+
 namespace W7\App\Controller\Admin;
 
 use Illuminate\Support\Facades\DB;
@@ -9,6 +19,7 @@ use W7\App\Model\Entity\Setting;
 use W7\App\Model\Entity\Star;
 use W7\App\Model\Entity\User;
 use W7\App\Model\Entity\UserOperateLog;
+use W7\App\Model\Logic\DocumentLogic;
 use W7\Http\Message\Server\Request;
 
 class UserOperateLogController extends BaseController
@@ -93,11 +104,11 @@ class UserOperateLogController extends BaseController
 		 */
 		$user = $request->getAttribute('user');
 		if (!$user->isManager) {
-			throw new ErrorHttpException('您没有权限管理该文档',[],Setting::ERROR_NO_POWER);
+			throw new ErrorHttpException('您没有权限管理该文档', [], Setting::ERROR_NO_POWER);
 		}
 
 		$query = UserOperateLog::query()->where('document_id', '=', $params['document_id'])
-			->where('operate', '!=', UserOperateLog::PREVIEW)->where('remark', '!=' , '')->orderByDesc('created_at');
+			->where('operate', '!=', UserOperateLog::PREVIEW)->where('remark', '!=', '')->orderByDesc('created_at');
 		if ($time) {
 			$query = $query->where('created_at', '<', time() - 86400 * $time);
 		}
@@ -113,7 +124,8 @@ class UserOperateLogController extends BaseController
 		$result['page_count'] = $list->lastPage();
 		$result['total'] = $list->total();
 		$result['page_current'] = $list->currentPage();
-
+		$document = DocumentLogic::instance()->getById($params['document_id']);
+		$result['is_history'] = $document->is_history;
 		return $this->data($result);
 	}
 

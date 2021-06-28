@@ -80,7 +80,42 @@ class DocumentController extends BaseController
 			]);
 		}
 
-		$res = DocumentLogic::instance()->getById($params['document_id']);
+		if ($res->is_history == Document::IS_HISTORY_YES) {
+			$res->increment('browse_num', 1);
+			$res->save();
+		}
 		return $this->data($res);
+	}
+
+	/**
+	 * @api {get} document/statistics 文档-文档统计
+	 * @apiName statistics
+	 * @apiGroup Document
+	 *
+	 * @apiParam {Number} document_id 文档id
+	 *
+	 * @apiSuccess {Number} browse_num 浏览次数
+	 * @apiSuccess {Number} history_num 编辑次数
+	 * @apiSuccess {String} last_update_time 上次修改时间
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":{"browse_num":2,"history_num":3,"last_update_time":"2021-06-17 18:16:26"},"message":"ok"}
+	 */
+	public function statistics(Request $request)
+	{
+		$params = $this->validate($request, [
+			'document_id' => 'required|integer|min:1',
+		], [
+			'document_id.required' => '文档id必填',
+			'document_id.integer' => '文档id非法'
+		]);
+		$res = DocumentLogic::instance()->getById($params['document_id']);
+		$last_history = $res->history()->orderBy('created_at', 'desc')->first();
+		$data = [
+			'browse_num' => $res->browse_num,
+			'history_num' => $res->history->count(),
+			'last_update_time' => $last_history->created_at
+		];
+		return $this->data($data);
 	}
 }

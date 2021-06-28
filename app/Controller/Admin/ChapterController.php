@@ -22,6 +22,7 @@ use W7\App\Model\Entity\UserOperateLog;
 use W7\App\Model\Logic\ChapterLogic;
 use W7\App\Model\Logic\Document\ChapterApi\ChapterImportLogic;
 use W7\App\Model\Logic\Document\ChapterContentLogic;
+use W7\App\Model\Logic\Document\HistoryLogic;
 use W7\App\Model\Logic\DocumentLogic;
 use W7\App\Model\Logic\DocumentPermissionLogic;
 use W7\App\Model\Logic\UserOperateLogic;
@@ -97,7 +98,7 @@ class ChapterController extends BaseController
 			throw new ErrorHttpException('您没有权限管理该文档', [], Setting::ERROR_NO_POWER);
 		}
 		//频繁操作时间限制
-		if (icache()->get('creat_lock_time')){
+		if (icache()->get('creat_lock_time')) {
 			throw new ErrorHttpException('操作过于频繁');
 		}
 
@@ -116,44 +117,53 @@ class ChapterController extends BaseController
 		$documentId = intval($request->post('document_id'));
 		$maxSort = Chapter::query()->where('document_id', '=', $documentId)->where('parent_id', '=', $parentId)->max('sort');
 		$sort = intval($request->post('sort', ++$maxSort));
-		$chapter = Chapter::query()->create([
-			'name' => $request->post('name'),
-			'sort' => $sort,
-			'is_dir' => $isDir ? 1 : 0,
-			'document_id' => $documentId,
-			'parent_id' => $parentId,
-		]);
-		if (!$chapter) {
-			throw new ErrorHttpException('章节添加失败');
-		}
-		//记录操作锁
-		icache()->set('creat_lock_time',1,3);
 
-		$layout = $request->post('layout', 0);
-		if ($layout) {
-			//如果是非默认类型，新建时锁定类型
-			if (!empty($chapter->content)) {
-				$chapter->content->content = '';
-				$chapter->content->layout = $layout;
-				$chapter->content->save();
-			} else {
-				ChapterContent::query()->create([
-					'chapter_id' => $chapter->id,
-					'content' => '',
-					'layout' => $layout
-				]);
+		idb()->beginTransaction();
+		try {
+			HistoryLogic::instance()->createHistory($documentId, $user->id);
+			$chapter = Chapter::query()->create([
+				'name' => $request->post('name'),
+				'sort' => $sort,
+				'is_dir' => $isDir ? 1 : 0,
+				'document_id' => $documentId,
+				'parent_id' => $parentId,
+			]);
+			if (!$chapter) {
+				throw new ErrorHttpException('章节添加失败');
 			}
+			//记录操作锁
+			icache()->set('creat_lock_time', 1, 3);
+
+			$layout = $request->post('layout', 0);
+			if ($layout) {
+				//如果是非默认类型，新建时锁定类型
+				if (!empty($chapter->content)) {
+					$chapter->content->content = '';
+					$chapter->content->layout = $layout;
+					$chapter->content->save();
+				} else {
+					ChapterContent::query()->create([
+						'chapter_id' => $chapter->id,
+						'content' => '',
+						'layout' => $layout
+					]);
+				}
+			}
+
+			UserOperateLog::query()->create([
+				'user_id' => $user->id,
+				'document_id' => $documentId,
+				'chapter_id' => $chapter->id,
+				'operate' => UserOperateLog::CREATE,
+				'remark' => $user->username . '创建章节' . $chapter->name
+			]);
+
+			idb()->commit();
+			return $this->data($chapter->toArray());
+		} catch (\Throwable $e) {
+			idb()->rollBack();
+			throw new ErrorHttpException($e->getMessage(), $e->getCode());
 		}
-
-		UserOperateLog::query()->create([
-			'user_id' => $user->id,
-			'document_id' => $documentId,
-			'chapter_id' => $chapter->id,
-			'operate' => UserOperateLog::CREATE,
-			'remark' => $user->username . '创建章节' . $chapter->name
-		]);
-
-		return $this->data($chapter->toArray());
 	}
 
 	public function update(Request $request)
@@ -189,19 +199,27 @@ class ChapterController extends BaseController
 			}
 			$chapter->parent_id = $parentId;
 		}
-
 		$chapter->name = $request->post('name');
-		$chapter->save();
 
-		UserOperateLog::query()->create([
-			'user_id' => $user->id,
-			'document_id' => $chapter->document_id,
-			'chapter_id' => $chapter->id,
-			'operate' => UserOperateLog::EDIT,
-			'remark' => $user->username . '编辑章节' . $chapter->name . '基本信息'
-		]);
+		idb()->beginTransaction();
+		try {
+			HistoryLogic::instance()->createHistory($chapter->document_id, $user->id);
 
-		return $this->data('success');
+			$chapter->save();
+			UserOperateLog::query()->create([
+				'user_id' => $user->id,
+				'document_id' => $chapter->document_id,
+				'chapter_id' => $chapter->id,
+				'operate' => UserOperateLog::EDIT,
+				'remark' => $user->username . '编辑章节' . $chapter->name . '基本信息'
+			]);
+
+			idb()->commit();
+			return $this->data('success');
+		} catch (\Throwable $e) {
+			idb()->rollBack();
+			throw new ErrorHttpException($e->getMessage(), $e->getCode());
+		}
 	}
 
 	public function sort(Request $request)
@@ -232,6 +250,7 @@ class ChapterController extends BaseController
 
 		idb()->beginTransaction();
 		try {
+			HistoryLogic::instance()->createHistory($chapter->document_id, $user->id);
 			if ($position == 'move') {
 				//移动当前文章/目录
 				$targetDocumentId = $request->post('target')['document_id'];
@@ -413,40 +432,50 @@ class ChapterController extends BaseController
 			$content = $chapterRecord->recordToMarkdown($record);
 		}
 		$words = hasForbidWords($content);
-		if ($words){
-			throw new ErrorHttpException('您输入的内容存在敏感词“'.implode('、',$words).'”，请修改之后提交。');
+		if ($words) {
+			throw new ErrorHttpException('您输入的内容存在敏感词“'.implode('、', $words).'”，请修改之后提交。');
 		}
 
-		if (!empty($chapter->content)) {
-			if ($chapter->content->layout != $layout) {
-				throw new ErrorHttpException('文档类型不可更改');
+		idb()->beginTransaction();
+		try {
+			if ($layout == 0) {
+				HistoryLogic::instance()->createHistory($chapter->document->id, $user->id);
 			}
-			$chapter->content->content = $content;
-			$chapter->content->save();
-		} else {
-			if ($layout) {
-				//默认0
-				throw new ErrorHttpException('文档类型不可更改');
+			if (!empty($chapter->content)) {
+				if ($chapter->content->layout != $layout) {
+					throw new ErrorHttpException('文档类型不可更改');
+				}
+				$chapter->content->content = $content;
+				$chapter->content->save();
+			} else {
+				if ($layout) {
+					//默认0
+					throw new ErrorHttpException('文档类型不可更改');
+				}
+				ChapterContent::query()->create([
+					'chapter_id' => $chapter->id,
+					'content' => $content,
+					'layout' => $layout
+				]);
 			}
-			ChapterContent::query()->create([
+
+			$chapter->updated_at = time();
+			$chapter->save();
+
+			UserOperateLog::query()->create([
+				'user_id' => $user->id,
+				'document_id' => $chapter->document_id,
 				'chapter_id' => $chapter->id,
-				'content' => $content,
-				'layout' => $layout
+				'operate' => UserOperateLog::EDIT,
+				'remark' => $user->username . '编辑章节' . $chapter->name . '内容'
 			]);
+
+			idb()->commit();
+			return $this->data('success');
+		} catch (\Throwable $e) {
+			idb()->rollBack();
+			throw new ErrorHttpException($e->getMessage(), $e->getCode());
 		}
-
-		$chapter->updated_at = time();
-		$chapter->save();
-
-		UserOperateLog::query()->create([
-			'user_id' => $user->id,
-			'document_id' => $chapter->document_id,
-			'chapter_id' => $chapter->id,
-			'operate' => UserOperateLog::EDIT,
-			'remark' => $user->username . '编辑章节' . $chapter->name . '内容'
-		]);
-
-		return $this->data('success');
 	}
 
 	/**
@@ -643,6 +672,7 @@ class ChapterController extends BaseController
 
 		idb()->beginTransaction();
 		try {
+			HistoryLogic::instance()->createHistory($params['document_id'], $user->id);
 			$newChapter = new Chapter();
 			$newChapter->parent_id = $params['parent_id'];
 			$newChapter->name = $params['name'];
