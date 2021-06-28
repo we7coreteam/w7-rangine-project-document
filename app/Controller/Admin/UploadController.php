@@ -53,7 +53,7 @@ class UploadController extends BaseController
 			$multipartUploadCacheName = 'multipartUpload_' . $post['upload_id'];
 			$multipartUploadCache = icache()->get($multipartUploadCacheName);
 			if ($multipartUploadCache) {
-				$parts = $multipartUploadCache['parts'];
+				$parts =$multipartUploadCache['parts'];
 				$key = $multipartUploadCache['key'];//上传路径必须与upload_id一致
 			}
 			$updateBack = [
@@ -61,8 +61,18 @@ class UploadController extends BaseController
 				'upload_id' => $post['upload_id']
 			];
 			try {
+				$partsData = [];
+				asort($parts);
+
+				foreach ($parts as $val) {
+					$partsData[] = $val;
+				}
+
+				if(empty($partsData)){
+					throw new ErrorHttpException('没有上传完的分片');
+				}
 				$end = CdnLogic::instance()->channel(SettingLogic::KEY_COS)
-					->completeMultipartUpload($key, $post['upload_id'], array_keys($parts));
+					->completeMultipartUpload($key, $post['upload_id'], $partsData);
 				$url = $end['Location'];
 				if (!(strpos($url, 'http://') !== false || strpos($url, 'https://') !== false)) {
 					$url = 'https://' . $url;
