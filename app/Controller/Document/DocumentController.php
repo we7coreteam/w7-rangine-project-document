@@ -114,7 +114,7 @@ class DocumentController extends BaseController
 		$data = [
 			'browse_num' => $res->browse_num,
 			'history_num' => $res->history->count(),
-			'last_update_time' => $last_history->created_at
+			'last_update_time' => $last_history->created_at ?? ''
 		];
 		return $this->data($data);
 	}
