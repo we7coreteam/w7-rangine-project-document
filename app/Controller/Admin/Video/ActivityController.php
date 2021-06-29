@@ -13,14 +13,14 @@
 namespace W7\App\Controller\Admin\Video;
 
 use W7\App\Controller\BaseController;
-use W7\App\Model\Logic\Video\CarouselLogic;
+use W7\App\Model\Logic\Video\ActivityLogic;
 use W7\Http\Message\Server\Request;
 
-class CarouselController extends BaseController
+class ActivityController extends BaseController
 {
 	protected function block()
 	{
-		return new CarouselLogic();
+		return new ActivityLogic();
 	}
 
 	public function handleValidate(Request $request)
@@ -37,9 +37,9 @@ class CarouselController extends BaseController
 	}
 
 	/**
-	 * @api {get} /admin/video/carousel 视频后台-轮播列表
+	 * @api {get} /admin/video/activity 视频后台-活动列表
 	 * @apiName index
-	 * @apiGroup videoCarouselAdmin
+	 * @apiGroup videoActivityAdmin
 	 *
 	 * @apiSuccess {String} name 名称
 	 * @apiSuccess {String} url 链接
@@ -57,9 +57,9 @@ class CarouselController extends BaseController
 	}
 
 	/**
-	 * @api {get} /admin/video/carousel/:id 视频后台-轮播详情
+	 * @api {get} /admin/video/activity/:id 视频后台-活动详情
 	 * @apiName show
-	 * @apiGroup videoCarouselAdmin
+	 * @apiGroup videoActivityAdmin
 	 *
 	 * @apiSuccess {String} name 名称
 	 * @apiSuccess {String} url 链接
@@ -75,9 +75,9 @@ class CarouselController extends BaseController
 	}
 
 	/**
-	 * @api {post} /admin/video/carousel 视频后台-新增轮播
+	 * @api {post} /admin/video/activity 视频后台-新增活动
 	 * @apiName store
-	 * @apiGroup videoCarouselAdmin
+	 * @apiGroup videoActivityAdmin
 	 *
 	 * @apiParam {String} name 名称
 	 * @apiParam {String} url 链接
@@ -94,9 +94,9 @@ class CarouselController extends BaseController
 	}
 
 	/**
-	 * @api {put} /admin/video/carousel/:id 视频后台-修改轮播
+	 * @api {put} /admin/video/activity/:id 视频后台-修改活动
 	 * @apiName update
-	 * @apiGroup videoCarouselAdmin
+	 * @apiGroup videoActivityAdmin
 	 *
 	 * @apiParam {String} name 名称
 	 * @apiParam {String} url 链接
@@ -113,9 +113,9 @@ class CarouselController extends BaseController
 	}
 
 	/**
-	 * @api {delete} /admin/video/carousel/:id 视频后台-删除轮播
+	 * @api {delete} /admin/video/activity/:id 视频后台-删除活动
 	 * @apiName delete
-	 * @apiGroup videoCarouselAdmin
+	 * @apiGroup videoActivityAdmin
 	 */
 	public function delete(Request $request, $id)
 	{

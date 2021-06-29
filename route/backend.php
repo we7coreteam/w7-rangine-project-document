@@ -162,6 +162,13 @@ $route->middleware(\W7\App\Middleware\CheckAdminMiddleware::class)->group(['pref
 	$route->put('/video/carousel/{id:\d+}', 'Admin\Video\CarouselController@update');
 	$route->delete('/video/carousel/{id:\d+}', 'Admin\Video\CarouselController@delete');
 
+	//视频活动
+	$route->get('/video/activity', 'Admin\Video\ActivityController@index');
+	$route->get('/video/activity/{id:\d+}', 'Admin\Video\ActivityController@show');
+	$route->post('/video/activity', 'Admin\Video\ActivityController@store');
+	$route->put('/video/activity/{id:\d+}', 'Admin\Video\ActivityController@update');
+	$route->delete('/video/activity/{id:\d+}', 'Admin\Video\ActivityController@delete');
+
 	//视频
 	$route->get('/video', 'Admin\VideoController@index');
 	$route->put('/video/success/{id:\d+}', 'Admin\VideoController@success');
