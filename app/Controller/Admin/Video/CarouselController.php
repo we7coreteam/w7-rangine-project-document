@@ -46,7 +46,7 @@ class CarouselController extends BaseController
 	 * @apiSuccess {String} image 图片
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 *
+	 * {"status":true,"code":200,"data":{"current_page":1,"data":[{"id":1,"name":"test1","url":"222","image":"333","created_at":"1624952972","updated_at":"1624952972"}],"first_page_url":"\/?=1","from":1,"last_page":1,"last_page_url":"\/?=1","next_page_url":null,"path":"\/","per_page":10,"prev_page_url":null,"to":1,"total":1},"message":"ok"}
 	 */
 	public function index(Request $request)
 	{
@@ -66,7 +66,7 @@ class CarouselController extends BaseController
 	 * @apiSuccess {String} image 图片
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 *
+	 * {"status":true,"code":200,"data":{"id":1,"name":"test1","url":"222","image":"333","created_at":"1624952972","updated_at":"1624952972"},"message":"ok"}
 	 */
 	public function show(Request $request, $id)
 	{
@@ -84,7 +84,7 @@ class CarouselController extends BaseController
 	 * @apiParam {String} image 图片
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 *
+	 * {"status":true,"code":200,"data":{"id":1,"name":"test1","url":"222","image":"333","created_at":"1624952972","updated_at":"1624952972"},"message":"ok"}
 	 */
 	public function store(Request $request)
 	{
@@ -103,7 +103,7 @@ class CarouselController extends BaseController
 	 * @apiParam {String} image 图片
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 *
+	 * {"status":true,"code":200,"data":{"id":1,"name":"test1","url":"222","image":"333","created_at":"1624952972","updated_at":"1624952972"},"message":"ok"}
 	 */
 	public function update(Request $request, $id)
 	{
