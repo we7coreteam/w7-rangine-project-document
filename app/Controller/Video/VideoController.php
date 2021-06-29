@@ -30,17 +30,103 @@ class VideoController extends BaseController
 			'title' => 'required|string',
 			'cover' => 'required|string',
 			'url' => 'required|string',
-			'category_id' => 'required|integer|gt:0',
+			'category_ids' => 'required|array|max:3',
 			'description' => 'string',
 			'is_reprint' => 'required|in:0,1',
+			'reprint_url' => 'string|url',
 		], [], [
 			'title' => '标题',
 			'cover' => '封面',
 			'url' => '视频',
-			'category_id' => '分类',
+			'category_ids' => '分类',
 			'description' => '简介',
 			'is_reprint' => '视频来源',
+			'reprint_url' => '转载地址',
 		]);
+	}
+
+	/**
+	 * @api {get} /video 视频-视频列表
+	 * @apiName index
+	 * @apiGroup video
+	 *
+	 * @apiParam {Number} category_id 分类id
+	 *
+	 * @apiSuccess {String} title 标题
+	 * @apiSuccess {String} url 视频地址
+	 * @apiSuccess {String} time_length 视频时长
+	 * @apiSuccess {String} cover 封面图
+	 * @apiSuccess {String} description 简介
+	 * @apiSuccess {String} time_str 发布时间
+	 * @apiSuccess {String} play_num_text 播放量
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":{"current_page":1,"data":[{"id":9,"title":"test","cover":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","url":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","description":"简介简介简介","time_length":"","category_ids":["1","3"],"user_id":1,"play_num":0,"praise_num":0,"is_reprint":0,"reprint_url":"https:\/\/www.baidu.com","status":0,"reason":"","created_at":"1624945388","updated_at":"1624945388","category":[{"id":16,"category_id":1,"video_id":9,"created_at":"1624945388","updated_at":"1624945388","category_config":{"id":1,"name":"test1","created_at":"1624938553","updated_at":"1624938553"}},{"id":17,"category_id":3,"video_id":9,"created_at":"1624945388","updated_at":"1624945388","category_config":{"id":3,"name":"test3","created_at":"1624944838","updated_at":"1624944838"}}],"user":{"id":1,"username":"admin","avatar":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","remark":"root","is_ban":0,"group_id":1,"company":"宿州市微擎云计算有限公司","resume":"计算机四级","skill":"微擎官方账号","address":"合肥","created_at":"1569409778","updated_at":"1624342983","follower_num":11,"following_num":11,"article_num":43}}],"first_page_url":"\/?=1","from":1,"last_page":1,"last_page_url":"\/?=1","next_page_url":null,"path":"\/","per_page":10,"prev_page_url":null,"to":1,"total":1},"message":"ok"}
+	 */
+	public function index(Request $request)
+	{
+		$page = $request->query('page', 1);
+		$pageSize = intval($request->input('page_size', 10));
+		$query = Video::query();
+		if ($request->input('category_id', '')) {
+			$categoryId = $request->input('category_id');
+			if (is_numeric($categoryId)) {
+				$query->leftJoin('video_category', 'video_category.video_id', 'video.id');
+				$query->where('video_category.category_id', $categoryId);
+			}
+		}
+		$query->with(['category', 'category.categoryConfig', 'user'])->where('video.status', Video::STATUS_SUCCESS);
+		$query->orderBy('video.id', 'desc');
+		$list = $query->paginate($pageSize, $columns = ['video.*'], '', $page);
+		return $this->data($list);
+	}
+
+	/**
+	 * @api {get} /video/indexMy 视频-用户视频列表
+	 * @apiName indexMy
+	 * @apiGroup video
+	 *
+	 * @apiSuccess {String} title 标题
+	 * @apiSuccess {String} url 视频地址
+	 * @apiSuccess {String} time_length 视频时长
+	 * @apiSuccess {String} cover 封面图
+	 * @apiSuccess {String} description 简介
+	 * @apiSuccess {String} time_str 发布时间
+	 * @apiSuccess {String} play_num_text 播放量
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":{"current_page":1,"data":[{"id":9,"title":"test","cover":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","url":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","description":"简介简介简介","time_length":"","category_ids":["1","3"],"user_id":1,"play_num":0,"praise_num":0,"is_reprint":0,"reprint_url":"https:\/\/www.baidu.com","status":0,"reason":"","created_at":"1624945388","updated_at":"1624945388","category":[{"id":16,"category_id":1,"video_id":9,"created_at":"1624945388","updated_at":"1624945388","category_config":{"id":1,"name":"test1","created_at":"1624938553","updated_at":"1624938553"}},{"id":17,"category_id":3,"video_id":9,"created_at":"1624945388","updated_at":"1624945388","category_config":{"id":3,"name":"test3","created_at":"1624944838","updated_at":"1624944838"}}],"user":{"id":1,"username":"admin","avatar":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","remark":"root","is_ban":0,"group_id":1,"company":"宿州市微擎云计算有限公司","resume":"计算机四级","skill":"微擎官方账号","address":"合肥","created_at":"1569409778","updated_at":"1624342983","follower_num":11,"following_num":11,"article_num":43}}],"first_page_url":"\/?=1","from":1,"last_page":1,"last_page_url":"\/?=1","next_page_url":null,"path":"\/","per_page":10,"prev_page_url":null,"to":1,"total":1},"message":"ok"}
+	 */
+	public function indexMy(Request $request)
+	{
+		$page = $request->query('page', 1);
+		$pageSize = intval($request->input('page_size', 10));
+		$user = $request->getAttribute('user');
+		$condition[] = ['user_id', '=', $user->id];
+		$list = $this->block()->index($condition, $page, $pageSize, ['category', 'category.categoryConfig', 'user']);
+		return $this->data($list);
+	}
+
+	/**
+	 * @api {get} /video/indexHot 视频-热门视频
+	 * @apiName indexHot
+	 * @apiGroup video
+	 *
+	 * @apiSuccess {String} title 标题
+	 * @apiSuccess {String} url 视频地址
+	 * @apiSuccess {String} time_length 视频时长
+	 * @apiSuccess {String} cover 封面图
+	 * @apiSuccess {String} description 简介
+	 * @apiSuccess {String} time_str 发布时间
+	 * @apiSuccess {String} play_num_text 播放量
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":{"current_page":1,"data":[{"id":9,"title":"test","cover":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","url":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","description":"简介简介简介","time_length":"","category_ids":["1","3"],"user_id":1,"play_num":0,"praise_num":0,"is_reprint":0,"reprint_url":"https:\/\/www.baidu.com","status":0,"reason":"","created_at":"1624945388","updated_at":"1624945388","category":[{"id":16,"category_id":1,"video_id":9,"created_at":"1624945388","updated_at":"1624945388","category_config":{"id":1,"name":"test1","created_at":"1624938553","updated_at":"1624938553"}},{"id":17,"category_id":3,"video_id":9,"created_at":"1624945388","updated_at":"1624945388","category_config":{"id":3,"name":"test3","created_at":"1624944838","updated_at":"1624944838"}}],"user":{"id":1,"username":"admin","avatar":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","remark":"root","is_ban":0,"group_id":1,"company":"宿州市微擎云计算有限公司","resume":"计算机四级","skill":"微擎官方账号","address":"合肥","created_at":"1569409778","updated_at":"1624342983","follower_num":11,"following_num":11,"article_num":43}}],"first_page_url":"\/?=1","from":1,"last_page":1,"last_page_url":"\/?=1","next_page_url":null,"path":"\/","per_page":10,"prev_page_url":null,"to":1,"total":1},"message":"ok"}
+	 */
+	public function indexHot(Request $request)
+	{
+		$list = $this->block()->indexHot();
+		return $this->data($list);
 	}
 
 	/**
@@ -51,12 +137,13 @@ class VideoController extends BaseController
 	 * @apiParam {String} title 标题
 	 * @apiParam {String} cover 封面图片地址
 	 * @apiParam {String} url 视频地址
-	 * @apiParam {Number} category_id 分类id
+	 * @apiParam {Array} category_ids 分类id
 	 * @apiParam {String} description 简介
 	 * @apiParam {Number} is_reprint 是否转载0否1是
+	 * @apiParam {String} reprint_url 转载地址
 	 *
 	 * @apiSuccessExample {json} Success-Response:
-	 *{"status":true,"code":200,"data":{"title":"test","cover":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","url":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","category_id":"1","description":"简介简介简介","is_reprint":"0","user_id":1,"updated_at":"1624510479","created_at":"1624510479","id":2},"message":"ok"}
+	 * {"status":true,"code":200,"data":{"title":"test","cover":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","url":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","category_ids":["1","3"],"description":"简介简介简介","is_reprint":"0","reprint_url":"https:\/\/www.baidu.com","user_id":1,"updated_at":"1624945388","created_at":"1624945388","id":9},"message":"ok"}
 	 */
 	public function store(Request $request)
 	{
@@ -64,6 +151,46 @@ class VideoController extends BaseController
 		$user = $request->getAttribute('user');
 		$data['user_id'] = $user->id;
 		$result = $this->block()->store($data);
+		return $this->data($result);
+	}
+
+	/**
+	 * @api {put} /video/:id 视频-编辑视频
+	 * @apiName update
+	 * @apiGroup video
+	 *
+	 * @apiParam {String} title 标题
+	 * @apiParam {String} cover 封面图片地址
+	 * @apiParam {String} url 视频地址
+	 * @apiParam {Array} category_ids 分类id
+	 * @apiParam {String} description 简介
+	 * @apiParam {Number} is_reprint 是否转载0否1是
+	 * @apiParam {String} reprint_url 转载地址
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":{"title":"test","cover":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","url":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","category_ids":["1","3"],"description":"简介简介简介","is_reprint":"0","reprint_url":"https:\/\/www.baidu.com","user_id":1,"updated_at":"1624945388","created_at":"1624945388","id":9},"message":"ok"}
+	 */
+	public function update(Request $request, $id)
+	{
+		$data = $this->handleValidate($request);
+		$user = $request->getAttribute('user');
+		//必须本用户修改
+		$checkData['user_id'] = $user->id;
+		$result = $this->block()->update($id, $data, $checkData);
+		return $this->data($result);
+	}
+
+	/**
+	 * @api {delete} /video/:id 视频-删除视频
+	 * @apiName destroy
+	 * @apiGroup video
+	 */
+	public function destroy(Request $request, $id)
+	{
+		$user = $request->getAttribute('user');
+		//必须本用户修改
+		$checkData['user_id'] = $user->id;
+		$result = $this->block()->destroy($id, $checkData);
 		return $this->data($result);
 	}
 
@@ -87,7 +214,6 @@ class VideoController extends BaseController
 	public function show(Request $request, $id)
 	{
 		$row = $this->block()->show($id, ['user']);
-
 		if ($row) {
 			if ($row->status != Video::STATUS_SUCCESS) {
 				//审核未通过-只能看见自己的

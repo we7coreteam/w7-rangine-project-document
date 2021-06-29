@@ -19,7 +19,9 @@ class CreateVideoTable2021_06_23_150738 extends Migration
 	protected $commentTable = 'video_comment';
 	protected $praiseTable = 'video_praise';
 	protected $carouselTable = 'video_carousel';
+	protected $configTable = 'video_category_config';
 	protected $categoryTable = 'video_category';
+	protected $activityTable = 'video_activity';
 	/**
 	 * Run the migrations.
 	 *
@@ -34,17 +36,18 @@ class CreateVideoTable2021_06_23_150738 extends Migration
 			$table->string('url', 255)->default('')->comment('视频地址');
 			$table->string('description', 255)->default('')->comment('视频简介');
 			$table->string('time_length', 100)->default('')->comment('视频时长');
-			$table->integer('category_id', false, true)->default(0)->comment('分类id');
+			$table->string('category_ids', 255)->default('')->comment('分类id');
 			$table->integer('user_id', false, true)->default(0)->comment('归属用户id');
 			$table->integer('play_num', false, true)->default(0)->comment('播放次数');
 			$table->integer('praise_num', false, true)->default(0)->comment('点赞次数');
 			$table->tinyInteger('is_reprint', false, true)->default(0)->comment('是否来自转载0否1是');
+			$table->string('reprint_url', 255)->default('')->comment('转载地址');
 			$table->tinyInteger('status', false, true)->default(0)->comment('状态0未审核1已审核2审核失败');
 			$table->string('reason', 255)->default('')->comment('驳回原因');
 			$table->integer('created_at', false, true)->default(0);
 			$table->integer('updated_at', false, true)->default(0);
 			$table->index(['user_id'], 'user_id');
-			$table->index(['category_id'], 'category_id');
+			$table->index(['status'], 'status');
 		});
 		$tableName = idb()->getTablePrefix() . $this->videoTable;
 		\Illuminate\Support\Facades\DB::statement("ALTER TABLE `{$tableName}` COMMENT '视频'");
@@ -84,14 +87,37 @@ class CreateVideoTable2021_06_23_150738 extends Migration
 		$tableName = idb()->getTablePrefix() . $this->carouselTable;
 		\Illuminate\Support\Facades\DB::statement("ALTER TABLE `{$tableName}` COMMENT '视频轮播'");
 
-		$this->schema->create($this->categoryTable, function (Blueprint $table) {
+		$this->schema->create($this->configTable, function (Blueprint $table) {
 			$table->bigIncrements('id');
 			$table->string('name', 100)->default('')->comment('分类名称');
 			$table->integer('created_at', false, true)->default(0);
 			$table->integer('updated_at', false, true)->default(0);
 		});
+		$tableName = idb()->getTablePrefix() . $this->configTable;
+		\Illuminate\Support\Facades\DB::statement("ALTER TABLE `{$tableName}` COMMENT '视频分类配置'");
+
+		$this->schema->create($this->categoryTable, function (Blueprint $table) {
+			$table->bigIncrements('id');
+			$table->integer('category_id', false, true)->default(0)->comment('分类id');
+			$table->integer('video_id', false, true)->default(0)->comment('视频id');
+			$table->integer('created_at', false, true)->default(0);
+			$table->integer('updated_at', false, true)->default(0);
+			$table->index(['video_id'], 'video_id');
+			$table->index(['category_id'], 'category_id');
+		});
 		$tableName = idb()->getTablePrefix() . $this->categoryTable;
 		\Illuminate\Support\Facades\DB::statement("ALTER TABLE `{$tableName}` COMMENT '视频分类'");
+
+		$this->schema->create($this->activityTable, function (Blueprint $table) {
+			$table->bigIncrements('id');
+			$table->string('name', 100)->default('')->comment('活动名称');
+			$table->string('url', 255)->default('')->comment('活动链接');
+			$table->string('image', 255)->default('')->comment('活动图片');
+			$table->integer('created_at', false, true)->default(0);
+			$table->integer('updated_at', false, true)->default(0);
+		});
+		$tableName = idb()->getTablePrefix() . $this->activityTable;
+		\Illuminate\Support\Facades\DB::statement("ALTER TABLE `{$tableName}` COMMENT '视频活动'");
 	}
 
 	/**
@@ -105,6 +131,8 @@ class CreateVideoTable2021_06_23_150738 extends Migration
 		$this->schema->dropIfExists($this->commentTable);
 		$this->schema->dropIfExists($this->praiseTable);
 		$this->schema->dropIfExists($this->carouselTable);
+		$this->schema->dropIfExists($this->configTable);
 		$this->schema->dropIfExists($this->categoryTable);
+		$this->schema->dropIfExists($this->activityTable);
 	}
 }
