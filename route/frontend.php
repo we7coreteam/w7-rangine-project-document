@@ -9,7 +9,8 @@
  * Using it under the license terms
  * visited https://www.w7.cc for more details
  */
-$route=irouter();
+
+$route = irouter();
 $route->middleware(\W7\App\Middleware\FrontendDocumentPermissionMiddleware::class)->group(['prefix' => '/document'], function ($route) {
 	$route->post('/all', 'Document\DocumentController@all');
 	$route->post('/detail', 'Document\DocumentController@detail');
@@ -46,7 +47,7 @@ $route->middleware(\W7\App\Middleware\CheckAuthMiddleware::class)->group([], fun
 
 	//文章
 	$route->get('/article/indexMy', 'Article\ArticleController@indexMy');
-	$route->post('/article/article', 'Article\ArticleController@store');
+	$route->post('/article', 'Article\ArticleController@store');
 	$route->put('/article/{id:\d+}', 'Article\ArticleController@update');
 	$route->delete('/article/{id:\d+}', 'Article\ArticleController@destroy');
 
@@ -70,9 +71,16 @@ $route->middleware(\W7\App\Middleware\CheckAuthMiddleware::class)->group([], fun
 	$route->post('/article/articleCollection/unCollection', 'Article\ArticleCollectionController@unCollection');
 
 	//视频
+	$route->get('/video/indexMy', 'Video\VideoController@indexMy');
 	$route->post('/video', 'Video\VideoController@store');
+	$route->put('/video/{id:\d+}', 'Video\VideoController@update');
+	$route->delete('/video/{id:\d+}', 'Video\VideoController@destroy');
+
+	//视频点赞
 	$route->post('/video/praise', 'Video\PraiseController@praise');
 	$route->post('/video/unPraise', 'Video\PraiseController@unPraise');
+
+	//视频评论
 	$route->post('/video/comment', 'Video\CommentController@store');
 });
 
@@ -94,8 +102,13 @@ $route->group([], function ($route) {
 	$route->get('/article/articleCollection/all', 'Article\ArticleCollectionController@index');
 
 	//视频
+	$route->get('/video', 'Video\VideoController@index');
+	$route->get('/video/indexHot', 'Video\VideoController@indexHot');
 	$route->get('/video/{id:\d+}', 'Video\VideoController@show');
 
 	//视频评论
 	$route->get('/video/comment', 'Video\CommentController@index');
+
+	//视频分类
+	$route->get('/video/categoryConfig', 'Video\CategoryConfigController@index');
 });

@@ -13,14 +13,14 @@
 namespace W7\App\Controller\Admin\Video;
 
 use W7\App\Controller\BaseController;
-use W7\App\Model\Logic\Video\CategoryLogic;
+use W7\App\Model\Logic\Video\CategoryConfigLogic;
 use W7\Http\Message\Server\Request;
 
-class CategoryController extends BaseController
+class CategoryConfigController extends BaseController
 {
 	protected function block()
 	{
-		return new CategoryLogic();
+		return new CategoryConfigLogic();
 	}
 
 	public function handleValidate(Request $request)
@@ -33,7 +33,7 @@ class CategoryController extends BaseController
 	}
 
 	/**
-	 * @api {get} /admin/video/category 视频后台-分类列表
+	 * @api {get} /admin/video/categoryConfig 视频后台-分类列表
 	 * @apiName index
 	 * @apiGroup videoCategory
 	 *
@@ -51,7 +51,7 @@ class CategoryController extends BaseController
 	}
 
 	/**
-	 * @api {post} /admin/video/category 视频后台-新增分类
+	 * @api {post} /admin/video/categoryConfig 视频后台-新增分类
 	 * @apiName store
 	 * @apiGroup videoCategory
 	 *
@@ -68,7 +68,7 @@ class CategoryController extends BaseController
 	}
 
 	/**
-	 * @api {put} /admin/video/category/:id 视频后台-修改分类
+	 * @api {put} /admin/video/categoryConfig/:id 视频后台-修改分类
 	 * @apiName update
 	 * @apiGroup videoCategory
 	 *

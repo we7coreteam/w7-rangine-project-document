@@ -13,16 +13,74 @@
 namespace W7\App\Model\Logic;
 
 use W7\App\Model\Entity\Video;
+use W7\App\Model\Entity\Video\Category;
 use W7\App\Exception\ErrorHttpException;
+use W7\App\Model\Logic\Video\CategoryLogic;
 
 class VideoLogic extends BaseLogic
 {
 	protected $model = Video::class;
 
+	public function indexHot()
+	{
+		$videos = Video::query()->where('status', 0)->with(['category', 'category.categoryConfig', 'user'])->orderBy('play_num', 'desc')->limit(50)->get()->toArray();
+		$keys = array_rand($videos, 6);
+		$hotVideos = [];
+		foreach ($keys as $key) {
+			$hotVideos[] = $videos[$key];
+		}
+		return $hotVideos;
+	}
+
 	public function store($data)
 	{
+		$data = $this->checkPost($data);
 		$data['status'] = Video::STATUS_CREATE;
-		return parent::store($data);
+		$row = parent::store($data);
+		CategoryLogic::instance()->saveCategory($row);
+		return $row;
+	}
+
+	public function update($id, $data, $checkData = [])
+	{
+		$row = $this->show($id, '', $checkData);
+		$data['user_id'] = $row->user_id;
+		$data = $this->checkPost($data);
+		$data['status'] = Video::STATUS_CREATE;
+		if (!$row->update($data)) {
+			throw new ErrorHttpException('保存失败');
+		}
+		CategoryLogic::instance()->saveCategory($row);
+		return $row;
+	}
+
+	public function destroy($id, $checkData = [])
+	{
+		idb()->beginTransaction();
+		try {
+			$model = $this->show($id, '', $checkData);
+			$model->comment()->delete();
+			$model->praise()->delete();
+			$model->category()->delete();
+			$model->delete();
+			idb()->commit();
+			return $model;
+		} catch (\Exception $e) {
+			idb()->rollBack();
+			throw new ErrorHttpException($e->getMessage());
+		}
+	}
+
+	public function checkPost($data)
+	{
+		if (!empty($data['category_id'])) {
+			$category = Category::query()->whereIn('id', $data['category_id'])->get()->toArray();
+			if (!$category) {
+				throw new ErrorHttpException('分类错误');
+			}
+			$data['category_id'] = array_column($category, 'id');
+		}
+		return $data;
 	}
 
 	public function success($id)

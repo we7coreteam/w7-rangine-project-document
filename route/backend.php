@@ -151,9 +151,9 @@ $route->middleware(\W7\App\Middleware\CheckAdminMiddleware::class)->group(['pref
 	$route->post('/article/reject', 'Admin\Article\ArticleController@reject');
 
 	//视频分类
-	$route->get('/video/category', 'Admin\Video\CategoryController@index');
-	$route->post('/video/category', 'Admin\Video\CategoryController@store');
-	$route->put('/video/category/{id:\d+}', 'Admin\Video\CategoryController@update');
+	$route->get('/video/categoryConfig', 'Admin\Video\CategoryConfigController@index');
+	$route->post('/video/categoryConfig', 'Admin\Video\CategoryConfigController@store');
+	$route->put('/video/categoryConfig/{id:\d+}', 'Admin\Video\CategoryConfigController@update');
 
 	//视频轮播
 	$route->get('/video/carousel', 'Admin\Video\CarouselController@index');

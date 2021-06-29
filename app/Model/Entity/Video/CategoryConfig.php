@@ -14,13 +14,8 @@ namespace W7\App\Model\Entity\Video;
 
 use W7\App\Model\Entity\BaseModel;
 
-class Category extends BaseModel
+class CategoryConfig extends BaseModel
 {
-	protected $table = 'video_category';
-	protected $fillable = ['category_id', 'video_id'];
-
-	public function categoryConfig()
-	{
-		return $this->belongsTo(CategoryConfig::class, 'category_id', 'id');
-	}
+	protected $table = 'video_category_config';
+	protected $fillable = ['name'];
 }
