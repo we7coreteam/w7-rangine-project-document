@@ -35,7 +35,7 @@ class CategoryConfigController extends BaseController
 	/**
 	 * @api {get} /admin/video/categoryConfig 视频后台-分类列表
 	 * @apiName index
-	 * @apiGroup videoCategory
+	 * @apiGroup videoCategoryAdmin
 	 *
 	 * @apiSuccess {String} name 分类名称
 	 *
@@ -53,7 +53,7 @@ class CategoryConfigController extends BaseController
 	/**
 	 * @api {post} /admin/video/categoryConfig 视频后台-新增分类
 	 * @apiName store
-	 * @apiGroup videoCategory
+	 * @apiGroup videoCategoryAdmin
 	 *
 	 * @apiParam {String} name 分类名称
 	 *
@@ -70,7 +70,7 @@ class CategoryConfigController extends BaseController
 	/**
 	 * @api {put} /admin/video/categoryConfig/:id 视频后台-修改分类
 	 * @apiName update
-	 * @apiGroup videoCategory
+	 * @apiGroup videoCategoryAdmin
 	 *
 	 * @apiParam {String} name 分类名称
 	 *

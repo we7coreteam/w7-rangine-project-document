@@ -39,7 +39,7 @@ class CarouselController extends BaseController
 	/**
 	 * @api {get} /admin/video/carousel 视频后台-轮播列表
 	 * @apiName index
-	 * @apiGroup videoCarousel
+	 * @apiGroup videoCarouselAdmin
 	 *
 	 * @apiSuccess {String} name 名称
 	 * @apiSuccess {String} url 链接
@@ -59,7 +59,7 @@ class CarouselController extends BaseController
 	/**
 	 * @api {get} /admin/video/carousel/:id 视频后台-轮播详情
 	 * @apiName show
-	 * @apiGroup videoCarousel
+	 * @apiGroup videoCarouselAdmin
 	 *
 	 * @apiSuccess {String} name 名称
 	 * @apiSuccess {String} url 链接
@@ -77,7 +77,7 @@ class CarouselController extends BaseController
 	/**
 	 * @api {post} /admin/video/carousel 视频后台-新增轮播
 	 * @apiName store
-	 * @apiGroup videoCarousel
+	 * @apiGroup videoCarouselAdmin
 	 *
 	 * @apiParam {String} name 名称
 	 * @apiParam {String} url 链接
@@ -96,7 +96,7 @@ class CarouselController extends BaseController
 	/**
 	 * @api {put} /admin/video/carousel/:id 视频后台-修改轮播
 	 * @apiName update
-	 * @apiGroup videoCarousel
+	 * @apiGroup videoCarouselAdmin
 	 *
 	 * @apiParam {String} name 名称
 	 * @apiParam {String} url 链接
@@ -115,7 +115,7 @@ class CarouselController extends BaseController
 	/**
 	 * @api {delete} /admin/video/carousel/:id 视频后台-删除轮播
 	 * @apiName delete
-	 * @apiGroup videoCarousel
+	 * @apiGroup videoCarouselAdmin
 	 */
 	public function delete(Request $request, $id)
 	{
