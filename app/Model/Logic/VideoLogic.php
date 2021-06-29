@@ -21,9 +21,21 @@ class VideoLogic extends BaseLogic
 {
 	protected $model = Video::class;
 
+	public function homeData()
+	{
+		$carousel = Video\Carousel::query()->get();
+		$activity = Video\Activity::query()->get();
+		$videoRank = Video::query()->where('status', Video::STATUS_SUCCESS)->with(['category', 'category.categoryConfig', 'user'])->orderBy('play_num', 'desc')->limit(10)->get();
+		return [
+			'carousel' => $carousel,
+			'activity' => $activity,
+			'videoRank' => $videoRank
+		];
+	}
+
 	public function indexHot()
 	{
-		$videos = Video::query()->where('status', 0)->with(['category', 'category.categoryConfig', 'user'])->orderBy('play_num', 'desc')->limit(50)->get()->toArray();
+		$videos = Video::query()->where('status', Video::STATUS_SUCCESS)->with(['category', 'category.categoryConfig', 'user'])->orderBy('play_num', 'desc')->limit(50)->get()->toArray();
 		$keys = array_rand($videos, 6);
 		$hotVideos = [];
 		foreach ($keys as $key) {

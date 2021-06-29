@@ -46,6 +46,24 @@ class VideoController extends BaseController
 	}
 
 	/**
+	 * @api {get} /video 视频-首页数据
+	 * @apiName home
+	 * @apiGroup video
+	 *
+	 * @apiSuccess {Object} carousel 轮播数据
+	 * @apiSuccess {Object} activity 活动数据
+	 * @apiSuccess {Object} videoRank 视频排行
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":{"carousel":[{"id":1,"name":"test1","url":"222","image":"333","created_at":"1624952972","updated_at":"1624952972"}],"activity":[{"id":1,"name":"test1111","url":"222","image":"333","created_at":"1624954318","updated_at":"1624954334"}],"videoRank":[{"id":14,"title":"test","cover":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","url":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","description":"简介简介简介","time_length":"","category_ids":["1","3"],"user_id":1,"play_num":10000,"praise_num":0,"is_reprint":0,"reprint_url":"https:\/\/www.baidu.com","status":0,"reason":"","created_at":"1624951081","updated_at":"1624951081","time_str":"1小时前","play_num_text":"10.0k","category":[{"id":26,"category_id":1,"video_id":14,"created_at":"1624951081","updated_at":"1624951081","category_config":{"id":1,"name":"test1","created_at":"1624938553","updated_at":"1624938553"}},{"id":27,"category_id":3,"video_id":14,"created_at":"1624951081","updated_at":"1624951081","category_config":{"id":3,"name":"test3","created_at":"1624944838","updated_at":"1624954489"}}],"user":{"id":1,"username":"admin","avatar":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","remark":"root","is_ban":0,"group_id":1,"company":"宿州市微擎云计算有限公司","resume":"计算机四级","skill":"微擎官方账号","address":"合肥","created_at":"1569409778","updated_at":"1624342983","follower_num":11,"following_num":11,"article_num":43}}]},"message":"ok"}
+	 */
+	public function home(Request $request)
+	{
+		$list = $this->block()->homeData();
+		return $this->data($list);
+	}
+
+	/**
 	 * @api {get} /video 视频-视频列表
 	 * @apiName index
 	 * @apiGroup video
