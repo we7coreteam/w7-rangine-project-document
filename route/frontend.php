@@ -46,7 +46,7 @@ irouter()->middleware(\W7\App\Middleware\CheckAuthMiddleware::class)->group(['pr
 
 	//文章
 	$route->get('/indexMy', 'Article\ArticleController@indexMy');
-	$route->post('/article', 'Article\ArticleController@store');
+	$route->post('/', 'Article\ArticleController@store');
 	$route->put('/{id:\d+}', 'Article\ArticleController@update');
 	$route->delete('/{id:\d+}', 'Article\ArticleController@destroy');
 
