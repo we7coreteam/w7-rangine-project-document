@@ -61,6 +61,7 @@ class CdnLogic extends LogicAbstract
 						'secretId' => $this->bucketSpace[$channel]['secretId'],
 						'secretKey' => $this->bucketSpace[$channel]['secretKey'],
 					],
+					'connect_timeout' => 60,
 					'timeout' => 60//超时时间
 				]);
 			} catch (\Throwable $e) {
