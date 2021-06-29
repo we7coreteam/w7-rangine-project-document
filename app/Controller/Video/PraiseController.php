@@ -23,6 +23,13 @@ class PraiseController extends BaseController
 		return new PraiseLogic();
 	}
 
+	/**
+	 * @api {post} /video/praise 视频点赞-点赞
+	 * @apiName praise
+	 * @apiGroup videoPraise
+	 *
+	 * @apiParam {Number} video_id 视频ID
+	 **/
 	public function praise(Request $request)
 	{
 		$data = $this->validate($request, [
@@ -35,6 +42,13 @@ class PraiseController extends BaseController
 		return $this->data($result);
 	}
 
+	/**
+	 * @api {post} /video/unPraise 视频点赞-取消点赞
+	 * @apiName unPraise
+	 * @apiGroup videoPraise
+	 *
+	 * @apiParam {Number} video_id 视频ID
+	 **/
 	public function unPraise(Request $request)
 	{
 		$data = $this->validate($request, [

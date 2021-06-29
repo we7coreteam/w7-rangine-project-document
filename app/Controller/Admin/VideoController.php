@@ -26,7 +26,7 @@ class VideoController extends BaseController
 	/**
 	 * @api {get} /admin/video 视频后台-视频列表
 	 * @apiName index
-	 * @apiGroup video
+	 * @apiGroup adminVideo
 	 *
 	 * @apiParam {Number} status 审核状态0待审核1通过2拒绝
 	 *
@@ -52,7 +52,7 @@ class VideoController extends BaseController
 	/**
 	 * @api {put} /admin/video/success/:id 视频后台-视频审核通过
 	 * @apiName success
-	 * @apiGroup video
+	 * @apiGroup adminVideo
 	 *
 	 * @apiSuccessExample {json} Success-Response:
 	 * {"status":true,"code":200,"data":{"id":2,"title":"test","cover":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","url":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","description":"简介简介简介","time_length":"","category_id":1,"user_id":1,"play_num":0,"praise_num":0,"is_reprint":0,"status":1,"reason":"","created_at":"1624510479","updated_at":"1624860325"},"message":"ok"}
@@ -66,7 +66,7 @@ class VideoController extends BaseController
 	/**
 	 * @api {put} /admin/video/reject/:id 视频后台-视频审核拒绝
 	 * @apiName reject
-	 * @apiGroup video
+	 * @apiGroup adminVideo
 	 *
 	 * @apiParam {String} reason 驳回原因
 	 *
