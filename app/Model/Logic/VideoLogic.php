@@ -12,10 +12,12 @@
 
 namespace W7\App\Model\Logic;
 
+use W7\App\Model\Entity\Message\Message;
 use W7\App\Model\Entity\Video;
 use W7\App\Model\Entity\Video\Category;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Logic\Video\CategoryLogic;
+use W7\App\Model\Logic\Message\Type\RemindLogic;
 
 class VideoLogic extends BaseLogic
 {
@@ -104,6 +106,7 @@ class VideoLogic extends BaseLogic
 			}
 			$row->status = Video::STATUS_SUCCESS;
 			$row->save();
+			(new RemindLogic())->add(0, $row->user_id, "恭喜，您发表的视频<span class='article_title'>《{$row->title}》</span>已通过审核。", Message::REMIND_VIDEO, $row->id);
 			return $row;
 		} else {
 			throw new ErrorHttpException('审核失败');
@@ -120,6 +123,7 @@ class VideoLogic extends BaseLogic
 			$row->status = Video::STATUS_FAIL;
 			$row->reason = $reason;
 			$row->save();
+			(new RemindLogic())->add(0, $row->user_id, "抱歉，您发表的视频<span class='article_title'>《{$row->title}》</span>审核不通过，拒绝原因：" . $reason, Message::REMIND_VIDEO, $row->id);
 			return $row;
 		} else {
 			throw new ErrorHttpException('审核失败');

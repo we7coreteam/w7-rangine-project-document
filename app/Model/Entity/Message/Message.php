@@ -30,6 +30,7 @@ class Message extends BaseModel
 
 	//任务
 	const REMIND_ARTICLE = 'remind_article'; // 文章通知
+	const REMIND_VIDEO = 'remind_video'; // 视频通知
 
 	public static function getTargetTypeLabel($type = '')
 	{
