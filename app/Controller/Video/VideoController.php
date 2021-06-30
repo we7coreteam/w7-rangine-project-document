@@ -69,6 +69,7 @@ class VideoController extends BaseController
 	 * @apiGroup video
 	 *
 	 * @apiParam {Number} category_id 分类id
+	 * @apiParam {Number} user_id 用户id
 	 *
 	 * @apiSuccess {String} title 标题
 	 * @apiSuccess {String} url 视频地址
@@ -91,6 +92,12 @@ class VideoController extends BaseController
 			if (is_numeric($categoryId)) {
 				$query->leftJoin('video_category', 'video_category.video_id', 'video.id');
 				$query->where('video_category.category_id', $categoryId);
+			}
+		}
+		if ($request->input('user_id', '')) {
+			$userId = $request->input('user_id');
+			if (is_numeric($userId)) {
+				$query->where('user_id', $userId);
 			}
 		}
 		$query->with(['category', 'category.categoryConfig', 'user'])->where('video.status', Video::STATUS_SUCCESS);
