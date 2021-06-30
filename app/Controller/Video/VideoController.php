@@ -30,6 +30,7 @@ class VideoController extends BaseController
 			'title' => 'required|string',
 			'cover' => 'required|string',
 			'url' => 'required|string',
+			'time_length' => 'required|string',
 			'category_ids' => 'required|array|max:3',
 			'description' => 'string',
 			'is_reprint' => 'required|in:0,1',
@@ -38,6 +39,7 @@ class VideoController extends BaseController
 			'title' => '标题',
 			'cover' => '封面',
 			'url' => '视频',
+			'time_length' => '时长',
 			'category_ids' => '分类',
 			'description' => '简介',
 			'is_reprint' => '视频来源',
@@ -162,6 +164,7 @@ class VideoController extends BaseController
 	 * @apiParam {String} title 标题
 	 * @apiParam {String} cover 封面图片地址
 	 * @apiParam {String} url 视频地址
+	 * @apiParam {String} time_length 视频时长
 	 * @apiParam {Array} category_ids 分类id
 	 * @apiParam {String} description 简介
 	 * @apiParam {Number} is_reprint 是否转载0否1是
@@ -249,5 +252,35 @@ class VideoController extends BaseController
 			}
 		}
 		return $this->data($row);
+	}
+
+	/**
+	 * @api {get} /video/recommend 视频-相关推荐
+	 * @apiName recommend
+	 * @apiGroup video
+	 *
+	 * @apiParam {Number} video_id 视频id
+	 *
+	 * @apiSuccess {String} title 标题
+	 * @apiSuccess {String} url 视频地址
+	 * @apiSuccess {String} time_length 视频时长
+	 * @apiSuccess {String} cover 封面图
+	 * @apiSuccess {String} description 简介
+	 * @apiSuccess {String} time_str 发布时间
+	 * @apiSuccess {String} play_num_text 播放量
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":{"current_page":1,"data":[{"id":9,"title":"test","cover":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","url":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","description":"简介简介简介","time_length":"","category_ids":["1","3"],"user_id":1,"play_num":0,"praise_num":0,"is_reprint":0,"reprint_url":"https:\/\/www.baidu.com","status":0,"reason":"","created_at":"1624945388","updated_at":"1624945388","category":[{"id":16,"category_id":1,"video_id":9,"created_at":"1624945388","updated_at":"1624945388","category_config":{"id":1,"name":"test1","created_at":"1624938553","updated_at":"1624938553"}},{"id":17,"category_id":3,"video_id":9,"created_at":"1624945388","updated_at":"1624945388","category_config":{"id":3,"name":"test3","created_at":"1624944838","updated_at":"1624944838"}}],"user":{"id":1,"username":"admin","avatar":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","remark":"root","is_ban":0,"group_id":1,"company":"宿州市微擎云计算有限公司","resume":"计算机四级","skill":"微擎官方账号","address":"合肥","created_at":"1569409778","updated_at":"1624342983","follower_num":11,"following_num":11,"article_num":43}}],"first_page_url":"\/?=1","from":1,"last_page":1,"last_page_url":"\/?=1","next_page_url":null,"path":"\/","per_page":10,"prev_page_url":null,"to":1,"total":1},"message":"ok"}
+	 */
+	public function recommend(Request $request)
+	{
+		$data = $this->validate($request, [
+			'video_id' => 'required|integer|gt:0',
+		], [
+			'video_id' => '视频ID',
+		]);
+
+		$list = $this->block()->recommendVideo($data['video_id']);
+		return $this->data($list);
 	}
 }

@@ -35,6 +35,23 @@ class VideoLogic extends BaseLogic
 		];
 	}
 
+	public function recommendVideo($videoId)
+	{
+		$videos = Video::query()
+			->leftJoin('video_category', 'video_category.video_id', 'video.id')
+			->whereIn('video_category.category_id', function ($query) use ($videoId) {
+				$query->select('category_id')->from('video_category')->where('video_id', $videoId)->get();
+			})
+			->where('video.id', '<>', $videoId)
+			->where('video.status', Video::STATUS_SUCCESS)
+			->with(['user'])
+			->limit(6)
+			->inRandomOrder()
+			->get();
+
+		return $videos;
+	}
+
 	public function indexHot()
 	{
 		$videos = Video::query()->where('status', Video::STATUS_SUCCESS)->with(['category', 'category.categoryConfig', 'user'])->orderBy('play_num', 'desc')->limit(50)->get()->toArray();
