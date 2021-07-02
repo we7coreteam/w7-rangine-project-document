@@ -80,6 +80,7 @@ $route->middleware(\W7\App\Middleware\CheckAuthMiddleware::class)->group([], fun
 	//视频点赞
 	$route->post('/video/praise', 'Video\PraiseController@praise');
 	$route->post('/video/unPraise', 'Video\PraiseController@unPraise');
+	$route->get('/video/isPraise', 'Video\PraiseController@isPraise');
 
 	//视频评论
 	$route->post('/video/comment', 'Video\CommentController@store');

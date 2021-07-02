@@ -77,4 +77,12 @@ class PraiseLogic extends BaseLogic
 			throw new ErrorHttpException($e->getMessage());
 		}
 	}
+
+	public function info($videoId, $uid)
+	{
+		return Praise::query()
+			->where('video_id', $videoId)
+			->where('user_id', $uid)
+			->first();
+	}
 }
