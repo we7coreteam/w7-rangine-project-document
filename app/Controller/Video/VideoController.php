@@ -48,7 +48,7 @@ class VideoController extends BaseController
 	}
 
 	/**
-	 * @api {get} /video 视频-首页数据
+	 * @api {get} /video/home 视频-首页数据
 	 * @apiName home
 	 * @apiGroup video
 	 *

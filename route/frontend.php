@@ -71,7 +71,6 @@ $route->middleware(\W7\App\Middleware\CheckAuthMiddleware::class)->group([], fun
 	$route->post('/article/articleCollection/unCollection', 'Article\ArticleCollectionController@unCollection');
 
 	//视频
-	$route->get('/video/home', 'Video\VideoController@home');
 	$route->get('/video/indexMy', 'Video\VideoController@indexMy');
 	$route->post('/video', 'Video\VideoController@store');
 	$route->put('/video/{id:\d+}', 'Video\VideoController@update');
@@ -110,6 +109,7 @@ $route->group([], function ($route) {
 
 	//视频
 	$route->get('/video', 'Video\VideoController@index');
+	$route->get('/video/home', 'Video\VideoController@home');
 	$route->get('/video/indexHot', 'Video\VideoController@indexHot');
 	$route->get('/video/{id:\d+}', 'Video\VideoController@show');
 	$route->get('/video/recommend', 'Video\VideoController@recommend');
