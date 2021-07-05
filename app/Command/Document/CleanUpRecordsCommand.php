@@ -26,9 +26,7 @@ class CleanUpRecordsCommand extends CommandAbstract
 
 	protected function handle($options)
 	{
-		go(function () {
-			$this->clean();
-		});
+		$this->clean();
 	}
 
 	/*

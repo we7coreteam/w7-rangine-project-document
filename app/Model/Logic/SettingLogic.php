@@ -22,6 +22,7 @@ class SettingLogic extends BaseLogic
 	const KEY_COS = 'cloud_cosv5';
 	const KEY_THIRD_PARTY_LOGIN = 'third_party_login';
 	const KEY_FORBID_WORDS = 'forbid_words';
+	const KEY_VOD = 'cloud_vod';
 
 
 	public function getByKey($key, $hide = 1)
