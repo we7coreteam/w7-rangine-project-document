@@ -12,6 +12,7 @@
 
 namespace W7\App\Command\Todo;
 
+use W7\App\Model\Logic\SettingLogic;
 use W7\Console\Command\CommandAbstract;
 
 class CustomCommand extends CommandAbstract
@@ -25,7 +26,18 @@ class CustomCommand extends CommandAbstract
 
 	protected function handle($options)
 	{
-		go(function () {
-		});
+		$this->vodInstall();
+	}
+
+	public function vodInstall()
+	{
+		$value = [
+			'app_id' => '1253494855',
+			'secret_id' => 'AKIDiGYibCWZNuA9rISLyKPCixvb092QXUAY',
+			'secret_key' => '8zauxiDRO4UeX9VbQxDDvMWQ3PTGn3A7',
+			'region' => 'ap-shanghai',
+			'key' => 'R2kvrQHOu8ZyFANCpNpY',
+		];
+		SettingLogic::instance()->save(SettingLogic::KEY_VOD, $value);
 	}
 }

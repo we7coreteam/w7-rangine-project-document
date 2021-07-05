@@ -16,11 +16,25 @@ use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Logic\SettingLogic;
 use W7\App\Model\Service\CdnLogic;
+use W7\App\Model\Service\Qcloud\QcloudVodService;
 use W7\App\Model\Service\UEditor\Uploader;
 use W7\Http\Message\Server\Request;
 
 class UploadController extends BaseController
 {
+	public function vodUploadSign(Request $request)
+	{
+		$post = $this->validate($request, [
+			'md5' => 'required',
+		], [
+			'md5' => '文件MD5',
+		]);
+		//MD5去重
+
+		$signature=(new QcloudVodService())->makeVodUploadSign();
+		return $this->data(['sign' => $signature]);
+	}
+
 	/**
 	 * @api {post} /admin/upload/multipartUploadHandle 切片上传
 	 * @apiName multipartUploadHandle
