@@ -17,6 +17,7 @@ class CreateVideoTable2021_06_23_150738 extends Migration
 {
 	protected $videoTable = 'video';
 	protected $commentTable = 'video_comment';
+	protected $commentPraiseTable = 'video_comment_praise';
 	protected $praiseTable = 'video_praise';
 	protected $carouselTable = 'video_carousel';
 	protected $configTable = 'video_category_config';
@@ -57,6 +58,7 @@ class CreateVideoTable2021_06_23_150738 extends Migration
 			$table->integer('video_id', false, true)->default(0)->comment('视频id');
 			$table->string('comment', 255)->default('')->comment('评论');
 			$table->integer('user_id', false, true)->default(0)->comment('评论用户id');
+			$table->integer('praise_num', false, true)->default(0)->comment('点赞数');
 			$table->integer('created_at', false, true)->default(0);
 			$table->integer('updated_at', false, true)->default(0);
 			$table->index(['video_id'], 'video_id');
@@ -118,6 +120,20 @@ class CreateVideoTable2021_06_23_150738 extends Migration
 		});
 		$tableName = idb()->getTablePrefix() . $this->activityTable;
 		\Illuminate\Support\Facades\DB::statement("ALTER TABLE `{$tableName}` COMMENT '视频活动'");
+
+		$this->schema->create($this->commentPraiseTable, function (Blueprint $table) {
+			$table->bigIncrements('id');
+			$table->integer('video_id', false, true)->default(0)->comment('视频id');
+			$table->integer('comment_id', false, true)->default(0)->comment('评论id');
+			$table->integer('user_id', false, true)->default(0)->comment('点赞用户id');
+			$table->integer('created_at', false, true)->default(0);
+			$table->integer('updated_at', false, true)->default(0);
+			$table->index(['video_id'], 'video_id');
+			$table->index(['comment_id'], 'comment_id');
+			$table->index(['user_id'], 'user_id');
+		});
+		$tableName = idb()->getTablePrefix() . $this->commentPraiseTable;
+		\Illuminate\Support\Facades\DB::statement("ALTER TABLE `{$tableName}` COMMENT '视频评论点赞'");
 	}
 
 	/**
@@ -134,5 +150,6 @@ class CreateVideoTable2021_06_23_150738 extends Migration
 		$this->schema->dropIfExists($this->configTable);
 		$this->schema->dropIfExists($this->categoryTable);
 		$this->schema->dropIfExists($this->activityTable);
+		$this->schema->dropIfExists($this->commentPraiseTable);
 	}
 }

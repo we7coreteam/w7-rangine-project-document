@@ -33,7 +33,6 @@ class PraiseLogic extends BaseLogic
 			->where('user_id', $uid)
 			->first();
 		try {
-			idb()->beginTransaction();
 			if ($row) {
 				throw new ErrorHttpException('您已点赞');
 			}
@@ -43,10 +42,8 @@ class PraiseLogic extends BaseLogic
 			];
 			Praise::query()->create($saveData);
 			$video->increment('praise_num', $num);
-			idb()->commit();
 			return $video;
 		} catch (\Exception $e) {
-			idb()->rollBack();
 			throw new ErrorHttpException($e->getMessage());
 		}
 	}
@@ -63,17 +60,14 @@ class PraiseLogic extends BaseLogic
 			->where('user_id', $uid)
 			->first();
 		try {
-			idb()->beginTransaction();
 			if (!$row) {
 				throw new ErrorHttpException('您未点赞');
 			}
 			$row->delete();
 			//点赞数量-1
 			$video->decrement('praise_num', $num);
-			idb()->commit();
 			return $video;
 		} catch (\Exception $e) {
-			idb()->rollBack();
 			throw new ErrorHttpException($e->getMessage());
 		}
 	}
