@@ -283,4 +283,22 @@ class VideoController extends BaseController
 		$list = $this->block()->recommendVideo($data['video_id']);
 		return $this->data($list);
 	}
+
+	/**
+	 * @api {post} /video/addPlayNum 视频-增加播放量
+	 * @apiName addPlayNum
+	 * @apiGroup video
+	 *
+	 * @apiParam {Number} video_id 视频ID
+	 **/
+	public function addPlayNum(Request $request)
+	{
+		$data = $this->validate($request, [
+			'video_id' => 'required|integer|gt:0',
+		], [
+			'video_id' => '视频ID',
+		]);
+		$result = $this->block()->addPlayNum($data['video_id']);
+		return $this->data($result);
+	}
 }

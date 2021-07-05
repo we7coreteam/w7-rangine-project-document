@@ -146,4 +146,14 @@ class VideoLogic extends BaseLogic
 			throw new ErrorHttpException('审核失败');
 		}
 	}
+
+	public function addPlayNum($videoId)
+	{
+		$video = Video::query()->find($videoId);
+		if (!$video) {
+			throw new ErrorHttpException('视频不存在');
+		}
+		$video->increment('play_num', 1);
+		return $video;
+	}
 }
