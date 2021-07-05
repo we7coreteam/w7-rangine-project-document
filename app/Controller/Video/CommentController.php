@@ -46,6 +46,7 @@ class CommentController extends BaseController
 	 * @apiParam {Number} video_id 视频ID
 	 *
 	 * @apiSuccess {String} comment 评论内容
+	 * @apiSuccess {Number} is_praise 是否点赞
 	 * @apiSuccess {Object} user 用户信息
 	 * @apiSuccess {String} user.username 用户昵称
 	 *
@@ -62,7 +63,11 @@ class CommentController extends BaseController
 		$page = $request->query('page', 1);
 		$pageSize = intval($request->input('page_size', 10));
 		$condition = $this->block()->handleCondition($this->query);
+		$user = $request->session->get('user');
 		$comments = $this->block()->index($condition, $page, $pageSize, 'user', 'created_at desc');
+		if ($user) {
+			$comments = $this->block()->isPraise($comments, $user);
+		}
 		return $this->data($comments);
 	}
 
