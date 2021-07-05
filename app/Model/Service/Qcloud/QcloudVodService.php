@@ -24,7 +24,18 @@ class QcloudVodService
 		$row = SettingLogic::instance()->getByKey(SettingLogic::KEY_VOD, 0);
 		$key = $row->setting['key'];
 
-		$dir = '/9d53cfb0vodcq1253494855/e77a1a8f5285890818866293110/';
+		$dir = '/';
+		$data = explode('/', $mediaUrl);
+		foreach ($data as $key => $val) {
+			if ($key > 2) {
+				$dir = $dir . $val . '/';
+			}
+			if ($key == count($data) - 2) {
+				break;
+			}
+		}
+
+		dump($dir);
 		if (!$time) {
 			$time = time() + 60 * 60 * 24;
 		}
