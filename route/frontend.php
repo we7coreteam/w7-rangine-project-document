@@ -113,6 +113,7 @@ $route->group([], function ($route) {
 	$route->get('/video/indexHot', 'Video\VideoController@indexHot');
 	$route->get('/video/{id:\d+}', 'Video\VideoController@show');
 	$route->get('/video/recommend', 'Video\VideoController@recommend');
+	$route->post('/video/addPlayNum', 'Video\VideoController@addPlayNum');
 
 	//视频评论
 	$route->get('/video/comment', 'Video\CommentController@index');
