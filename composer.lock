@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f82606af49b367f337c3e25de1a28c3b",
+    "content-hash": "6b2511b4221971f82f29e976f9806574",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -3141,6 +3141,53 @@
             "time": "2021-05-18T12:47:31+00:00"
         },
         {
+            "name": "qcloud/vod-sdk-v5",
+            "version": "v2.4.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tencentyun/vod-php-sdk-v5.git",
+                "reference": "a2af6b9662c2b33f88ba78e8e5bb9a2a76b4e178"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tencentyun/vod-php-sdk-v5/zipball/a2af6b9662c2b33f88ba78e8e5bb9a2a76b4e178",
+                "reference": "a2af6b9662c2b33f88ba78e8e5bb9a2a76b4e178",
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "require": {
+                "php": ">=5.6.33",
+                "qcloud/cos-sdk-v5": "^v2.0.0",
+                "tencentcloud/tencentcloud-sdk-php": "^3.0.166"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Vod\\": "src/Vod/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "xujianguo",
+                    "email": "450846733@qq.com"
+                }
+            ],
+            "description": "VOD SDK For PHP",
+            "time": "2021-03-10T11:51:50+00:00"
+        },
+        {
             "name": "ralouphie/getallheaders",
             "version": "3.0.3",
             "source": {
@@ -4899,6 +4946,56 @@
                 }
             ],
             "time": "2021-03-23T23:28:01+00:00"
+        },
+        {
+            "name": "tencentcloud/tencentcloud-sdk-php",
+            "version": "3.0.427",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/TencentCloud/tencentcloud-sdk-php.git",
+                "reference": "3e81daa493d6a07813724a6bfc02a02ccfff82a2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/TencentCloud/tencentcloud-sdk-php/zipball/3e81daa493d6a07813724a6bfc02a02ccfff82a2",
+                "reference": "3e81daa493d6a07813724a6bfc02a02ccfff82a2",
+                "shasum": "",
+                "mirrors": [
+                    {
+                        "url": "https://mirrors.aliyun.com/composer/dists/%package%/%reference%.%type%",
+                        "preferred": true
+                    }
+                ]
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.3 || ^7.0.1",
+                "guzzlehttp/psr7": "^1.4",
+                "php": ">=5.6.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/QcloudApi/QcloudApi.php"
+                ],
+                "psr-4": {
+                    "TencentCloud\\": "./src/TencentCloud"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "coolli",
+                    "email": "tencentcloudapi@tencent.com",
+                    "homepage": "https://cloud.tencent.com/document/sdk/PHP",
+                    "role": "Developer"
+                }
+            ],
+            "description": "TencentCloudApi php sdk",
+            "homepage": "https://github.com/TencentCloud/tencentcloud-sdk-php",
+            "time": "2021-07-05T01:07:45+00:00"
         },
         {
             "name": "twig/twig",
