@@ -22,20 +22,19 @@ class QcloudVodService
 	public function makeVodDownloadSign($mediaUrl, $time = '')
 	{
 		$row = SettingLogic::instance()->getByKey(SettingLogic::KEY_VOD, 0);
-		$key = $row->setting['key'];
+		$qcloudKey = $row->setting['key'];
 
 		$dir = '/';
 		$data = explode('/', $mediaUrl);
-		foreach ($data as $key => $val) {
-			if ($key > 2) {
-				$dir = $dir . $val . '/';
+		foreach ($data as $k => $v) {
+			if ($k > 2) {
+				$dir = $dir . $v . '/';
 			}
-			if ($key == count($data) - 2) {
+			if ($k== count($data) - 2) {
 				break;
 			}
 		}
 
-		dump($dir);
 		if (!$time) {
 			$time = time() + 60 * 60 * 24;
 		}
@@ -43,7 +42,7 @@ class QcloudVodService
 			't' => $time,
 			'us' => time()
 		];
-		$sign = md5($key . $dir . $param['t'] . $param['us']);
+		$sign = md5($qcloudKey . $dir . $param['t'] . $param['us']);
 		$param['sign'] = $sign;
 		$original = http_build_query($param);
 
