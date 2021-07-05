@@ -84,6 +84,11 @@ $route->middleware(\W7\App\Middleware\CheckAuthMiddleware::class)->group([], fun
 
 	//视频评论
 	$route->post('/video/comment', 'Video\CommentController@store');
+
+	//视频评论点赞
+	$route->get('/video/commentPraise/isPraise', 'Video\CommentPraiseController@isPraise');
+	$route->post('/video/commentPraise/praise', 'Video\CommentPraiseController@praise');
+	$route->post('/video/commentPraise/unPraise', 'Video\CommentPraiseController@unPraise');
 });
 
 $route->group([], function ($route) {

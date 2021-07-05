@@ -13,60 +13,60 @@
 namespace W7\App\Controller\Video;
 
 use W7\App\Controller\BaseController;
-use W7\App\Model\Logic\Video\PraiseLogic;
+use W7\App\Model\Logic\Video\CommentPraiseLogic;
 use W7\Http\Message\Server\Request;
 
-class PraiseController extends BaseController
+class CommentPraiseController extends BaseController
 {
 	protected function block()
 	{
-		return new PraiseLogic();
+		return new CommentPraiseLogic();
 	}
 
 	/**
-	 * @api {post} /video/praise 视频点赞-点赞
+	 * @api {post} /video/commentPraise/praise 视频评论点赞-点赞
 	 * @apiName praise
-	 * @apiGroup videoPraise
+	 * @apiGroup videoCommentPraise
 	 *
-	 * @apiParam {Number} video_id 视频ID
+	 * @apiParam {Number} comment_id 视频评论ID
 	 **/
 	public function praise(Request $request)
 	{
 		$data = $this->validate($request, [
-			'video_id' => 'required|integer',
+			'comment_id' => 'required|integer',
 		], [
-			'video_id' => '视频ID',
+			'comment_id' => '评论ID',
 		]);
 		$user = $request->getAttribute('user');
-		$result = $this->block()->praise($data['video_id'], $user->id);
+		$result = $this->block()->praise($data['comment_id'], $user->id);
 		return $this->data($result);
 	}
 
 	/**
-	 * @api {post} /video/unPraise 视频点赞-取消点赞
+	 * @api {post} /video/commentPraise/unPraise 视频评论点赞-取消点赞
 	 * @apiName unPraise
-	 * @apiGroup videoPraise
+	 * @apiGroup videoCommentPraise
 	 *
-	 * @apiParam {Number} video_id 视频ID
+	 * @apiParam {Number} comment_id 视频评论ID
 	 **/
 	public function unPraise(Request $request)
 	{
 		$data = $this->validate($request, [
-			'video_id' => 'required|integer',
+			'comment_id' => 'required|integer',
 		], [
-			'video_id' => '视频ID',
+			'comment_id' => '评论ID',
 		]);
 		$user = $request->getAttribute('user');
-		$result = $this->block()->unPraise($data['video_id'], $user->id);
+		$result = $this->block()->unPraise($data['comment_id'], $user->id);
 		return $this->data($result);
 	}
 
 	/**
-	 * @api {get} /video/isPraise 视频点赞-是否已点赞
+	 * @api {get} /video/commentPraise/isPraise 视频评论点赞-是否已点赞
 	 * @apiName isPraise
-	 * @apiGroup videoPraise
+	 * @apiGroup videoCommentPraise
 	 *
-	 * @apiParam {Number} video_id 视频ID
+	 * @apiParam {Number} comment_id 视频评论ID
 	 *
 	 * @apiSuccess {Number} is_praise 是否已点赞1已点赞0未点赞
 	 *
@@ -76,12 +76,12 @@ class PraiseController extends BaseController
 	public function isPraise(Request $request)
 	{
 		$data = $this->validate($request, [
-			'video_id' => 'required|integer',
+			'comment_id' => 'required|integer',
 		], [
-			'video_id' => '视频ID',
+			'comment_id' => '视频ID',
 		]);
 		$user = $request->getAttribute('user');
-		$praise = $this->block()->info($data['video_id'], $user->id);
+		$praise = $this->block()->info($data['comment_id'], $user->id);
 		$result = $praise ? 1 : 0;
 		return $this->data(['is_praise' => $result]);
 	}
