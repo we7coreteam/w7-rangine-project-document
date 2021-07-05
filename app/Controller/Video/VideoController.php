@@ -244,9 +244,9 @@ class VideoController extends BaseController
 		$row = $this->block()->show($id, ['user']);
 		if ($row) {
 			if ($row->status != Video::STATUS_SUCCESS) {
-				//审核未通过-只能看见自己的
 				$userData = $request->session->get('user');
-				if ($userData['uid'] != $row->user_id) {
+				//审核未通过-只能看见自己的
+				if (!$userData || $userData['uid'] != $row->user_id) {
 					$row = [];
 				}
 			}

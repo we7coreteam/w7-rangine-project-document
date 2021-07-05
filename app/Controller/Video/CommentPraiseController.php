@@ -60,29 +60,4 @@ class CommentPraiseController extends BaseController
 		$result = $this->block()->unPraise($data['comment_id'], $user->id);
 		return $this->data($result);
 	}
-
-	/**
-	 * @api {get} /video/commentPraise/isPraise 视频评论点赞-是否已点赞
-	 * @apiName isPraise
-	 * @apiGroup videoCommentPraise
-	 *
-	 * @apiParam {Number} comment_id 视频评论ID
-	 *
-	 * @apiSuccess {Number} is_praise 是否已点赞1已点赞0未点赞
-	 *
-	 * @apiSuccessExample {json} Success-Response:
-	 * {"status":true,"code":200,"data":{"is_praise":1},"message":"ok"}
-	 **/
-	public function isPraise(Request $request)
-	{
-		$data = $this->validate($request, [
-			'comment_id' => 'required|integer',
-		], [
-			'comment_id' => '视频ID',
-		]);
-		$user = $request->getAttribute('user');
-		$praise = $this->block()->info($data['comment_id'], $user->id);
-		$result = $praise ? 1 : 0;
-		return $this->data(['is_praise' => $result]);
-	}
 }

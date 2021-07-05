@@ -76,12 +76,4 @@ class CommentPraiseLogic extends BaseLogic
 			throw new ErrorHttpException($e->getMessage());
 		}
 	}
-
-	public function info($commentId, $uid)
-	{
-		return CommentPraise::query()
-			->where('comment_id', $commentId)
-			->where('user_id', $uid)
-			->first();
-	}
 }
