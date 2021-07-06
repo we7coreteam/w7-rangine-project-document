@@ -40,23 +40,32 @@ function timeToString($time)
 	}
 }
 
-if (!function_exists('config')) {
-	function config()
-	{
+if (!function_exists('configger')) {
+	/**
+	 * 输入对象
+	 * @return RepositoryInterface
+	 */
+	function configger() {
 		return App::getApp()->getConfigger();
 	}
 }
 
 if (!function_exists('db')) {
-	function db()
-	{
+	/**
+	 * 输入对象
+	 * @return DB
+	 */
+	function db() {
 		return DB::getFacadeRoot();
 	}
 }
 
 if (!function_exists('cache')) {
-	function cache()
-	{
+	/**
+	 * 输入对象
+	 * @return Cache
+	 */
+	function cache() {
 		return Cache::getFacadeRoot();
 	}
 }
@@ -64,6 +73,10 @@ if (!function_exists('cache')) {
 if (!function_exists('logger')) {
 	function logger()
 	{
+		/**
+		 * 输入对象
+		 * @return Logger
+		 */
 		return Logger::getFacadeRoot();
 	}
 }
