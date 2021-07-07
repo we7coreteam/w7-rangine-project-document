@@ -14,6 +14,7 @@ namespace W7\App\Controller\Admin;
 
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
+use W7\App\Model\Logic\MediaLogic;
 use W7\App\Model\Logic\SettingLogic;
 use W7\App\Model\Service\CdnLogic;
 use W7\App\Model\Service\Qcloud\QcloudVodService;
@@ -24,15 +25,19 @@ class UploadController extends BaseController
 {
 	public function vodUploadSign(Request $request)
 	{
-		$post = $this->validate($request, [
-			'md5' => 'required',
+		$data = $this->validate($request, [
+			'unique' => 'required',
 		], [
-			'md5' => '文件MD5',
+			'unique' => '文件MD5',
 		]);
 		//MD5去重
-
-		$signature=(new QcloudVodService())->makeVodUploadSign();
-		return $this->data(['sign' => $signature]);
+		$media = MediaLogic::instance()->getByUnique($data['unique']);
+		if ($media) {
+			return $this->data(['media' => $media]);
+		} else {
+			$signature = (new QcloudVodService())->makeVodUploadSign();
+			return $this->data(['sign' => $signature]);
+		}
 	}
 
 	/**

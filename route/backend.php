@@ -129,7 +129,6 @@ $route->middleware([\W7\App\Middleware\AppAuthMiddleware::class, \W7\App\Middlew
 	$route->post('/upload/image', 'Admin\UploadController@image');
 	$route->post('/upload/multipartUpload', 'Admin\UploadController@multipartUpload');
 	$route->post('/upload/multipartUploadHandle', 'Admin\UploadController@multipartUploadHandle');
-	$route->post('/upload/vodUploadSign', 'Admin\UploadController@vodUploadSign');
 });
 
 $route->middleware(\W7\App\Middleware\CheckAdminMiddleware::class)->group(['prefix' => '/admin'], function ($route) {
@@ -178,3 +177,4 @@ $route->middleware(\W7\App\Middleware\CheckAdminMiddleware::class)->group(['pref
 
 //获取请求数据 结构
 $route->get('/admin/document/chapterapi/getData', 'Admin\Document\ChapterApiDataController@getData');
+$route->post('/upload/vodUploadSign', 'Admin\UploadController@vodUploadSign');

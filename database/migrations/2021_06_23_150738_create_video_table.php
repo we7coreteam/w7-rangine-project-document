@@ -23,6 +23,7 @@ class CreateVideoTable2021_06_23_150738 extends Migration
 	protected $configTable = 'video_category_config';
 	protected $categoryTable = 'video_category';
 	protected $activityTable = 'video_activity';
+	protected $mediaTable = 'media';
 	/**
 	 * Run the migrations.
 	 *
@@ -134,6 +135,17 @@ class CreateVideoTable2021_06_23_150738 extends Migration
 		});
 		$tableName = idb()->getTablePrefix() . $this->commentPraiseTable;
 		\Illuminate\Support\Facades\DB::statement("ALTER TABLE `{$tableName}` COMMENT '视频评论点赞'");
+
+		$this->schema->create($this->mediaTable, function (Blueprint $table) {
+			$table->bigIncrements('id');
+			$table->integer('url', false, true)->default(0)->comment('媒体url');
+			$table->string('unique', 32)->default('')->comment('媒体唯一值');
+			$table->integer('created_at', false, true)->default(0);
+			$table->integer('updated_at', false, true)->default(0);
+			$table->index(['unique'], 'unique');
+		});
+		$tableName = idb()->getTablePrefix() . $this->mediaTable;
+		\Illuminate\Support\Facades\DB::statement("ALTER TABLE `{$tableName}` COMMENT '媒体数据'");
 	}
 
 	/**
@@ -151,5 +163,6 @@ class CreateVideoTable2021_06_23_150738 extends Migration
 		$this->schema->dropIfExists($this->categoryTable);
 		$this->schema->dropIfExists($this->activityTable);
 		$this->schema->dropIfExists($this->commentPraiseTable);
+		$this->schema->dropIfExists($this->mediaTable);
 	}
 }
