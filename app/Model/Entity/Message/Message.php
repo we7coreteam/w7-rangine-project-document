@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use W7\App\Model\Entity\Article\Article;
 use W7\App\Model\Entity\BaseModel;
 use W7\App\Model\Entity\User;
+use W7\App\Model\Entity\Video;
 
 class Message extends BaseModel
 {
@@ -91,6 +92,9 @@ class Message extends BaseModel
 		switch ($this->target_type) {
 			case self::REMIND_ARTICLE:
 				return Article::find($this->target_id);
+				break;
+			case self::REMIND_VIDEO:
+				return Video::find($this->target_id);
 				break;
 			default:
 				return '';
