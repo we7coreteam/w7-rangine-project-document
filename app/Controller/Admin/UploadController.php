@@ -14,13 +14,32 @@ namespace W7\App\Controller\Admin;
 
 use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
+use W7\App\Model\Logic\MediaLogic;
 use W7\App\Model\Logic\SettingLogic;
 use W7\App\Model\Service\CdnLogic;
+use W7\App\Model\Service\Qcloud\QcloudVodService;
 use W7\App\Model\Service\UEditor\Uploader;
 use W7\Http\Message\Server\Request;
 
 class UploadController extends BaseController
 {
+	public function vodUploadSign(Request $request)
+	{
+		$data = $this->validate($request, [
+			'unique' => 'required',
+		], [
+			'unique' => '文件MD5',
+		]);
+		//MD5去重
+		$media = MediaLogic::instance()->getByUnique($data['unique']);
+		if ($media) {
+			return $this->data(['media' => $media]);
+		} else {
+			$signature = (new QcloudVodService())->makeVodUploadSign();
+			return $this->data(['sign' => $signature]);
+		}
+	}
+
 	/**
 	 * @api {post} /admin/upload/multipartUploadHandle 切片上传
 	 * @apiName multipartUploadHandle

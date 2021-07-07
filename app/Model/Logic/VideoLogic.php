@@ -55,10 +55,14 @@ class VideoLogic extends BaseLogic
 	public function indexHot()
 	{
 		$videos = Video::query()->where('status', Video::STATUS_SUCCESS)->with(['category', 'category.categoryConfig', 'user'])->orderBy('play_num', 'desc')->limit(50)->get()->toArray();
-		$keys = array_rand($videos, 6);
-		$hotVideos = [];
-		foreach ($keys as $key) {
-			$hotVideos[] = $videos[$key];
+		if (count($videos) < 6) {
+			$hotVideos = $videos;
+		} else {
+			$keys = array_rand($videos, 6);
+			$hotVideos = [];
+			foreach ($keys as $key) {
+				$hotVideos[] = $videos[$key];
+			}
 		}
 		return $hotVideos;
 	}
