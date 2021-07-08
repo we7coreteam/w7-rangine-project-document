@@ -25,4 +25,19 @@ class MediaLogic extends BaseLogic
 	{
 		return Media::query()->where('unique', $unique)->first();
 	}
+
+	public function add($fileId, $url, $unique)
+	{
+		$row = $this->getByUnique($unique);
+		if (!$row) {
+			$data = [
+				'fileid' => $fileId,
+				'url' => $url,
+				'unique' => $unique
+			];
+			return parent::store($data);
+		} else {
+			return $row;
+		}
+	}
 }

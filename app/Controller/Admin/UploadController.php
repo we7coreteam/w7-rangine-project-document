@@ -24,7 +24,7 @@ use W7\Http\Message\Server\Request;
 class UploadController extends BaseController
 {
 	/**
-	 * @api {post} /admin/upload/vodUploadSign 切片上传
+	 * @api {post} /admin/upload/vodUploadSign 获取云点播上传签名
 	 * @apiName vodUploadSign
 	 * @apiGroup Upload
 	 *
@@ -38,7 +38,7 @@ class UploadController extends BaseController
 	{
 		$data = $this->validate($request, [
 			'unique' => 'required',
-		], [
+		], [], [
 			'unique' => '文件MD5',
 		]);
 		//MD5去重

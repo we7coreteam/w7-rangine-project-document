@@ -276,7 +276,7 @@ class VideoController extends BaseController
 	{
 		$data = $this->validate($request, [
 			'video_id' => 'required|integer|gt:0',
-		], [
+		], [], [
 			'video_id' => '视频ID',
 		]);
 
@@ -295,7 +295,7 @@ class VideoController extends BaseController
 	{
 		$data = $this->validate($request, [
 			'video_id' => 'required|integer|gt:0',
-		], [
+		], [], [
 			'video_id' => '视频ID',
 		]);
 		$result = $this->block()->addPlayNum($data['video_id']);

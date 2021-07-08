@@ -138,6 +138,7 @@ class CreateVideoTable2021_06_23_150738 extends Migration
 
 		$this->schema->create($this->mediaTable, function (Blueprint $table) {
 			$table->bigIncrements('id');
+			$table->integer('fileid', false, true)->default(0)->comment('媒体id');
 			$table->integer('url', false, true)->default(0)->comment('媒体url');
 			$table->string('unique', 32)->default('')->comment('媒体唯一值');
 			$table->integer('created_at', false, true)->default(0);
