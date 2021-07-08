@@ -15,4 +15,5 @@ namespace W7\App\Model\Entity;
 class Media extends BaseModel
 {
 	protected $table = 'media';
+	protected $fillable = ['fileid', 'url', 'unique'];
 }

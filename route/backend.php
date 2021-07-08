@@ -130,6 +130,9 @@ $route->middleware([\W7\App\Middleware\AppAuthMiddleware::class, \W7\App\Middlew
 	$route->post('/upload/multipartUpload', 'Admin\UploadController@multipartUpload');
 	$route->post('/upload/multipartUploadHandle', 'Admin\UploadController@multipartUploadHandle');
 	$route->post('/upload/vodUploadSign', 'Admin\UploadController@vodUploadSign');
+
+	//媒体
+	$route->post('/media', 'Admin\MediaController@store');
 });
 
 $route->middleware(\W7\App\Middleware\CheckAdminMiddleware::class)->group(['prefix' => '/admin'], function ($route) {
