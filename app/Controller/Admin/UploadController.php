@@ -23,6 +23,17 @@ use W7\Http\Message\Server\Request;
 
 class UploadController extends BaseController
 {
+	/**
+	 * @api {post} /admin/upload/vodUploadSign 切片上传
+	 * @apiName vodUploadSign
+	 * @apiGroup Upload
+	 *
+	 * @apiParam {String} unique 媒体唯一值（文件MD5）
+	 *
+	 * @apiSuccess {Number} code 识别码201为签名 202为媒体数据
+	 * @apiSuccess {Object} media 媒体数据
+	 * @apiSuccess {String} sign 签名
+	 */
 	public function vodUploadSign(Request $request)
 	{
 		$data = $this->validate($request, [
@@ -33,10 +44,10 @@ class UploadController extends BaseController
 		//MD5去重
 		$media = MediaLogic::instance()->getByUnique($data['unique']);
 		if ($media) {
-			return $this->data(['media' => $media]);
+			return $this->data(['media' => $media], 'ok', 202);
 		} else {
 			$signature = (new QcloudVodService())->makeVodUploadSign();
-			return $this->data(['sign' => $signature]);
+			return $this->data(['sign' => $signature], 'ok', 201);
 		}
 	}
 
