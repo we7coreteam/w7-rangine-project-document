@@ -15,6 +15,7 @@ namespace W7\App\Controller\Video;
 use W7\App\Controller\BaseController;
 use W7\App\Model\Entity\Video;
 use W7\App\Model\Logic\VideoLogic;
+use W7\App\Model\Service\Qcloud\QcloudVodService;
 use W7\Http\Message\Server\Request;
 
 class VideoController extends BaseController
@@ -29,21 +30,25 @@ class VideoController extends BaseController
 		return $this->validate($request, [
 			'title' => 'required|string',
 			'cover' => 'required|string',
+			'fileid' => 'required|string',
 			'url' => 'required|string',
 			'time_length' => 'required|string',
 			'category_ids' => 'required|array|max:3',
 			'description' => 'string',
 			'is_reprint' => 'required|in:0,1',
 			'reprint_url' => 'string|url',
+			'is_transcode' => 'required|in:0,1',
 		], [], [
 			'title' => '标题',
 			'cover' => '封面',
+			'fileid' => '媒体id',
 			'url' => '视频',
 			'time_length' => '时长',
 			'category_ids' => '分类',
 			'description' => '简介',
 			'is_reprint' => '视频来源',
 			'reprint_url' => '转载地址',
+			'is_transcode' => '转码',
 		]);
 	}
 
@@ -163,12 +168,14 @@ class VideoController extends BaseController
 	 *
 	 * @apiParam {String} title 标题
 	 * @apiParam {String} cover 封面图片地址
+	 * @apiParam {String} fileid 媒体id
 	 * @apiParam {String} url 视频地址
 	 * @apiParam {String} time_length 视频时长
 	 * @apiParam {Array} category_ids 分类id
 	 * @apiParam {String} description 简介
 	 * @apiParam {Number} is_reprint 是否转载0否1是
 	 * @apiParam {String} reprint_url 转载地址
+	 * @apiParam {Number} is_transcode 是否需要转码1需要0不需要
 	 *
 	 * @apiSuccessExample {json} Success-Response:
 	 * {"status":true,"code":200,"data":{"title":"test","cover":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","url":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","category_ids":["1","3"],"description":"简介简介简介","is_reprint":"0","reprint_url":"https:\/\/www.baidu.com","user_id":1,"updated_at":"1624945388","created_at":"1624945388","id":9},"message":"ok"}
@@ -179,6 +186,9 @@ class VideoController extends BaseController
 		$user = $request->getAttribute('user');
 		$data['user_id'] = $user->id;
 		$result = $this->block()->store($data);
+		if ($data['is_transcode'] == 1) {
+			(new QcloudVodService())->makeTranscode($data['fileid']);
+		}
 		return $this->data($result);
 	}
 
@@ -189,11 +199,13 @@ class VideoController extends BaseController
 	 *
 	 * @apiParam {String} title 标题
 	 * @apiParam {String} cover 封面图片地址
+	 * @apiParam {String} fileid 媒体id
 	 * @apiParam {String} url 视频地址
 	 * @apiParam {Array} category_ids 分类id
 	 * @apiParam {String} description 简介
 	 * @apiParam {Number} is_reprint 是否转载0否1是
 	 * @apiParam {String} reprint_url 转载地址
+	 * @apiParam {Number} is_transcode 是否需要转码1需要0不需要
 	 *
 	 * @apiSuccessExample {json} Success-Response:
 	 * {"status":true,"code":200,"data":{"title":"test","cover":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","url":"https:\/\/wikidev-1257227245.cos.ap-shanghai.myqcloud.com\/document\/CUqNdJoUvpju1LLH6dVHsnju3a31ALNL.jpeg","category_ids":["1","3"],"description":"简介简介简介","is_reprint":"0","reprint_url":"https:\/\/www.baidu.com","user_id":1,"updated_at":"1624945388","created_at":"1624945388","id":9},"message":"ok"}
@@ -205,6 +217,9 @@ class VideoController extends BaseController
 		//必须本用户修改
 		$checkData['user_id'] = $user->id;
 		$result = $this->block()->update($id, $data, $checkData);
+		if ($data['is_transcode'] == 1) {
+			(new QcloudVodService())->makeTranscode($data['fileid']);
+		}
 		return $this->data($result);
 	}
 
