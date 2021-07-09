@@ -18,6 +18,7 @@ use W7\App\Model\Entity\Video\Category;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Logic\Video\CategoryLogic;
 use W7\App\Model\Logic\Message\Type\RemindLogic;
+use W7\App\Model\Service\Qcloud\QcloudVodService;
 
 class VideoLogic extends BaseLogic
 {
@@ -104,6 +105,13 @@ class VideoLogic extends BaseLogic
 			idb()->rollBack();
 			throw new ErrorHttpException($e->getMessage());
 		}
+	}
+
+	public function show($id, $with = '', $checkData = [])
+	{
+		$row = parent::show($id, $with, $checkData);
+		$row->url = (new QcloudVodService())->makeVodDownloadSign($row->url);
+		return $row;
 	}
 
 	public function checkPost($data)
