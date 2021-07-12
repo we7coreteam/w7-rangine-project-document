@@ -39,7 +39,7 @@ class VideoLogic extends BaseLogic
 	public function recommendVideo($videoId)
 	{
 		$videos = Video::query()
-			->leftJoin('video_category', 'video_category.video_id', 'video.id')
+			->leftJoin('video_category', 'video.id', 'video_category.video_id')
 			->whereIn('video_category.category_id', function ($query) use ($videoId) {
 				$query->select('category_id')->from('video_category')->where('video_id', $videoId)->get();
 			})
@@ -48,7 +48,7 @@ class VideoLogic extends BaseLogic
 			->with(['user'])
 			->limit(6)
 			->inRandomOrder()
-			->get();
+			->get(['video.*']);
 
 		return $videos;
 	}
