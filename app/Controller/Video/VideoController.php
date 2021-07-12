@@ -71,7 +71,7 @@ class VideoController extends BaseController
 	}
 
 	/**
-	 * @api {get} /video 视频-视频列表
+	 * @api {get} /video/list 视频-视频列表
 	 * @apiName index
 	 * @apiGroup video
 	 *
@@ -238,7 +238,7 @@ class VideoController extends BaseController
 	}
 
 	/**
-	 * @api {get} /video/:id 视频-视频详情
+	 * @api {get} /video/info/:id 视频-视频详情
 	 * @apiName show
 	 * @apiGroup video
 	 *

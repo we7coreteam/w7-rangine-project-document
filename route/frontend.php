@@ -108,10 +108,10 @@ $route->group([], function ($route) {
 	$route->get('/article/articleCollection/all', 'Article\ArticleCollectionController@index');
 
 	//视频
-	$route->get('/video', 'Video\VideoController@index');
+	$route->get('/video/list', 'Video\VideoController@index');
 	$route->get('/video/home', 'Video\VideoController@home');
 	$route->get('/video/indexHot', 'Video\VideoController@indexHot');
-	$route->get('/video/{id:\d+}', 'Video\VideoController@show');
+	$route->get('/video/info/{id:\d+}', 'Video\VideoController@show');
 	$route->get('/video/recommend', 'Video\VideoController@recommend');
 	$route->post('/video/addPlayNum', 'Video\VideoController@addPlayNum');
 
