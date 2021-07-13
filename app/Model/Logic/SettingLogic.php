@@ -24,7 +24,6 @@ class SettingLogic extends BaseLogic
 	const KEY_FORBID_WORDS = 'forbid_words';
 	const KEY_VOD = 'cloud_vod';
 
-
 	public function getByKey($key, $hide = 1)
 	{
 		$row = Setting::query()->where('key', $key)->first();
@@ -42,6 +41,14 @@ class SettingLogic extends BaseLogic
 			$value['secret_id'] = $data->setting['secret_id'] ? substr($data->setting['secret_id'], 0, 3) . '***' . substr($data->setting['secret_id'], -3, 3) : '';
 			$value['secret_key'] = $data->setting['secret_key'] ? substr($data->setting['secret_key'], 0, 3) . '***' . substr($data->setting['secret_key'], -3, 3) : '';
 			$value['url'] = $data->setting['url'] ? substr($data->setting['url'], 0, 3) . '***' . substr($data->setting['url'], -3, 3) : '';
+			$data->value = json_encode($value);
+			$data->setting = $value;
+		} elseif ($key == SettingLogic::KEY_VOD) {
+			$value = $data->setting;
+			$value['app_id'] = $data->setting['app_id'] ? substr($data->setting['app_id'], 0, 3) . '***' . substr($data->setting['app_id'], -3, 3) : '';
+			$value['secret_id'] = $data->setting['secret_id'] ? substr($data->setting['secret_id'], 0, 3) . '***' . substr($data->setting['secret_id'], -3, 3) : '';
+			$value['secret_key'] = $data->setting['secret_key'] ? substr($data->setting['secret_key'], 0, 3) . '***' . substr($data->setting['secret_key'], -3, 3) : '';
+			$value['key'] = $data->setting['key'] ? substr($data->setting['key'], 0, 3) . '***' . substr($data->setting['key'], -3, 3) : '';
 			$data->value = json_encode($value);
 			$data->setting = $value;
 		} elseif ($key == SettingLogic::KEY_THIRD_PARTY_LOGIN) {

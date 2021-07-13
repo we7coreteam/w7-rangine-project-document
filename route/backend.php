@@ -121,6 +121,7 @@ $route->middleware([\W7\App\Middleware\AppAuthMiddleware::class, \W7\App\Middlew
 
 	$route->middleware(\W7\App\Middleware\CheckFounderMiddleware::class)->group([], function ($route) {
 		$route->post('/setting/cos', 'Admin\SettingController@cos');
+		$route->post('/setting/vod', 'Admin\SettingController@vod');
 		$route->post('/setting/save', 'Admin\SettingController@save');
 		$route->get('/setting/config', 'Admin\SettingController@config');
 	});
