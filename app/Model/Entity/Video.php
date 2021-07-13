@@ -19,7 +19,7 @@ use W7\App\Model\Entity\Video\Praise;
 class Video extends BaseModel
 {
 	protected $table = 'video';
-	protected $fillable = ['title', 'cover', 'url', 'description', 'time_length', 'category_ids', 'user_id', 'is_reprint', 'reprint_url', 'status'];
+	protected $fillable = ['title', 'cover', 'fileid', 'url', 'description', 'time_length', 'category_ids', 'user_id', 'is_reprint', 'reprint_url', 'status'];
 	protected $appends = ['time_str', 'play_num_text'];
 
 	const STATUS_CREATE = 0;

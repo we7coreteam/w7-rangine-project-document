@@ -35,6 +35,7 @@ class CreateVideoTable2021_06_23_150738 extends Migration
 			$table->bigIncrements('id');
 			$table->string('title', 100)->default('')->comment('视频标题');
 			$table->string('cover', 255)->default('')->comment('视频封面');
+			$table->string('fileid', 255)->default('')->comment('媒体id');
 			$table->string('url', 255)->default('')->comment('视频地址');
 			$table->string('description', 255)->default('')->comment('视频简介');
 			$table->string('time_length', 100)->default('')->comment('视频时长');

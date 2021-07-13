@@ -16,6 +16,7 @@ use W7\App\Controller\BaseController;
 use W7\App\Exception\ErrorHttpException;
 use W7\App\Model\Logic\SettingLogic;
 use W7\App\Model\Service\CdnLogic;
+use W7\App\Model\Service\Qcloud\QcloudVodService;
 use W7\Http\Message\Server\Request;
 
 class SettingController extends BaseController
@@ -125,6 +126,8 @@ class SettingController extends BaseController
 			//验证票据
 			if ($key == SettingLogic::KEY_COS) {
 				CdnLogic::instance()->channel(SettingLogic::KEY_COS, true);
+			} elseif ($key == SettingLogic::KEY_VOD) {
+				(new QcloudVodService())->checkConnect();
 			}
 			idb()->commit();
 		} catch (\Throwable $e) {
@@ -132,6 +135,9 @@ class SettingController extends BaseController
 			if ($key == SettingLogic::KEY_COS) {
 				ilogger()->channel('error')->error('云存储链接失败，请检查配置是否正确' . $e->getMessage());
 				throw new ErrorHttpException('云存储链接失败，请检查配置是否正确');
+			} elseif ($key == SettingLogic::KEY_VOD) {
+				ilogger()->channel('error')->error('云点播连接失败，请检查配置是否正确' . $e->getMessage());
+				throw new ErrorHttpException('云点播连接失败，请检查配置是否正确');
 			}
 			throw new ErrorHttpException($e->getMessage());
 		}
