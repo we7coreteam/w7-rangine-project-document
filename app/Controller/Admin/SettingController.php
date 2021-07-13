@@ -22,17 +22,19 @@ class SettingController extends BaseController
 {
 	private $handler = [
 		SettingLogic::KEY_COS => 'saveCos',
+		SettingLogic::KEY_VOD => 'saveVod',
 		SettingLogic::KEY_FORBID_WORDS => '',
 	];
 
-	public function config(Request $request){
+	public function config(Request $request)
+	{
 		$param = $this->validate($request, [
 			'key' => 'required',
 		], [
 			'key.required' => 'key必填',
 		]);
 		$this->check($request);
-		$setting = SettingLogic::instance()->getByKey($param['key'],0);
+		$setting = SettingLogic::instance()->getByKey($param['key'], 0);
 		return $this->data([$param['key'] => $setting->setting]);
 	}
 
@@ -51,6 +53,50 @@ class SettingController extends BaseController
 		]);
 	}
 
+	/**
+	 * @api {post} /admin/setting/vod 获取云点播配置
+	 * @apiName vod
+	 * @apiGroup setting
+	 *
+	 * @apiSuccess {String} key 配置key
+	 * @apiSuccess {Object} setting 配置信息
+	 * @apiSuccess {String} setting.app_id app_id
+	 * @apiSuccess {String} setting.secret_id secret_id
+	 * @apiSuccess {String} setting.secret_key secret_key
+	 * @apiSuccess {String} setting.region 地区
+	 * @apiSuccess {String} setting.key key
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":{"key":"cloud_vod","setting":{"app_id":"125***855","secret_id":"AKI***UAY","secret_key":"8za***3A7","region":"ap-shanghai","key":"R2k***NpY"}},"message":"ok"}
+	 */
+	public function vod(Request $request)
+	{
+		$this->check($request);
+
+		$setting = SettingLogic::instance()->getByKey(SettingLogic::KEY_VOD);
+		$settingData = $setting->setting;
+		return $this->data([
+			'key' => SettingLogic::KEY_VOD,
+			'setting' => $settingData,
+		]);
+	}
+
+	/**
+	 * @api {post} /admin/setting/save 保存云点播配置
+	 * @apiName saveVod
+	 * @apiGroup setting
+	 *
+	 * @apiParam {String} key 配置key (cloud_vod)
+	 * @apiParam {Object} setting 配置信息
+	 * @apiParam {String} setting.app_id app_id
+	 * @apiParam {String} setting.secret_id secret_id
+	 * @apiParam {String} setting.secret_key secret_key
+	 * @apiParam {String} setting.region 地区
+	 * @apiParam {String} setting.key key
+	 *
+	 * @apiSuccessExample {json} Success-Response:
+	 * {"status":true,"code":200,"data":{"key":"cloud_vod","setting":{"app_id":"125***855","secret_id":"AKI***UAY","secret_key":"8za***3A7","region":"ap-shanghai","key":"R2k***NpY"}},"message":"ok"}
+	 */
 	public function save(Request $request)
 	{
 		$this->validate($request, [
@@ -67,7 +113,7 @@ class SettingController extends BaseController
 		if (!empty($this->handler[$key])) {
 			$value = call_user_func_array([$this, $this->handler[$key]], [$request]);
 		} else {
-			$value = $request->post('setting','');
+			$value = $request->post('setting', '');
 		}
 
 		try {
@@ -77,7 +123,9 @@ class SettingController extends BaseController
 			}
 			SettingLogic::instance()->save($key, $value);
 			//验证票据
-			if ($key == SettingLogic::KEY_COS) CdnLogic::instance()->channel(SettingLogic::KEY_COS, true);
+			if ($key == SettingLogic::KEY_COS) {
+				CdnLogic::instance()->channel(SettingLogic::KEY_COS, true);
+			}
 			idb()->commit();
 		} catch (\Throwable $e) {
 			idb()->rollBack();
@@ -126,6 +174,35 @@ class SettingController extends BaseController
 		if (empty($data['path'])) {
 			$data['path'] = '';
 		}
+
+		return $data;
+	}
+
+	private function saveVod(Request $request)
+	{
+		$this->validate($request, [
+			'setting.app_id' => 'required',
+			'setting.secret_id' => 'required',
+			'setting.secret_key' => 'required',
+			'setting.region' => 'required',
+			'setting.key' => 'required',
+		], [
+			'setting.app_id.required' => 'app_id必填',
+			'setting.secret_id.required' => 'secret_id必填',
+			'setting.secret_key.required' => 'secret_key必填',
+			'setting.region.required' => '所属地址必填',
+			'setting.key' => 'key必填',
+		]);
+
+		$setting = $request->post('setting');
+
+		$data = [
+			'app_id' => $setting['app_id'],
+			'secret_id' => $setting['secret_id'],
+			'secret_key' => $setting['secret_key'],
+			'region' => $setting['region'],
+			'key' => $setting['key'],
+		];
 
 		return $data;
 	}
