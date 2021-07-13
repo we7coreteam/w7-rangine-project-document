@@ -245,6 +245,7 @@ class VideoController extends BaseController
 	 * @apiSuccess {String} title 标题
 	 * @apiSuccess {String} cover 封面地址
 	 * @apiSuccess {String} url 视频地址
+	 * @apiSuccess {String} play_url 视频播放地址
 	 * @apiSuccess {String} description 简介
 	 * @apiSuccess {Number} praise_num 点赞数
 	 * @apiSuccess {Number} play_num 播放量
