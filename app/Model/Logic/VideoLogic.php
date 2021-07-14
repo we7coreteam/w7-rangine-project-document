@@ -107,10 +107,12 @@ class VideoLogic extends BaseLogic
 		}
 	}
 
-	public function show($id, $with = '', $checkData = [])
+	public function show($id, $with = '', $checkData = [], $isPlay = false)
 	{
 		$row = parent::show($id, $with, $checkData);
-		$row->play_url = (new QcloudVodService())->makeVodDownloadSign($row->url);
+		if ($isPlay) {
+			$row->play_url = (new QcloudVodService())->makeVodDownloadSign($row->url);
+		}
 		return $row;
 	}
 

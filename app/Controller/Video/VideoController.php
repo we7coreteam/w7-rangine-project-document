@@ -257,7 +257,7 @@ class VideoController extends BaseController
 	 */
 	public function show(Request $request, $id)
 	{
-		$row = $this->block()->show($id, ['user']);
+		$row = $this->block()->show($id, ['user'], [], true);
 		if ($row) {
 			if ($row->status != Video::STATUS_SUCCESS) {
 				$userData = $request->session->get('user');
