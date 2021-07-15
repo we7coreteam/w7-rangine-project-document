@@ -26,18 +26,5 @@ class CustomCommand extends CommandAbstract
 
 	protected function handle($options)
 	{
-		$this->vodInstall();
-	}
-
-	public function vodInstall()
-	{
-		$value = [
-			'app_id' => '1253494855',
-			'secret_id' => 'AKIDiGYibCWZNuA9rISLyKPCixvb092QXUAY',
-			'secret_key' => '8zauxiDRO4UeX9VbQxDDvMWQ3PTGn3A7',
-			'region' => 'ap-shanghai',
-			'key' => 'R2kvrQHOu8ZyFANCpNpY',
-		];
-		SettingLogic::instance()->save(SettingLogic::KEY_VOD, $value);
 	}
 }
