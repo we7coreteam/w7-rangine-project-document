@@ -133,8 +133,8 @@ class SettingController extends BaseController
 		} catch (\Throwable $e) {
 			idb()->rollBack();
 			if ($key == SettingLogic::KEY_COS) {
-				ilogger()->channel('error')->error('云存储链接失败，请检查配置是否正确' . $e->getMessage());
-				throw new ErrorHttpException('云存储链接失败，请检查配置是否正确');
+				ilogger()->channel('error')->error('云存储连接失败，请检查配置是否正确' . $e->getMessage());
+				throw new ErrorHttpException('云存储连接失败，请检查配置是否正确');
 			} elseif ($key == SettingLogic::KEY_VOD) {
 				ilogger()->channel('error')->error('云点播连接失败，请检查配置是否正确' . $e->getMessage());
 				throw new ErrorHttpException('云点播连接失败，请检查配置是否正确');
