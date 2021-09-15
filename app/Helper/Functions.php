@@ -104,7 +104,7 @@ function base_url()
 {
 	static $baseUrl = '';
 	if (empty($baseUrl)) {
-		$request = \W7\App::getApp()->getContext()->getRequest();
+		$request = \W7\Facade\Context::getRequest();
 		$baseUrl = $request->getUri()->getScheme() . '://' . $request->server('HTTP_HOST');
 	}
 	return $baseUrl;

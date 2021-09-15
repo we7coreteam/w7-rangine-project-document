@@ -17,8 +17,7 @@ return [
 		'server' => ienv('SETTING_SERVERS', 'http'),
 		'basedir' => [
 			BASE_PATH,
-		],
-		'lang' => 'zh-CN',
+		]
 	],
 	'cache' => [
 		'default' => [
@@ -51,7 +50,7 @@ return [
 	],
 	'session' => [
 		'expires' => 86400,
-		'handler' => ienv('SESSION_HANDLER', 'file')
+		'handler' => ienv('SESSION_HANDLER', 'cache')
 	],
 	'cookie' => [
 		'path' => ienv('COOKIE_PATH', '/'),

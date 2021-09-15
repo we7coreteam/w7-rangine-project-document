@@ -10,7 +10,9 @@
  * visited https://www.w7.cc for more details
  */
 
-irouter()->middleware('FrontendDocumentPermissionMiddleware')->group(['prefix' => '/document'], function (\W7\Core\Route\Route $route) {
+$route = irouter();
+
+$route->middleware(\W7\App\Middleware\FrontendDocumentPermissionMiddleware::class)->group(['prefix' => '/document'], function ($route) {
 	$route->post('/detail', 'Document\DocumentController@detail');
 	$route->post('/chapter/list', 'Document\ChapterController@catalog');
 	$route->post('/chapter/detail', 'Document\ChapterController@detail');
@@ -22,7 +24,7 @@ irouter()->middleware('FrontendDocumentPermissionMiddleware')->group(['prefix' =
 	$route->get('/home/check', 'Document\DocumentHomeController@checkHome');
 	$route->get('/home/search-hot', 'Document\DocumentHomeController@getSearchHot');
 });
-irouter()->middleware('CorsApiMiddleware')->group(['prefix' => '/document'], function (\W7\Core\Route\Route $route) {
+$route->middleware(\W7\App\Middleware\CorsApiMiddleware::class)->group(['prefix' => '/document'], function ($route) {
 	$route->post('/chapter/record', 'Document\ChapterController@record');
 	$route->all('/mockApiReponse/{id}/{router:[\w/]+}', 'Document\MockApiReponseController@index');
 });

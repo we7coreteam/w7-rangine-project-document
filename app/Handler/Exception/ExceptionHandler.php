@@ -41,12 +41,12 @@ class ExceptionHandler extends ExceptionHandlerAbstract
 
 //			if (!env('DATABASE_DEFAULT_DATABASE')) {
 //				//安装页
-//				return $this->getResponse()->html(iloader()->singleton(View::class)->render('@public/install'));
+//				return $this->getResponse()->html(\W7\Facade\View::render('@public/install'));
 //			}
 
 			//如果访问的是admin下的路由，先检测是否登录
 			if (substr($route, 0, 12) == '/admin-login' || $route == '/') {
-				return $this->getResponse()->html(iloader()->singleton(View::class)->render('@public/index'));
+				return $this->getResponse()->html(\W7\Facade\View::render('@public/index'));
 			}
 			if (substr($route, 0, 6) == '/admin') {
 				$session = new Session();
@@ -69,7 +69,7 @@ class ExceptionHandler extends ExceptionHandlerAbstract
 					}
 				}
 			}
-			return $this->getResponse()->html(iloader()->singleton(View::class)->render('@public/index'));
+			return $this->getResponse()->html(\W7\Facade\View::render('@public/index'));
 		}
 		if ($e instanceof InternalException) {
 			$message = json_encode([
