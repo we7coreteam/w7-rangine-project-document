@@ -6,7 +6,7 @@
 
 $serverSetting = [
 	'common' => [
-		'pname' => 'document_mall',
+		'pname' => 'document_open_source',
 		'pid_file' => '/tmp/swoole.pid',
 		'max_request' => 10000,
 		'worker_num' => ienv('SERVER_COMMON_WORKER_NUM', 2),
