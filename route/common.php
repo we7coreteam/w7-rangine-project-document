@@ -32,9 +32,9 @@ $route->post('/common/auth/method', 'Common\AuthController@method');
 $route->get('/common/auth/getlogouturl', 'Common\AuthController@getlogouturl');
 $route->get('/common/auth/logout', 'Common\AuthController@logout');
 $route->post('/common/auth/logout', 'Common\AuthController@logout');
-$route->middleware('CheckAuthMiddleware')
+$route->middleware(\W7\App\Middleware\CheckAuthMiddleware::class)
 	->post('/common/auth/user', 'Common\AuthController@user');
-$route->middleware('CheckAuthMiddleware')
+$route->middleware(\W7\App\Middleware\CheckAuthMiddleware::class)
 	->post('/common/auth/unbind', 'Common\AuthController@unbind'); //解绑
 
 $route->post('/common/auth/third-party-login', 'Common\AuthController@thirdPartyLogin');

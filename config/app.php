@@ -50,7 +50,7 @@ return [
 	],
 	'session' => [
 		'expires' => 86400,
-		'handler' => ienv('SESSION_HANDLER', 'file')
+		'handler' => ienv('SESSION_HANDLER', 'cache')
 	],
 	'cookie' => [
 		'path' => ienv('COOKIE_PATH', '/'),
