@@ -17,8 +17,7 @@ return [
 		'server' => ienv('SETTING_SERVERS', 'http'),
 		'basedir' => [
 			BASE_PATH,
-		],
-		'lang' => 'zh-CN',
+		]
 	],
 	'cache' => [
 		'default' => [

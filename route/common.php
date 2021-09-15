@@ -13,40 +13,42 @@
 use W7\App;
 use function GuzzleHttp\Psr7\build_query;
 
-irouter()->any('/oauth/login', function () {
-	$request = App::getApp()->getContext()->getRequest();
+$route = irouter();
+
+$route->any('/oauth/login', function () {
+	$request = \W7\Facade\Context::getRequest();
 	$query = $request->getQueryParams();
 
-	return App::getApp()->getContext()->getResponse()->redirect(ienv('API_HOST') . 'login?' . build_query($query));
+	return \W7\Facade\Context::getResponse()->redirect(ienv('API_HOST') . 'login?' . build_query($query));
 });
 
 //获取验证码
-irouter()->post('/common/verifycode/image', 'Common\VerifyCodeController@image');
+$route->post('/common/verifycode/image', 'Common\VerifyCodeController@image');
 
 //登录退出
-irouter()->post('/common/auth/login', 'Common\AuthController@login');
-irouter()->post('/common/auth/method', 'Common\AuthController@method');
+$route->post('/common/auth/login', 'Common\AuthController@login');
+$route->post('/common/auth/method', 'Common\AuthController@method');
 
-irouter()->get('/common/auth/getlogouturl', 'Common\AuthController@getlogouturl');
-irouter()->get('/common/auth/logout', 'Common\AuthController@logout');
-irouter()->post('/common/auth/logout', 'Common\AuthController@logout');
-irouter()->middleware('CheckAuthMiddleware')
+$route->get('/common/auth/getlogouturl', 'Common\AuthController@getlogouturl');
+$route->get('/common/auth/logout', 'Common\AuthController@logout');
+$route->post('/common/auth/logout', 'Common\AuthController@logout');
+$route->middleware('CheckAuthMiddleware')
 	->post('/common/auth/user', 'Common\AuthController@user');
-irouter()->middleware('CheckAuthMiddleware')
+$route->middleware('CheckAuthMiddleware')
 	->post('/common/auth/unbind', 'Common\AuthController@unbind'); //解绑
 
-irouter()->post('/common/auth/third-party-login', 'Common\AuthController@thirdPartyLogin');
-irouter()->post('/common/auth/changeThirdPartyUser', 'Common\AuthController@changeThirdPartyUser');
-irouter()->post('/common/auth/bindThirdPartyUser', 'Common\AuthController@bindThirdPartyUser');
-irouter()->post('/common/auth/ThirdPartyUserCacheIn', 'Common\AuthController@ThirdPartyUserCacheIn');
-irouter()->post('/common/auth/third-party-login-bind', 'Common\AuthController@thirdPartyLoginBind');
-irouter()->post('/common/auth/default-login-url', 'Common\AuthController@defaultLoginUrl');
+$route->post('/common/auth/third-party-login', 'Common\AuthController@thirdPartyLogin');
+$route->post('/common/auth/changeThirdPartyUser', 'Common\AuthController@changeThirdPartyUser');
+$route->post('/common/auth/bindThirdPartyUser', 'Common\AuthController@bindThirdPartyUser');
+$route->post('/common/auth/ThirdPartyUserCacheIn', 'Common\AuthController@ThirdPartyUserCacheIn');
+$route->post('/common/auth/third-party-login-bind', 'Common\AuthController@thirdPartyLoginBind');
+$route->post('/common/auth/default-login-url', 'Common\AuthController@defaultLoginUrl');
 
-irouter()->post('/menu/setting', 'Common\MenuController@setting');
+$route->post('/menu/setting', 'Common\MenuController@setting');
 //上传图片
-irouter()->post('/common/upload/image', 'Admin\UploadController@image');
+$route->post('/common/upload/image', 'Admin\UploadController@image');
 
 //
-irouter()->get('/user/info', 'Common\UserController@info');
-irouter()->post('/user/update', 'Common\UserController@update');
-irouter()->get('/user/operate', 'Common\UserController@operate');
+$route->get('/user/info', 'Common\UserController@info');
+$route->post('/user/update', 'Common\UserController@update');
+$route->get('/user/operate', 'Common\UserController@operate');

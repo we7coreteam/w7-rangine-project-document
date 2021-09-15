@@ -31,7 +31,7 @@ class CorsApiMiddleware implements MiddlewareInterface
 //		$urlInfo = parse_url($headerHost);
 //		$headerHost = ($urlInfo['scheme'] ?? '') . '://' . ($urlInfo['host'] ?? '');
 
-		$response = App::getApp()->getContext()->getResponse();
+		$response = \W7\Facade\Context::getResponse();
 
 		$header=$request->getHeaders();
 		$allowHeaders=[];
@@ -47,7 +47,7 @@ class CorsApiMiddleware implements MiddlewareInterface
 			return $response->json('success');
 		}
 
-		App::getApp()->getContext()->setResponse($response);
+        \W7\Facade\Context::setResponse($response);
 		return $handler->handle($request);
 	}
 }
