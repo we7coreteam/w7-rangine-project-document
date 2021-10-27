@@ -10,6 +10,7 @@
   * PHP Swoole 扩展 >= 4.3.0
   * PHP Mbstring 扩展
   * PHP Pdo MySql 扩展
+  * PHP Redis 扩展
 
 ### 安装
 
