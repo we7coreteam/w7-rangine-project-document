@@ -48,6 +48,11 @@ bin/server start
 sh restart.sh
 ```
 
+执行数据迁移命令：项目根目录下执行命令
+```
+bin/gerent migrate:migrate --force
+```
+
 如需重新安装
 请手动删除 runtime/install.lock 与.env文件 并且重启服务
 
