@@ -155,8 +155,8 @@ class InstallLogic
 		// cache
 		$env = str_replace('{{CACHE_DEFAULT_DRIVER}}', $config['cache_driver'], $env);
 		if ($config['cache_driver'] == 'redis') {
-			$env = str_replace('{{CACHE_DEFAULT_HOST}}', $config['cache_host'], $env);
-			$env = str_replace('{{CACHE_DEFAULT_PORT}}', $config['cache_port'], $env);
+			$env = str_replace('{{CACHE_DEFAULT_HOST}}', $config['cache_host'] ?? '', $env);
+			$env = str_replace('{{CACHE_DEFAULT_PORT}}', $config['cache_port'] ?? '', $env);
 			$env = str_replace('{{CACHE_DEFAULT_PASSWORD}}', '', $env);
 		} else {
 			$env = str_replace('{{CACHE_DEFAULT_HOST}}', '127.0.0.1', $env);
