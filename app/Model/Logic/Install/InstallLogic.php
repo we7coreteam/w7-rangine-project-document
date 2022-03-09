@@ -29,14 +29,17 @@ class InstallLogic
 			// 版本检查
 			$this->checkExtension();
 
-			try {
-				$redis = new \Redis();
-				$connect = $redis->connect($config['cache_host'], $config['cache_port'], 15);
-				if (!$connect) {
-					throw new InternalException('redis链接失败');
+			if($config['cache_driver']== 'redis'){
+				//如果缓存是redis服务进行校验，否则不校验
+				try {
+					$redis = new \Redis();
+					$connect = $redis->connect($config['cache_host'], $config['cache_port'], 15);
+					if (!$connect) {
+						throw new InternalException('redis链接失败');
+					}
+				} catch (\Throwable $exception) {
+					throw new InternalException('redis链接失败：' . $exception->getMessage());
 				}
-			} catch (\Throwable $exception) {
-				throw new InternalException('redis链接失败：' . $exception->getMessage());
 			}
 
 			//仅做验证，不进行安装操作
