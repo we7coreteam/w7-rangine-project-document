@@ -19,6 +19,10 @@ class InstallLogic
 {
 	public function install($config)
 	{
+		if (ienv('API_HOST')) {
+			//已安装已重启
+			throw new InternalException('文档系统已经安装，如果需要重新安装请手动删除 配置 文件');
+		}
 		try {
 			// 是否已安装
 			$lockFile = RUNTIME_PATH . '/install.lock';
