@@ -19,7 +19,7 @@ class InstallLogic
 {
 	public function install($config)
 	{
-		if (ienv('API_HOST')) {
+		if (ienv('DATABASE_DEFAULT_DATABASE')) {
 			//已安装已重启
 			throw new InternalException('文档系统已经安装，如果需要重新安装请手动删除 配置 文件');
 		}
