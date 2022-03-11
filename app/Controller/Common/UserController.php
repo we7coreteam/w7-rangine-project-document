@@ -19,12 +19,12 @@ class UserController extends BaseController
 	 */
 	public function info(Request $request){
 		$param = $this->validate($request,[
-			'user_id' => 'required|integer'
+			'username' => 'required|string'
 		],[
-			'user_id' => '用户id'
+			'username' => '用户名'
 		]);
 		$Logic = new UserLogic();
-		$user = $Logic->getByUid($param['user_id'])->setHidden(['userpass']);
+		$user = $Logic->getByUserName($param['user_id'])->setHidden(['userpass']);
 		return $this->data($user);
 	}
 
