@@ -32,7 +32,7 @@ class SettingController extends BaseController
 			'key.required' => 'key必填',
 		]);
 		$this->check($request);
-		$setting = SettingLogic::instance()->getByKey($param['key'],0);
+		$setting = SettingLogic::instance()->getByKey($param['key'],1);
 		return $this->data([$param['key'] => $setting->setting]);
 	}
 
