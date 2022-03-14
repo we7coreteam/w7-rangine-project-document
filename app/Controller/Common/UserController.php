@@ -24,7 +24,7 @@ class UserController extends BaseController
 			'username' => '用户名'
 		]);
 		$Logic = new UserLogic();
-		$user = $Logic->getByUserName($param['user_id'])->setHidden(['userpass']);
+		$user = $Logic->getByUserName($param['username'])->setHidden(['userpass']);
 		return $this->data($user);
 	}
 
