@@ -19,6 +19,10 @@ class InstallLogic
 {
 	public function install($config)
 	{
+		if (ienv('DATABASE_DEFAULT_DATABASE')) {
+			//已安装已重启
+			throw new InternalException('文档系统已经安装，如果需要重新安装请手动删除 配置 文件');
+		}
 		try {
 			// 是否已安装
 			$lockFile = RUNTIME_PATH . '/install.lock';
@@ -29,14 +33,17 @@ class InstallLogic
 			// 版本检查
 			$this->checkExtension();
 
-			try {
-				$redis = new \Redis();
-				$connect = $redis->connect($config['cache_host'], $config['cache_port'], 15);
-				if (!$connect) {
-					throw new InternalException('redis链接失败');
+			if($config['cache_driver']== 'redis'){
+				//如果缓存是redis服务进行校验，否则不校验
+				try {
+					$redis = new \Redis();
+					$connect = $redis->connect($config['cache_host'], $config['cache_port'], 15);
+					if (!$connect) {
+						throw new InternalException('redis链接失败');
+					}
+				} catch (\Throwable $exception) {
+					throw new InternalException('redis链接失败：' . $exception->getMessage());
 				}
-			} catch (\Throwable $exception) {
-				throw new InternalException('redis链接失败：' . $exception->getMessage());
 			}
 
 			//仅做验证，不进行安装操作
@@ -155,8 +162,8 @@ class InstallLogic
 		// cache
 		$env = str_replace('{{CACHE_DEFAULT_DRIVER}}', $config['cache_driver'], $env);
 		if ($config['cache_driver'] == 'redis') {
-			$env = str_replace('{{CACHE_DEFAULT_HOST}}', $config['cache_host'], $env);
-			$env = str_replace('{{CACHE_DEFAULT_PORT}}', $config['cache_port'], $env);
+			$env = str_replace('{{CACHE_DEFAULT_HOST}}', $config['cache_host'] ?? '', $env);
+			$env = str_replace('{{CACHE_DEFAULT_PORT}}', $config['cache_port'] ?? '', $env);
 			$env = str_replace('{{CACHE_DEFAULT_PASSWORD}}', '', $env);
 		} else {
 			$env = str_replace('{{CACHE_DEFAULT_HOST}}', '127.0.0.1', $env);

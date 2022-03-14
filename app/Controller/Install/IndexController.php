@@ -151,12 +151,16 @@ class IndexController extends BaseController
 		$params['db_port'] = $dbHost[1];
 
 		$params['cache_driver'] = 'redis';
-		$cacheHost = explode(':', $params['cache_host']);
-		if (count($cacheHost) < 2 || (!is_numeric($cacheHost[1]))) {
-			throw new ErrorHttpException('请填写redis端口号');
+		if ($params['cache_host'] == 'db') {
+			$params['cache_driver'] = 'db';
+		} else {
+			$cacheHost = explode(':', $params['cache_host']);
+			if (count($cacheHost) < 2 || (!is_numeric($cacheHost[1]))) {
+				throw new ErrorHttpException('请填写redis端口号');
+			}
+			$params['cache_host'] = $cacheHost[0];
+			$params['cache_port'] = $cacheHost[1];
 		}
-		$params['cache_host'] = $cacheHost[0];
-		$params['cache_port'] = $cacheHost[1];
 
 		$installLogic = new InstallLogic();
 		$data = $installLogic->install($params);
