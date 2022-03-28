@@ -390,7 +390,10 @@ class ChapterRecordLogic
 			$urlStr = build_query($query['data']);
 			$url = $url . '?' . $urlStr;
 		}
-		$text = '> ' . $data['methodLabel'] . ' /' . $url . "\n\n";
+        if (strpos($url, 'http://') !== 0 && strpos($url, 'https://') !== 0) {
+            $url = '/' . $url;
+        }
+        $text = '> ' . $data['methodLabel'] . ' ' . $url . "\n\n";
 		if ($data['description']) {
 			$text .= $data['description'] . "\n";
 		}
